@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:zxing="clr-namespace:ZXing.Net.Maui.Controls;assembly=ZXing.Net.MAUI.Controls"
+             xmlns:viewModels="clr-namespace:v4posme_maui.ViewModels"
+             x:Class="v4posme_maui.Views.BarCodePage">
+    <ContentPage.Content>
+        <Grid>
+            <zxing:CameraBarcodeReaderView x:Name="BarcodeReader"
+                                           BarcodesDetected="OnBarcodesDetected"
+                                           IsTorchOn="False"
+                                           HorizontalOptions="FillAndExpand"
+                                           VerticalOptions="FillAndExpand" />
+            <BoxView x:Name="ScanLine"
+                     Color="{StaticResource Secondary}"
+                     HeightRequest="2"
+                     HorizontalOptions="FillAndExpand"
+                     VerticalOptions="Start"
+                     Opacity="0.8" />
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>

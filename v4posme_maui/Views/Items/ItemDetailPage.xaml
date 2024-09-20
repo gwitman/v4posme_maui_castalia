@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:dxcn="clr-namespace:DevExpress.Maui.Controls;assembly=DevExpress.Maui.Controls"
+             xmlns:dx="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
+             Title="{Binding Title}"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             ios:Page.UseSafeArea="true"
+             x:Class="v4posme_maui.Views.Items.ItemDetailPage"
+             Style="{StaticResource DetailPageStyle}">
+    <ContentPage.Behaviors>
+        <toolkit:StatusBarBehavior
+            StatusBarColor="{AppThemeBinding Light={StaticResource PageBackground}, Dark={StaticResource PageBackgroundDark}}"
+            StatusBarStyle="{AppThemeBinding Light=DarkContent, Dark=LightContent}" />
+    </ContentPage.Behaviors>
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Command="{Binding EditCommand}" Text="Edit"
+                     IconImageSource="{AppThemeBinding Light=edit, Dark=edit}" />
+        <ToolbarItem Clicked="DeleteItemClick" Text="Delete"
+                     IconImageSource="{AppThemeBinding Light=delete, Dark=delete}" />
+    </ContentPage.ToolbarItems>
+
+    <ScrollView>
+        <dx:DXStackLayout Orientation="Vertical" Padding="0, 10, 0, 0">
+            <dx:DXImage Source="product_delivery.png" WidthRequest="100" HeightRequest="100"
+                        Margin="0,0,0,10">
+                <dx:DXImage.Clip>
+                    <EllipseGeometry RadiusX="50" RadiusY="50" Center="50, 50" />
+                </dx:DXImage.Clip>
+            </dx:DXImage>
+            <dx:DXStackLayout Orientation="Vertical"
+                              HorizontalOptions="Center">
+                <Label Text="{Binding Item.BarCode}"
+                       FontSize="24"
+                       HorizontalTextAlignment="Center"
+                       FontAttributes="Bold" />
+                <Label Text="{Binding Item.ItemNumber}"
+                       HorizontalTextAlignment="Center"
+                       FontSize="24"
+                       FontAttributes="Bold" />
+            </dx:DXStackLayout>
+
+            <dx:DXBorder Style="{StaticResource PropertyBorder}">
+                <dx:DXStackLayout Orientation="Vertical">
+                    <Label Text="Descripcion" FontAttributes="Bold" FontSize="18" />
+                    <Label Text="{Binding Item.Name}" FontSize="18" />
+                </dx:DXStackLayout>
+            </dx:DXBorder>
+            <dx:DXBorder Style="{StaticResource PropertyBorder}">
+                <dx:DXStackLayout Orientation="Vertical">
+                    <Label Text="Precio al publico: " FontAttributes="Bold" FontSize="18" />
+                    <Label Text="{Binding Item.PrecioPublico,StringFormat='{0:N2}'}" FontSize="18" />
+                </dx:DXStackLayout>
+            </dx:DXBorder>
+            <dx:DXBorder Style="{StaticResource PropertyBorder}">
+                <dx:DXStackLayout Orientation="Vertical">
+                    <Label Text="Existencia final: " FontAttributes="Bold" FontSize="18" />
+                    <Label Text="{Binding Item.CantidadFinal}" FontSize="18" />
+                </dx:DXStackLayout>
+            </dx:DXBorder>
+            <dx:DXBorder Style="{StaticResource PropertyBorder}">
+                <dx:DXStackLayout Orientation="Vertical">
+                    <Label Text="Cantidad ingresadas: " FontAttributes="Bold" FontSize="18" />
+                    <Label Text="{Binding Item.CantidadEntradas}" FontSize="18" />
+                </dx:DXStackLayout>
+            </dx:DXBorder>
+            <dx:DXBorder Style="{StaticResource PropertyBorder}">
+                <dx:DXStackLayout Orientation="Vertical">
+                    <Label Text="Cantidad retirada: " FontAttributes="Bold" FontSize="18" />
+                    <Label Text="{Binding Item.CantidadSalidas}" FontSize="18" />
+                </dx:DXStackLayout>
+            </dx:DXBorder>
+            <dx:DXBorder Style="{StaticResource PropertyBorder}">
+                <dx:DXStackLayout Orientation="Vertical">
+                    <Label Text="Cantidad: " FontAttributes="Bold" FontSize="18" />
+                    <Label Text="{Binding Item.Quantity}" FontSize="18" />
+                </dx:DXStackLayout>
+            </dx:DXBorder>
+            <dxcn:DXPopup x:Name="Popup" AllowScrim="True"
+                          VerticalAlignment="Bottom"
+                          HorizontalAlignment="Stretch"
+                          Margin="16" CornerRadius="16"
+                          BackgroundColor="{AppThemeBinding Light={StaticResource PageBackground}, Dark={StaticResource PageBackgroundDark}}">
+                <dx:DXStackLayout Orientation="Vertical" Padding="10">
+                    <Label Text="¿Seguro quiere elimar este producto? Está acción no se puede revertir"
+                           Margin="0,20"
+                           HorizontalTextAlignment="Center"
+                           FontAttributes="Bold" />
+                    <dx:DXBorder Style="{StaticResource SeparatorStyle}" />
+                    <dx:DXButton Content="Eliminar"
+                                 Icon="delete"
+                                 Clicked="DeleteConfirmedClick"
+                                 Style="{StaticResource PopupActionDeleteButtonStyle}" />
+                    <dx:DXBorder Style="{StaticResource SeparatorStyle}" />
+                    <dx:DXButton Content="Cancelar"
+                                 Icon="cancel"
+                                 Clicked="CancelDeleteClick"
+                                 Style="{StaticResource PopupActionButtonStyle}" />
+                </dx:DXStackLayout>
+            </dxcn:DXPopup>
+        </dx:DXStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:printers="clr-namespace:v4posme_maui.ViewModels.Printers"
+             xmlns:core="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
+             xmlns:zxing="clr-namespace:ZXing.Net.Maui.Controls;assembly=ZXing.Net.MAUI.Controls"
+             xmlns:controls="clr-namespace:DevExpress.Maui.Controls;assembly=DevExpress.Maui.Controls"
+             xmlns:editors="clr-namespace:DevExpress.Maui.Editors;assembly=DevExpress.Maui.Editors"
+             Title="{Binding Title}"
+             x:Class="v4posme_maui.Views.Printers.PrinterProductoPage">
+    <ContentPage.BindingContext>
+        <printers:PrinterProductViewModel />
+    </ContentPage.BindingContext>
+    <ContentPage.ToolbarItems>
+        <ToolbarItem IconImageSource="shared" Clicked="MenuItem_OnClicked" />
+        <ToolbarItem IconImageSource="printer" Command="{Binding PrinterCommand}" />
+    </ContentPage.ToolbarItems>
+    <ContentPage.Content>
+        <controls:ShimmerView
+            Style="{StaticResource ShimmerEffect}"
+            IsLoading="{Binding IsBusy}">
+            <controls:ShimmerView.Content>
+                <core:DXStackLayout>
+                    <core:DXStackLayout
+                        x:Name="DxStackLayout">
+                        <core:DXBorder
+                            Style="{StaticResource BorderProducto}">
+                            <Grid ColumnSpacing="10">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <zxing:BarcodeGeneratorView
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    HeightRequest="100"
+                                    ForegroundColor="Black"
+                                    Value="{Binding ItemsResponse.BarCode}"
+                                    Format="Code128"
+                                    Margin="0,0,0,0" />
+                                <Label
+                                    Grid.Row="1"
+                                    FontAttributes="Bold"
+                                    HorizontalOptions="Center"
+                                    Text="{Binding ItemsResponse.Name}" />
+                                <Label
+                                    Grid.Row="2"
+                                    FontAttributes="Bold"
+                                    HorizontalOptions="Center"
+                                    Text="{Binding ItemsResponse.BarCode}" />
+                                <Label
+                                    Grid.Row="3"
+                                    HorizontalOptions="Center"
+                                    Text="{Binding ItemsResponse.ItemNumber}" />
+                                <HorizontalStackLayout
+                                    Grid.Row="4"
+                                    HorizontalOptions="Center">
+                                    <Label Text="Precio: C$ " />
+                                    <Label
+                                        HorizontalOptions="End"
+                                        Text="{Binding ItemsResponse.PrecioPublico}" />
+                                </HorizontalStackLayout>
+                            </Grid>
+                        </core:DXBorder>
+                    </core:DXStackLayout>
+                    <core:DXStackLayout
+                        Margin="10"
+                        ItemSpacing="10">
+                        <editors:TextEdit
+                            Keyboard="Numeric"
+                            IconColor="#006E98"
+                            StartIcon="quantity"
+                            ClearIconCommand="{Binding ClearCommand}"
+                            Text="{Binding CantidadImprimir}" />
+                    </core:DXStackLayout>
+                </core:DXStackLayout>
+            </controls:ShimmerView.Content>
+            <controls:ShimmerView.LoadingView>
+                <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                   HeightRequest="50"
+                                   WidthRequest="50" />
+            </controls:ShimmerView.LoadingView>
+        </controls:ShimmerView>
+    </ContentPage.Content>
+</ContentPage>

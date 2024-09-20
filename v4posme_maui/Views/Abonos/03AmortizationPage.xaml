@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:abonos="clr-namespace:v4posme_maui.ViewModels.Abonos"
+             xmlns:dxg="clr-namespace:DevExpress.Maui.DataGrid;assembly=DevExpress.Maui.DataGrid"
+             xmlns:core="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
+             xmlns:controls="clr-namespace:DevExpress.Maui.Controls;assembly=DevExpress.Maui.Controls"
+             Title="{Binding Title}"
+             x:Class="v4posme_maui.Views.Abonos.CreditDetailInvoicePage">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Style x:Key="SelectedLabelStyle" TargetType="Label">
+                <Style.Triggers>
+                    <DataTrigger TargetType="Label"
+                                 Binding="{Binding Source={RelativeSource AncestorType={x:Type dxg:CellData}}, Path=IsSelected}"
+                                 Value="True">
+                        <Setter Property="TextColor" Value="White" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <ContentPage.BindingContext>
+        <abonos:CreditDetailInvoiceViewModel />
+    </ContentPage.BindingContext>
+    <ContentPage.Content>
+        <controls:ShimmerView
+            Style="{StaticResource ShimmerEffect}"
+            IsLoading="{Binding IsBusy}">
+            <controls:ShimmerView.Content>
+                <dxg:DataGridView ItemsSource="{Binding Items}" x:Name="DataGridView">
+                    <dxg:DataGridView.CellAppearance>
+                        <dxg:CellAppearance Padding="5" BackgroundColor="{StaticResource White}" BorderColor="#515151"
+                                            FontSize="14" SelectionColor="{StaticResource Secondary}"
+                                            SelectionFontColor="White" />
+                    </dxg:DataGridView.CellAppearance>
+
+                    <dxg:DataGridView.ColumnHeaderAppearance>
+                        <dxg:ColumnHeaderAppearance BackgroundColor="#333333" BorderColor="#515151"
+                                                    FontSize="16" FontColor="{StaticResource White}"
+                                                    FontAttributes="Bold"
+                                                    HorizontalLineThickness="2" />
+                    </dxg:DataGridView.ColumnHeaderAppearance>
+                    <dxg:DataGridView.Columns>
+                        <dxg:TemplateColumn FieldName="Remaining" Caption="Monto"
+                                            IsReadOnly="true" MinWidth="200">
+                            <dxg:TemplateColumn.DisplayTemplate>
+                                <DataTemplate>
+                                    <Grid VerticalOptions="Center" Padding="15" HorizontalOptions="End">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <Label Style="{StaticResource SelectedLabelStyle}">
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="{Binding Item.CurrencyName}"
+                                                          FontSize="16" />
+                                                    <Span Text=" "></Span>
+                                                    <Span FontSize="16"
+                                                          Text="{Binding Item.Remaining, StringFormat = '{0:N0}'}" />
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                    </Grid>
+                                </DataTemplate>
+                            </dxg:TemplateColumn.DisplayTemplate>
+                        </dxg:TemplateColumn>
+                        <dxg:DateColumn FieldName="DateApply"
+                                        HorizontalContentAlignment="End"
+                                        Caption="Fecha"
+                                        DisplayFormat="yyyy-MM-dd" />
+                    </dxg:DataGridView.Columns>
+                    <dxg:DataGridView.EndSwipeItems>
+                        <dxg:SwipeItem
+                            Command="{Binding SwipeCommand}">
+                            <dxg:SwipeItem.Template>
+                                <DataTemplate>
+                                    <core:DXStackLayout Orientation="Horizontal">
+                                        <core:DXImage Source="invoice_outline" />
+                                        <Label Text="Aplicar Abono"
+                                               FontSize="14"
+                                               TextColor="White"
+                                               FontAttributes="Bold"
+                                               VerticalOptions="Center"
+                                               HorizontalTextAlignment="Center" />
+                                    </core:DXStackLayout>
+                                </DataTemplate>
+                            </dxg:SwipeItem.Template>
+                        </dxg:SwipeItem>
+                    </dxg:DataGridView.EndSwipeItems>
+
+                    <dxg:DataGridView.SwipeItemAppearance>
+                        <dxg:SwipeItemAppearance Width="200" BackgroundColor="{StaticResource Primary}" />
+                    </dxg:DataGridView.SwipeItemAppearance>
+                </dxg:DataGridView>
+            </controls:ShimmerView.Content>
+            <controls:ShimmerView.LoadingView>
+                <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                   HeightRequest="50"
+                                   WidthRequest="50" />
+            </controls:ShimmerView.LoadingView>
+        </controls:ShimmerView>
+    </ContentPage.Content>
+</ContentPage>

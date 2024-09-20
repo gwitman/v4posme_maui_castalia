@@ -1,0 +1,156 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:dxe="clr-namespace:DevExpress.Maui.Editors;assembly=DevExpress.Maui.Editors"
+             xmlns:dxco="clr-namespace:DevExpress.Maui.Controls;assembly=DevExpress.Maui.Controls"
+             xmlns:dx="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
+             xmlns:viewModels="clr-namespace:v4posme_maui.ViewModels"
+             x:Class="v4posme_maui.Views.ParameterPage">
+    <ContentPage.BindingContext>
+        <viewModels:PosMeParameterViewModel />
+    </ContentPage.BindingContext>
+    <ContentPage.Resources>
+        <ResourceDictionary Source="../Resources/Styles/Colors.xaml" />
+        <ResourceDictionary Source="../Resources/Styles/Styles.xaml" />
+    </ContentPage.Resources>
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Command="{Binding SaveCommand}" Text="Save"
+                     IconImageSource="{AppThemeBinding Light=save, Dark=save}" />
+    </ContentPage.ToolbarItems>
+    <ContentPage.Content>
+        <RefreshView IsRefreshing="{Binding IsRefreshing}"
+                     Refreshing="RefreshView_OnRefreshing"
+                     RefreshColor="{StaticResource Primary}"
+                     Command="{Binding RefreshCommand}">
+            <ScrollView>
+                <dx:DXStackLayout Orientation="Vertical"
+                                  Margin="15"
+                                  Padding="15">
+                    <dxco:DXPopup x:Name="Popup"
+                                  AllowScrim="True"
+                                  BackgroundColor="{Binding PopupBackgroundColor}"
+                                  VerticalAlignment="Bottom"
+                                  ScrimColor="#b3adb9ce"
+                                  IsOpen="{Binding PopUpShow}">
+                        <StackLayout WidthRequest="250">
+                            <Label Text="{Binding Mensaje}"
+                                   FontAttributes="Bold"
+                                   FontSize="15"
+                                   TextColor="{StaticResource White}"
+                                   Margin="20, 20" />
+                            <Button Text="Aceptar"
+                                    Clicked="ClosePopup_Clicked"
+                                    BackgroundColor="{StaticResource Gray600}"
+                                    FontSize="20"
+                                    TextColor="White" />
+                        </StackLayout>
+                    </dxco:DXPopup>
+                    <dx:DXBorder Margin="15"
+                                 WidthRequest="100"
+                                 BackgroundColor="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}"
+                                 BorderThickness="0" CornerRadius="0">
+                        <Image Source="settings" WidthRequest="75" Aspect="Fill" />
+                    </dx:DXBorder>
+                    <dx:DXBorder
+                        Margin="15"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}"
+                        BorderThickness="0" CornerRadius="0">
+                        <dxe:NumericEdit
+                            x:Name="TextContador"
+                            MinValue="0"
+                            LabelColor="{StaticResource Primary}"
+                            IsUpDownIconVisible="True"
+                            TextHorizontalAlignment="Start"
+                            IconColor="{StaticResource Primary}"
+                            StartIcon="quantity"
+                            Value="{Binding Contador}"
+                            LabelText="Contador de Transacciones" />
+                    </dx:DXBorder>
+                   
+                    <dx:DXBorder Margin="15"
+                                 BackgroundColor="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}"
+                                 BorderThickness="0" CornerRadius="10">
+                        <dxe:TextEdit
+                            x:Name="TextPrinter"
+                            HasError="{Binding PrinterHasError}"
+                            ErrorText="Debe especificar un Nombre de impresora..."
+                            IsErrorIconVisible="True"
+                            IconColor="#006E98"
+                            StartIcon="textbox"
+                            Text="{Binding Printer}"
+                            LabelText="Nombre de impresora" />
+                    </dx:DXBorder>
+                    <dx:DXBorder
+                        Margin="15"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}"
+                        BorderThickness="0" CornerRadius="0">
+                        <dxe:TextEdit
+                            x:Name="TextCodigoAbono"
+                            HasError="{Binding AbonoHasError}"
+                            ErrorText="Debe especificar un código de abono..."
+                            IsErrorIconVisible="True"
+                            IconColor="#006E98"
+                            StartIcon="textbox"
+                            Text="{Binding CodigoAbono}"
+                            LabelText="Código de Abono" />
+                    </dx:DXBorder>
+                    <dx:DXBorder
+                        Margin="15"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}"
+                        BorderThickness="0" CornerRadius="0">
+                        <dxe:TextEdit
+                            x:Name="TextCodigoFactura"
+                            HasError="{Binding FacturaHasError}"
+                            ErrorText="Debe especificar un código de factura..."
+                            IsErrorIconVisible="True"
+                            IconColor="#006E98"
+                            StartIcon="textbox"
+                            Text="{Binding CodigoFactura}"
+                            LabelText="Código de Factura" />
+                    </dx:DXBorder>
+                    <Grid HeightRequest="180" WidthRequest="160" Margin="0,30,0,10">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="ImageTapped" />
+                        </Grid.GestureRecognizers>
+                        <Label TextColor="{StaticResource Primary}"
+                               Text="Seleccionar logo"
+                               VerticalOptions="Start"
+                               HorizontalOptions="Center" />
+                        <dx:DXBorder CornerRadius="10"
+                                     WidthRequest="140"
+                                     HeightRequest="140">
+                            <dx:DXImage x:Name="Preview"
+                                        Source="{Binding ShowImage}" />
+                        </dx:DXBorder>
+                        <dx:DXBorder x:Name="EditControl" BorderColor="White" BorderThickness="2"
+                                     BackgroundColor="OrangeRed"
+                                     WidthRequest="48" HeightRequest="48" CornerRadius="70" HorizontalOptions="End"
+                                     VerticalOptions="End">
+                            <dx:DXImage Source="pencil" WidthRequest="24" HeightRequest="24" />
+                        </dx:DXBorder>
+                    </Grid>
+                    <dxco:BottomSheet x:Name="BottomSheet" HalfExpandedRatio="0.3" AllowedState="HalfExpanded">
+                        <Grid RowDefinitions="Auto, Auto, Auto" RowSpacing="5">
+                            <dx:DXButton Style="{StaticResource SinFondoColorRedondeado}"
+                                         Icon="delete"
+                                         Content="Eliminar logo"
+                                         Tap="DeletePhotoClicked" />
+                            <dx:DXButton Grid.Row="1"
+                                         Style="{StaticResource SinFondoColorRedondeado}"
+                                         Icon="take_photo"
+                                         Content="Hacer foto"
+                                         Tap="TakePhotoClicked" />
+                            <dx:DXButton Grid.Row="2"
+                                         Style="{StaticResource SinFondoColorRedondeado}"
+                                         Icon="gallery"
+                                         Content="Selecciona desde la galeria"
+                                         Tap="SelectPhotoClicked" />
+                        </Grid>
+                    </dxco:BottomSheet>
+
+                </dx:DXStackLayout>
+            </ScrollView>
+        </RefreshView>
+    </ContentPage.Content>
+</ContentPage>

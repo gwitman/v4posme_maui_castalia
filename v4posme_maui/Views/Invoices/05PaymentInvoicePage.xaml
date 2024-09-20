@@ -1,0 +1,183 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:invoices="clr-namespace:v4posme_maui.ViewModels.Invoices"
+             xmlns:dx="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
+             xmlns:editors="clr-namespace:DevExpress.Maui.Editors;assembly=DevExpress.Maui.Editors"
+             xmlns:controls="clr-namespace:DevExpress.Maui.Controls;assembly=DevExpress.Maui.Controls"
+             Title="{Binding Title}"
+             x:Class="v4posme_maui.Views.Invoices.PaymentInvoicePage">
+    <ContentPage.BindingContext>
+        <invoices:PaymentInvoiceViewModel />
+    </ContentPage.BindingContext>
+    <ContentPage.Content>
+        <controls:ShimmerView 
+            Style="{StaticResource ShimmerEffect}" 
+            IsLoading="{Binding IsBusy}">
+            <controls:ShimmerView.Content>
+                <Grid>
+                <!-- Define the rows -->
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" /> <!-- Header -->
+                    <RowDefinition Height="*" />    <!-- Body -->
+                    <RowDefinition Height="Auto" /> <!-- Footer -->
+                </Grid.RowDefinitions>
+
+                <!-- Header -->
+                <StackLayout
+                    Grid.Row="0"
+                    BackgroundColor="{StaticResource Secondary}"
+                    Padding="10">
+                    <Label
+                        FontSize="24"
+                        TextColor="White"
+                        Text="Procesar Pago"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center" />
+                </StackLayout>
+
+                <!-- Body -->
+                <Grid
+                    Grid.Row="1"
+                    RowSpacing="25"
+                    VerticalOptions="Center"
+                    Padding="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Label
+                        FontSize="48"
+                        FontAttributes="Bold"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="{Binding Moneda}" />
+                                <Span Text=" " />
+                                <Span Text="{Binding Balance, StringFormat='{0:N2}'}" />
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                    <editors:TextEdit
+                        Grid.Row="1"
+                        IconColor="{StaticResource Primary}"
+                        StartIcon="quantity"
+                        PlaceholderText="Ingrese monto..."
+                        ClearIconCommand="{Binding ClearMontoCommand}"
+                        ClearIconCommandParameter="{Binding Monto}"
+                        Text="{Binding Monto}"
+                        Keyboard="Numeric" />
+                    <editors:TextEdit
+                        Grid.Row="2"
+                        IconColor="{StaticResource Primary}"
+                        IsReadOnly="True"
+                        StartIcon="quantity"
+                        Text="{Binding Cambio}"
+                        PlaceholderText="Cambio..."
+                        Keyboard="Numeric" />
+                </Grid>
+
+                <!-- Footer -->
+                <StackLayout
+                    Grid.Row="2"
+                    Padding="10">
+                    <Grid
+                        ColumnSpacing="5"
+                        Margin="2"
+                        RowSpacing="5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <dx:DXToggleButton
+                            Style="{StaticResource SinFondoColorSinRedondeado}"
+                            IconWidth="40"
+                            IconHeight="40"
+                            Content="Efectivo"
+                            IsChecked="{Binding ChkEfectivo}"
+                            Command="{Binding SelectionEfectivoCommand}"
+                            IconPlacement="Top"
+                            Icon="dollar_bill"
+                            Grid.Row="0"
+                            Grid.Column="0" />
+                        <dx:DXToggleButton
+                            Style="{StaticResource SinFondoColorSinRedondeado}"
+                            IconWidth="40"
+                            IconHeight="40"
+                            Content="Tar. Débito"
+                            IsChecked="{Binding ChkDebito}"
+                            Command="{Binding SelectionDebitoCommand}"
+                            IconPlacement="Top"
+                            Icon="credit_card_1"
+                            Grid.Row="0"
+                            Grid.Column="1" />
+                        <dx:DXToggleButton
+                            Style="{StaticResource SinFondoColorSinRedondeado}"
+                            IconWidth="40"
+                            IconHeight="40"
+                            Content="Tar. Crédito"
+                            IsChecked="{Binding ChkCredito}"
+                            Command="{Binding SelectionCreditoCommand}"
+                            IconPlacement="Top"
+                            Icon="debit_card_1"
+                            Grid.Row="0"
+                            Grid.Column="2" />
+                        <dx:DXToggleButton
+                            Style="{StaticResource SinFondoColorSinRedondeado}"
+                            IconWidth="40"
+                            IconHeight="40"
+                            Content="Monedero"
+                            IsChecked="{Binding ChkMonedero}"
+                            Command="{Binding SelectionMonederoCommand}"
+                            IconPlacement="Top"
+                            Icon="purse"
+                            Grid.Row="1"
+                            Grid.Column="0" />
+                        <dx:DXToggleButton
+                            Style="{StaticResource SinFondoColorSinRedondeado}"
+                            IconWidth="40"
+                            IconHeight="40"
+                            Content="Cheque"
+                            IsChecked="{Binding ChkCheque}"
+                            Command="{Binding SelectionChequeCommand}"
+                            IconPlacement="Top"
+                            Icon="check_payment"
+                            Grid.Row="1"
+                            Grid.Column="1" />
+                        <dx:DXToggleButton
+                            Style="{StaticResource SinFondoColorSinRedondeado}"
+                            IconWidth="40"
+                            IconHeight="40"
+                            Content="Otros"
+                            IsChecked="{Binding ChkOtros}"
+                            Command="{Binding SelectionOtrosCommand}"
+                            IconPlacement="Top"
+                            Icon="otros_pago"
+                            Grid.Row="1"
+                            Grid.Column="2" />
+                    </Grid>
+                    <dx:DXStackLayout
+                        Orientation="Vertical">
+                        <dx:DXButton
+                            Content="{Binding PagarSeleccion}"
+                            Command="{Binding AplicarPagoCommand}" />
+                    </dx:DXStackLayout>
+                </StackLayout>
+            </Grid>
+            </controls:ShimmerView.Content>
+            <controls:ShimmerView.LoadingView>
+                <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                   HeightRequest="50"
+                                   WidthRequest="50" />
+            </controls:ShimmerView.LoadingView>
+        </controls:ShimmerView>
+    </ContentPage.Content>
+</ContentPage>

@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:dxcn="clr-namespace:DevExpress.Maui.Controls;assembly=DevExpress.Maui.Controls"
+             xmlns:dx="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
+             x:Class="v4posme_maui.Views.Customers.CustomerDetailPage"
+             Style="{StaticResource DetailPageStyle}">
+    <ContentPage.Behaviors>
+        <toolkit:StatusBarBehavior
+            StatusBarColor="{AppThemeBinding Light={StaticResource PageBackground}, Dark={StaticResource PageBackgroundDark}}"
+            StatusBarStyle="{AppThemeBinding Light=DarkContent, Dark=LightContent}" />
+    </ContentPage.Behaviors>
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Command="{Binding EditCommand}" Text="Edit"
+                     IconImageSource="{AppThemeBinding Light=edit, Dark=edit}" />
+        <ToolbarItem Clicked="DeleteItemClick" Text="Delete"
+                     IconImageSource="{AppThemeBinding Light=delete, Dark=delete}" />
+    </ContentPage.ToolbarItems>
+    <ContentPage.Content>
+        <ScrollView>
+            <dx:DXStackLayout Orientation="Vertical" Padding="0, 10, 0, 0">
+                <dx:DXImage Source="person_charge" WidthRequest="150" HeightRequest="150" />
+                <dx:DXStackLayout Orientation="Vertical"
+                                  HorizontalOptions="Center">
+                    <Label Text="{Binding Item.EntityId}"
+                           FontSize="24"
+                           HorizontalTextAlignment="Center"
+                           FontAttributes="Bold" />
+                    <Label Text="{Binding Item.Identification}"
+                           HorizontalTextAlignment="Center"
+                           FontSize="24"
+                           FontAttributes="Bold" />
+                </dx:DXStackLayout>
+
+                <dx:DXBorder Style="{StaticResource PropertyBorder}">
+                    <dx:DXStackLayout Orientation="Vertical">
+                        <Label Text="Nombres: " FontAttributes="Bold" FontSize="18" />
+                        <Label Text="{Binding Item.FirstName}" FontSize="18" />
+                    </dx:DXStackLayout>
+                </dx:DXBorder>
+                <dx:DXBorder Style="{StaticResource PropertyBorder}">
+                    <dx:DXStackLayout Orientation="Vertical">
+                        <Label Text="Apellidos: " FontAttributes="Bold" FontSize="18" />
+                        <Label Text="{Binding Item.LastName}" FontSize="18" />
+                    </dx:DXStackLayout>
+                </dx:DXBorder>
+                <dx:DXBorder Style="{StaticResource PropertyBorder}">
+                    <dx:DXStackLayout Orientation="Vertical">
+                        <Label Text="Balance: " FontAttributes="Bold" FontSize="18" />
+                        <Label Text="{Binding Item.Balance}" FontSize="18" />
+                    </dx:DXStackLayout>
+                </dx:DXBorder>
+                <dxcn:DXPopup x:Name="Popup" AllowScrim="True"
+                              VerticalAlignment="Bottom"
+                              HorizontalAlignment="Stretch"
+                              Margin="16" CornerRadius="16"
+                              BackgroundColor="{AppThemeBinding Light={StaticResource PageBackground}, Dark={StaticResource PageBackgroundDark}}">
+                    <dx:DXStackLayout Orientation="Vertical" Padding="10">
+                        <Label Text="¿Seguro quiere elimar este cliente? Está acción no se puede revertir"
+                               Margin="0,20"
+                               HorizontalTextAlignment="Center"
+                               FontAttributes="Bold" />
+                        <dx:DXBorder Style="{StaticResource SeparatorStyle}" />
+                        <dx:DXButton Content="Eliminar"
+                                     Icon="delete"
+                                     Clicked="DeleteConfirmedClick"
+                                     Style="{StaticResource PopupActionDeleteButtonStyle}" />
+                        <dx:DXBorder Style="{StaticResource SeparatorStyle}" />
+                        <dx:DXButton Content="Cancelar"
+                                     Icon="cancel"
+                                     Clicked="CancelDeleteClick"
+                                     Style="{StaticResource PopupActionButtonStyle}" />
+                    </dx:DXStackLayout>
+                </dxcn:DXPopup>
+            </dx:DXStackLayout>
+        </ScrollView>
+    </ContentPage.Content>
+</ContentPage>

@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:core="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
+             xmlns:editors="clr-namespace:DevExpress.Maui.Editors;assembly=DevExpress.Maui.Editors"
+             x:Class="v4posme_maui.Views.Invoices.ModificarValorPage">
+    <ContentPage.Content>
+        <core:DXStackLayout
+            Padding="0,50,0,0"
+            Orientation="Vertical"
+            VerticalOptions="Start"
+            HorizontalOptions="Center"
+            ItemSpacing="30">
+            <core:DXImage
+                HeightRequest="150"
+                WidthRequest="150"
+                Aspect="AspectFill"
+                Source="pencil_square"/>
+            <editors:TextEdit
+                StartIcon="quantity"
+                x:Name="TxtValor"
+                MinimumWidthRequest="300"
+                Keyboard="Numeric"
+                PlaceholderText="Ingrese valor"/>
+            <core:DXButton
+                Clicked="DXButtonBase_OnClicked"
+                MinimumWidthRequest="300"
+                Content="Aplicar"/>
+        </core:DXStackLayout>
+    </ContentPage.Content>
+</ContentPage>

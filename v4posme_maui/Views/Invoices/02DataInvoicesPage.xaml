@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:invoices="clr-namespace:v4posme_maui.ViewModels.Invoices"
+             xmlns:dxdf="clr-namespace:DevExpress.Maui.DataForm;assembly=DevExpress.Maui.Editors"
+             xmlns:dxe="clr-namespace:DevExpress.Maui.Editors;assembly=DevExpress.Maui.Editors"
+             xmlns:dx="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
+             xmlns:controls="clr-namespace:DevExpress.Maui.Controls;assembly=DevExpress.Maui.Controls"
+             Title="{Binding Title}"
+             x:Class="v4posme_maui.Views.Invoices.DataInvoicesPage">
+    <ContentPage.BindingContext>
+        <invoices:DataInvoicesViewModel />
+    </ContentPage.BindingContext>
+    <ContentPage.Content>
+        <controls:ShimmerView
+            Style="{StaticResource ShimmerEffect}"
+            IsLoading="{Binding IsBusy}">
+            <controls:ShimmerView.Content>
+                <ScrollView>
+                    <StackLayout>
+                        <dx:DXStackLayout Orientation="Vertical">
+                            <dx:DXBorder HeightRequest="1" BorderThickness="1"
+                                         BackgroundColor="{AppThemeBinding Light={StaticResource SeparatorColor}, Dark={StaticResource SeparatorColorDark}}" />
+                            <dx:DXImage Source="invoice_green" WidthRequest="150" HeightRequest="150" />
+                        </dx:DXStackLayout>
+                        <dx:DXBorder
+                            Margin="15"
+                            BackgroundColor="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}"
+                            BorderThickness="0" CornerRadius="10">
+                            <Grid RowSpacing="15" Padding="15">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <dxe:TextEdit
+                                    Grid.Row="0"
+                                    x:Name="TxtCustomer"
+                                    IsReadOnly="True"
+                                    IconColor="{StaticResource Primary}"
+                                    StartIcon="person"
+                                    Text="{Binding Item.NombreCompleto}"
+                                    LabelText="Nombre completo" />
+                                <dxe:TextEdit
+                                    Grid.Row="1"
+                                    IconColor="{StaticResource Primary}"
+                                    HasError="{Binding ErrorComentarios}"
+                                    x:Name="Txtcomentarios"
+                                    IsErrorIconVisible="{Binding ErrorComentarios}"
+                                    StartIcon="identificacion"
+                                    Text="{Binding Comentarios}"
+                                    LabelText="Comentarios" />
+                                <dxe:TextEdit
+                                    Grid.Row="2"
+                                    IconColor="{StaticResource Primary}"
+                                    HasError="{Binding ErrorReferencia}"
+                                    x:Name="TxtReferencia"
+                                    IsErrorIconVisible="{Binding ErrorReferencia}"
+                                    StartIcon="identificacion"
+                                    Text="{Binding Referencias}"
+                                    LabelText="Referencia" />
+                                <dxe:ComboBoxEdit
+                                    Grid.Row="3"
+                                    SelectedItem="{Binding SelectedCurrency}"
+                                    HasError="{Binding ErrorCurrency}"
+                                    IsLabelFloating="True"
+                                    StartIcon="price"
+                                    LabelText="Moneda"
+                                    ItemsSource="{Binding Currencies}" />
+                                <dxe:ComboBoxEdit
+                                    Grid.Row="4"
+                                    SelectedItem="{Binding SelectedTipoDocumento}"
+                                    HasError="{Binding ErrorTipoDocumento}"
+                                    StartIcon="identificacion"
+                                    IsLabelFloating="True"
+                                    LabelText="Tipo de documento"
+                                    ItemsSource="{Binding TipoDocumentos}" />
+                                <dx:DXButton
+                                    Grid.Row="5"
+                                    Content="Seleccionar Productos"
+                                    Command="{Binding SeleccionarProductosCommand}" />
+                            </Grid>
+                        </dx:DXBorder>
+                    </StackLayout>
+                </ScrollView>
+            </controls:ShimmerView.Content>
+            <controls:ShimmerView.LoadingView>
+                <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                   HeightRequest="50"
+                                   WidthRequest="50" />
+            </controls:ShimmerView.LoadingView>
+        </controls:ShimmerView>
+    </ContentPage.Content>
+</ContentPage>

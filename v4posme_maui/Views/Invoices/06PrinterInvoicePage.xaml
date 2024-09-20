@@ -1,0 +1,231 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:invoices="clr-namespace:v4posme_maui.ViewModels.Invoices"
+             xmlns:dx="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
+             xmlns:models="clr-namespace:v4posme_maui.Models"
+             xmlns:controls="clr-namespace:DevExpress.Maui.Controls;assembly=DevExpress.Maui.Controls"
+             Title="{Binding Title}"
+             x:Class="v4posme_maui.Views.Invoices.PrinterInvoicePage"
+             Style="{StaticResource DetailPageStyle}">
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsEnabled="False"
+                            IsVisible="False" />
+    </Shell.BackButtonBehavior>
+    <Shell.PresentationMode>
+        Animated
+    </Shell.PresentationMode>
+    <ContentPage.BindingContext>
+        <invoices:PrinterInvoiceViewModel />
+    </ContentPage.BindingContext>
+    <ContentPage.ToolbarItems>
+        <ToolbarItem IconImageSource="shared" Clicked="MenuItem_OnClicked" />
+        <ToolbarItem Text="Imprimir" Order="Secondary" x:Name="ItemPrint" Command="{Binding PrintCommand}" />
+        <ToolbarItem Text="Nueva Factura" Order="Secondary" Command="{Binding AplicarOtroCommand}" />
+    </ContentPage.ToolbarItems>
+    <ContentPage.Content>
+        <controls:ShimmerView Style="{StaticResource ShimmerEffect}" IsLoading="{Binding IsBusy}">
+            <controls:ShimmerView.Content>
+                <ScrollView>
+                    <dx:DXStackLayout
+                        x:Name="DxStackLayout"
+                        BackgroundColor="White"
+                        Margin="10">
+                        <dx:DXStackLayout
+                            Orientation="Vertical">
+                            <dx:DXImage x:Name="Logo"
+                                        HorizontalOptions="Center"
+                                        HeightRequest="150"
+                                        WidthRequest="150"
+                                        Source="{Binding LogoSource}" />
+                            <Label
+                                HorizontalTextAlignment="Center"
+                                Text="{Binding Company.Name}"
+                                FontAttributes="Bold" />
+                            <Label
+                                HorizontalTextAlignment="Center"
+                                FontAttributes="Bold">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="RUC" FontAttributes="Bold" />
+                                        <Span Text=" : " FontAttributes="Bold" />
+                                        <Span Text="{Binding CompanyRuc.Value}" FontAttributes="Bold" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                            <Label Text="Factura"
+                                   HorizontalTextAlignment="Center"
+                                   FontAttributes="Bold" />
+                            <Label
+                                HorizontalTextAlignment="Center"
+                                FontAttributes="Bold"
+                                Text="{Binding DtoInvoice.Codigo}" FontSize="14" />
+                            <Label
+                                HorizontalTextAlignment="Center"
+                                FontAttributes="Bold">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="Fecha" />
+                                        <Span Text=" : " />
+                                        <Span
+                                            Text="{Binding DtoInvoice.TransactionOn, StringFormat='{0:yyyy-MM-dd hh:mm tt}'}" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                            <dx:DXBorder Padding="15">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Label Grid.Row="0" Grid.Column="0" Text="Vendedor:" />
+                                    <Label Grid.Row="0" Grid.Column="1" Text="{Binding CodigoVendedor}" />
+                                    <Label Grid.Row="1" Grid.Column="0" Text="Codigo:" />
+                                    <Label Grid.Row="1" Grid.Column="1" Text="{Binding DtoInvoice.Codigo}" />
+                                    <Label Grid.Row="2" Grid.Column="0" Text="Tipo:" />
+                                    <Label Grid.Row="2" Grid.Column="1" Text="{Binding DtoInvoice.TipoDocumento.Name}" />
+                                    <Label Grid.Row="3" Grid.Column="0" Text="Moneda:" />
+                                    <Label Grid.Row="3" Grid.Column="1" Text="{Binding SimboloMoneda}" />
+                                    <Label Grid.Row="4" Grid.Column="0" Text="Cliente:" />
+                                    <Label Grid.Row="5"
+                                           Grid.Column="0"
+                                           Grid.ColumnSpan="2"
+                                           Text="{Binding NombreCliente}" />
+                                    <Label Grid.Row="6"
+                                           Grid.ColumnSpan="2"
+                                           Grid.Column="0"
+                                           Text="{Binding DtoInvoice.Comentarios}" />
+                                </Grid>
+                            </dx:DXBorder>
+                        </dx:DXStackLayout>
+
+                        <dx:DXStackLayout>
+                            <dx:DXSeparator />
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Label Grid.Column="0"
+                                       HorizontalTextAlignment="Center"
+                                       Text="Cantidad" />
+                                <Label Grid.Column="1"
+                                       HorizontalTextAlignment="Center"
+                                       Text="Precio" />
+                                <Label Grid.Column="2"
+                                       HorizontalTextAlignment="Center"
+                                       Text="Importe" />
+                            </Grid>
+                            <dx:DXSeparator />
+                            <dx:DXBorder Padding="10">
+                                <CollectionView
+                                    x:Name="ItemsListView"
+                                    VerticalOptions="FillAndExpand"
+                                    ItemsSource="{Binding ItemsResponses}">
+                                    <CollectionView.ItemTemplate>
+                                        <DataTemplate>
+                                            <dx:DXStackLayout Margin="5">
+                                                <Grid
+                                                    HorizontalOptions="Fill"
+                                                    VerticalOptions="Fill"
+                                                    x:DataType="models:Api_AppMobileApi_GetDataDownloadItemsResponse">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto" />
+                                                        <RowDefinition Height="Auto" />
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Label
+                                                        Grid.Row="0"
+                                                        Grid.Column="0"
+                                                        Grid.ColumnSpan="4"
+                                                        Text="{Binding Name}" />
+                                                    <Label
+                                                        Grid.Row="1"
+                                                        Grid.Column="0"
+                                                        HorizontalTextAlignment="End"
+                                                        Text="{Binding Quantity}" />
+                                                    <Label
+                                                        Grid.Row="1"
+                                                        Grid.Column="2"
+                                                        HorizontalTextAlignment="End"
+                                                        Text="{Binding PrecioPublico}" />
+                                                    <Label
+                                                        Grid.Row="1"
+                                                        Grid.Column="3"
+                                                        HorizontalTextAlignment="End"
+                                                        Text="{Binding Importe}" />
+                                                </Grid>
+                                            </dx:DXStackLayout>
+                                        </DataTemplate>
+                                    </CollectionView.ItemTemplate>
+                                </CollectionView>
+                            </dx:DXBorder>
+                        </dx:DXStackLayout>
+
+                        <dx:DXStackLayout
+                            ItemSpacing="5"
+                            Margin="20">
+                            <Label
+                                HorizontalOptions="End">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="Total: " />
+                                        <Span Text="{Binding Moneda}" />
+                                        <Span Text="{Binding Balance}" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                            <Label
+                                HorizontalOptions="End">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="Recibido: " />
+                                        <Span Text="{Binding Moneda}" />
+                                        <Span Text="{Binding Monto}" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                            <Label
+                                HorizontalOptions="End">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="Cambio: " />
+                                        <Span Text="{Binding Moneda}" />
+                                        <Span Text="{Binding Cambio}" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                        </dx:DXStackLayout>
+                        <Label
+                            HorizontalTextAlignment="Center"
+                            Text="{Binding Company.Address}" />
+                        <Label
+                            HorizontalOptions="Center"
+                            Text="{Binding CompanyTelefono.Value}" />
+                    </dx:DXStackLayout>
+                </ScrollView>
+            </controls:ShimmerView.Content>
+            <controls:ShimmerView.LoadingView>
+                <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                   HeightRequest="50"
+                                   WidthRequest="50" />
+            </controls:ShimmerView.LoadingView>
+        </controls:ShimmerView>
+    </ContentPage.Content>
+</ContentPage>

@@ -1,0 +1,115 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:dx="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
+             xmlns:dxe="clr-namespace:DevExpress.Maui.Editors;assembly=DevExpress.Maui.Editors"
+             xmlns:abonos="clr-namespace:v4posme_maui.ViewModels.Abonos"
+             xmlns:controls="clr-namespace:DevExpress.Maui.Controls;assembly=DevExpress.Maui.Controls"
+             Title="{Binding Title}"
+             Style="{StaticResource DetailPageStyle}"
+             x:Class="v4posme_maui.Views.Abonos.AplicarAbonoPage">
+    <ContentPage.BindingContext>
+        <abonos:AplicarAbonoViewModel />
+    </ContentPage.BindingContext>
+    <ContentPage.Content>
+        <controls:ShimmerView
+            Style="{StaticResource ShimmerEffect}"
+            IsLoading="{Binding IsBusy}">
+            <controls:ShimmerView.Content>
+                <ScrollView>
+                    <dx:DXStackLayout Orientation="Vertical">
+                        <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                           IsVisible="{Binding IsBusy}" />
+                        <dx:DXStackLayout Orientation="Vertical">
+                            <dx:DXBorder HeightRequest="1" BorderThickness="1"
+                                         BackgroundColor="{AppThemeBinding Light={StaticResource SeparatorColor}, Dark={StaticResource SeparatorColorDark}}" />
+                            <dx:DXImage Source="invoice_green" WidthRequest="150" HeightRequest="150" />
+                            <Label Text="{Binding DocumentCreditAmortizationResponse.CustomerNumber}"
+                                   FontSize="16"
+                                   HorizontalTextAlignment="Center"
+                                   FontAttributes="Bold" />
+                            <Label HorizontalTextAlignment="Center"
+                                   FontSize="16"
+                                   FontAttributes="Bold">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="{Binding DocumentCreditAmortizationResponse.FirstName}" />
+                                        <Span Text=" " />
+                                        <Span Text="{Binding DocumentCreditAmortizationResponse.LastName}" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                        </dx:DXStackLayout>
+                        <dx:DXBorder
+                            Margin="15"
+                            BackgroundColor="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}"
+                            BorderThickness="0" CornerRadius="10">
+                            <Grid RowSpacing="15" Padding="10">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <dxe:TextEdit Grid.Row="0"
+                                              LabelText="Moneda"
+                                              IconColor="{StaticResource Primary}"
+                                              StartIcon="identificacion"
+                                              x:Name="TxtCurrencyName"
+                                              IsReadOnly="True"
+                                              Text="{Binding CurrencyName}" />
+                                <dxe:TextEdit Grid.Row="1"
+                                              LabelText="Descripción del abono"
+                                              IconColor="{StaticResource Primary}"
+                                              StartIcon="identificacion"
+                                              x:Name="TxtDescription"
+                                              TextChanged="TxtDescription_OnTextChanged"
+                                              Text="{Binding Description}" />
+                                <dxe:TextEdit Grid.Row="2"
+                                              LabelText="Saldo Inicial"
+                                              x:Name="TxtSaldoInicial"
+                                              IconColor="{StaticResource Primary}"
+                                              StartIcon="quantity"
+                                              IsReadOnly="True"
+                                              Text="{Binding SaldoInicial}" />
+                                <dxe:TextEdit Grid.Row="3"
+                                              LabelText="Monto a ingresar"
+                                              x:Name="TxtMonto"
+                                              IconColor="{StaticResource Primary}"
+                                              StartIcon="identificacion"
+                                              Keyboard="Numeric"
+                                              ClearIconCommand="{Binding ClearMontoCommand}"
+                                              TextChanged="TxtMonto_OnTextChanged"
+                                              Text="{Binding Monto}" />
+                                <dxe:TextEdit Grid.Row="4"
+                                              LabelText="Saldo Final"
+                                              IconColor="{StaticResource Primary}"
+                                              StartIcon="identificacion"
+                                              IsReadOnly="True"
+                                              Text="{Binding SaldoFinal}" />
+                                <dx:DXButton Grid.Row="5"
+                                             PressedBackgroundColor="{StaticResource Secondary}"
+                                             DisabledBackgroundColor="{StaticResource Gray400}"
+                                             Command="{Binding AplicarAbonoCommand}"
+                                             Margin="10"
+                                             TextColor="White"
+                                             Icon="ok_circle"
+                                             IconColor="White"
+                                             Content="Aplicar Abono"
+                                             ButtonType="Outlined" />
+                            </Grid>
+                        </dx:DXBorder>
+                    </dx:DXStackLayout>
+                </ScrollView>
+            </controls:ShimmerView.Content>
+            <controls:ShimmerView.LoadingView>
+                <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                   HeightRequest="50"
+                                   WidthRequest="50" />
+            </controls:ShimmerView.LoadingView>
+        </controls:ShimmerView>
+    </ContentPage.Content>
+</ContentPage>

@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:dxco="clr-namespace:DevExpress.Maui.Controls;assembly=DevExpress.Maui.Controls"
+             xmlns:dx="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
+             xmlns:upload="clr-namespace:v4posme_maui.ViewModels.Upload"
+             Title="{Binding Title}"
+             x:Class="v4posme_maui.Views.Upload.UploadPage">
+    <ContentPage.BindingContext>
+        <upload:UploadViewModel/>
+    </ContentPage.BindingContext>
+    <ContentPage.Content>
+        <dxco:ShimmerView
+            Style="{StaticResource ShimmerEffect}"
+            IsLoading="{Binding IsBusy}">
+            <dxco:ShimmerView.Content>
+                <VerticalStackLayout
+                    Padding="25"
+                    Spacing="10"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Center">
+                    <dxco:DXPopup x:Name="Popup"
+                                  AllowScrim="True"
+                                  BackgroundColor="{Binding PopupBackgroundColor}"
+                                  VerticalAlignment="Bottom"
+                                  ScrimColor="#b3adb9ce"
+                                  IsOpen="{Binding PopUpShow}">
+                        <StackLayout WidthRequest="250">
+                            <Label Text="{Binding Mensaje}"
+                                   FontAttributes="Bold"
+                                   FontSize="15"
+                                   TextColor="{StaticResource White}"
+                                   Margin="20, 20" />
+                            <Button Text="Aceptar"
+                                    Clicked="ClosePopup_Clicked"
+                                    BackgroundColor="{StaticResource Gray600}"
+                                    FontSize="20"
+                                    TextColor="White" />
+                        </StackLayout>
+                    </dxco:DXPopup>
+                    <Label
+                        Text="La subida de datos limpiará aquellos que fueron modificados y los datos de transacciones" />
+                    <dx:DXButton Content="Subir Datos"
+                                 Command="{Binding UploadCommand}" />
+                    <HorizontalStackLayout HeightRequest="20">
+                        <Label
+                            HorizontalOptions="Start"
+                            Text="¿Subir los Datos a la web?" />
+                        <Switch HorizontalOptions="Center"
+                                IsToggled="{Binding Switch}" />
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </dxco:ShimmerView.Content>
+            <dxco:ShimmerView.LoadingView>
+                <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                   HeightRequest="50"
+                                   WidthRequest="50" />
+            </dxco:ShimmerView.LoadingView>
+        </dxco:ShimmerView>
+    </ContentPage.Content>
+</ContentPage>

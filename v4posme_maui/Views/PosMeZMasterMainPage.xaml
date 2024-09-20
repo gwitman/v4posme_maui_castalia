@@ -1,0 +1,124 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:local="clr-namespace:v4posme_maui.Views"
+       ItemTemplate="{StaticResource ShellMenuItemTemplate}"
+       MenuItemTemplate="{StaticResource ShellMenuItemTemplate}"
+       xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+       xmlns:items="clr-namespace:v4posme_maui.Views.Items"
+       xmlns:customers="clr-namespace:v4posme_maui.Views.Customers"
+       xmlns:abonos="clr-namespace:v4posme_maui.Views.Abonos"
+       xmlns:invoices="clr-namespace:v4posme_maui.Views.Invoices"
+       xmlns:printers="clr-namespace:v4posme_maui.Views.Printers"
+       xmlns:upload="clr-namespace:v4posme_maui.Views.Upload"
+       ios:Page.UseSafeArea="true"
+       x:Class="v4posme_maui.Views.MainPage">
+
+    <Shell.FlyoutHeader>
+        <Frame BackgroundColor="White">
+            <Image Source="pm_png_96px.png" />
+        </Frame>
+    </Shell.FlyoutHeader>
+    <FlyoutItem Title="Inicio" Icon="basic_home.svg">
+        <ShellContent Title="Inicio"
+                      Icon="basic_home.svg"
+                      ContentTemplate="{DataTemplate local:AboutPage}"/>
+
+        <ShellContent Title="Abono" Icon="coin.svg"
+                      ContentTemplate="{DataTemplate abonos:AbonosPage}" 
+                      Route="AbonoPage"/>
+
+        <ShellContent Title="Factura" Icon="invoice.svg"
+                      ContentTemplate="{DataTemplate invoices:InvoicesPage}" />
+
+        <ShellContent Title="Parametros" Icon="parameters.svg"
+                      ContentTemplate="{DataTemplate local:ParameterPage}" />
+
+    </FlyoutItem>
+
+    <FlyoutItem Title="Descargar" Icon="download.svg">
+
+        <ShellContent Title="Descargar" Icon="download.svg"
+                      ContentTemplate="{DataTemplate local:DownloadPage}"/>
+
+        <ShellContent Title="Abono" Icon="coin.svg"
+                      ContentTemplate="{DataTemplate abonos:AbonosPage}" />
+
+        <ShellContent Title="Factura" Icon="invoice.svg"
+                      ContentTemplate="{DataTemplate invoices:InvoicesPage}" />
+
+        <ShellContent Title="Parametros" Icon="parameters.svg"
+                      ContentTemplate="{DataTemplate local:ParameterPage}" />
+
+    </FlyoutItem>
+
+    <FlyoutItem Title="Subir" Icon="upload.svg">
+
+        <ShellContent Title="Subir Datos" Icon="basic_home.svg"
+                      ContentTemplate="{DataTemplate upload:UploadPage}" />
+
+        <ShellContent Title="Abono" Icon="coin.svg"
+                      ContentTemplate="{DataTemplate abonos:AbonosPage}" />
+
+        <ShellContent Title="Factura" Icon="invoice.svg"
+                      ContentTemplate="{DataTemplate invoices:InvoicesPage}" />
+
+        <ShellContent Title="Parametros" Icon="parameters.svg"
+                      ContentTemplate="{DataTemplate local:ParameterPage}" />
+
+    </FlyoutItem>
+
+    <FlyoutItem Title="Clientes" Icon="person.svg">
+
+        <ShellContent Title="Clientes" Icon="person"
+                      ContentTemplate="{DataTemplate customers:CustomersPage}" />
+
+        <ShellContent Title="Abono" Icon="coin.svg"
+                      ContentTemplate="{DataTemplate abonos:AbonosPage}" />
+
+        <ShellContent Title="Factura" Icon="invoice.svg"
+                      ContentTemplate="{DataTemplate invoices:InvoicesPage}" />
+
+        <ShellContent Title="Parametros" Icon="parameters.svg"
+                      ContentTemplate="{DataTemplate local:ParameterPage}" />
+
+    </FlyoutItem>
+
+    <FlyoutItem Title="Productos" Icon="products.svg">
+
+        <ShellContent Title="Productos" Icon="products.svg"
+                      ContentTemplate="{DataTemplate items:ItemsPage}" />
+
+        <ShellContent Title="Abono" Icon="coin.svg"
+                      ContentTemplate="{DataTemplate abonos:AbonosPage}"/>
+
+        <ShellContent Title="Factura" Icon="invoice.svg"
+                      ContentTemplate="{DataTemplate invoices:InvoicesPage}" />
+
+        <ShellContent Title="Parametros" Icon="parameters.svg"
+                      ContentTemplate="{DataTemplate local:ParameterPage}" />
+
+    </FlyoutItem>
+
+    <FlyoutItem Title="Impresiones" Icon="printer.svg">
+
+        <ShellContent Title="Impresiones" Icon="printer.svg"
+                      ContentTemplate="{DataTemplate printers:DashboardPrinterPage}" />
+
+        <ShellContent Title="Abono" Icon="coin.svg"
+                      ContentTemplate="{DataTemplate abonos:AbonosPage}" />
+
+        <ShellContent Title="Factura" Icon="invoice.svg"
+                      ContentTemplate="{DataTemplate invoices:InvoicesPage}" />
+
+        <ShellContent Title="Parametros" Icon="parameters.svg"
+                      ContentTemplate="{DataTemplate local:ParameterPage}" />
+
+    </FlyoutItem>
+
+    <MenuItem Text="Salir"
+              IconImageSource="logout"
+              StyleClass="MenuItemLayoutStyle"
+              Clicked="OnMenuItemClicked" />
+</Shell>

@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:dxc="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
+             xmlns:dxcv="clr-namespace:DevExpress.Maui.CollectionView;assembly=DevExpress.Maui.CollectionView"
+             xmlns:dxe="clr-namespace:DevExpress.Maui.Editors;assembly=DevExpress.Maui.Editors"
+             xmlns:models="clr-namespace:v4posme_maui.Models"
+             xmlns:abonos="clr-namespace:v4posme_maui.ViewModels.Abonos"
+             xmlns:controls="clr-namespace:DevExpress.Maui.Controls;assembly=DevExpress.Maui.Controls"
+             Title="{Binding Title}"
+             x:Class="v4posme_maui.Views.Abonos.CustomerDetailInvoicePage">
+    <ContentPage.BindingContext>
+        <abonos:CustomerDetailInvoiceViewModel />
+    </ContentPage.BindingContext>
+    <ContentPage.Content>
+        <controls:ShimmerView
+            Style="{StaticResource ShimmerEffect}"
+            IsLoading="{Binding IsBusy}">
+            <controls:ShimmerView.Content>
+                <ScrollView>
+                    <Grid
+                        RowDefinitions="Auto,*"
+                        HorizontalOptions="Center">
+                        <Grid ColumnDefinitions="0.2*">
+                            <dxe:TextEdit x:Name="SearchBar"
+                                          Grid.Column="1"
+                                          Margin="5"
+                                          StartIcon="search"
+                                          Text="{Binding Search}"
+                                          StartIconCommand="{Binding SearchCommand}"
+                                          ReturnCommand="{Binding SearchCommand}"
+                                          PlaceholderText="Buscar por código de factura" />
+                        </Grid>
+                        <dxcv:DXCollectionView x:Name="InvoicesCollectionView"
+                                               Grid.Row="1"
+                                               ItemsSource="{Binding Invoices}"
+                                               SelectedItem="{Binding SelectedInvoice}"
+                                               SelectionMode="Single"
+                                               TapCommand="{Binding Source={x:Reference InvoicesCollectionView}, Path=Commands.ShowDetailForm}"
+                                               IsRefreshing="{Binding  IsBusy, Mode=OneWay}">
+                            <dxcv:DXCollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <dxc:DXStackLayout
+                                        CornerRadius="15"
+                                        Margin="10">
+                                        <Grid
+                                            x:DataType="models:Api_AppMobileApi_GetDataDownloadDocumentCreditResponse"
+                                            HorizontalOptions="Fill"
+                                            Padding="10"
+                                            VerticalOptions="Fill"
+                                            BackgroundColor="{StaticResource Primary}">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="1.5*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <Frame
+                                                WidthRequest="60"
+                                                HeightRequest="60"
+                                                BackgroundColor="Transparent"
+                                                Grid.Column="0"
+                                                Grid.RowSpan="3">
+                                                <dxc:DXImage WidthRequest="55"
+                                                             HeightRequest="55"
+                                                             Source="invoice_outline"
+                                                             Aspect="Fill" />
+                                            </Frame>
+                                            <Label Grid.Column="1" Grid.Row="0" FontAttributes="Bold"
+                                                   Grid.ColumnSpan="2"
+                                                   TextColor="White"
+                                                   Text="{Binding DocumentNumber}" />
+                                            <HorizontalStackLayout Grid.Column="1" Grid.Row="1">
+                                                <Label Text="{Binding Remaining,StringFormat='{0:N0}'}"
+                                                       TextColor="White"
+                                                       HorizontalOptions="Start" />
+                                            </HorizontalStackLayout>
+                                            <HorizontalStackLayout Grid.Row="1" Grid.Column="2">
+                                                <Label
+                                                    HorizontalOptions="End">
+                                                    <Label.FormattedText>
+                                                        <FormattedString>
+                                                            <Span
+                                                                Text="{Binding DateApply,StringFormat='{0:yyyy-MM-dd}'}"
+                                                                TextColor="White" />
+                                                        </FormattedString>
+                                                    </Label.FormattedText>
+                                                </Label>
+                                            </HorizontalStackLayout>
+                                            <HorizontalStackLayout Grid.Row="2"
+                                                                   Grid.Column="1"
+                                                                   Grid.ColumnSpan="2">
+                                                <Label Text="{Binding CurrencyName}" TextColor="White" />
+                                            </HorizontalStackLayout>
+                                            <Grid.GestureRecognizers>
+                                                <TapGestureRecognizer
+                                                    NumberOfTapsRequired="1"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type abonos:CustomerDetailInvoiceViewModel}}, Path=ItemTapped}"
+                                                    CommandParameter="{Binding .}" />
+                                            </Grid.GestureRecognizers>
+                                        </Grid>
+                                    </dxc:DXStackLayout>
+                                </DataTemplate>
+                            </dxcv:DXCollectionView.ItemTemplate>
+                        </dxcv:DXCollectionView>
+                    </Grid>
+                </ScrollView>
+            </controls:ShimmerView.Content>
+            <controls:ShimmerView.LoadingView>
+                <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                   HeightRequest="50"
+                                   WidthRequest="50" />
+            </controls:ShimmerView.LoadingView>
+        </controls:ShimmerView>
+    </ContentPage.Content>
+</ContentPage>

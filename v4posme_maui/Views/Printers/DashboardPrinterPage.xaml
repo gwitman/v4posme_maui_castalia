@@ -1,0 +1,384 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:dxco="clr-namespace:DevExpress.Maui.Controls;assembly=DevExpress.Maui.Controls"
+             xmlns:printers="clr-namespace:v4posme_maui.ViewModels.Printers"
+             xmlns:core="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
+             xmlns:editors="clr-namespace:DevExpress.Maui.Editors;assembly=DevExpress.Maui.Editors"
+             x:Class="v4posme_maui.Views.Printers.DashboardPrinterPage">
+    <ContentPage.BindingContext>
+        <printers:DashboardPrinterViewModel />
+    </ContentPage.BindingContext>
+    <ContentPage.Resources>
+        <Style TargetType="core:DXStackLayout">
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Normal" />
+                        <VisualState x:Name="Selected">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor" Value="White" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </Setter>
+        </Style>
+    </ContentPage.Resources>
+    <ContentPage.ToolbarItems>
+        <ToolbarItem IconImageSource="barcode_scan" Command="{Binding OnBarCode}" />
+    </ContentPage.ToolbarItems>
+    <ContentPage.Content>
+        <dxco:ShimmerView
+            Style="{StaticResource ShimmerEffect}"
+            IsLoading="{Binding IsBusy}">
+            <dxco:ShimmerView.Content>
+                <dxco:TabView
+                    SelectedItemIndicatorColor="{StaticResource Secondary}"
+                    HeaderPanelBackgroundColor="{StaticResource Gray200}"
+                    SelectedItemIndex="{Binding SelectedIndex}">
+                    <dxco:TabViewItem HeaderText="Facturas">
+                        <dxco:TabViewItem.Content>
+                            <ScrollView>
+                                <core:DXStackLayout>
+                                    <Grid
+                                        Padding="15">
+                                        <editors:TextEdit
+                                            StartIcon="search"
+                                            Text="{Binding Search}"
+                                            StartIconCommand="{Binding SearchFacturaCommand}"
+                                            ReturnCommand="{Binding SearchFacturaCommand}"
+                                            PlaceholderText="Buscar por código"/>
+                                    </Grid>
+                                    <CollectionView
+                                        Margin="10"
+                                        x:Name="FacturaCollectionView"
+                                        ItemsSource="{Binding Facturas}"
+                                        SelectionMode="Single">
+                                        <CollectionView.ItemTemplate>
+                                            <DataTemplate>
+                                                <core:DXStackLayout>
+                                                    <Grid
+                                                        Margin="5"
+                                                        RowSpacing="5"
+                                                        ColumnSpacing="5">
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="Auto" />
+                                                            <RowDefinition Height="Auto" />
+                                                            <RowDefinition Height="Auto" />
+                                                        </Grid.RowDefinitions>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="75" />
+                                                            <ColumnDefinition Width="20" />
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="35" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <Label
+                                                            Grid.Row="0"
+                                                            Grid.Column="0"
+                                                            Text="{Binding Codigo}" />
+                                                        <Label
+                                                            Grid.Row="0"
+                                                            Grid.Column="1"
+                                                            Grid.ColumnSpan="3"
+                                                            Text="{Binding FirstName}" />
+                                                        <Label
+                                                            Grid.Row="1"
+                                                            Grid.Column="0">
+                                                            <Label.FormattedText>
+                                                                <FormattedString>
+                                                                    <Span Text="{Binding Currency.Simbolo}" />
+                                                                    <Span Text=" " />
+                                                                    <Span Text="{Binding Monto, StringFormat='{0:N2}'}" />
+                                                                </FormattedString>
+                                                            </Label.FormattedText>
+                                                        </Label>
+                                                        <Label
+                                                            Grid.Row="1"
+                                                            Grid.Column="1"
+                                                            Grid.ColumnSpan="3"
+                                                            Text="{Binding LastName}" />
+                                                        <Label
+                                                            Grid.Row="2"
+                                                            Grid.Column="0"
+                                                            Grid.ColumnSpan="2"
+                                                            Text="{Binding TransactionOn, StringFormat='{0:yyyy-MM-dd hh:mm tt}'}" />
+                                                        <core:DXButton
+                                                            Command="{Binding BindingContext.SelectedFacturaCommand,Source={x:Reference FacturaCollectionView}}"
+                                                            CommandParameter="{Binding .}"
+                                                            Style="{StaticResource SinFondoColorRedondeado}"
+                                                            Grid.Row="0"
+                                                            Grid.Column="4"
+                                                            Grid.RowSpan="2"
+                                                            IconHeight="30"
+                                                            IconWidth="30"
+                                                            Icon="view_1" />
+                                                    </Grid>
+                                                    <core:DXSeparator BackgroundColor="{StaticResource Secondary}" />
+                                                </core:DXStackLayout>
+                                            </DataTemplate>
+                                        </CollectionView.ItemTemplate>
+                                    </CollectionView>
+                                    <core:DXStackLayout
+                                        Margin="10"
+                                        HorizontalOptions="End"
+                                        Orientation="Horizontal">
+                                        <Label
+                                            FontSize="20"
+                                            FontAttributes="Bold"
+                                            HorizontalOptions="End"
+                                            TextColor="{StaticResource Secondary}"
+                                            Text="TOTAL: " />
+                                        <Label
+                                            FontSize="20"
+                                            FontAttributes="Bold"
+                                            TextColor="{StaticResource Secondary}"
+                                            HorizontalOptions="End"
+                                            Text="{Binding TotalCordobasFacturado}" />
+                                    </core:DXStackLayout>
+                                    <core:DXStackLayout
+                                        Margin="10"
+                                        HorizontalOptions="End"
+                                        Orientation="Horizontal">
+                                        <Label
+                                            FontSize="20"
+                                            FontAttributes="Bold"
+                                            HorizontalOptions="End"
+                                            TextColor="{StaticResource Secondary}"
+                                            Text="TOTAL: " />
+                                        <Label
+                                            FontSize="20"
+                                            FontAttributes="Bold"
+                                            TextColor="{StaticResource Secondary}"
+                                            HorizontalOptions="End"
+                                            Text="{Binding TotalDolaresFacturado}" />
+                                    </core:DXStackLayout>
+                                </core:DXStackLayout>
+                            </ScrollView>
+                        </dxco:TabViewItem.Content>
+                    </dxco:TabViewItem>
+                    <dxco:TabViewItem HeaderText="Abonos">
+                        <dxco:TabViewItem.Content>
+                            <ScrollView>
+                                <core:DXStackLayout>
+                                    <Grid
+                                        Padding="15">
+                                        <editors:TextEdit
+                                            StartIcon="search"
+                                            Text="{Binding SearchAbonos}"
+                                            StartIconCommand="{Binding SearchAbonoCommand}"
+                                            ReturnCommand="{Binding SearchAbonoCommand}"
+                                            PlaceholderText="Buscar por código" />
+                                    </Grid>
+                                    <CollectionView
+                                        Margin="10"
+                                        x:Name="AbonosCollectionView"
+                                        ItemsSource="{Binding Abonos}"
+                                        SelectionMode="Single">
+                                        <CollectionView.ItemTemplate>
+                                            <DataTemplate>
+                                                <core:DXStackLayout>
+                                                    <Grid
+                                                        Margin="5"
+                                                        RowSpacing="5"
+                                                        ColumnSpacing="5">
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="Auto" />
+                                                            <RowDefinition Height="Auto" />
+                                                            <RowDefinition Height="Auto" />
+                                                        </Grid.RowDefinitions>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="75" />
+                                                            <ColumnDefinition Width="20" />
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="35" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <Label
+                                                            Grid.Row="0"
+                                                            Grid.Column="0"
+                                                            Text="{Binding DocumentNumber}" />
+                                                        <core:DXStackLayout Orientation="Horizontal"
+                                                                            Grid.Row="0"
+                                                                            Grid.Column="1"
+                                                                            Grid.ColumnSpan="3">
+                                                            <Label Text="{Binding FirstName}" />
+                                                        </core:DXStackLayout>
+                                                        <Label
+                                                            Grid.Row="1"
+                                                            Grid.Column="0">
+                                                            <Label.FormattedText>
+                                                                <FormattedString>
+                                                                    <Span Text="{Binding CurrencyName}" />
+                                                                    <Span Text=" " />
+                                                                    <Span
+                                                                        Text="{Binding MontoAplicar, StringFormat='{0:N2}'}" />
+                                                                </FormattedString>
+                                                            </Label.FormattedText>
+                                                        </Label>
+                                                        <Label
+                                                            Grid.Row="1"
+                                                            Grid.Column="1"
+                                                            Grid.ColumnSpan="3"
+                                                            Text="{Binding LastName}" />
+                                                        <Label
+                                                            Grid.Row="2"
+                                                            Grid.Column="0"
+                                                            Grid.ColumnSpan="2"
+                                                            Text="{Binding Fecha, StringFormat='{0:yyyy-MM-dd}'}" />
+                                                        <core:DXButton
+                                                            Command="{Binding BindingContext.SelectedAbonoCommand,Source={x:Reference AbonosCollectionView}}"
+                                                            CommandParameter="{Binding .}"
+                                                            Style="{StaticResource SinFondoColorRedondeado}"
+                                                            Grid.Row="0"
+                                                            Grid.Column="4"
+                                                            Grid.RowSpan="2"
+                                                            IconHeight="30"
+                                                            IconWidth="30"
+                                                            Icon="view_1" />
+                                                    </Grid>
+                                                    <core:DXSeparator BackgroundColor="{StaticResource Secondary}" />
+                                                </core:DXStackLayout>
+                                            </DataTemplate>
+                                        </CollectionView.ItemTemplate>
+                                    </CollectionView>
+                                    <core:DXStackLayout
+                                        Margin="20"
+                                        HorizontalOptions="End"
+                                        Orientation="Horizontal">
+                                        <Label
+                                            FontSize="20"
+                                            FontAttributes="Bold"
+                                            HorizontalOptions="End"
+                                            TextColor="{StaticResource Secondary}"
+                                            Text="TOTAL: " />
+                                        <Label
+                                            FontSize="20"
+                                            FontAttributes="Bold"
+                                            TextColor="{StaticResource Secondary}"
+                                            HorizontalOptions="End"
+                                            Text="{Binding TotalCordobasAbonos}" />
+                                    </core:DXStackLayout>
+                                    <core:DXStackLayout
+                                        Margin="20"
+                                        HorizontalOptions="End"
+                                        Orientation="Horizontal">
+                                        <Label
+                                            FontSize="20"
+                                            FontAttributes="Bold"
+                                            HorizontalOptions="End"
+                                            TextColor="{StaticResource Secondary}"
+                                            Text="TOTAL: " />
+                                        <Label
+                                            FontSize="20"
+                                            FontAttributes="Bold"
+                                            TextColor="{StaticResource Secondary}"
+                                            HorizontalOptions="End"
+                                            Text="{Binding TotalDolaresAbonos}" />
+                                    </core:DXStackLayout>
+                                </core:DXStackLayout>
+                            </ScrollView>
+                        </dxco:TabViewItem.Content>
+                    </dxco:TabViewItem>
+                    <dxco:TabViewItem HeaderText="Productos">
+                        <dxco:TabViewItem.Content>
+                            <ScrollView>
+                                <StackLayout>
+                                    <Grid ColumnDefinitions="0.2*">
+                                        <editors:TextEdit x:Name="SearchBar"
+                                                          Grid.Column="1"
+                                                          Margin="5"
+                                                          StartIcon="search"
+                                                          Text="{Binding SearchProduct}"
+                                                          StartIconCommand="{Binding SearchProductCommand}"
+                                                          ReturnCommand="{Binding SearchProductCommand}"
+                                                          PlaceholderText="Buscar por código, código de barra y descripción"/>
+                                    </Grid>
+                                    <CollectionView x:Name="ItemsListView"
+                                                    ItemsSource="{Binding Productos}"
+                                                    SelectionMode="Single">
+                                        <CollectionView.ItemTemplate>
+                                            <DataTemplate>
+                                                <core:DXStackLayout
+                                                    CornerRadius="15"
+                                                    Margin="10">
+                                                    <Grid
+                                                        HorizontalOptions="Fill"
+                                                        Padding="10"
+                                                        VerticalOptions="Fill">
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="Auto" />
+                                                            <RowDefinition Height="Auto" />
+                                                            <RowDefinition Height="Auto" />
+                                                        </Grid.RowDefinitions>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="*" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <Label
+                                                            Grid.Column="0"
+                                                            Grid.Row="0"
+                                                            FontAttributes="Bold"
+                                                            Grid.ColumnSpan="2"
+                                                            Text="{Binding BarCode}" />
+                                                        <HorizontalStackLayout
+                                                            Grid.Column="0"
+                                                            Grid.Row="1">
+                                                            <Label
+                                                                HorizontalOptions="Start">
+                                                                <Label.FormattedText>
+                                                                    <FormattedString>
+                                                                        <Span Text="{Binding ItemNumber}" />
+                                                                    </FormattedString>
+                                                                </Label.FormattedText>
+                                                            </Label>
+                                                        </HorizontalStackLayout>
+                                                        <HorizontalStackLayout
+                                                            Grid.Column="2"
+                                                            Grid.Row="1">
+                                                            <Label Text="Precio: C$ " />
+                                                            <Label
+                                                                HorizontalOptions="End"
+                                                                Text="{Binding PrecioPublico}" />
+                                                        </HorizontalStackLayout>
+                                                        <HorizontalStackLayout Grid.Row="2"
+                                                                               Grid.Column="0"
+                                                                               Grid.ColumnSpan="2">
+                                                            <Label
+                                                                FontAttributes="Bold"
+                                                                Text="{Binding Name}" />
+                                                        </HorizontalStackLayout>
+                                                        <core:DXButton
+                                                            Command="{Binding BindingContext.SelectedProductoCommand,Source={x:Reference ItemsListView}}"
+                                                            CommandParameter="{Binding .}"
+                                                            Style="{StaticResource SinFondoColorRedondeado}"
+                                                            Grid.Row="0"
+                                                            Grid.Column="3"
+                                                            Grid.RowSpan="3"
+                                                            IconHeight="30"
+                                                            IconWidth="30"
+                                                            Icon="view_1" />
+                                                    </Grid>
+                                                    <core:DXSeparator BackgroundColor="{StaticResource Secondary}" />
+                                                </core:DXStackLayout>
+                                            </DataTemplate>
+                                        </CollectionView.ItemTemplate>
+                                    </CollectionView>
+                                </StackLayout>
+                            </ScrollView>
+                        </dxco:TabViewItem.Content>
+                    </dxco:TabViewItem>
+                </dxco:TabView>
+            </dxco:ShimmerView.Content>
+            <dxco:ShimmerView.LoadingView>
+                <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                   HeightRequest="50"
+                                   WidthRequest="50"/>
+            </dxco:ShimmerView.LoadingView>
+        </dxco:ShimmerView>
+    </ContentPage.Content>
+</ContentPage>

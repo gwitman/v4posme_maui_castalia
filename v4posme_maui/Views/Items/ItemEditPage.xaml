@@ -1,0 +1,161 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="v4posme_maui.Views.Items.ItemEditPage"
+             xmlns:dxdf="clr-namespace:DevExpress.Maui.DataForm;assembly=DevExpress.Maui.Editors"
+             xmlns:dxe="clr-namespace:DevExpress.Maui.Editors;assembly=DevExpress.Maui.Editors"
+             xmlns:dxco="clr-namespace:DevExpress.Maui.Controls;assembly=DevExpress.Maui.Controls"
+             xmlns:dx="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
+             Title="Editar Producto"
+             Style="{StaticResource DetailPageStyle}">
+    <ContentPage.Triggers>
+        <DataTrigger Binding="{Binding IsNew}" Value="True" TargetType="ContentPage">
+            <Setter Property="Title" Value="Agregar Producto" />
+            <Setter Property="BackgroundColor"
+                    Value="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}" />
+        </DataTrigger>
+    </ContentPage.Triggers>
+    <ContentPage.ToolbarItems>
+        <ToolbarItem IconImageSource="barcode_scan" Clicked="SimpleButton_OnClicked" />
+        <ToolbarItem IconImageSource="save" Clicked="SaveItemClick" />
+    </ContentPage.ToolbarItems>
+    <Grid>
+        <ScrollView>
+            <dx:DXStackLayout Orientation="Vertical">
+                <dxco:DXPopup x:Name="Popup"
+                              AllowScrim="True"
+                              BackgroundColor="Red"
+                              VerticalAlignment="Bottom"
+                              ScrimColor="#b3adb9ce">
+                    <StackLayout WidthRequest="250">
+                        <Label x:Name="TxtMensaje"
+                               FontAttributes="Bold"
+                               FontSize="15"
+                               TextColor="{StaticResource White}"
+                               Margin="20, 20" />
+                        <Button Text="Aceptar"
+                                Clicked="ClosePopup_Clicked"
+                                BackgroundColor="{StaticResource Gray600}"
+                                FontSize="20"
+                                TextColor="White" />
+                    </StackLayout>
+                </dxco:DXPopup>
+                <dx:DXStackLayout Orientation="Vertical">
+                    <dx:DXStackLayout.Triggers>
+                        <DataTrigger Binding="{Binding IsNew}" Value="True" TargetType="dx:DXStackLayout">
+                            <Setter Property="IsVisible" Value="False" />
+                        </DataTrigger>
+                    </dx:DXStackLayout.Triggers>
+                    <dx:DXBorder HeightRequest="1" BorderThickness="1"
+                                 BackgroundColor="{AppThemeBinding Light={StaticResource SeparatorColor}, Dark={StaticResource SeparatorColorDark}}" />
+                    <dx:DXImage Source="product_item" WidthRequest="100" HeightRequest="100"
+                                Margin="0,10,0,10">
+                        <dx:DXImage.Clip>
+                            <EllipseGeometry RadiusX="50" RadiusY="50" Center="50, 50" />
+                        </dx:DXImage.Clip>
+                    </dx:DXImage>
+                </dx:DXStackLayout>
+                <dx:DXBorder
+                    Margin="15"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}"
+                    BorderThickness="0" CornerRadius="10">
+                    <dxdf:DataFormView x:Name="DataForm" DataObject="{Binding Item}"
+                                       EditorLabelColor="{StaticResource Primary}"
+                                       EditorLabelWidth="0"
+                                       IsAutoGenerationEnabled="False"
+                                       ValidationMode="LostFocus"
+                                       ValidateForm="DataForm_OnValidateForm"
+                                       Margin="0,10,0,0" Background="Transparent">
+                        <dxdf:DataFormCustomItem>
+                            <dxe:TextEdit
+                                x:Name="TxtBarCode"
+                                IconColor="#006E98"
+                                StartIcon="barcode"
+                                IsErrorIconVisible="True"
+                                Text="{Binding BarCode}"
+                                ErrorText="No puede estar vacío"
+                                LabelText="Código de barra" />
+                        </dxdf:DataFormCustomItem>
+                        <dxdf:DataFormCustomItem>
+                            <dxe:TextEdit
+                                x:Name="TextItemNumber"
+                                IconColor="#006E98"
+                                StartIcon="quantity"
+                                Text="{Binding ItemNumber}"
+                                ErrorText="No puede estar vacío"
+                                LabelText="Código de producto" />
+                        </dxdf:DataFormCustomItem>
+                        <dxdf:DataFormCustomItem>
+                            <dxe:TextEdit
+                                x:Name="TextName"
+                                IconColor="#006E98"
+                                StartIcon="textbox"
+                                Text="{Binding Name}"
+                                ErrorText="No puede estar vacío"
+                                LabelText="Descripción del producto" />
+                        </dxdf:DataFormCustomItem>
+                        <dxdf:DataFormCustomItem>
+                            <dxe:TextEdit
+                                x:Name="TextPrecioPublico"
+                                Keyboard="Numeric"
+                                IconColor="#006E98"
+                                StartIcon="price"
+                                ErrorText="No puede estar vacío"
+                                Text="{Binding PrecioPublico}"
+                                LabelText="Precio al publico" />
+                        </dxdf:DataFormCustomItem>
+                        <dxdf:DataFormCustomItem>
+                            <dxe:TextEdit
+                                x:Name="TextCantidadFinal"
+                                Keyboard="Numeric"
+                                IsReadOnly="True"
+                                IconColor="#006E98"
+                                StartIcon="quantity"
+                                Text="{Binding CantidadFinal}"
+                                LabelText="Existencia total" />
+                        </dxdf:DataFormCustomItem>
+                        <dxdf:DataFormCustomItem>
+                            <dxe:TextEdit
+                                TextChanged="TextCantidadEntrada_OnTextChanged"
+                                x:Name="TextCantidadEntrada"
+                                Keyboard="Numeric"
+                                IconColor="#006E98"
+                                StartIcon="quantity"
+                                Text="{Binding CantidadEntradas}"
+                                LabelText="Cantidad a ingresar" />
+                        </dxdf:DataFormCustomItem>
+                        <dxdf:DataFormCustomItem>
+                            <dxe:TextEdit
+                                TextChanged="TextCantidadEntrada_OnTextChanged"
+                                x:Name="TextCantidadSalida"
+                                Keyboard="Numeric"
+                                IconColor="#006E98"
+                                StartIcon="quantity"
+                                Text="{Binding CantidadSalidas}"
+                                LabelText="Cantidad a retirar" />
+                        </dxdf:DataFormCustomItem>
+                        <dxdf:DataFormCustomItem>
+                            <dxe:TextEdit
+                                Keyboard="Numeric"
+                                IconColor="#006E98"
+                                IsReadOnly="True"
+                                StartIcon="quantity"
+                                Text="{Binding Quantity}"
+                                LabelText="Cantidad" />
+                        </dxdf:DataFormCustomItem>
+                    </dxdf:DataFormView>
+                    <dx:DXBorder.Triggers>
+                        <DataTrigger Binding="{Binding IsNew}" Value="False" TargetType="dx:DXBorder">
+                            <Setter Property="Shadow">
+                                <Setter.Value>
+                                    <Shadow Brush="Gray" Offset="2,2" Radius="4" />
+                                </Setter.Value>
+                            </Setter>
+                        </DataTrigger>
+                    </dx:DXBorder.Triggers>
+                </dx:DXBorder>
+            </dx:DXStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

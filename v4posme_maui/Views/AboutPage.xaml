@@ -1,0 +1,166 @@
+﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             Title="{Binding Title}"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             xmlns:viewModels="clr-namespace:v4posme_maui.ViewModels"
+             xmlns:controls="clr-namespace:DevExpress.Maui.Controls;assembly=DevExpress.Maui.Controls"
+             xmlns:core="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
+             ios:Page.UseSafeArea="true"
+             x:Class="v4posme_maui.Views.AboutPage">
+    <ContentPage.BindingContext>
+        <viewModels:AboutViewModel />
+    </ContentPage.BindingContext>
+    <ContentPage.Content>
+        <controls:ShimmerView Style="{StaticResource ShimmerEffect}" IsLoading="{Binding IsBusy}">
+
+            <ScrollView>
+                <StackLayout Padding="10" Spacing="10">
+                    <core:DXBorder Style="{StaticResource PropertyBorder}" BorderThickness="0,0,5,0" BorderColor="Red">
+                        <Grid Padding="10" ColumnSpacing="25">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Image Source="payment_2" WidthRequest="40" HeightRequest="40" />
+                            <StackLayout Grid.Column="1" Spacing="0">
+                                <StackLayout Orientation="Horizontal">
+                                    <Label Text="{Binding CantidadAbonos}"
+                                           FontSize="24"
+                                           FontAttributes="Bold" />
+                                </StackLayout>
+                                <Label Text="Abonos Aplicados" FontSize="14" />
+                                <StackLayout Orientation="Horizontal">
+                                    <Label Text="Monto Córdobas: C$"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="Red" />
+                                    <Label Text="{Binding MontoAbonosCordobas,StringFormat='{0:N2}'}"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="Red" />
+                                    <Label Text=" " />
+                                </StackLayout>
+                                <StackLayout Orientation="Horizontal">
+                                    <Label Text="Monto Dólares: $"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="Red" />
+                                    <Label Text="{Binding MontoAbonosDolares,StringFormat='{0:N2}'}"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="Red" />
+                                </StackLayout>
+                            </StackLayout>
+                        </Grid>
+                    </core:DXBorder>
+
+                    <core:DXBorder Style="{StaticResource PropertyBorder}" BorderThickness="0,0,5,0"
+                                   BorderColor="Yellow">
+                        <Grid Padding="10" ColumnSpacing="25">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Image Source="invoice_bill" WidthRequest="40" HeightRequest="40" />
+                            <StackLayout Grid.Column="1" Spacing="0">
+                                <Label Text="{Binding CantidadFacutrasContado}" FontSize="24" FontAttributes="Bold" />
+                                <Label Text="Facturas de Contado" FontSize="14" />
+                                <StackLayout Orientation="Horizontal">
+                                    <Label Text="Monto Córdobas: C$"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="{StaticResource Primary}" />
+                                    <Label Text="{Binding MontoFacturasContadoCordobas,StringFormat='{0:N2}'}"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="{StaticResource Primary}" />
+                                    <Label Text=" " />
+                                </StackLayout>
+                                <StackLayout Orientation="Horizontal">
+                                    <Label Text="Monto Dólares: $"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="{StaticResource Primary}" />
+                                    <Label Text="{Binding MontoFacturasContadoDolares,StringFormat='{0:N2}'}"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="{StaticResource Primary}" />
+                                </StackLayout>
+                            </StackLayout>
+                        </Grid>
+                    </core:DXBorder>
+
+                    <core:DXBorder Style="{StaticResource PropertyBorder}" BorderThickness="0,0,5,0"
+                                   BorderColor="Green">
+                        <Grid Padding="10" ColumnSpacing="25">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Image Source="cash_pay" WidthRequest="40" HeightRequest="40" />
+                            <StackLayout Grid.Column="1" Spacing="0">
+                                <Label Text="{Binding CantidadFacutrasCredito}" FontSize="24" FontAttributes="Bold" />
+                                <Label Text="Facturas de Crédito" FontSize="14" />
+                                <StackLayout Orientation="Horizontal">
+                                    <Label Text="Monto Córdobas: C$"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="Green" />
+                                    <Label Text="{Binding MontoFacturasCreditoCordobas,StringFormat='{0:N2}'}"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="Green" />
+                                    <Label Text=" " />
+                                </StackLayout>
+                                <StackLayout Orientation="Horizontal">
+                                    <Label Text="Monto Dólares: $"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="Green" />
+                                    <Label Text="{Binding MontoFacturasCreditoDolares,StringFormat='{0:N2}'}"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="Green" />
+                                </StackLayout>
+                            </StackLayout>
+                        </Grid>
+                    </core:DXBorder>
+                    <!-- TOTALES -->
+                    <Grid Padding="0" ColumnSpacing="25">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <StackLayout 
+                            Grid.Column="1" 
+                            Margin="0,10,10,0"
+                            Spacing="0">
+                            <StackLayout Orientation="Horizontal" HorizontalOptions="End">
+                                <Label Text="TOTAL: C$"
+                                       FontSize="18"
+                                       FontAttributes="Bold"
+                                       TextColor="{StaticResource Secondary}" />
+                                <Label Text="{Binding TotalCordobas,StringFormat='{0:N2}'}"
+                                       FontSize="18"
+                                       FontAttributes="Bold"
+                                       TextColor="{StaticResource Secondary}" />
+                            </StackLayout>
+                            <StackLayout Orientation="Horizontal" HorizontalOptions="End">
+                                <Label Text="TOTAL: $"
+                                       FontSize="18"
+                                       FontAttributes="Bold"
+                                       TextColor="{StaticResource Secondary}" />
+                                <Label Text="{Binding TotalDolares,StringFormat='{0:N2}'}"
+                                       FontSize="18"
+                                       FontAttributes="Bold"
+                                       TextColor="{StaticResource Secondary}" />
+                            </StackLayout>
+                        </StackLayout>
+                    </Grid>
+                </StackLayout>
+            </ScrollView>
+
+        </controls:ShimmerView>
+    </ContentPage.Content>
+
+</ContentPage>
