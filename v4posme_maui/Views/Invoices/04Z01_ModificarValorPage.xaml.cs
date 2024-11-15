@@ -50,15 +50,21 @@ public partial class ModificarValorPage : ContentPage
             return;
         }
 
-        var value = decimal.Parse(valueText);
-        if (decimal.Compare(decimal.Zero, value)==0)
-        {
-            TxtValor.HasError = true;
-            TxtValor.ErrorText = Mensajes.MensajeValorZero;
+      
+
+        if (SelectedItem is null) 
             return;
-        }
-        if (SelectedItem is null) return;
-        if (decimal.Compare(Quantity, decimal.Zero) > 0)
+
+
+        var value = decimal.Parse(valueText);
+        //--wg-if (decimal.Compare(decimal.Zero, value) == 0)
+        //--wg-{
+        //--wg-    TxtValor.HasError = true;
+        //--wg-    TxtValor.ErrorText = Mensajes.MensajeValorZero;
+        //--wg-    return;
+        //--wg-}
+
+        if (decimal.Compare(Quantity, decimal.Zero) >= 0)
         {
             SelectedItem.Quantity = value;
         }
@@ -72,7 +78,11 @@ public partial class ModificarValorPage : ContentPage
         VariablesGlobales.DtoInvoice.Balance = VariablesGlobales.DtoInvoice.Items.Sum(response => response.Importe);
         var findIndex = VariablesGlobales.DtoInvoice.Items.FindIndex(response => response.ItemNumber == SelectedItem.ItemNumber);
         VariablesGlobales.DtoInvoice.Items.RemoveAt(findIndex);
+
+        //Si la cantidad es mayor que 0 volver a insertar
+        if(SelectedItem.Quantity > 0 )
         VariablesGlobales.DtoInvoice.Items.Insert(findIndex, SelectedItem);
+
         await Navigation.PopAsync(true);
     }
 }

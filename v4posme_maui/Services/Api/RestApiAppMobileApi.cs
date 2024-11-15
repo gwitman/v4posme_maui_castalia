@@ -6,13 +6,14 @@ using v4posme_maui.Services.Helpers;
 using v4posme_maui.Services.Repository;
 using v4posme_maui.Services.SystemNames;
 using Unity;
+using Android.Content;
+using static Java.Util.Jar.Attributes;
 
 namespace v4posme_maui.Services.Api;
 
 public class RestApiAppMobileApi
 {
     private readonly HttpClient _httpClient = new();
-
     private readonly IRepositoryTbCustomer _repositoryTbCustomer = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCustomer>();
 
     private readonly IRepositoryItems _repositoryItems = VariablesGlobales.UnityContainer.Resolve<IRepositoryItems>();
@@ -53,11 +54,15 @@ public class RestApiAppMobileApi
                 Content = new FormUrlEncodedContent(nvc)
             };
 
+            //validar repuesta
             var response = await _httpClient.SendAsync(req);
             if (!response.IsSuccessStatusCode) return false;
+
             var responseBody = await response.Content.ReadAsStringAsync();
             var apiResponse = JsonConvert.DeserializeObject<Api_AppMobileApi_GetDataDownloadResponse>(responseBody);
             if (apiResponse is null || apiResponse.Error) return false;
+
+            //eliminar movimientos
             var customerDeleteAll = _repositoryTbCustomer!.PosMeDeleteAll();
             var itemsDeleteAll = _repositoryItems!.PosMeDeleteAll();
             var documentCreditAmortizationDeleteAll = _repositoryDocumentCreditAmortization!.PosMeDeleteAll();
@@ -69,17 +74,24 @@ public class RestApiAppMobileApi
                 documentCreditDeleteAll, companyDeleteAll
             ]);
 
+            //insertar nuevos movimientos
             var taskCompany = _repositoryTbCompany.PosMeInsert(apiResponse.ObjCompany);
             var taskCustomer = _repositoryTbCustomer!.PosMeInsertAll(apiResponse.ListCustomer);
             var taskItem = _repositoryItems!.PosMeInsertAll(apiResponse.ListItem);
-            var taskDocumentCreditAmortization =
-                _repositoryDocumentCreditAmortization!.PosMeInsertAll(apiResponse.ListDocumentCreditAmortization);
+            var taskDocumentCreditAmortization = _repositoryDocumentCreditAmortization!.PosMeInsertAll(apiResponse.ListDocumentCreditAmortization);
             var taskParameters = _repositoryParameters!.PosMeInsertAll(apiResponse.ListParameter);
             var taskDocumentCredit = _repositoryDocumentCredit!.PosMeInsertAll(apiResponse.ListDocumentCredit);
             await Task.WhenAll([
                 taskCustomer, taskItem, taskDocumentCreditAmortization, taskParameters,
                 taskDocumentCredit, taskCompany
             ]);
+
+            //inicializar contador 
+            var objParameterSystem = await _parameterSystem.PosMeFindByName(Constantes.ParemeterEntityIDAutoIncrement);
+            objParameterSystem.Value = $"-1";
+            await _parameterSystem.PosMeUpdate(objParameterSystem);
+
+
             return true;
         }
         catch (Exception ex)

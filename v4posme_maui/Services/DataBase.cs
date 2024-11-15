@@ -1,5 +1,6 @@
 ﻿using v4posme_maui.Models;
 using SQLite;
+using v4posme_maui.Services.SystemNames;
 
 namespace v4posme_maui.Services;
 
@@ -21,11 +22,12 @@ public class DataBase
         {
             var parametrosDefault = new List<TbParameterSystem>
             {
-                new() { Name = "COUNTER", Description = "Contador Global", Value = "0" },
-                new() { Name = "LOGO", Description = "Logo de la aplicación", Value = "" },                
-                new() { Name = "PRINTER", Description = "Impresora", Value = "Printer" },
-                new() { Name = "TRANSACTION_SHARE", Description = "Número de abono", Value = "ABO-0001" },
-                new() { Name = "TRANSACTION_INVOICE", Description = "Número de factura", Value = "FAC-0001" }
+                new() { Name = Constantes.ParametroCounter, Description = "Contador Global", Value = "0" },
+                new() { Name = Constantes.ParametroLogo, Description = "Logo de la aplicación", Value = "" },                
+                new() { Name = Constantes.ParametroPrinter, Description = "Impresora", Value = "Printer" },
+                new() { Name = Constantes.ParametroCodigoAbono, Description = "Número de abono", Value = "ABO-0001" },
+                new() { Name = Constantes.ParameterCodigoFactura, Description = "Número de factura", Value = "FAC-0001" },
+                new() { Name = Constantes.ParemeterEntityIDAutoIncrement, Description = "Auto incrementado", Value = "-1" }
             };
             await Database.InsertAllAsync(parametrosDefault);
         }

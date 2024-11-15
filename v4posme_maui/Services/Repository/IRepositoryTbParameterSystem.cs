@@ -9,4 +9,6 @@ public interface IRepositoryTbParameterSystem : IRepositoryFacade<TbParameterSys
     Task<TbParameterSystem> PosMeFindPrinter();
     Task<TbParameterSystem> PosMeFindCodigoAbono();
     Task<TbParameterSystem> PosMeFindCodigoFactura();
+    Task<TbParameterSystem> PosMeFindAutoIncrement();
+    Task<TbParameterSystem> PosMeFindByName(string name);
 }

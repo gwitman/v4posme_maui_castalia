@@ -9,6 +9,7 @@ using GoogleGson;
 using Android.Service.Autofill;
 using Android.Widget;
 using Android.Util;
+using System.Runtime.CompilerServices;
 namespace v4posme_maui.Services.Helpers;
 
 public class HelperCore(IRepositoryTbParameterSystem repositoryParameters)
@@ -46,6 +47,19 @@ public class HelperCore(IRepositoryTbParameterSystem repositoryParameters)
         await repositoryParameters.PosMeUpdate(find);
 
         return codigo;
+    }
+
+    public async Task<int> GetAutoIncrement()
+    {
+        var find = await repositoryParameters.PosMeFindAutoIncrement();
+        var codigo = find.Value!;
+        
+        var numero = Convert.ToInt32(codigo);
+        numero -= 1;
+        find.Value = numero.ToString();
+        await repositoryParameters.PosMeUpdate(find);
+        return Convert.ToInt32(codigo);
+
     }
     public async Task<string> GetCodigoFactura()
     {

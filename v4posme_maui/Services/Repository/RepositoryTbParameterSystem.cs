@@ -17,7 +17,13 @@ public class RepositoryTbParameterSystem(DataBase dataBase) : RepositoryFacade<T
         return dataBase.Database.Table<TbParameterSystem>()
             .FirstOrDefaultAsync(system => system.Name == Constantes.ParametroCounter);
     }
-   
+    public Task<TbParameterSystem> PosMeFindByName(string name )
+    {
+        return dataBase.Database.Table<TbParameterSystem>()
+            .FirstOrDefaultAsync(system => system.Name == name);
+    }
+
+    
     public Task<TbParameterSystem> PosMeFindPrinter()
     {
         return dataBase.Database.Table<TbParameterSystem>()
@@ -35,4 +41,13 @@ public class RepositoryTbParameterSystem(DataBase dataBase) : RepositoryFacade<T
         return dataBase.Database.Table<TbParameterSystem>()
             .FirstOrDefaultAsync(system => system.Name == Constantes.ParameterCodigoFactura);
     }
+
+    public Task<TbParameterSystem> PosMeFindAutoIncrement()
+    {
+        return dataBase.Database.Table<TbParameterSystem>()
+            .FirstOrDefaultAsync(system => system.Name == Constantes.ParemeterEntityIDAutoIncrement);
+    }
+
+   
+
 }

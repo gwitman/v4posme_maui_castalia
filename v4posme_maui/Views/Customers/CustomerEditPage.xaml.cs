@@ -41,10 +41,16 @@ public partial class CustomerEditPage : ContentPage
             return;
 
         var saveCustomer = (Api_AppMobileApi_GetDataDownloadCustomerResponse)DataForm.DataObject;
-        saveCustomer.Modificado = true;
+        saveCustomer.Modificado             = true;
         if (ViewModel.IsNew)
         {
-            saveCustomer.CustomerCreditLineId = 0;
+            saveCustomer.CurrencyName = "Cordoba";
+            saveCustomer.CurrencyId = (int)TypeCurrency.Cordoba;
+            saveCustomer.CompanyId = Constantes.CompanyId;
+            saveCustomer.BranchId = Constantes.BranchId;
+            saveCustomer.EntityId = await _helperContador.GetAutoIncrement();
+            saveCustomer.CustomerCreditLineId = await _helperContador.GetAutoIncrement();
+            saveCustomer.CustomerNumber = (await _helperContador.GetAutoIncrement()).ToString();
             await RepositoryTbCustomer.PosMeInsert(saveCustomer);
         }
         else
