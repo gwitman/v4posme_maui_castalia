@@ -8,7 +8,7 @@
              ios:Page.UseSafeArea="true"
              x:Class="v4posme_maui.Views.AboutPage">
     <ContentPage.BindingContext>
-        <viewModels:AboutViewModel />
+        <viewModels:AboutViewModel /> 
     </ContentPage.BindingContext>
     <ContentPage.Content>
         <controls:ShimmerView Style="{StaticResource ShimmerEffect}" IsLoading="{Binding IsBusy}">
