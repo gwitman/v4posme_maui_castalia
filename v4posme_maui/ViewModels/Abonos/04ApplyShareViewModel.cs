@@ -67,7 +67,7 @@ public class AplicarAbonoViewModel : BaseViewModel, IQueryAttributable
 			_customerResponse = await _repositoryTbCustomer.PosMeFindCustomer(DocumentCreditAmortizationResponse.CustomerNumber!);
 
 			//para mostrar los saldo final e inicial
-			var mostrarPrintSinSaldos = await _repositoryParameters.PosMeFindByKey("CXC_SHOW_BALANCE_IN_SHARE_MOBILE");
+			var mostrarPrintSinSaldos = await _helper.GetValueParameter("CXC_SHOW_BALANCE_IN_SHARE_MOBILE","false");
 
 			VariablesGlobales.DtoAplicarAbono = new ViewTempDtoAbono(
 				codigoAbono,
@@ -109,7 +109,7 @@ public class AplicarAbonoViewModel : BaseViewModel, IQueryAttributable
 			var taskPlus = _helper.PlusCounter();
 			await Task.WhenAll([taskPlus, taskTransactionMaster]);
 
-			if (MostarSaldos(mostrarPrintSinSaldos))
+			if (mostrarPrintSinSaldos == "true")
 			{
 				await NavigationService.NavigateToAsync<ValidarAbonoViewModel>();
 			}
@@ -145,23 +145,7 @@ public class AplicarAbonoViewModel : BaseViewModel, IQueryAttributable
 		return true;
 	}
 
-	private static bool MostarSaldos(Api_AppMobileApi_GetDataDownloadParametersResponse? parametro)
-	{
-		if(parametro is not null)
-		{
-			if (!string.IsNullOrEmpty(parametro.Value))
-			{
-				return parametro.Value.ToLower() switch
-				{
-					"false" => false,
-					"true" => true,
-					_ => true
-				};
-			}
-		}
 
-		return true;
-	}
 
 	public Api_AppMobileApi_GetDataDownloadDocumentCreditAmortizationResponse DocumentCreditAmortizationResponse
 	{

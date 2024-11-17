@@ -12,9 +12,10 @@ using Android.Util;
 using System.Runtime.CompilerServices;
 namespace v4posme_maui.Services.Helpers;
 
-public class HelperCore(IRepositoryTbParameterSystem repositoryParameters)
+public class HelperCore(
+        IRepositoryTbParameterSystem repositoryParameters, IRepositoryParameters _repositoryParametersWeb
+)
 {
-   
     public async Task<int> GetCounter()
     {
         var find = await repositoryParameters.PosMeFindCounter();
@@ -61,6 +62,21 @@ public class HelperCore(IRepositoryTbParameterSystem repositoryParameters)
         return Convert.ToInt32(codigo);
 
     }
+    public async Task<string> GetValueParameter(string name, string valueDefault)
+    {
+
+        var parametro = await _repositoryParametersWeb.PosMeFindByKey(name);
+        if (parametro is not null)
+        {
+            if (!string.IsNullOrEmpty(parametro.Value))
+            {
+                return parametro.Value;
+            }
+        }
+
+        return valueDefault;
+    }
+
     public async Task<string> GetCodigoFactura()
     {
         var find = await repositoryParameters.PosMeFindCodigoFactura();
@@ -79,6 +95,8 @@ public class HelperCore(IRepositoryTbParameterSystem repositoryParameters)
 
         return codigo;
     }
+
+   
 
     public string GetFilePath(string filename)
     {
