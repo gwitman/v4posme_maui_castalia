@@ -1,0 +1,153 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:dx="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
+             xmlns:abonos="clr-namespace:v4posme_maui.ViewModels.Abonos"
+             xmlns:controls="clr-namespace:DevExpress.Maui.Controls;assembly=DevExpress.Maui.Controls"
+             Title="{Binding Title}"
+             x:Class="v4posme_maui.Views.Abonos.ValidarAbonoHideSaldoPage"
+             Style="{StaticResource DetailPageStyle}">
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsEnabled="False" IsVisible="False" />
+    </Shell.BackButtonBehavior>
+    <Shell.PresentationMode>Animated</Shell.PresentationMode>
+    <ContentPage.BindingContext>
+        <abonos:ValidarAbonoHideSaldoViewModel />
+    </ContentPage.BindingContext>
+    <ContentPage.ToolbarItems>
+        <ToolbarItem IconImageSource="shared" Clicked="MenuItem_OnClicked" />
+        <ToolbarItem Text="Imprimir" Order="Secondary" x:Name="ItemPrint" Command="{Binding PrintCommand}" />
+        <ToolbarItem Text="Nuevo Abono" Order="Secondary" Command="{Binding AplicarOtroCommand}" />
+    </ContentPage.ToolbarItems>
+    <ContentPage.Content>
+        <controls:ShimmerView Style="{StaticResource ShimmerEffect}" IsLoading="{Binding IsBusy}">
+            <controls:ShimmerView.Content>
+                <ScrollView>
+                    <dx:DXStackLayout
+                        BackgroundColor="White"
+                        x:Name="DxStackLayout"
+                        Orientation="Vertical"
+                        Padding="20">
+                        <dx:DXStackLayout Orientation="Vertical"
+                                          Margin="0,0,0,10"
+                                          HorizontalOptions="Center">
+                            <dx:DXImage x:Name="Logo"
+                                        HeightRequest="150"
+                                        WidthRequest="150"
+                                        Source="{Binding LogoSource}" />
+                            <Label Text="Comprobante de Abono"
+                                   FontSize="24"
+                                   HorizontalTextAlignment="Center"
+                                   FontAttributes="Bold" />
+                            <Label FontSize="16">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="Le informamos que: " />
+                                        <Span Text="{Binding Item.FirstName}" />
+                                        <Span Text=" " />
+                                        <Span Text="{Binding Item.LastName}" />
+                                        <Span Text=" creó un código para abono de factura con los siguientes datos" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                        </dx:DXStackLayout>
+                        <dx:DXStackLayout Orientation="Horizontal">
+                            <Label Text="Código de abono: " FontAttributes="Bold" FontSize="14" />
+                            <Label Text="{Binding Item.CodigoAbono}" FontSize="14" />
+                        </dx:DXStackLayout>
+                        <StackLayout Spacing="5">
+                            <dx:DXStackLayout Orientation="Horizontal">
+                                <Label Text="Nombres: " FontAttributes="Bold" FontSize="14" />
+                                <Label Text="{Binding Item.FirstName}" FontSize="14" />
+                            </dx:DXStackLayout>
+                            <dx:DXStackLayout Orientation="Horizontal">
+                                <Label Text="Apellidos: " FontAttributes="Bold" FontSize="14" />
+                                <Label Text="{Binding Item.LastName}" FontSize="14" />
+                            </dx:DXStackLayout>
+                            <Grid
+                                RowSpacing="5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Label
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    Text="Fecha:" 
+                                    FontAttributes="Bold" FontSize="14" />
+                                <Label
+                                    Grid.Row="0"
+                                    Grid.Column="1"
+                                    Text="{Binding Item.Fecha, StringFormat='{0:yyyy-MM-dd}'}"
+                                       FontSize="14" />
+                                <!--
+                                <Label
+                                    Grid.Row="1"
+                                    Grid.Column="0"
+                                    Text="Saldo Inicial: " FontAttributes="Bold" 
+                                    FontSize="14" />
+                                <dx:DXStackLayout
+                                    Grid.Row="1"
+                                    Grid.Column="1"
+                                    Orientation="Horizontal">
+                                    <Label Text="{Binding Item.CurrencyName}" FontSize="14" />
+                                    <Label Text=" " />
+                                    <Label Text="{Binding Item.SaldoInicial, StringFormat='{0:N2}'}"
+                                           FontSize="14" />
+                                </dx:DXStackLayout>
+                                -->
+                                <Label
+                                    Grid.Row="2"
+                                    Grid.Column="0"
+                                    Text="Monto Aplicar: " 
+                                    FontAttributes="Bold" 
+                                    FontSize="14" />
+                                <dx:DXStackLayout
+                                    Grid.Row="2"
+                                    Grid.Column="1"
+                                    Orientation="Horizontal">
+                                    <Label Text="{Binding Item.CurrencyName}" FontSize="14" />
+                                    <Label Text=" " />
+                                    <Label Text="{Binding Item.MontoAplicar, StringFormat='{0:N0}'}"
+                                           FontSize="14" />
+                                </dx:DXStackLayout>
+                                <!--
+                                <Label
+                                    Grid.Row="3"
+                                    Grid.Column="0"
+                                    Text="Saldo final: " 
+                                       FontAttributes="Bold" FontSize="14" />
+                                <dx:DXStackLayout
+                                    Grid.Row="3"
+                                    Grid.Column="1"
+                                    Orientation="Horizontal">
+                                    <Label Text="{Binding Item.CurrencyName}" FontSize="14" />
+                                    <Label Text=" " />
+                                    <Label Text="{Binding Item.SaldoFinal, StringFormat='{0:N0}'}"
+                                           FontSize="14" />
+                                </dx:DXStackLayout>
+                                -->
+                            </Grid>
+                            <dx:DXStackLayout Orientation="Vertical">
+                                <Label Text="Comentarios: " FontAttributes="Bold" FontSize="14" />
+                                <Label Text="{Binding Item.Description}" FontSize="14" />
+                            </dx:DXStackLayout>
+                        </StackLayout>
+                    </dx:DXStackLayout>
+                </ScrollView>
+            </controls:ShimmerView.Content>
+            <controls:ShimmerView.LoadingView>
+                <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                   HeightRequest="50"
+                                   WidthRequest="50" />
+            </controls:ShimmerView.LoadingView>
+        </controls:ShimmerView>
+    </ContentPage.Content>
+</ContentPage>

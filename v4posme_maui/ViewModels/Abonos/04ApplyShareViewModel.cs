@@ -13,217 +13,250 @@ namespace v4posme_maui.ViewModels.Abonos;
 
 public class AplicarAbonoViewModel : BaseViewModel, IQueryAttributable
 {
-    private readonly IRepositoryDocumentCredit _repositoryDocumentCredit;
-    private readonly IRepositoryDocumentCreditAmortization _repositoryDocumentCreditAmortization;
-    private readonly IRepositoryTbCustomer _repositoryTbCustomer;
-    private readonly IRepositoryTbTransactionMaster _repositoryTransactionMaster;
-    private readonly HelperCore _helper;
-    private readonly HelperCustomerCreditDocumentAmortization _helperCustomerCreditDocumentAmortization;
-    private Api_AppMobileApi_GetDataDownloadDocumentCreditResponse _documentCreditResponse;
-    private Api_AppMobileApi_GetDataDownloadDocumentCreditAmortizationResponse _documentCreditAmortization;
-    private Api_AppMobileApi_GetDataDownloadCustomerResponse _customerResponse;
+	private readonly IRepositoryDocumentCredit _repositoryDocumentCredit;
+	private readonly IRepositoryDocumentCreditAmortization _repositoryDocumentCreditAmortization;
+	private readonly IRepositoryTbCustomer _repositoryTbCustomer;
+	private readonly IRepositoryTbTransactionMaster _repositoryTransactionMaster;
+	private readonly IRepositoryParameters _repositoryParameters;
+	private readonly HelperCore _helper;
+	private readonly HelperCustomerCreditDocumentAmortization _helperCustomerCreditDocumentAmortization;
+	private Api_AppMobileApi_GetDataDownloadDocumentCreditResponse _documentCreditResponse;
+	private Api_AppMobileApi_GetDataDownloadDocumentCreditAmortizationResponse _documentCreditAmortization;
+	private Api_AppMobileApi_GetDataDownloadCustomerResponse _customerResponse;
 
-    public AplicarAbonoViewModel()
-    {
-        _documentCreditResponse = new();
-        _documentCreditAmortization = new();
-        _customerResponse = new();
-        _helper = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
-        _helperCustomerCreditDocumentAmortization = VariablesGlobales.UnityContainer.Resolve<HelperCustomerCreditDocumentAmortization>();
-        Title = "Completar Abono 4/5";
-        _repositoryDocumentCredit = VariablesGlobales.UnityContainer.Resolve<IRepositoryDocumentCredit>();
-        _repositoryDocumentCreditAmortization = VariablesGlobales.UnityContainer.Resolve<IRepositoryDocumentCreditAmortization>();
-        _repositoryTbCustomer = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCustomer>();
-        _repositoryTransactionMaster = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMaster>();
-        AplicarAbonoCommand = new Command(OnAplicarAbono, OnValidateMonto);
-        ClearMontoCommand = new Command(OnClearMontoCommand);
-        PropertyChanged += (_, _) => AplicarAbonoCommand.ChangeCanExecute();
-    }
+	public AplicarAbonoViewModel()
+	{
+		_documentCreditResponse = new();
+		_documentCreditAmortization = new();
+		_customerResponse = new();
+		_helper = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
+		_helperCustomerCreditDocumentAmortization = VariablesGlobales.UnityContainer.Resolve<HelperCustomerCreditDocumentAmortization>();
+		Title = "Completar Abono 4/5";
+		_repositoryDocumentCredit = VariablesGlobales.UnityContainer.Resolve<IRepositoryDocumentCredit>();
+		_repositoryDocumentCreditAmortization = VariablesGlobales.UnityContainer.Resolve<IRepositoryDocumentCreditAmortization>();
+		_repositoryTbCustomer = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCustomer>();
+		_repositoryTransactionMaster = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMaster>();
+		_repositoryParameters = VariablesGlobales.UnityContainer.Resolve<IRepositoryParameters>();
+		AplicarAbonoCommand = new Command(OnAplicarAbono, OnValidateMonto);
+		ClearMontoCommand = new Command(OnClearMontoCommand);
+		PropertyChanged += (_, _) => AplicarAbonoCommand.ChangeCanExecute();
+	}
 
-    private void OnClearMontoCommand(object obj)
-    {
-        Monto = decimal.Zero;
-    }
+	private void OnClearMontoCommand(object obj)
+	{
+		Monto = decimal.Zero;
+	}
 
-    private bool OnValidateMonto(object arg)
-    {
-        return !Validate();
-    }
+	private bool OnValidateMonto(object arg)
+	{
+		return !Validate();
+	}
 
-    private async void OnAplicarAbono(object obj)
-    {
-        if (Validate())
-        {
-            return;
-        }
+	private async void OnAplicarAbono(object obj)
+	{
+		if (Validate())
+		{
+			return;
+		}
 
-        try
-        {
-            IsBusy = true;
-            var codigoAbono = await _helper.GetCodigoAbono();
-            //Obtener Cliente
-            _customerResponse = await _repositoryTbCustomer.PosMeFindCustomer(DocumentCreditAmortizationResponse.CustomerNumber!);
-            VariablesGlobales.DtoAplicarAbono = new ViewTempDtoAbono(
-                codigoAbono,
-                _customerResponse.EntityId,
-                _customerResponse.FirstName!,
-                _customerResponse.LastName!,
-                _customerResponse.Identification!,
-                DateTime.Now,
-                DocumentCreditAmortizationResponse.DocumentNumber!,
-                CurrencyName!,
-                Monto,
-                SaldoInicial,
-                SaldoFinal,
-                Description!
-            );
+		try
+		{
+			IsBusy = true;
+			var codigoAbono = await _helper.GetCodigoAbono();
+			//Obtener Cliente
+			_customerResponse = await _repositoryTbCustomer.PosMeFindCustomer(DocumentCreditAmortizationResponse.CustomerNumber!);
 
-            //Aplicar Abono
-            string reference = await HelperCustomerCreditDocumentAmortization.ApplyShare(_customerResponse.EntityId, DocumentCreditResponse.DocumentNumber!, Monto);
+			//para mostrar los saldo final e inicial
+			var mostrarPrintSinSaldos = await _repositoryParameters.PosMeFindByKey("CXC_SHOW_BALANCE_IN_SHARE_MOBILE");
 
-            //Ingrear Abono 
-            var tmpMonto = Monto;
-            var transactionMaster = new TbTransactionMaster
-            {
-                TransactionId = TypeTransaction.TransactionShare,
-                SubAmount = Monto,
-                Discount = SaldoInicial,
-                Amount = SaldoFinal,
-                Comment = Description,
-                TransactionNumber = codigoAbono,
-                TransactionOn = DateTime.Now,
-                EntitySecondaryId = _customerResponse.CustomerNumber,
-                EntityId = _customerResponse.EntityId,
-                CurrencyId = (TypeCurrency)CurrencyId,
-                Reference1 = reference,
-                CustomerCreditLineId = _customerResponse.CustomerCreditLineId,
-                CustomerIdentification = _customerResponse.Identification!
-            };
-            var taskTransactionMaster = _repositoryTransactionMaster.PosMeInsert(transactionMaster);
-            var taskPlus = _helper.PlusCounter();
-            await Task.WhenAll([taskPlus, taskTransactionMaster]);
-            await NavigationService.NavigateToAsync<ValidarAbonoViewModel>();
-            IsBusy = false;
-        }
-        catch (Exception e)
-        {
-            Debug.WriteLine(e);
-        }
-    }
+			VariablesGlobales.DtoAplicarAbono = new ViewTempDtoAbono(
+				codigoAbono,
+				_customerResponse.EntityId,
+				_customerResponse.FirstName!,
+				_customerResponse.LastName!,
+				_customerResponse.Identification!,
+				DateTime.Now,
+				DocumentCreditAmortizationResponse.DocumentNumber!,
+				CurrencyName!,
+				Monto,
+				SaldoInicial,
+				SaldoFinal,
+				Description!
+			);
 
-    private bool Validate()
-    {
-        if (string.IsNullOrWhiteSpace(Description))
-        {
-            //ShowToast("Especifique una descripción del abono", ToastDuration.Long, 16);
-            return true;
-        }
+			//Aplicar Abono
+			string reference = await HelperCustomerCreditDocumentAmortization.ApplyShare(_customerResponse.EntityId, DocumentCreditResponse.DocumentNumber!, Monto);
 
-        if (decimal.Compare(Monto, decimal.Zero) <= 0)
-        {
-            //ShowToast("Especifique un monto del abono", ToastDuration.Long, 16);
-            return true;
-        }
+			//Ingrear Abono 
+			var tmpMonto = Monto;
+			var transactionMaster = new TbTransactionMaster
+			{
+				TransactionId = TypeTransaction.TransactionShare,
+				SubAmount = Monto,
+				Discount = SaldoInicial,
+				Amount = SaldoFinal,
+				Comment = Description,
+				TransactionNumber = codigoAbono,
+				TransactionOn = DateTime.Now,
+				EntitySecondaryId = _customerResponse.CustomerNumber,
+				EntityId = _customerResponse.EntityId,
+				CurrencyId = (TypeCurrency)CurrencyId,
+				Reference1 = reference,
+				CustomerCreditLineId = _customerResponse.CustomerCreditLineId,
+				CustomerIdentification = _customerResponse.Identification!
+			};
+			var taskTransactionMaster = _repositoryTransactionMaster.PosMeInsert(transactionMaster);
+			var taskPlus = _helper.PlusCounter();
+			await Task.WhenAll([taskPlus, taskTransactionMaster]);
 
-        if (decimal.Compare(SaldoFinal, decimal.Zero) >= 0) return false;
-        ShowToast(Mensajes.MensajeSaldoNegativo, ToastDuration.Long, 16);
-        return true;
-    }
+			if (MostarSaldos(mostrarPrintSinSaldos))
+			{
+				await NavigationService.NavigateToAsync<ValidarAbonoViewModel>();
+			}
+			else
+			{
+				await NavigationService.NavigateToAsync<ValidarAbonoHideSaldoViewModel>();
+			}
+			
+			IsBusy = false;
+		}
+		catch (Exception e)
+		{
+			Debug.WriteLine(e);
+		}
+	}
 
-    public Api_AppMobileApi_GetDataDownloadDocumentCreditAmortizationResponse DocumentCreditAmortizationResponse
-    {
-        get => _documentCreditAmortization;
-        set => SetProperty(ref _documentCreditAmortization, value);
-    }
+	private bool Validate()
+	{
+		if (string.IsNullOrWhiteSpace(Description))
+		{
+			//ShowToast("Especifique una descripción del abono", ToastDuration.Long, 16);
+			return true;
+		}
 
-    public Api_AppMobileApi_GetDataDownloadDocumentCreditResponse DocumentCreditResponse
-    {
-        get => _documentCreditResponse;
-        set => SetProperty(ref _documentCreditResponse, value);
-    }
+		if (decimal.Compare(Monto, decimal.Zero) <= 0)
+		{
+			//ShowToast("Especifique un monto del abono", ToastDuration.Long, 16);
+			return true;
+		}
 
-    public bool MontoError { get; set; }
+		if (decimal.Compare(SaldoFinal, decimal.Zero) >= 0) return false;
+		ShowToast(Mensajes.MensajeSaldoNegativo, ToastDuration.Long, 16);
+		return true;
+	}
 
-    public bool DescriptionError { get; set; }
+	private static bool MostarSaldos(Api_AppMobileApi_GetDataDownloadParametersResponse? parametro)
+	{
+		if(parametro is not null)
+		{
+			if (!string.IsNullOrEmpty(parametro.Value))
+			{
+				return parametro.Value.ToLower() switch
+				{
+					"false" => false,
+					"true" => true,
+					_ => true
+				};
+			}
+		}
 
-    private string? _currencyName;
+		return true;
+	}
 
-    public string? CurrencyName
-    {
-        get => _currencyName;
-        set => SetProperty(ref _currencyName, value);
-    }
+	public Api_AppMobileApi_GetDataDownloadDocumentCreditAmortizationResponse DocumentCreditAmortizationResponse
+	{
+		get => _documentCreditAmortization;
+		set => SetProperty(ref _documentCreditAmortization, value);
+	}
 
-    private string? _description;
+	public Api_AppMobileApi_GetDataDownloadDocumentCreditResponse DocumentCreditResponse
+	{
+		get => _documentCreditResponse;
+		set => SetProperty(ref _documentCreditResponse, value);
+	}
 
-    public string? Description
-    {
-        get => _description;
-        set => SetProperty(ref _description, value);
-    }
+	public bool MontoError { get; set; }
 
-    private decimal _saldoInicial;
+	public bool DescriptionError { get; set; }
 
-    public decimal SaldoInicial
-    {
-        get => _saldoInicial;
-        set => SetProperty(ref _saldoInicial, value);
-    }
+	private string? _currencyName;
 
-    private decimal _monto;
+	public string? CurrencyName
+	{
+		get => _currencyName;
+		set => SetProperty(ref _currencyName, value);
+	}
 
-    public decimal Monto
-    {
-        get => _monto;
-        set
-        {
-            SetProperty(ref _monto, value);
-            _saldoFinal = decimal.Subtract(SaldoInicial, value);
-            OnPropertyChanged(nameof(SaldoFinal));
-        }
-    }
+	private string? _description;
 
-    private decimal _saldoFinal;
+	public string? Description
+	{
+		get => _description;
+		set => SetProperty(ref _description, value);
+	}
 
-    public decimal SaldoFinal
-    {
-        get => _saldoFinal;
-        set => SetProperty(ref _saldoFinal, value);
-    }
+	private decimal _saldoInicial;
 
-    public Command AplicarAbonoCommand { get; }
+	public decimal SaldoInicial
+	{
+		get => _saldoInicial;
+		set => SetProperty(ref _saldoInicial, value);
+	}
 
-    public override async Task InitializeAsync(object parameter)
-    {
-        await LoadInvoices(parameter as string);
-    }
+	private decimal _monto;
 
-    private async Task LoadInvoices(string? parameter)
-    {
-        if (string.IsNullOrWhiteSpace(parameter))
-        {
-            return;
-        }
+	public decimal Monto
+	{
+		get => _monto;
+		set
+		{
+			SetProperty(ref _monto, value);
+			_saldoFinal = decimal.Subtract(SaldoInicial, value);
+			OnPropertyChanged(nameof(SaldoFinal));
+		}
+	}
 
-        DocumentCreditResponse = await _repositoryDocumentCredit.PosMeFindDocumentNumber(parameter);
-        DocumentCreditAmortizationResponse = await _repositoryDocumentCreditAmortization.PosMeFindByDocumentNumber(parameter);
-        CurrencyId = DocumentCreditResponse.CurrencyId;
-        CurrencyName = DocumentCreditResponse.CurrencyName!;
-        SaldoInicial = DocumentCreditResponse.Remaining;
-        IsBusy = false;
-    }
+	private decimal _saldoFinal;
 
-    public int CurrencyId { get; set; }
-    public Command ClearMontoCommand { get; }
+	public decimal SaldoFinal
+	{
+		get => _saldoFinal;
+		set => SetProperty(ref _saldoFinal, value);
+	}
 
-    public async void ApplyQueryAttributes(IDictionary<string, object> query)
-    {
-        var id = HttpUtility.UrlDecode(query["id"] as string);
-        await LoadInvoices(id);
-    }
+	public Command AplicarAbonoCommand { get; }
 
-    public void OnAppearing(INavigation navigation)
-    {
-        Navigation = navigation;
-    }
+	public override async Task InitializeAsync(object parameter)
+	{
+		await LoadInvoices(parameter as string);
+	}
+
+	private async Task LoadInvoices(string? parameter)
+	{
+		if (string.IsNullOrWhiteSpace(parameter))
+		{
+			return;
+		}
+
+		DocumentCreditResponse = await _repositoryDocumentCredit.PosMeFindDocumentNumber(parameter);
+		DocumentCreditAmortizationResponse = await _repositoryDocumentCreditAmortization.PosMeFindByDocumentNumber(parameter);
+		CurrencyId = DocumentCreditResponse.CurrencyId;
+		CurrencyName = DocumentCreditResponse.CurrencyName!;
+		SaldoInicial = DocumentCreditResponse.Remaining;
+		IsBusy = false;
+	}
+
+	public int CurrencyId { get; set; }
+	public Command ClearMontoCommand { get; }
+
+	public async void ApplyQueryAttributes(IDictionary<string, object> query)
+	{
+		var id = HttpUtility.UrlDecode(query["id"] as string);
+		await LoadInvoices(id);
+	}
+
+	public void OnAppearing(INavigation navigation)
+	{
+		Navigation = navigation;
+	}
 }
