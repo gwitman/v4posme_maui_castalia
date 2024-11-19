@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Plugin.Permissions;
+using Plugin.Permissions.Abstractions;
 using System.Diagnostics;
-using System.Threading.Tasks;
 
 namespace v4posme_maui.Services
 {
@@ -63,6 +63,41 @@ namespace v4posme_maui.Services
 				Location = null,
 				Message = Message
 			};
+		}
+
+		public async Task<bool> HasLocationPermission()
+		{
+			try
+			{
+				var status = await CrossPermissions.Current.CheckPermissionStatusAsync<LocationPermission>();
+
+				if (status != Plugin.Permissions.Abstractions.PermissionStatus.Granted)
+				{
+					if (await CrossPermissions.Current.ShouldShowRequestPermissionRationaleAsync(Permission.Location))
+					{
+						return false;
+					}
+
+					status = await CrossPermissions.Current.RequestPermissionAsync<LocationPermission>();
+				}
+
+				if (status == Plugin.Permissions.Abstractions.PermissionStatus.Granted)
+				{
+					return true;
+				}
+				else if (status != Plugin.Permissions.Abstractions.PermissionStatus.Unknown)
+				{
+					return false;
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine($"Ocurrió un error al obtener la ubicación: {ex.Message}"); // Manejar excepción
+				Message = ex.Message;
+				Debug.Write(ex);
+			}
+
+			return false;
 		}
 	}
 }

@@ -42,10 +42,10 @@ public class RepositoryItems(DataBase dataBase)
             .ToListAsync();
     }
 
-    public Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeDescending10()
+    public Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeDescending10(int top = 10)
     {
         return _dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadItemsResponse>()
-            .Take(10)
+            .Take(top)
             .OrderByDescending(response => response.ItemNumber)
             .ToListAsync();
     }

@@ -5,13 +5,15 @@ using v4posme_maui.Services.Repository;
 using v4posme_maui.Services.SystemNames;
 using v4posme_maui.Views;
 using Unity;
+using v4posme_maui.Services.Helpers;
 
 namespace v4posme_maui.ViewModels.Invoices;
 
 public class InvoicesViewModel : BaseViewModel
 {
     private readonly IRepositoryTbCustomer _customerRepositoryTbCustomer;
-    public ICommand ItemTapped { get; }
+	private readonly HelperCore _helper;
+	public ICommand ItemTapped { get; }
     public ObservableCollection<Api_AppMobileApi_GetDataDownloadCustomerResponse> Customers { get; }
     public ICommand SearchCommand { get; }
     public ICommand OnBarCode { get; }
@@ -21,7 +23,8 @@ public class InvoicesViewModel : BaseViewModel
     {
         Title = "Selección de cliente 1/5";
         _customerRepositoryTbCustomer = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCustomer>();
-        ItemTapped = new Command<Api_AppMobileApi_GetDataDownloadCustomerResponse>(OnItemTapped);
+		_helper = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
+		ItemTapped = new Command<Api_AppMobileApi_GetDataDownloadCustomerResponse>(OnItemTapped);
         SearchCommand = new Command(OnSearchCommand);
         OnBarCode = new Command(OnBarCodeShow);
         Customers = new();
@@ -62,7 +65,9 @@ public class InvoicesViewModel : BaseViewModel
         List<Api_AppMobileApi_GetDataDownloadCustomerResponse> finds;
         if (string.IsNullOrWhiteSpace(Search))
         {
-            finds = await _customerRepositoryTbCustomer.PosMeAscTake10();
+			//para mostar un determinado numero de clientes
+			var valueTop = await _helper.GetValueParameter("MOBILE_SHOW_TOP_CUSTOMER_IN_SHARE", "10");
+			finds = await _customerRepositoryTbCustomer.PosMeAscTake10(int.Parse(valueTop));
         }
         else
         {
@@ -80,7 +85,9 @@ public class InvoicesViewModel : BaseViewModel
     public async void LoadsClientes()
     {
         Customers.Clear();
-        var findAll = await _customerRepositoryTbCustomer.PosMeAscTake10();
+		//para mostar un determinado numero de clientes
+		var valueTop = await _helper.GetValueParameter("MOBILE_SHOW_TOP_CUSTOMER_IN_SHARE", "10");
+		var findAll = await _customerRepositoryTbCustomer.PosMeAscTake10(int.Parse(valueTop));
         foreach (var response in findAll)
         {
             Customers.Add(response);

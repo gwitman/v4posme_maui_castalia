@@ -14,11 +14,13 @@ namespace v4posme_maui.ViewModels;
 public class PosMeCustomerViewModel : BaseViewModel
 {
     private readonly IRepositoryTbCustomer _customerRepositoryTbCustomer;
+	private readonly HelperCore _helper;
 
-    public PosMeCustomerViewModel()
+	public PosMeCustomerViewModel()
     {
         _customerRepositoryTbCustomer = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCustomer>();
-        Customers = new ObservableCollection<Api_AppMobileApi_GetDataDownloadCustomerResponse>();
+		_helper = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
+		Customers = new ObservableCollection<Api_AppMobileApi_GetDataDownloadCustomerResponse>();
         SearchCommand = new Command(OnSearchCommand);
         OnBarCode = new Command(OnBarCodeShow);
     }
@@ -48,7 +50,10 @@ public class PosMeCustomerViewModel : BaseViewModel
         List<Api_AppMobileApi_GetDataDownloadCustomerResponse> finds;
         if (string.IsNullOrWhiteSpace(Search))
         {
-            finds = await _customerRepositoryTbCustomer.PosMeAscTake10();
+			//para mostar un determinado numero de clientes
+			var valueTop = await _helper.GetValueParameter("MOBILE_SHOW_TOP_CUSTOMER", "10");
+
+			finds = await _customerRepositoryTbCustomer.PosMeAscTake10(int.Parse(valueTop));
         }
         else
         {

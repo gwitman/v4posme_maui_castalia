@@ -14,7 +14,7 @@ public interface IRepositoryItems : IRepositoryFacade<Api_AppMobileApi_GetDataDo
     
     Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeFilterdByItemNumberAndBarCodeAndName(string? textSearch);
 
-    Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeDescending10();
+    Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeDescending10(int top = 10);
 
     Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeTakeModificado();
 }

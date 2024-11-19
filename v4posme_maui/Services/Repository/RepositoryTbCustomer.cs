@@ -67,11 +67,11 @@ public class RepositoryTbCustomer(DataBase dataBase) : RepositoryFacade<Api_AppM
             .ToListAsync();
     }
 
-    public Task<List<Api_AppMobileApi_GetDataDownloadCustomerResponse>> PosMeAscTake10()
+    public Task<List<Api_AppMobileApi_GetDataDownloadCustomerResponse>> PosMeAscTake10(int top = 10)
     {
         return _dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadCustomerResponse>()
             .OrderBy(response => response.CustomerNumber)
-            .Take(10)
+            .Take(top)
             .ToListAsync();
     }
 

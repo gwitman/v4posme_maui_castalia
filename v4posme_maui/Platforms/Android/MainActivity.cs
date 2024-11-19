@@ -7,6 +7,9 @@ using Android;
 using Android.Widget;
 using AndroidX.Core.App;
 using AndroidX.Core.Content;
+using Plugin.Permissions;
+using v4posme_maui.Services;
+using Android.Content;
 
 
 namespace v4posme_maui
@@ -24,11 +27,12 @@ namespace v4posme_maui
                     ActivityCompat.RequestPermissions(this, new string[] { Manifest.Permission.BluetoothConnect }, 1);
                 }
             }
-        }
+		}
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResults)
         {
-            base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+			PermissionsImplementation.Current.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+			base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
             if (requestCode == 1)
             {
                 if (grantResults.Length > 0 && grantResults[0] == Permission.Granted)

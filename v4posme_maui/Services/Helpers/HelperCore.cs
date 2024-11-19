@@ -66,6 +66,7 @@ public class HelperCore(
     {
 
         var parametro = await _repositoryParametersWeb.PosMeFindByKey(name);
+
         if (parametro is not null)
         {
             if (!string.IsNullOrEmpty(parametro.Value))
