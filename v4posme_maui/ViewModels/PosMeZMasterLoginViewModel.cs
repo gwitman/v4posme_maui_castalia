@@ -248,7 +248,10 @@ namespace v4posme_maui.ViewModels
             }
 
             VariablesGlobales.TbCompany = await _repositoryTbCompany.PosMeFindFirst();
-            Current!.MainPage = new MainPage();
+
+            v4posme_maui.App.StartLocationService();
+
+			Current!.MainPage = new MainPage();
             await Navigation.PopModalAsync();
         }
 

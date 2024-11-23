@@ -8,6 +8,7 @@ using v4posme_maui.Services.Api;
 using v4posme_maui.Services.SystemNames;
 using v4posme_maui.Views.Printers;
 using Application = Microsoft.Maui.Controls.Application;
+using Android.Content;
 
 namespace v4posme_maui
 {
@@ -24,7 +25,7 @@ namespace v4posme_maui
             dataBase.InitDownloadTables();
             MainPage = new LoginPage();
             UserAppTheme = AppTheme.Light;
-        }
+		}
 
 
         protected override void OnStart()
@@ -43,6 +44,13 @@ namespace v4posme_maui
             Routing.RegisterRoute(typeof(RevisarProductosSeleccionadosPage).FullName, typeof(RevisarProductosSeleccionadosPage));
             Routing.RegisterRoute(typeof(VoucherInvoicePage).FullName, typeof(VoucherInvoicePage));
 
+        }
+
+        public static void StartLocationService()
+        {
+            var intent = new Intent(Android.App.Application.Context, typeof(GPSService));
+
+            Android.App.Application.Context.StartService(intent);
         }
     }
 }
