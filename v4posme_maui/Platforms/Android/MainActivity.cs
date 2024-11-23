@@ -11,6 +11,7 @@ using Plugin.Permissions;
 using v4posme_maui.Services;
 using Android.Content;
 using AndroidX.ConstraintLayout.Widget;
+using v4posme_maui.Services.SystemNames;
 
 
 namespace v4posme_maui
@@ -54,7 +55,7 @@ namespace v4posme_maui
 					ActivityCompat.RequestPermissions(this, new string[] { Manifest.Permission.ForegroundServiceLocation }, 1);
 				}
 
-				var channel = new NotificationChannel("LocationServiceChannel", "Location Service Channel", NotificationImportance.Default);
+				var channel = new NotificationChannel(Constantes.GpsNameServices, Constantes.GpsDescriptionServices, NotificationImportance.Default);
 				var manager = GetSystemService(NotificationService) as NotificationManager;
 				manager?.CreateNotificationChannel(channel);
 			}

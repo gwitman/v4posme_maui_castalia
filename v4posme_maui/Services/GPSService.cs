@@ -18,15 +18,12 @@ namespace v4posme_maui.Services
 	[Service(Exported = false, Enabled = true, Name = "com.Services.GPSService", ForegroundServiceType = Android.Content.PM.ForegroundService.TypeLocation)]
 	public class GPSService : Service, ILocationListener
 	{
-		private const int SERVICE_ID = 7070;
-
-		private const string SERVICE_NOTIFICATION_CHANNEL_ID = "7071";
-
-		private LocationManager? _locationManager;
-
+		private const int SERVICE_ID							= Constantes.GpsServicesId;
+		private const string SERVICE_NOTIFICATION_CHANNEL_ID	= Constantes.GpsServicesChanelId;
+        private const string TAG								= Constantes.TagGps;
+        private LocationManager? _locationManager;
 		private HelperCore? _helper;
-
-		private const string TAG = "LocationService";
+		
 
 		public string Message { get; private set; } = string.Empty;
 
@@ -159,7 +156,7 @@ namespace v4posme_maui.Services
 		private Notification BuildNotification()
 		{
 			// Building intent
-			var notificationBuilder = new Notification.Builder(this, "LocationServiceChannel")
+		  var notificationBuilder = new Notification.Builder(this,Constantes.GpsNameChangelNotification)
 		 .SetContentTitle("Tracking Location")
 		 .SetContentText("Sending location data every 20 minutes")
 		 .SetSmallIcon(Resource.Drawable.notification_action_background); // Cambia icon por tu recurso de ícono.
@@ -187,16 +184,14 @@ namespace v4posme_maui.Services
 
 		private async void RequestLocationUpdates()
 		{
-			var criteria = new Criteria { Accuracy = Accuracy.Fine };
-			//var valueTime = await _helper.GetValueParameter("MOBILE_SYNC_GPS", "20");
-
-			_locationManager.RequestLocationUpdates(60000 * 3, 0, criteria, this, Looper.MainLooper);
+			var criteria	= new Criteria { Accuracy = Accuracy.Fine };
+			var time		= Convert.ToInt32(Constantes.TimeGps);
+			_locationManager.RequestLocationUpdates(time, 0, criteria, this, Looper.MainLooper);
 		}
 
 		private async void SendLocationToApi(double latitude, double longitude)
 		{
 			var httpClient = new HttpClient();
-			
 			var tempUrl = Constantes.UrlGPSShare.Replace("{UrlBase}", VariablesGlobales.CompanyKey);
 
 			if (string.IsNullOrEmpty(tempUrl))

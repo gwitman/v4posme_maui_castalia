@@ -46,10 +46,9 @@ namespace v4posme_maui
 
         }
 
-        public static void StartLocationService()
+        public static void StartGpsService()
         {
             var intent = new Intent(Android.App.Application.Context, typeof(GPSService));
-
             Android.App.Application.Context.StartService(intent);
         }
     }
