@@ -18,7 +18,7 @@ public static class Constantes
     public static int CompanyId                                     = 2;
     public static int BranchId                                      = 2;
     public const string UrlBase                                     = "{UrlBase}";
-    public const string TimeGpsInMilleseconds                       = "60000";
+    public const string TimeGpsInMilleseconds                       = "1200000"; 
     public const string GpsTitleContentNotification = "Gps posMe";
     public const string GpsTextContentNotification  = "Envio cada 20 min";
     public const string TagGps                      = "GpsLocationServicePosMe";
