@@ -208,8 +208,9 @@ namespace v4posme_maui.Services
 				new("txtPassword", password),
 				new("txtLatituded", latitude.ToString()),
 				new("txtLongituded", longitude.ToString()),
-				new("txtReference1", " ")
-			};
+				new("txtReference1", " "),
+                new("txtCompanyName", VariablesGlobales.CompanyKey!.ToString())
+            };
 			var req = new HttpRequestMessage(HttpMethod.Post, tempUrl)
 			{
 				Content = new FormUrlEncodedContent(nvc)
