@@ -55,7 +55,7 @@ namespace v4posme_maui
 					ActivityCompat.RequestPermissions(this, new string[] { Manifest.Permission.ForegroundServiceLocation }, 1);
 				}
 
-				var channel = new NotificationChannel(Constantes.GpsNameServices, Constantes.GpsDescriptionServices, NotificationImportance.Default);
+				var channel = new NotificationChannel(Constantes.GpsNameChangelNotification, Constantes.GpsDescriptionServices, NotificationImportance.Default);
 				var manager = GetSystemService(NotificationService) as NotificationManager;
 				manager?.CreateNotificationChannel(channel);
 			}

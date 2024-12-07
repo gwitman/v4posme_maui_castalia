@@ -17,8 +17,10 @@ public static class Constantes
     public const string ParameterCodigoFactura                      = "TRANSACTION_INVOICE";
     public static int CompanyId                                     = 2;
     public static int BranchId                                      = 2;
-    public const string UrlBase                     = "{UrlBase}";
-    public const string TimeGps                     = "180000";
+    public const string UrlBase                                     = "{UrlBase}";
+    public const string TimeGpsInMilleseconds                       = "60000";
+    public const string GpsTitleContentNotification = "Gps posMe";
+    public const string GpsTextContentNotification  = "Envio cada 20 min";
     public const string TagGps                      = "GpsLocationServicePosMe";
     public const string GpsServicesChanelId         = "7071";
     public const int GpsServicesId                  = 7070;

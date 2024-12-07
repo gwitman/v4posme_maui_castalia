@@ -157,8 +157,8 @@ namespace v4posme_maui.Services
 		{
 			// Building intent
 		  var notificationBuilder = new Notification.Builder(this,Constantes.GpsNameChangelNotification)
-		 .SetContentTitle("Tracking Location")
-		 .SetContentText("Sending location data every 20 minutes")
+		 .SetContentTitle(Constantes.GpsTitleContentNotification)
+		 .SetContentText(Constantes.GpsTextContentNotification)
 		 .SetSmallIcon(Resource.Drawable.notification_action_background); // Cambia icon por tu recurso de ícono.
 
 			return notificationBuilder.Build();
@@ -185,7 +185,7 @@ namespace v4posme_maui.Services
 		private async void RequestLocationUpdates()
 		{
 			var criteria	= new Criteria { Accuracy = Accuracy.Fine };
-			var time		= Convert.ToInt32(Constantes.TimeGps);
+			var time		= Convert.ToInt32(Constantes.TimeGpsInMilleseconds);
 			_locationManager.RequestLocationUpdates(time, 0, criteria, this, Looper.MainLooper);
 		}
 
