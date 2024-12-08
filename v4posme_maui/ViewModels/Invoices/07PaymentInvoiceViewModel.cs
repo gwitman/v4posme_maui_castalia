@@ -23,7 +23,7 @@ public class PaymentInvoiceViewModel : BaseViewModel
         _repositoryTbTransactionMasterDetail = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMasterDetail>();
         _repositoryTbTransactionMaster = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMaster>();
         _repositoryItems = VariablesGlobales.UnityContainer.Resolve<IRepositoryItems>();
-        Title = "Pago 5/5";
+        Title = "Pago 6/6";
         SelectionEfectivoCommand = new Command(OnSelectionEfectivoCommand);
         SelectionDebitoCommand = new Command(OnSelectionDebitoCommand);
         SelectionCreditoCommand = new Command(OnSelectionCreditoCommand);
@@ -88,7 +88,11 @@ public class PaymentInvoiceViewModel : BaseViewModel
             TransactionNumber = codigo,
             CurrencyId = (TypeCurrency)dtoInvoice.Currency!.Key,
             CustomerCreditLineId = dtoInvoice.CustomerResponse.CustomerCreditLineId,
-            CustomerIdentification = dtoInvoice.CustomerResponse.Identification!
+            CustomerIdentification = dtoInvoice.CustomerResponse.Identification!,
+            Plazo = dtoInvoice.Plazo,
+            NextVisit = dtoInvoice.NextVisit,
+            FixedExpenses = dtoInvoice.FixedExpenses,
+            PeriodPay = (TypePeriodPay)dtoInvoice.PeriodPay!.Key
         };
         transactionMaster.SubAmount = dtoInvoice.Balance - transactionMaster.Discount + transactionMaster.Taxi1;
 

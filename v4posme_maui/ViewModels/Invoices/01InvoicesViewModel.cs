@@ -21,7 +21,7 @@ public class InvoicesViewModel : BaseViewModel
 
     public InvoicesViewModel()
     {
-        Title = "Selección de cliente 1/5";
+        Title = "Selección de cliente 1/6";
         _customerRepositoryTbCustomer = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCustomer>();
 		_helper = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
 		ItemTapped = new Command<Api_AppMobileApi_GetDataDownloadCustomerResponse>(OnItemTapped);

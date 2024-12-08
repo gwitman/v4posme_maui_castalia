@@ -14,7 +14,7 @@ public class SeleccionarProductoViewModel : BaseViewModel
 
     public SeleccionarProductoViewModel()
     {
-        Title = "Seleccionar producto 3/5";
+        Title = "Seleccionar producto 4/6";
         Productos = new();
         _repositoryItems = VariablesGlobales.UnityContainer.Resolve<IRepositoryItems>();
         AnadirProducto = new Command<Api_AppMobileApi_GetDataDownloadItemsResponse>(OnAnadirProducto);

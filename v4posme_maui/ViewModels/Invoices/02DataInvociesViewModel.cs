@@ -20,10 +20,10 @@ public class DataInvoicesViewModel : BaseViewModel, IQueryAttributable
     public DataInvoicesViewModel()
     {
         _repositoryTbCustomer = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCustomer>();
-        Title = "Datos de facturacion 2/5";
+        Title = "Datos de facturacion 2/6";
         Item = VariablesGlobales.DtoInvoice;
-        SeleccionarProductosCommand = new Command(OnSeleccionarProductos, ValidateFields);
-        PropertyChanged += (_, _) => SeleccionarProductosCommand.ChangeCanExecute();
+        SeleccionarInvoiceCreditCommand = new Command(OnSeleccionarDataCredit, ValidateFields);
+        PropertyChanged += (_, _) => SeleccionarInvoiceCreditCommand.ChangeCanExecute();
         LoadComboBox();
     }
 
@@ -38,7 +38,7 @@ public class DataInvoicesViewModel : BaseViewModel, IQueryAttributable
         return !Validate();
     }
 
-    private async void OnSeleccionarProductos()
+    private async void OnSeleccionarDataCredit()
     {
         if (!ValidateFields())
         {
@@ -58,11 +58,11 @@ public class DataInvoicesViewModel : BaseViewModel, IQueryAttributable
             return;
         }
 
-        Item.Comentarios = Comentarios;
-        Item.Referencia = Referencias;
-        Item.Currency = SelectedCurrency;
-        Item.TipoDocumento = SelectedTipoDocumento;
-        await NavigationService.NavigateToAsync<SeleccionarProductoViewModel>();
+        Item.Comentarios    = Comentarios;
+        Item.Referencia     = Referencias;
+        Item.Currency       = SelectedCurrency;
+        Item.TipoDocumento      = SelectedTipoDocumento;        
+        await NavigationService.NavigateToAsync<DataInvoiceCreditViewModel>(Item.CustomerResponse!.CustomerNumber!);
         IsBusy = false;
     }
 
@@ -103,7 +103,7 @@ public class DataInvoicesViewModel : BaseViewModel, IQueryAttributable
         set => SetProperty(ref _tipoDocumentos, value);
     }
 
-    public Command SeleccionarProductosCommand { get; }
+    public Command SeleccionarInvoiceCreditCommand { get; }
     public DtoCatalogItem? SelectedCurrency { get; set; }
     public DtoCatalogItem? SelectedTipoDocumento { get; set; }
 

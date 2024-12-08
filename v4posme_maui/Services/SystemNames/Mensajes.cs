@@ -30,6 +30,7 @@ public static class Mensajes
     public const string MensajeCampoRequerido = "Todos los campos son requeridos, intente nuevamente.";
     public const string MensajeCompartirComprobante = "Compartir Comprobante de Factura";
     public const string MensajeSeleccionarMoneda = "Seleccione una moneda para continuar";
+    public const string MensajeSeleccionarFrecuenciaPago = "Seleccione una frecuencia de pago";
     public const string MensajeSeleccionarTipoDocumento = "Seleccione un tipo de documento para continuar";
     public const string MensajeCompartirComprobanteAbono = "Compartir Comprobante de abono";
     public const string MensajeEspecificarDatosGuardar = "Debe especificar los datos a guardar";

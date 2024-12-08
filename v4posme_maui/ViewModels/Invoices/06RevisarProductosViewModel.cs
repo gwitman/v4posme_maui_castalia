@@ -9,7 +9,7 @@ public class RevisarProductosSeleccionadosViewModel : BaseViewModel
 {
     public RevisarProductosSeleccionadosViewModel()
     {
-        Title = "Productos Seleccionados 4/5";
+        Title = "Productos Seleccionados 5/6";
         ProductosSeleccionados = VariablesGlobales.DtoInvoice.Items;
         TapCommandProducto = new Command(OnTapCommand);
         PrecioCommand = new Command<Api_AppMobileApi_GetDataDownloadItemsResponse>(OnPrecioCommand);

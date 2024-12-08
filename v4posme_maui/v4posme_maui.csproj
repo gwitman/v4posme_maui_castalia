@@ -98,10 +98,31 @@
 	  <Compile Update="Views\Abonos\06PrinterPage.xaml.cs">
 	    <DependentUpon>06PrinterPage.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Views\Invoices\03DataInvoiceCreditPage.xaml.cs">
+	    <DependentUpon>03DataInvoiceCreditPage.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Invoices\05ModificarValorPage.xaml.cs">
+	    <DependentUpon>05ModificarValorPage.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Invoices\07PaymentInvoicePage.xaml.cs">
+	    <DependentUpon>07PaymentInvoicePage.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Invoices\06RevisarProductosPage.xaml.cs">
+	    <DependentUpon>06RevisarProductosPage.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Invoices\04SeleccionarProductoPage.xaml.cs">
+	    <DependentUpon>04SeleccionarProductoPage.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Invoices\08PrinterInvoicePage.xaml.cs">
+	    <DependentUpon>08PrinterInvoicePage.xaml</DependentUpon>
+	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
 	  <MauiXaml Update="Views\Abonos\06PrinterPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Invoices\03DataInvoiceCreditPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>

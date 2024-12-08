@@ -44,6 +44,10 @@ public class ViewTempDtoInvoice
     public DateTime TransactionOn { get; set; }
     public int TransactionMasterId { get; set; }
     public TypePayment TipoPayment { get; set; }
+    public decimal FixedExpenses { get; set; } = decimal.Zero;
+    public int Plazo { get; set; } = 1;
+    public DateTime NextVisit { get; set; } = DateTime.Now;
+    public DtoCatalogItem PeriodPay { get; set; } 
     public TbTransactionMaster TransactionMaster { get; set; }
 
     public void ClearItems()

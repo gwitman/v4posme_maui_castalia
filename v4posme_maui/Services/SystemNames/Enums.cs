@@ -12,6 +12,16 @@ namespace v4posme_maui.Services.SystemNames
         TransactionShare = 23
     }
 
+
+    public enum TypePeriodPay
+    {
+        Mensual = 190,
+        Quincenal = 189,
+        Semanal = 188,
+        Diario = 531,
+        Catorcenal = 2322,
+        MesYMedio = 203,
+    }
     public enum TypeCurrency
     {
         Cordoba = 1,

@@ -20,6 +20,11 @@ public class TbTransactionMaster
 
     [DataMember(Name = "entityID")] public int EntityId { get; set; }
     [DataMember(Name = "transactionOn")] public DateTime TransactionOn { get; set; }
+    [DataMember(Name = "transactionOn2")] public DateTime TransactionOn2 { get; set; }
+    [DataMember(Name = "nextVisit")] public DateTime NextVisit { get; set; } = DateTime.Now.Date;
+    [DataMember(Name = "plazo")] public int Plazo { get; set; } = 1;
+    [DataMember(Name = "fixedExpenses")] public decimal FixedExpenses { get; set; } = decimal.Zero;
+    [DataMember(Name = "periodPay")] public TypePeriodPay PeriodPay { get; set; } = TypePeriodPay.Mensual;
 
     [DataMember(Name = "entitySecondaryID")]
     public string? EntitySecondaryId { get; set; }
