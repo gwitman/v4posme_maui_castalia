@@ -15,7 +15,8 @@ public static class Constantes
     public static readonly string ParametroCodigoAbono              = "TRANSACTION_SHARE";
     public static readonly string ParemeterEntityIDAutoIncrement    = "AUTO_INCREMENT";
     public const string ParameterCodigoFactura                      = "TRANSACTION_INVOICE";
-    public static int CompanyId                                     = 2;
+	public const string ParameterCodigoVisita                       = "TRANSACTION_VISIT";
+	public static int CompanyId                                     = 2;
     public static int BranchId                                      = 2;
     public const string UrlBase                     = "{UrlBase}";
     public const string TimeGps                     = "180000";

@@ -12,6 +12,7 @@
        xmlns:invoices="clr-namespace:v4posme_maui.Views.Invoices"
        xmlns:printers="clr-namespace:v4posme_maui.Views.Printers"
        xmlns:upload="clr-namespace:v4posme_maui.Views.Upload"
+       xmlns:more="clr-namespace:v4posme_maui.Views.More"
        ios:Page.UseSafeArea="true"
        x:Class="v4posme_maui.Views.MainPage">
 
@@ -20,6 +21,7 @@
             <Image Source="pm_png_96px.png" />
         </Frame>
     </Shell.FlyoutHeader>
+    
     <FlyoutItem Title="Inicio" Icon="basic_home.svg">
         <ShellContent Title="Inicio"
                       Icon="basic_home.svg"
@@ -114,6 +116,22 @@
 
         <ShellContent Title="Parametros" Icon="parameters.svg"
                       ContentTemplate="{DataTemplate local:ParameterPage}" />
+
+    </FlyoutItem>
+
+    <FlyoutItem Title="Mas" Icon="add.svg">
+
+        <ShellContent Title="Mas" Icon="add.svg"
+                  ContentTemplate="{DataTemplate more:MorePage}" />
+
+        <ShellContent Title="Abono" Icon="coin.svg"
+                  ContentTemplate="{DataTemplate abonos:AbonosPage}" />
+
+        <ShellContent Title="Factura" Icon="invoice.svg"
+                  ContentTemplate="{DataTemplate invoices:InvoicesPage}" />
+
+        <ShellContent Title="Parametros" Icon="parameters.svg"
+                  ContentTemplate="{DataTemplate local:ParameterPage}" />
 
     </FlyoutItem>
 

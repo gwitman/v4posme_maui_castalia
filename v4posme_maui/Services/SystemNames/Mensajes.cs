@@ -20,7 +20,8 @@ public static class Mensajes
     public const string MensajeDocumentCreditCustomerVacio = "No hay datos de facturación con el cliente seleccionado.";
     public const string MensajeDocumentCreditAmortizationVacio = "No hay datos de detalle para abono de factura con el documento seleccionado";
     public const string MnesajeCountadoDeAbonoMalFormado = "El countador de los abonos tiene un formato incorrecto, ABC-#";
-    public const string AnularAbonoValidacion = "No puede eliminar este abono, intente nuevamente";
+	public const string MensajeCountadorDeVisitaMalFormado = "El countador de las visitas tiene un formato incorrecto, ABC-#";
+	public const string AnularAbonoValidacion = "No puede eliminar este abono, intente nuevamente";
     public const string MensajeMontoMenorIgualCero = "Debe especificar un monto mayor a 0";
     public const string MensajeSaldoNegativo = "No se puede ingresar un saldo negativo";
     public const string MensajeValorZero = "No puede ingresar un valor en 0";
@@ -42,4 +43,8 @@ public static class Mensajes
     public const string AuthTokenError = "No fue posible generar el token";
     public const string MensajeCompania = "Debe especificar nombre de compañia";
     public const string MessagePermisosEscrituraNotConcedidos = "Permiso de escritura no concedido";
+    public const string MessageCommentEmpty = "El comentario no puede estar vacio";
+    public const string MessageDateMoreThan = "La fecha no puede ser menor al dia de hoy";
+    public const string MessageErrorVisita = "Ha ocurrido un error al guardar la visita";
+	public const string MessageOkVisita = "Se ha registrado la visita correctamente";
 }

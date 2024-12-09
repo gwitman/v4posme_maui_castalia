@@ -50,7 +50,28 @@ public class HelperCore(
         return codigo;
     }
 
-    public async Task<int> GetAutoIncrement()
+	public async Task<string> GetCodigoVisita()
+	{
+		var find = await repositoryParameters.PosMeFindCodigoVisita();
+		var codigo = find.Value!;
+
+		if (codigo.IndexOf("-", StringComparison.Ordinal) < 0)
+        {
+			throw new Exception(Mensajes.MensajeCountadorDeVisitaMalFormado);
+		}
+
+		var prefix = find.Value!.Split("-")[0];
+		var counter = find.Value!.Split("-")[1];
+		var numero = Convert.ToInt32(counter);
+		numero += 1;
+		var nuevoCodigoAbono = prefix + "-" + Convert.ToString(numero).PadLeft(4, '0');
+		find.Value = nuevoCodigoAbono;
+		await repositoryParameters.PosMeUpdate(find);
+
+		return codigo;
+	}
+
+	public async Task<int> GetAutoIncrement()
     {
         var find = await repositoryParameters.PosMeFindAutoIncrement();
         var codigo = find.Value!;

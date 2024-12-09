@@ -38,17 +38,34 @@ namespace v4posme_maui.Services
 		[return: GeneratedEnum]
 		public override StartCommandResult OnStartCommand(Intent intent, [GeneratedEnum] StartCommandFlags flags, int startId)
 		{
+			var hasPermission = Task.Run(() =>
+			{
+				HasLocationPermission();
+			}).IsCompleted;
+
+			var status = Task.Run(() =>
+			{
+				Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
+			}).IsCompleted;
+
+			if (!status)
+			{
+				Task.Run(() =>
+				{
+					Permissions.RequestAsync<Permissions.LocationWhenInUse>();
+				});
+			}
+
 			//  Build the notification for the foreground service
 			var notification = BuildNotification();
 			if (Build.VERSION.SdkInt >= BuildVersionCodes.R)
 			{
-				StartForeground(SERVICE_ID, notification, Android.Content.PM.ForegroundService.TypeLocation);
+				if (hasPermission && status)
+				{
+					StartForeground(SERVICE_ID, notification, Android.Content.PM.ForegroundService.TypeLocation);
+				}
 			}
-			else
-			{
-				StartForeground(SERVICE_ID, notification);
-			}
-
+			
 			RequestLocationUpdates();
 
 			//  Return a sticky result so that the service remains running

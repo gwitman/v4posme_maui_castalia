@@ -9,6 +9,9 @@ using v4posme_maui.Services.SystemNames;
 using v4posme_maui.Views.Printers;
 using Application = Microsoft.Maui.Controls.Application;
 using Android.Content;
+using v4posme_maui.Views.More;
+using v4posme_maui.Views.More.ReporteVenta;
+using v4posme_maui.Views.More.Visita;
 
 namespace v4posme_maui
 {
@@ -32,6 +35,7 @@ namespace v4posme_maui
         {
             DependencyService.Register<NavigationService>();
             Routing.RegisterRoute(typeof(ItemDetailPage).FullName, typeof(ItemDetailPage));
+            //Routing.RegisterRoute(typeof(AboutPage).FullName, typeof(AboutPage));
             Routing.RegisterRoute(typeof(CustomerDetailInvoicePage).FullName, typeof(CustomerDetailInvoicePage));
             Routing.RegisterRoute(typeof(AbonosPage).FullName, typeof(AbonosPage));
             Routing.RegisterRoute(typeof(CreditDetailInvoicePage).FullName, typeof(CreditDetailInvoicePage));
@@ -43,8 +47,10 @@ namespace v4posme_maui
             Routing.RegisterRoute(typeof(PaymentInvoicePage).FullName, typeof(PaymentInvoicePage));
             Routing.RegisterRoute(typeof(RevisarProductosSeleccionadosPage).FullName, typeof(RevisarProductosSeleccionadosPage));
             Routing.RegisterRoute(typeof(VoucherInvoicePage).FullName, typeof(VoucherInvoicePage));
-
-        }
+            Routing.RegisterRoute(typeof(MorePage).FullName, typeof(MorePage));
+			Routing.RegisterRoute(typeof(ReporteVentaPage).FullName, typeof(ReporteVentaPage));
+			Routing.RegisterRoute(typeof(VisitaPage).FullName, typeof(VisitaPage));
+		}
 
         public static void StartGpsService()
         {
