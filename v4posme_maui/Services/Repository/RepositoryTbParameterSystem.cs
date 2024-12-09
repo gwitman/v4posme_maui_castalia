@@ -48,6 +48,10 @@ public class RepositoryTbParameterSystem(DataBase dataBase) : RepositoryFacade<T
             .FirstOrDefaultAsync(system => system.Name == Constantes.ParemeterEntityIDAutoIncrement);
     }
 
-   
-
+    //Carlos Conto
+	public Task<TbParameterSystem> PosMeFindCodigoVisita()
+	{ //ParameterCodigoVisita
+		return dataBase.Database.Table<TbParameterSystem>()
+			.FirstOrDefaultAsync(system => system.Name == Constantes.ParameterCodigoVisita);
+	}
 }

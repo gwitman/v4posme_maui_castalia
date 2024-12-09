@@ -23,12 +23,13 @@ public class DataBase
             var parametrosDefault = new List<TbParameterSystem>
             {
                 new() { Name = Constantes.ParametroCounter, Description = "Contador Global", Value = "0" },
-                new() { Name = Constantes.ParametroLogo, Description = "Logo de la aplicación", Value = "" },                
+                new() { Name = Constantes.ParametroLogo, Description = "Logo de la aplicación", Value = "" },
                 new() { Name = Constantes.ParametroPrinter, Description = "Impresora", Value = "Printer" },
                 new() { Name = Constantes.ParametroCodigoAbono, Description = "Número de abono", Value = "ABO-0001" },
                 new() { Name = Constantes.ParameterCodigoFactura, Description = "Número de factura", Value = "FAC-0001" },
-                new() { Name = Constantes.ParemeterEntityIDAutoIncrement, Description = "Auto incrementado", Value = "-1" }
-            };
+                new() { Name = Constantes.ParemeterEntityIDAutoIncrement, Description = "Auto incrementado", Value = "-1" },
+				new() { Name = Constantes.ParameterCodigoVisita, Description = "Número de factura", Value = "VISI-0001" },
+			};
             await Database.InsertAllAsync(parametrosDefault);
         }
     }

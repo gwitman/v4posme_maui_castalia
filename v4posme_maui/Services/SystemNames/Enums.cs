@@ -9,7 +9,16 @@ namespace v4posme_maui.Services.SystemNames
     public enum TypeTransaction
     {
         TransactionInvoiceBilling = 19,
-        TransactionShare = 23
+        TransactionShare = 23,
+        TransactionQueryMedical = 35
+    }
+
+    public enum TypeQueryMedical
+    {
+        Entrada = 518,
+        Salida = 519,
+        ConsultaMedica = 716,
+        Visita = 739
     }
 
 

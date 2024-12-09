@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="v4posme_maui.Views.More.MorePage"
+             xmlns:dxco="clr-namespace:DevExpress.Maui.Controls;assembly=DevExpress.Maui.Controls"
+             xmlns:dx="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
+             Title="Mas">
+
+    <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand" VerticalOptions="StartAndExpand">
+        <!-- Botón a la izquierda -->
+        <Button Text="Cierre"
+            BackgroundColor="#3498db"
+            TextColor="White"
+            Padding="10,10"
+            Margin="0, 20,10, 0"
+            WidthRequest="150"
+            HeightRequest="50"
+            HorizontalOptions="EndAndExpand"
+            Clicked="OnButtonClicked"
+            CommandParameter="1">
+
+            <Button.ImageSource>
+                <FileImageSource File="invoice.png"/>
+            </Button.ImageSource>
+        </Button>
+
+        <!-- Botón a la derecha -->
+        <Button Text="Visita"
+            BackgroundColor="#e74c3c"
+            TextColor="White"
+            Padding="10,10"
+            Margin="0,20,10,0"
+            WidthRequest="150"
+            HeightRequest="50"
+            HorizontalOptions="StartAndExpand"
+            Clicked="OnButtonClicked"
+            CommandParameter="2">
+            <Button.ImageSource>
+                <FileImageSource File="person.png" />
+            </Button.ImageSource>
+        </Button>
+    </StackLayout>
+
+    <!--
+    <VerticalStackLayout>
+        <Label 
+            Text="Welcome to .NET MAUI!"
+            VerticalOptions="Center" 
+            HorizontalOptions="Center" />
+
+        <Button Text="Presionar"
+        BackgroundColor="#e74c3c"
+        TextColor="White"
+        BorderColor="Transparent"
+        BorderWidth="2"
+        CornerRadius="25"
+        Padding="15,10">
+           
+        </Button>
+
+    </VerticalStackLayout>-->
+</ContentPage>
