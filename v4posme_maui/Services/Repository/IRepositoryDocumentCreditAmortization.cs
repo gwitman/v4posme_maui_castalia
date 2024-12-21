@@ -9,4 +9,5 @@ public interface IRepositoryDocumentCreditAmortization : IRepositoryFacade<Api_A
     Task<List<Api_AppMobileApi_GetDataDownloadDocumentCreditAmortizationResponse>> PosMeFilterByDocumentNumber(string document);
     Task<Api_AppMobileApi_GetDataDownloadDocumentCreditAmortizationResponse> PosMeFindByDocumentNumber(string document);
     Task<Api_AppMobileApi_GetDataDownloadDocumentCreditAmortizationResponse> PosMeFindByAmortizationId(int id);
+	Task<List<Api_AppMobileApi_GetDataDownloadDocumentCreditAmortizationResponse>> PosMeFindByDate(DateTime startDate, DateTime endDate);
 }

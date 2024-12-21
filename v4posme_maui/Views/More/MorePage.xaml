@@ -20,7 +20,7 @@
             CommandParameter="1">
 
             <Button.ImageSource>
-                <FileImageSource File="invoice.png"/>
+                <FileImageSource File="invoice_white.svg"/>
             </Button.ImageSource>
         </Button>
 
@@ -36,7 +36,7 @@
             Clicked="OnButtonClicked"
             CommandParameter="2">
             <Button.ImageSource>
-                <FileImageSource File="person.png" />
+                <FileImageSource File="person_white.svg" />
             </Button.ImageSource>
         </Button>
     </StackLayout>

@@ -122,6 +122,7 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\Invoices\03DataInvoiceCreditPage.xaml">
+	  </MauiXaml>
 	  <MauiXaml Update="Views\More\MorePage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

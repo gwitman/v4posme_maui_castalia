@@ -19,7 +19,7 @@ public partial class ValidarAbonoHideSaldoPage : ContentPage
     {
         base.OnAppearing();
         await ((ValidarAbonoHideSaldoViewModel)BindingContext).OnAppearing(Navigation);
-        Logo.Source = ((ValidarAbonoHideSaldoViewModel)BindingContext).LogoSource;
+		Logo_.Source = ((ValidarAbonoHideSaldoViewModel)BindingContext).LogoSource;
     }
 
     protected override bool OnBackButtonPressed()
@@ -67,7 +67,8 @@ public partial class ValidarAbonoHideSaldoPage : ContentPage
 
     private async Task<string> FileImage()
     {
-        var screenshotResult = await DxStackLayout.CaptureAsync();
+        var screenshotResult = await DxStackLayout_.CaptureAsync();
+
         if (screenshotResult is null)
         {
             ((ValidarAbonoViewModel)BindingContext)

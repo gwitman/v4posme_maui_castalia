@@ -32,4 +32,11 @@ public class RepositoryDocumentCredit(DataBase dataBase) : RepositoryFacade<Api_
             .Where(response => response.CreditAmortizationId == id)
             .FirstOrDefaultAsync();
     }
+
+	public Task<List<Api_AppMobileApi_GetDataDownloadDocumentCreditResponse>> PosMeFindByDate(DateTime startDate, DateTime endDate)
+	{
+		return dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadDocumentCreditResponse>()
+			.Where(response => response.DateApply >= startDate && response.DateApply <= endDate)
+			.ToListAsync();
+	}
 }

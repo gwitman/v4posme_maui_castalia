@@ -52,4 +52,13 @@ public class RepositoryDocumentCreditAmortization(DataBase dataBase) : Repositor
         return  _dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadDocumentCreditAmortizationResponse>()
             .FirstOrDefaultAsync(response => response.CreditAmortizationId == id);
     }
-}
+
+	public async Task<List<Api_AppMobileApi_GetDataDownloadDocumentCreditAmortizationResponse>> PosMeFindByDate(DateTime startDate, DateTime endDate)
+	{
+		var results = await _dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadDocumentCreditAmortizationResponse>()
+		 .Where(response => response.DateApply >= startDate && response.DateApply <= endDate)
+         .ToListAsync();
+
+        return results;
+	}
+} 

@@ -17,7 +17,7 @@
     </ContentPage.BindingContext>
     <ContentPage.ToolbarItems>
         <ToolbarItem IconImageSource="shared" Clicked="MenuItem_OnClicked" />
-        <ToolbarItem Text="Imprimir" Order="Secondary" x:Name="ItemPrint" Command="{Binding PrintCommand}" />
+        <ToolbarItem Text="Imprimir" Order="Secondary" x:Name="ItemPrint_" Command="{Binding PrintCommand}" />
         <ToolbarItem Text="Nuevo Abono" Order="Secondary" Command="{Binding AplicarOtroCommand}" />
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
@@ -26,13 +26,13 @@
                 <ScrollView>
                     <dx:DXStackLayout
                         BackgroundColor="White"
-                        x:Name="DxStackLayout"
+                        x:Name="DxStackLayout_"
                         Orientation="Vertical"
                         Padding="20">
                         <dx:DXStackLayout Orientation="Vertical"
                                           Margin="0,0,0,10"
                                           HorizontalOptions="Center">
-                            <dx:DXImage x:Name="Logo"
+                            <dx:DXImage x:Name="Logo_"
                                         HeightRequest="150"
                                         WidthRequest="150"
                                         Source="{Binding LogoSource}" />

@@ -1,4 +1,5 @@
-﻿using v4posme_maui.Models;
+﻿using Android.Widget;
+using v4posme_maui.Models;
 using v4posme_maui.Services.SystemNames;
 
 namespace v4posme_maui.Services.Repository;
@@ -104,4 +105,28 @@ public class RepositoryTbTransactionMaster(DataBase dataBase) : RepositoryFacade
         return _dataBase.Database.Table<TbTransactionMaster>()
             .FirstOrDefaultAsync(master => master.TransactionNumber == transactionNumber);
     }
+
+	Task<List<TbTransactionMaster>> IRepositoryTbTransactionMaster.PosmeGetAll()
+	{
+		var query = $"""
+                     select distinct tm.TransactionId,
+                             tm.TransactionMasterId,
+                             tm.TransactionNumber,
+                             tm.EntityId,
+                             tm.TransactionOn,
+                             tm.Amount,
+                             tm.TransactionCausalId,
+                             tm.ExchangeRate,
+                             tm.CurrencyId,
+                             tm.Comment,
+                             tm.Reference1,
+                             tm.Reference2,
+                             c.firstName || ' ' || c.lastName referencie3
+                     from tb_transaction_master tm
+                              left join tb_customers c on tm.EntityId=c.EntityId
+                     order by tm.TransactionOn DESC 
+                     """;
+
+		return _dataBase.Database.QueryAsync<TbTransactionMaster>(query);
+	}
 }
