@@ -46,7 +46,7 @@ namespace v4posme_maui.ViewModels.More.Visita
 			Navigation = navigation;
 		}
 
-		public DtoVisita CurrentVisita { get; set; }
+		public ViewTempDtoVisita CurrentVisita { get; set; }
 
 		private readonly IRepositoryTbTransactionMaster _repositoryTransactionMaster;
 		private readonly HelperCore _helper;
@@ -80,7 +80,7 @@ namespace v4posme_maui.ViewModels.More.Visita
 			_repositoryTransactionMaster = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMaster>();
 		}
 
-		public async Task<bool> OnAplicarAbono(object? obj)
+		public async Task<bool> OnAplicarVisita(object? obj)
 		{
 			try
 			{

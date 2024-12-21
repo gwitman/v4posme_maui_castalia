@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace v4posme_maui.Models
 {
-	public class DtoVisita : INotifyPropertyChanged
+	public class ViewTempDtoVisita : INotifyPropertyChanged
 	{
 
 		private string _comentario;

@@ -28,7 +28,7 @@ public class DataBase
                 new() { Name = Constantes.ParametroCodigoAbono, Description = "Número de abono", Value = "ABO-0001" },
                 new() { Name = Constantes.ParameterCodigoFactura, Description = "Número de factura", Value = "FAC-0001" },
                 new() { Name = Constantes.ParemeterEntityIDAutoIncrement, Description = "Auto incrementado", Value = "-1" },
-				new() { Name = Constantes.ParameterCodigoVisita, Description = "Número de factura", Value = "VISI-0001" },
+				new() { Name = Constantes.ParameterCodigoVisita, Description = "Número de visita", Value = "VST-0001" },
 			};
             await Database.InsertAllAsync(parametrosDefault);
         }

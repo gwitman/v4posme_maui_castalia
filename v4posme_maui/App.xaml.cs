@@ -35,7 +35,6 @@ namespace v4posme_maui
         {
             DependencyService.Register<NavigationService>();
             Routing.RegisterRoute(typeof(ItemDetailPage).FullName, typeof(ItemDetailPage));
-            //Routing.RegisterRoute(typeof(AboutPage).FullName, typeof(AboutPage));
             Routing.RegisterRoute(typeof(CustomerDetailInvoicePage).FullName, typeof(CustomerDetailInvoicePage));
             Routing.RegisterRoute(typeof(AbonosPage).FullName, typeof(AbonosPage));
             Routing.RegisterRoute(typeof(CreditDetailInvoicePage).FullName, typeof(CreditDetailInvoicePage));

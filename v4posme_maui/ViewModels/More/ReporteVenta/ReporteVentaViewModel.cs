@@ -173,11 +173,11 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 			protected set => SetProperty(ref _totalNIO, value);
 		}
 
-		public ObservableCollection<DtoReporteCierre> Invoices { get; }
-		public ObservableCollection<DtoReporteCierre> InvoicesNIO { get; }
-		public ObservableCollection<DtoReporteCierre> Credits { get; }
-		public ObservableCollection<DtoReporteCierre> CreditsNIO { get; }
-		public ObservableCollection<DtoReporteCierre> Visits { get; }
+		public ObservableCollection<ViewTempDtoReporteCierre> Invoices { get; }
+		public ObservableCollection<ViewTempDtoReporteCierre> InvoicesNIO { get; }
+		public ObservableCollection<ViewTempDtoReporteCierre> Credits { get; }
+		public ObservableCollection<ViewTempDtoReporteCierre> CreditsNIO { get; }
+		public ObservableCollection<ViewTempDtoReporteCierre> Visits { get; }
 
 		public ReporteVentaViewModel()
 		{
@@ -268,7 +268,7 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 					.Where(_invoices => _invoices.TransactionId == TypeTransaction.TransactionInvoiceBilling)
 					.Where(_invoices => _invoices.TransactionOn >= FechaInical && _invoices.TransactionOn <= FechaFinal.AddHours(12))
 					.Where(_invoices => _invoices.CurrencyId == TypeCurrency.Dolar)
-					.Select(x => new DtoReporteCierre()
+					.Select(x => new ViewTempDtoReporteCierre()
 					{
 						DocumentNumber = x.TransactionNumber!,
 						CurrencyId = (int)x.CurrencyId,
@@ -281,7 +281,7 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 					.Where(_credits => _credits.TransactionId == TypeTransaction.TransactionShare)
 					.Where(_credits => _credits.TransactionOn >= FechaInical && _credits.TransactionOn <= FechaFinal.AddHours(12))
 					.Where(_credits => _credits.CurrencyId == TypeCurrency.Dolar)
-					.Select(x => new DtoReporteCierre()
+					.Select(x => new ViewTempDtoReporteCierre()
 					{
 						DocumentNumber = x.TransactionNumber!,
 						CurrencyId = (int)x.CurrencyId,
@@ -294,7 +294,7 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 					.Where(_invoices => _invoices.TransactionId == TypeTransaction.TransactionInvoiceBilling)
 					.Where(_invoices => _invoices.TransactionOn >= FechaInical && _invoices.TransactionOn <= FechaFinal.AddHours(12))
 					.Where(_invoices => _invoices.CurrencyId == TypeCurrency.Cordoba)
-					.Select(x => new DtoReporteCierre()
+					.Select(x => new ViewTempDtoReporteCierre()
 					{
 						DocumentNumber = x.TransactionNumber!,
 						CurrencyId = (int)x.CurrencyId,
@@ -307,7 +307,7 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 					.Where(_credits => _credits.TransactionId == TypeTransaction.TransactionShare)
 					.Where(_credits => _credits.TransactionOn >= FechaInical && _credits.TransactionOn <= FechaFinal.AddHours(12))
 					.Where(_credits => _credits.CurrencyId == TypeCurrency.Cordoba)
-					.Select(x => new DtoReporteCierre()
+					.Select(x => new ViewTempDtoReporteCierre()
 					{
 						DocumentNumber = x.TransactionNumber!,
 						CurrencyId = (int)x.CurrencyId,
@@ -319,7 +319,7 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 				var visits = transactions
 					.Where(_visits => _visits.TransactionId == TypeTransaction.TransactionQueryMedical)
 					.Where(_visits => _visits.TransactionOn >= FechaInical && _visits.TransactionOn <= FechaFinal.AddHours(12))
-					.Select(x => new DtoReporteCierre()
+					.Select(x => new ViewTempDtoReporteCierre()
 					{
 						DocumentNumber = x.TransactionNumber!,
 						Remaining = x.Amount,

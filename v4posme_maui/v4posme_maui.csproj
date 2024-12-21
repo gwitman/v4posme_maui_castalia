@@ -115,6 +115,12 @@
 	  <Compile Update="Views\Invoices\08PrinterInvoicePage.xaml.cs">
 	    <DependentUpon>08PrinterInvoicePage.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Views\More\Visita\01CustomerPage.xaml.cs">
+	    <DependentUpon>01CustomerPage.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\More\Visita\02VisitaFormPage.xaml.cs">
+	    <DependentUpon>02VisitaFormPage.xaml</DependentUpon>
+	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -129,10 +135,10 @@
 	  <MauiXaml Update="Views\More\ReporteVenta\ReporteVentaPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Views\More\Visita\VisitaFormPage.xaml">
+	  <MauiXaml Update="Views\More\Visita\02VisitaFormPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Views\More\Visita\VisitaPage.xaml">
+	  <MauiXaml Update="Views\More\Visita\01CustomerPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>

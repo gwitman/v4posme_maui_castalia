@@ -1,6 +1,6 @@
 ﻿namespace v4posme_maui.Models
 {
-	public class DtoReporteCierre
+	public class ViewTempDtoReporteCierre
 	{
 		public string DocumentNumber { get; set; } = null!;
 		public string CurrencyName { get; set; } = null!;

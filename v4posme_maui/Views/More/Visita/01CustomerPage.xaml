@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
@@ -7,52 +7,57 @@
              xmlns:dxe="clr-namespace:DevExpress.Maui.Editors;assembly=DevExpress.Maui.Editors"
              xmlns:local="clr-namespace:v4posme_maui.ViewModels"
              xmlns:models="clr-namespace:v4posme_maui.Models"
-             xmlns:abonos="clr-namespace:v4posme_maui.ViewModels.Abonos"
+             xmlns:visita="clr-namespace:v4posme_maui.ViewModels.More.Visita"
              xmlns:controls="clr-namespace:DevExpress.Maui.Controls;assembly=DevExpress.Maui.Controls"
-             x:Class="v4posme_maui.Views.Abonos.AbonosPage"
-             Title="{Binding Title}">
+             x:Class="v4posme_maui.Views.More.Visita.VisitaPage"
+             Title="{Binding Title}"
+             >
+
+
     <ContentPage.BindingContext>
-        <abonos:AbonosViewModel />
+        <visita:VisitaViewModel />
     </ContentPage.BindingContext>
+    
     
     <ContentPage.ToolbarItems>
         <ToolbarItem IconImageSource="barcode_scan" Command="{Binding OnBarCode}" />
     </ContentPage.ToolbarItems>
-    
+
+
     <ContentPage.Content>
         <controls:ShimmerView Style="{StaticResource ShimmerEffect}" 
-                              IsLoading="{Binding IsBusy}">
+                          IsLoading="{Binding IsBusy}">
             <controls:ShimmerView.Content>
                 <dxc:DXStackLayout Orientation="Vertical">
                     <Grid
-                        RowDefinitions="Auto,*"
-                        HorizontalOptions="Center">
+                    RowDefinitions="Auto,*"
+                    HorizontalOptions="Center">
                         <Grid ColumnDefinitions="0.2*">
                             <dxe:TextEdit x:Name="SearchBar"
-                                          Grid.Column="1"
-                                          Margin="5"
-                                          StartIcon="search"
-                                          Text="{Binding Search}"
-                                          StartIconCommand="{Binding SearchCommand}"
-                                          ReturnCommand="{Binding SearchCommand}"
-                                          PlaceholderText="Buscar por código, identificacion y nombres" />
+                                      Grid.Column="1"
+                                      Margin="5"
+                                      StartIcon="search"
+                                      Text="{Binding Search}"
+                                      StartIconCommand="{Binding SearchCommand}"
+                                      ReturnCommand="{Binding SearchCommand}"
+                                      PlaceholderText="Buscar por código, identificacion y nombres" />
                         </Grid>
                         <dxcv:DXCollectionView x:Name="ClientesCollectionView"
-                                               Grid.Row="1"
-                                               ItemsSource="{Binding Customers}"
-                                               SelectedItem="{Binding SelectedCustomer}"
-                                               SelectionMode="Single"
-                                               IsRefreshing="{Binding  IsBusy, Mode=OneWay}">
+                                           Grid.Row="1"
+                                           ItemsSource="{Binding Customers}"
+                                           SelectedItem="{Binding SelectedCustomer}"
+                                           SelectionMode="Single"
+                                           IsRefreshing="{Binding  IsBusy, Mode=OneWay}">
                             <dxcv:DXCollectionView.ItemTemplate>
                                 <DataTemplate>
                                     <dxc:DXStackLayout
-                                        CornerRadius="15"
-                                        Margin="10">
+                                    CornerRadius="15"
+                                    Margin="10">
                                         <Grid
-                                              HorizontalOptions="Fill"
-                                              Padding="10"
-                                              VerticalOptions="Fill"
-                                              BackgroundColor="{StaticResource Primary}">
+                                          HorizontalOptions="Fill"
+                                          Padding="10"
+                                          VerticalOptions="Fill"
+                                          BackgroundColor="{StaticResource Primary}">
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="Auto" />
                                                 <RowDefinition Height="Auto" />
@@ -66,63 +71,63 @@
                                             </Grid.ColumnDefinitions>
 
                                             <Frame
-                                                WidthRequest="60"
-                                                HeightRequest="60"
-                                                BackgroundColor="Transparent"
-                                                Grid.Column="0"
-                                                Grid.RowSpan="3">
+                                            WidthRequest="60"
+                                            HeightRequest="60"
+                                            BackgroundColor="Transparent"
+                                            Grid.Column="0"
+                                            Grid.RowSpan="3">
                                                 <dxc:DXImage WidthRequest="55"
-                                                             HeightRequest="55"
-                                                             Source="person_charge"
-                                                             Aspect="Fill" />
+                                                         HeightRequest="55"
+                                                         Source="person_charge"
+                                                         Aspect="Fill" />
                                             </Frame>
                                             <Label Grid.Column="1" Grid.Row="0" FontAttributes="Bold"
-                                                   Grid.ColumnSpan="2"
-                                                   TextColor="White"
-                                                   Text="{Binding Identification}" />
+                                               Grid.ColumnSpan="2"
+                                               TextColor="White"
+                                               Text="{Binding Identification}" />
                                             <HorizontalStackLayout Grid.Column="1" Grid.Row="1">
                                                 <Label Text="{Binding CustomerNumber}"
-                                                       TextColor="White"
-                                                       HorizontalOptions="Start" />
+                                                   TextColor="White"
+                                                   HorizontalOptions="Start" />
                                             </HorizontalStackLayout>
                                             <HorizontalStackLayout Grid.Row="1" Grid.Column="2">
                                                 <Label
-                                                    HorizontalOptions="End">
+                                                HorizontalOptions="End">
                                                     <Label.FormattedText>
                                                         <FormattedString>
                                                             <Span Text="Balance: "
-                                                                  TextColor="White" />
+                                                              TextColor="White" />
                                                             <Span Text="{Binding CurrencyName}"
-                                                                  TextColor="White"/>
+                                                              TextColor="White"/>
                                                             <Span Text="{Binding Balance,StringFormat='{0:N2}'}"
-                                                                  TextColor="White" />
+                                                              TextColor="White" />
                                                         </FormattedString>
                                                     </Label.FormattedText>
                                                 </Label>
                                             </HorizontalStackLayout>
                                             <HorizontalStackLayout Grid.Row="2"
-                                                                   Grid.Column="1"
-                                                                   Grid.ColumnSpan="2">
+                                                               Grid.Column="1"
+                                                               Grid.ColumnSpan="2">
                                                 <Label Text="{Binding FirstName}" TextColor="White" />
                                                 <Label Text=" " />
                                                 <Label Text="{Binding LastName}" TextColor="White" />
                                             </HorizontalStackLayout>
                                             <HorizontalStackLayout
-                                                Grid.Row="3"
-                                                Grid.Column="1"
-                                                Grid.ColumnSpan="2">
+                                            Grid.Row="3"
+                                            Grid.Column="1"
+                                            Grid.ColumnSpan="2">
                                                 <Label
-                                                    Text="Linea de crédito: "
-                                                    TextColor="White" />
+                                                Text="Linea de crédito: "
+                                                TextColor="White" />
                                                 <Label
-                                                    TextColor="White"
-                                                    Text="{Binding CustomerCreditLineId}" />
+                                                TextColor="White"
+                                                Text="{Binding CustomerCreditLineId}" />
                                             </HorizontalStackLayout>
                                             <Grid.GestureRecognizers>
                                                 <TapGestureRecognizer
-                                                    NumberOfTapsRequired="1"
-                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type abonos:AbonosViewModel}}, Path=ItemTapped}"
-                                                    CommandParameter="{Binding .}">
+                                                NumberOfTapsRequired="1"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type visita:VisitaViewModel}}, Path=ItemTapped}"
+                                                CommandParameter="{Binding .}">
                                                 </TapGestureRecognizer>
                                             </Grid.GestureRecognizers>
                                         </Grid>
@@ -131,22 +136,22 @@
                             </dxcv:DXCollectionView.ItemTemplate>
                         </dxcv:DXCollectionView>
                         <controls:DXPopup x:Name="Popup"
-                                          AllowScrim="True"
-                                          BackgroundColor="{Binding PopupBackgroundColor}"
-                                          VerticalAlignment="Bottom"
-                                          ScrimColor="#b3adb9ce"
-                                          IsOpen="{Binding PopUpShow}">
+                                      AllowScrim="True"
+                                      BackgroundColor="{Binding PopupBackgroundColor}"
+                                      VerticalAlignment="Bottom"
+                                      ScrimColor="#b3adb9ce"
+                                      IsOpen="{Binding PopUpShow}">
                             <StackLayout WidthRequest="250">
                                 <Label Text="{Binding Mensaje}"
-                                       FontAttributes="Bold"
-                                       FontSize="15"
-                                       TextColor="{StaticResource White}"
-                                       Margin="20, 20" />
+                                   FontAttributes="Bold"
+                                   FontSize="15"
+                                   TextColor="{StaticResource White}"
+                                   Margin="20, 20" />
                                 <Button Text="Aceptar"
-                                        Clicked="ClosePopup_Clicked"
-                                        BackgroundColor="{StaticResource Gray600}"
-                                        FontSize="20"
-                                        TextColor="White" />
+                                    Clicked="ClosePopup_Clicked"
+                                    BackgroundColor="{StaticResource Gray600}"
+                                    FontSize="20"
+                                    TextColor="White" />
                             </StackLayout>
                         </controls:DXPopup>
                     </Grid>
@@ -154,9 +159,12 @@
             </controls:ShimmerView.Content>
             <controls:ShimmerView.LoadingView>
                 <ActivityIndicator IsRunning="{Binding IsBusy}"
-                                   HeightRequest="50"
-                                   WidthRequest="50" />
+                               HeightRequest="50"
+                               WidthRequest="50" />
             </controls:ShimmerView.LoadingView>
         </controls:ShimmerView>
     </ContentPage.Content>
+    
+
+
 </ContentPage>

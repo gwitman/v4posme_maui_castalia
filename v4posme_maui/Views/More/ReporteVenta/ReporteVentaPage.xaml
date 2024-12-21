@@ -144,7 +144,7 @@
                                             <dx:DXStackLayout
                                                 CornerRadius="15">
                                                 <Grid
-                                                    x:DataType="models:DtoReporteCierre"
+                                                    x:DataType="models:ViewTempDtoReporteCierre"
                                                     Padding="2"
                                                     BackgroundColor="White">
 
@@ -214,7 +214,7 @@
                                         <DataTemplate>
                                             <dx:DXStackLayout CornerRadius="15">
                                                 <Grid
-                                                    x:DataType="models:DtoReporteCierre"
+                                                    x:DataType="models:ViewTempDtoReporteCierre"
                                                     Padding="2"
                                                     BackgroundColor="White">
 
@@ -282,7 +282,7 @@
                                             <dx:DXStackLayout
                                                 CornerRadius="15">
                                                 <Grid
-                                                    x:DataType="models:DtoReporteCierre"
+                                                    x:DataType="models:ViewTempDtoReporteCierre"
                                                     Padding="2"
                                                     BackgroundColor="White">
                                                     <Grid.RowDefinitions>
@@ -349,7 +349,7 @@
                                         <DataTemplate>
                                             <dx:DXStackLayout CornerRadius="15">
                                                 <Grid
-                                                    x:DataType="models:DtoReporteCierre"
+                                                    x:DataType="models:ViewTempDtoReporteCierre"
                                                     Padding="2"
                                                     BackgroundColor="White">
                                                     <Grid.RowDefinitions>
@@ -455,7 +455,7 @@
                                         <DataTemplate>
                                             <dx:DXStackLayout CornerRadius="15">
                                                 <Grid
-                                                    x:DataType="models:DtoReporteCierre"
+                                                    x:DataType="models:ViewTempDtoReporteCierre"
                                                     Padding="2"
                                                     BackgroundColor="White">
 
