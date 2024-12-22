@@ -11,18 +11,16 @@ using v4posme_maui.Services.SystemNames;
 namespace v4posme_maui.ViewModels.More.Visita;
 internal class VisitaViewModel : BaseViewModel
 {
-    private readonly IRepositoryTbCustomer _customerRepositoryTbCustomer;
-    private readonly IRepositoryDocumentCredit _repositoryDocumentCredit;
+    private readonly IRepositoryTbCustomer _customerRepositoryTbCustomer;    
 
     public VisitaViewModel()
     {
-        Title = "Selección de cliente 1/2";
-        _customerRepositoryTbCustomer = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCustomer>();
-        _repositoryDocumentCredit = VariablesGlobales.UnityContainer.Resolve<IRepositoryDocumentCredit>();
-        Customers = new();
-        SearchCommand = new Command(OnSearchCommand);
-        OnBarCode = new Command(OnBarCodeShow);
-        ItemTapped = new Command<Api_AppMobileApi_GetDataDownloadCustomerResponse>(OnItemSelected);
+        Title           = "Selección de cliente 1/2";
+        _customerRepositoryTbCustomer = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCustomer>();        
+        Customers       = new();
+        SearchCommand   = new Command(OnSearchCommand);
+        OnBarCode       = new Command(OnBarCodeShow);
+        ItemTapped      = new Command<Api_AppMobileApi_GetDataDownloadCustomerResponse>(OnItemSelected);
     }
 
     private async void OnBarCodeShow()
@@ -43,13 +41,6 @@ internal class VisitaViewModel : BaseViewModel
         }
 
         IsBusy = true;
-        var invoices = await _repositoryDocumentCredit.PosMeFindByEntityId(item.EntityId);
-        if (invoices.Count == 0)
-        {
-            ShowToast(Mensajes.MensajeDocumentCreditCustomerVacio, ToastDuration.Short, 14);
-            return;
-        }
-
         await NavigationService.NavigateToAsync<VisitaFormViewModel>(item.EntityId);
         IsBusy = false;
     }

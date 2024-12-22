@@ -13,8 +13,7 @@ public partial class VisitaPage : ContentPage
     private readonly VisitaViewModel _viewModel;
     public VisitaPage()
     {
-        InitializeComponent();
-        Title = "Visita - Seleccionar cliente 1/2";
+        InitializeComponent();        
         BindingContext = _viewModel = new VisitaViewModel();
 
     }

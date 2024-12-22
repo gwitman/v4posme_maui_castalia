@@ -50,7 +50,8 @@ namespace v4posme_maui
             Routing.RegisterRoute(typeof(MorePage).FullName, typeof(MorePage));
 			Routing.RegisterRoute(typeof(ReporteVentaPage).FullName, typeof(ReporteVentaPage));
 			Routing.RegisterRoute(typeof(VisitaPage).FullName, typeof(VisitaPage));
-		}
+            Routing.RegisterRoute(typeof(VisitaFormPage).FullName, typeof(VisitaFormPage));
+        }
 
         public static void StartGpsService()
         {

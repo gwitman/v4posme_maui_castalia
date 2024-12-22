@@ -48,6 +48,5 @@ public class TbTransactionMaster
     [DataMember(Name = "referencie1")] public string? Reference1 { get; set; } = string.Empty;
     [DataMember(Name = "referencie2")] public string? Reference2 { get; set; } = string.Empty;
     [DataMember(Name = "referencie3")] public string? Reference3 { get; set; } = string.Empty;
-
-    [DataMember(Name = "referencie1")] public string CustomerIdentification { get; set; } = string.Empty;
+    [DataMember(Name = "CustomerIdentification")] public string CustomerIdentification { get; set; } = string.Empty;
 }

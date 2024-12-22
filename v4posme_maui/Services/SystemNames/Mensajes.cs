@@ -45,6 +45,7 @@ public static class Mensajes
     public const string MensajeCompania = "Debe especificar nombre de compañia";
     public const string MessagePermisosEscrituraNotConcedidos = "Permiso de escritura no concedido";
     public const string MessageCommentEmpty = "El comentario no puede estar vacio";
+    public const string MessageVisitTipificationEmpty = "Seleccionar una tipificacion";
     public const string MessageDateMoreThan = "La fecha no puede ser menor al dia de hoy";
     public const string MessageErrorVisita = "Ha ocurrido un error al guardar la visita";
 	public const string MessageOkVisita = "Se ha registrado la visita correctamente";

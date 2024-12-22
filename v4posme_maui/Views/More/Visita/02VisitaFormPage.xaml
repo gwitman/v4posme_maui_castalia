@@ -10,7 +10,7 @@
              xmlns:vm1="clr-namespace:v4posme_maui.ViewModels.More.Visita"
              x:Class="v4posme_maui.Views.More.Visita.VisitaFormPage"
              Style="{StaticResource DetailPageStyle}"
-             Title="Visita - Formulario">
+             Title="{Binding Title}" >
 
     <ContentPage.BindingContext>
         <visita:VisitaFormViewModel />
@@ -23,14 +23,36 @@
         
     </ContentPage.Behaviors>
 
+    
     <ContentPage.ToolbarItems>
         <ToolbarItem IconImageSource="save" Clicked="SaveItemClick" />
     </ContentPage.ToolbarItems>
-
+    
+    
     <ContentPage.Content>
         <ScrollView>
             <dx:DXStackLayout Orientation="Vertical">
 
+                <dxcn:DXPopup x:Name="Popup"
+                   AllowScrim="True"
+                   BackgroundColor="{Binding PopupBackgroundColor}"
+                   VerticalAlignment="Bottom"
+                   ScrimColor="#b3adb9ce"
+                   IsOpen="{Binding PopUpShow}">
+                    <StackLayout WidthRequest="250">
+                        <Label Text="{Binding Mensaje}"
+                    FontAttributes="Bold"
+                    FontSize="15"
+                    TextColor="{StaticResource White}"
+                    Margin="20, 20" />
+                        <Button Text="Aceptar"
+                     Clicked="ClosePopup_Clicked"
+                     BackgroundColor="{StaticResource Gray600}"
+                     FontSize="20"
+                     TextColor="White" />
+                    </StackLayout>
+                </dxcn:DXPopup>
+                
 
                 <dx:DXStackLayout Orientation="Vertical">
                     <dx:DXStackLayout.Triggers>
@@ -59,48 +81,37 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
-                        <dxdf:DataFormView x:Name="DataForm" DataObject="{Binding Item}"
-                           EditorLabelColor="{StaticResource Primary}"
-                           EditorLabelWidth="0"
-                           IsAutoGenerationEnabled="False"
-                           ValidationMode="LostFocus"
-                           ValidateForm="DataForm_OnValidateForm"
-                           Margin="0,10,0,0" Background="Transparent">
-                            
-                            <dxdf:DataFormCustomItem>
-                                <dxe:TextEdit
-                                x:Name="TextComentario"
-                                ErrorText="No puede estar vacío"
-                                IsErrorIconVisible="True"
-                                IconColor="#006E98"
-                                StartIcon="editorsemail"
-                                Text="{Binding Comentario}"
-                                LabelText="Comentario"/>
-                            </dxdf:DataFormCustomItem>
+                        <dxe:TextEdit
+                            x:Name="TextComentario"
+                            ErrorText="No puede estar vacío"
+                            IsErrorIconVisible="True"
+                            IconColor="#006E98"
+                            StartIcon="editorsemail"
+                            Text="{Binding Comentario}"
+                            TextChanged="TxtComentario_OnTextChanged"
+                            LabelText="Comentario"/>
 
-                            <dxdf:DataFormCustomItem>
-                                <dxe:DateEdit
+                        <dxe:DateEdit
                             Grid.Row="1"
                             IconColor="{StaticResource Primary}"
                             x:Name="TxtFecha"
                             DisplayFormat="d"
                             StartIcon="editorscalendar"
-                            LabelText="Fecha Visita" Date="{Binding SelectedDate}"/>
-                            </dxdf:DataFormCustomItem>
+                            LabelText="Fecha Visita" Date="{Binding SelectedDate}"/>            
 
-                            <dxdf:DataFormCustomItem>
-                                <dxe:ComboBoxEdit
-                                Grid.Row="3"
-                                x:Name="TxtTipificacion"
-                                SelectedItem="0"
-                                IsLabelFloating="True"
-                                StartIcon="quantity"
-                                LabelText="Tipificación"
-                                SelectedIndex="0"
-                                ItemsSource="{Binding Tipificaciones}"
-                                />
-                            </dxdf:DataFormCustomItem>
-                        </dxdf:DataFormView>
+
+                        <dxe:ComboBoxEdit
+                           Grid.Row="3"       
+                           SelectedItem="{Binding SelectedTipificacion}"
+                           HasError="{Binding ErrorTipificacion}"
+                           x:Name="TxtTipificacion"                                
+                           IsLabelFloating="True"
+                           StartIcon="quantity"
+                           LabelText="Tipificación"   
+                           ItemsSource="{Binding Tipificaciones}"
+                           />
+                        
+                        
                     </Grid>
 
                     <dx:DXBorder.Triggers>
