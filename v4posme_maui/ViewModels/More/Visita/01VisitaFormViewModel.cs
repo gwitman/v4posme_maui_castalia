@@ -19,8 +19,10 @@ namespace v4posme_maui.ViewModels.More.Visita
         private readonly HelperCore _helper;
         public ViewTempDtoVisita CurrentVisita { get; set; }
 
-        public bool ErrorCurrency { get; set; }        
-
+        /*********
+         * Propiedad Fecha
+        *******************/
+        
         private DateTime _selectedDate = DateTime.Now.AddDays(1);
         public DateTime SelectedDate
         {
@@ -31,33 +33,35 @@ namespace v4posme_maui.ViewModels.More.Visita
 				SetProperty(ref _selectedDate, value);
 			}
 		}
-
+        /*********
+         * Propiedad Tipificacion
+        *******************/
         public DtoCatalogItem? SelectedTipificacion { get; set; }
-
-        private ObservableCollection<DtoCatalogItem>? _tipificaciones;
+        public bool ErrorTipificacion { get; set; }
+        private ObservableCollection<DtoCatalogItem>? _Tipificaciones;
         public ObservableCollection<DtoCatalogItem>? Tipificaciones
 		{
-			get => _tipificaciones;
-			set => SetProperty(ref _tipificaciones, value);
+			get => _Tipificaciones;
+			set => SetProperty(ref _Tipificaciones, value);
 		}
-
-        private string _comentario = string.Empty;
+        /*********
+         * Propiedad Comentario
+        *******************/
+        private string _comentario = ".";
         public string Comentario
 		{
 			get => _comentario;
 			set => SetProperty(ref _comentario, value);
 		}
 
-
         public VisitaFormViewModel()
         {
-            CurrentVisita					= new();
+            CurrentVisita					= new();            
             _repositoryTbCustomer			= VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCustomer>();
             _helper							= VariablesGlobales.UnityContainer.Resolve<HelperCore>();
             _repositoryTransactionMaster	= VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMaster>();
             Title			= "Agendar visita 2/2";         
-            LoadComboBox();          
-            
+            LoadComboBox();            
         }
 
        
@@ -72,8 +76,6 @@ namespace v4posme_maui.ViewModels.More.Visita
             var id = HttpUtility.UrlDecode(query["id"] as string);
             await LoadVisita(id);
         }
-
-
         private async Task LoadVisita(string? param)
         {
             var customer			= await _repositoryTbCustomer.PosMeFindEntityId(Convert.ToInt32(param!));
@@ -81,10 +83,10 @@ namespace v4posme_maui.ViewModels.More.Visita
             LoadComboBox();
             IsBusy = false;
         }
-
         private void LoadComboBox()
         {
-            SelectedDate	= DateTime.Now.AddDays(1);
+
+            SelectedDate	= DateTime.Now.AddDays(1);            
             Tipificaciones	=
 			[
                 new DtoCatalogItem((int)TypeQueryMedical.ConsultaMedica, "Consulta Médica", ""),
@@ -99,8 +101,6 @@ namespace v4posme_maui.ViewModels.More.Visita
             }
 
         }
-
-
         public async Task<bool> OnAplicarVisita(object? obj)
 		{
 			try
