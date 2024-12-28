@@ -49,4 +49,6 @@ public static class Mensajes
     public const string MessageDateMoreThan = "La fecha no puede ser menor al dia de hoy";
     public const string MessageErrorVisita = "Ha ocurrido un error al guardar la visita";
 	public const string MessageOkVisita = "Se ha registrado la visita correctamente";
+    public const string MessagePermissionDenied = "El permisio es requerido para el funcionanamiento de la apliacion";
+	public const string MessagePermissionShouldAccept = "El permiso debe otorgarse manualmente (Permiso de Localizacion y Dispositivo Bluetooth) para obtener los dispositivos cercanos";
 }
