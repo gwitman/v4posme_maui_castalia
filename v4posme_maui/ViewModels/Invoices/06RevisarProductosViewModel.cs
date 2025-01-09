@@ -28,6 +28,7 @@ public class RevisarProductosSeleccionadosViewModel : BaseViewModel
     {
         var modificarValorPage = new ModificarValorPage();
         modificarValorPage.SetQuantity(obj.Quantity);
+        modificarValorPage.SetCampo("cantidad");
         modificarValorPage.SetItemSelected(obj);
         Navigation!.PushAsync(modificarValorPage, true);
     }
@@ -36,6 +37,7 @@ public class RevisarProductosSeleccionadosViewModel : BaseViewModel
     {
         var modificarValorPage = new ModificarValorPage();
         modificarValorPage.SetPrecio(obj.PrecioPublico);
+        modificarValorPage.SetCampo("precio");
         modificarValorPage.SetItemSelected(obj);
         Navigation!.PushAsync(modificarValorPage, true);
     }

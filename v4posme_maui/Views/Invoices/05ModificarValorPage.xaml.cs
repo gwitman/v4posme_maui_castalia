@@ -19,7 +19,12 @@ public partial class ModificarValorPage : ContentPage
 
     private decimal Quantity { get; set; }
     private decimal Precio { get; set; }
+    private string Campo { get; set; }
 
+    public void SetCampo(string name)
+    {
+        Campo = name;
+    }
     public void SetQuantity(decimal value)
     {
         Quantity = value;
@@ -29,8 +34,8 @@ public partial class ModificarValorPage : ContentPage
 
     public void SetPrecio(decimal value)
     {
-        Precio = decimal.Zero;
         Precio = value;
+        Quantity = decimal.Zero;
         TxtValor.Text = value.ToString("N2");
     }
 
@@ -64,18 +69,19 @@ public partial class ModificarValorPage : ContentPage
         //--wg-    return;
         //--wg-}
 
-        if (decimal.Compare(Quantity, decimal.Zero) >= 0)
+        if (decimal.Compare(Quantity, decimal.Zero) >= 0 && Campo == "cantidad" )
         {
             SelectedItem.Quantity = value;
         }
 
-        if (decimal.Compare(Precio, decimal.Zero) > 0)
+        if (decimal.Compare(Precio, decimal.Zero) >= 0 && Campo == "precio")
         {
             SelectedItem.PrecioPublico = value;
         }
 
-        SelectedItem.Importe = decimal.Multiply(SelectedItem.Quantity, SelectedItem.PrecioPublico);
-        VariablesGlobales.DtoInvoice.Balance = VariablesGlobales.DtoInvoice.Items.Sum(response => response.Importe);
+        SelectedItem.Importe                    = decimal.Multiply(SelectedItem.Quantity, SelectedItem.PrecioPublico);
+        VariablesGlobales.DtoInvoice.Balance    = VariablesGlobales.DtoInvoice.Items.Sum(response => response.Importe);
+
         var findIndex = VariablesGlobales.DtoInvoice.Items.FindIndex(response => response.ItemNumber == SelectedItem.ItemNumber);
         VariablesGlobales.DtoInvoice.Items.RemoveAt(findIndex);
 
