@@ -19,6 +19,7 @@ public static class Constantes
 	public static int CompanyId                                     = 2;
     public static int BranchId                                      = 2;
     public const string UrlBase                                     = "{UrlBase}";
+    public const string UrlBasePosme                                = "https://posme.net/v4posme/posme/public/";
     public const string TimeGpsInMilleseconds                       = "300000"; 
     public const string GpsTitleContentNotification = "Gps posMe";
     public const string GpsTextContentNotification  = "Envio cada 5 min";
@@ -32,6 +33,7 @@ public static class Constantes
     public static string UrlRequestDownload         = UrlBase + "app_mobile_api/getDataDownload";
     public static string UrlUpload                  = UrlBase + "app_mobile_api/setDataUpload";
     public const string UrlGPSShare                 = UrlBase + "app_mobile_api/setPositionGps";
+    public const string UrlGpSShareOnly             = "app_mobile_api/setPositionGps";
     public const string UrlPagadito                 = "https://connect.pagadito.com/api/v2/exec-trans";
     public const string UrlPagaditoToken            = "https://comercios.pagadito.com/apipg/charges.php";
     public const string TokenPagadito               = "";

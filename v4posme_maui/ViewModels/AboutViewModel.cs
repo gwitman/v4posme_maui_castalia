@@ -130,7 +130,7 @@ namespace v4posme_maui.ViewModels
                         listaAbonosDolares.Add(master);
                     }
                 }
-                else
+                else if (master.TransactionId == TypeTransaction.TransactionInvoiceBilling)
                 {
                     if (master.TransactionCausalId == TypeTransactionCausal.Credito)
                     {

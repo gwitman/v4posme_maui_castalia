@@ -208,6 +208,7 @@ namespace v4posme_maui.Services
 
 		private async void SendLocationToApi(double latitude, double longitude)
 		{
+			//Enviar a comercio gps
 			var httpClient = new HttpClient();
 			var tempUrl = Constantes.UrlGPSShare.Replace("{UrlBase}", VariablesGlobales.CompanyKey);
 
@@ -249,7 +250,51 @@ namespace v4posme_maui.Services
 				Log.Error(TAG, $"Error sending location: {ex.Message}");
 			}
 
-		}
+
+            //Enviar a PosMe Gps
+            var httpClientPosme		= new HttpClient();
+            tempUrl					= Constantes.UrlBasePosme+ Constantes.UrlGpSShareOnly;
+
+            if (string.IsNullOrEmpty(tempUrl))
+            {
+                return;
+            }
+
+            nickname = VariablesGlobales.User!.Nickname!;
+            password = VariablesGlobales.User!.Password!;
+
+            var nvcPosme = new List<KeyValuePair<string, string>>
+            {
+                new("txtNickname", nickname),
+                new("txtPassword", password),
+                new("txtLatituded", latitude.ToString()),
+                new("txtLongituded", longitude.ToString()),
+                new("txtReference1", " "),
+                new("txtCompanyName", VariablesGlobales.CompanyKey!.ToString())
+            };
+            var reqPosme = new HttpRequestMessage(HttpMethod.Post, tempUrl)
+            {
+                Content = new FormUrlEncodedContent(nvcPosme)
+            };
+
+            try
+            {
+                var response = await httpClientPosme.SendAsync(reqPosme);
+                if (!response.IsSuccessStatusCode)
+                {
+                    Log.Debug(TAG, $"API Response: {response.StatusCode}");
+                    return;
+                }
+
+                Log.Debug(TAG, $"API Response: {response.StatusCode}");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(TAG, $"Error sending location: {ex.Message}");
+            }
+
+
+        }
 
 		public override void OnDestroy()
 		{
