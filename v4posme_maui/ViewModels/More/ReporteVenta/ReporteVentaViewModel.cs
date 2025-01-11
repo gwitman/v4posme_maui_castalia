@@ -77,33 +77,33 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 			protected set => SetProperty(ref _isVisibleDate, value);
 		}
 
-		private decimal _totalFactura = 0;
+		private string _totalFactura = "$ 0";
 
-		public decimal TotalFactura
+		public string TotalFactura
 		{
 			get => _totalFactura;
 			protected set => SetProperty(ref _totalFactura, value);
 		}
 
-		private decimal _totalFacturaNIO = 0;
+		private string _totalFacturaNIO = "$ 0";
 
-		public decimal TotalFacturaNIO
+		public string TotalFacturaNIO
 		{
 			get => _totalFacturaNIO;
 			protected set => SetProperty(ref _totalFacturaNIO, value);
 		}
 
-		private decimal _totalCredito = 0;
+		private string _totalCredito = "$ 0";
 
-		public decimal TotalCredito
+		public string TotalCredito
 		{
 			get => _totalCredito;
 			protected set => SetProperty(ref _totalCredito, value);
 		}
 
-		private decimal _totalCreditoNIO = 0;
+		private string _totalCreditoNIO = "$ 0";
 
-		public decimal TotalCreditoNIO
+		public string TotalCreditoNIO
 		{
 			get => _totalCreditoNIO;
 			protected set => SetProperty(ref _totalCreditoNIO, value);
@@ -254,10 +254,10 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 				InvoicesNIO.Clear();
 				CreditsNIO.Clear();
 
-				TotalFactura = 0;
-				TotalFacturaNIO = 0;
-				TotalCredito = 0;
-				TotalCreditoNIO = 0;
+				var _TotalFactura = 0m;
+				var _TotalFacturaNIO = 0m;
+				var _TotalCredito = 0m;
+				var _TotalCreditoNIO = 0m;
 
 				var totalNIO = 0m;
 				var totalUSD = 0m;
@@ -331,28 +331,28 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 				foreach (var item in invoicesUS)
 				{
 					Invoices.Add(item);
-					TotalFactura += item.Remaining;
+					_TotalFactura += item.Remaining;
 					totalUSD += item.Remaining;
 				}
 
 				foreach (var item in invoicesNIO)
 				{
 					InvoicesNIO.Add(item);
-					TotalFacturaNIO += item.Remaining;
+					_TotalFacturaNIO += item.Remaining;
 					totalNIO += item.Remaining;
 				}
 
 				foreach (var item in creditsUS)
 				{
 					Credits.Add(item);
-					TotalCredito += item.Remaining;
+					_TotalCredito += item.Remaining;
 					totalUSD += item.Remaining;
 				}
 
 				foreach (var item in creditsNIO)
 				{
 					CreditsNIO.Add(item);
-					TotalCreditoNIO += item.Remaining;
+					_TotalCreditoNIO += item.Remaining;
 					totalNIO += item.Remaining;
 				}
 
@@ -379,6 +379,11 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 				VisitHeight = 24 * Visits.Count;
 				TotalNIO = $"C$ {totalNIO:N2}";
 				TotalUSD = $"$ {totalUSD:N2}";
+
+				TotalFactura = $"$ {_TotalFactura:N2}";
+				TotalFacturaNIO = $"C$ {_TotalFacturaNIO:N2}";
+				TotalCredito = $"$ {_TotalCredito:N2}";
+				TotalCreditoNIO = $"C$ {_TotalCreditoNIO:N2}";
 			}
 			catch (Exception ex)
 			{

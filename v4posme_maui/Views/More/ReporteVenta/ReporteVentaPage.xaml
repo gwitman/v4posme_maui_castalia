@@ -180,14 +180,14 @@
                                     </dxcv:DXCollectionView.ItemTemplate>
                                 </dxcv:DXCollectionView>
 
-                                <Label Text="C$"
+                                <Label Text=" "
                                      FontSize="15"
                                      HorizontalTextAlignment="End"
                                      FontAttributes="Bold"
                                      Grid.Row="2" Grid.Column="0" WidthRequest="450"
                                      Margin="0, 0, 0, 15"/>
 
-                                <Label Text="{Binding TotalFacturaNIO, StringFormat='{0:N0}'}"
+                                <Label Text="{Binding TotalFacturaNIO}"
                                      FontSize="15"
                                      HorizontalTextAlignment="End"
                                      FontAttributes="Bold"
@@ -250,13 +250,13 @@
                                     </dxcv:DXCollectionView.ItemTemplate>
                                 </dxcv:DXCollectionView>
 
-                                <Label Text="C$"
+                                <Label Text=" "
                                      FontSize="15"
                                      HorizontalTextAlignment="End"
                                      FontAttributes="Bold"
                                      Grid.Row="5" Grid.Column="0" WidthRequest="450"
                                      Margin="0, 0, 0, 15"/>
-                                <Label Text="{Binding TotalCreditoNIO, StringFormat='{0:N0}'}"
+                                <Label Text="{Binding TotalCreditoNIO}"
                                      FontSize="15"
                                      HorizontalTextAlignment="End"
                                      FontAttributes="Bold"
@@ -316,14 +316,14 @@
                                     </dxcv:DXCollectionView.ItemTemplate>
                                 </dxcv:DXCollectionView>
 
-                                <Label Text="$"
+                                <Label Text=" "
                                     FontSize="15"
                                     HorizontalTextAlignment="End"
                                     FontAttributes="Bold"
                                     Grid.Row="8" Grid.Column="0" WidthRequest="470"
                                     Margin="0, 0, 0, 15"/>
 
-                                <Label Text="{Binding TotalFactura, StringFormat='{0:N0}'}"
+                                <Label Text="{Binding TotalFactura}"
                                     FontSize="15"
                                     HorizontalTextAlignment="End"
                                     FontAttributes="Bold"
@@ -384,13 +384,13 @@
                                     </dxcv:DXCollectionView.ItemTemplate>
                                 </dxcv:DXCollectionView>
 
-                                <Label Text="$"
+                                <Label Text=" "
                                        FontSize="15"
                                        HorizontalTextAlignment="End"
                                        FontAttributes="Bold"
                                        Grid.Row="11" Grid.Column="0" WidthRequest="450"
                                        Margin="0, 10, 0, 0"/>
-                                <Label Text="{Binding TotalCredito, StringFormat='{0:N0}'}"
+                                <Label Text="{Binding TotalCredito}"
                                        FontSize="15"
                                        HorizontalTextAlignment="End"
                                        FontAttributes="Bold"
