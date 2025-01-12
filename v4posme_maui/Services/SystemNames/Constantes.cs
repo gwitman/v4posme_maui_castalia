@@ -20,7 +20,7 @@ public static class Constantes
     public static int BranchId                                      = 2;
     public const string UrlBase                                     = "{UrlBase}";
     public const string UrlBasePosme                                = "https://posme.net/v4posme/posme/public/";
-    public const string TimeGpsInMilleseconds                       = "300000"; 
+    public const string TimeGpsInMilleseconds                       = "10000"; 
     public const string GpsTitleContentNotification = "Gps posMe";
     public const string GpsTextContentNotification  = "Envio cada 5 min";
     public const string TagGps                      = "GpsLocationServicePosMe";
