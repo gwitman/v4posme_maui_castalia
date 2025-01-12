@@ -43,10 +43,10 @@
 
 	<ItemGroup>
 		<!-- App Icon -->
-		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
+		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" ForegroundScale="0.65" Color="#FFF" />
 
 		<!-- Splash Screen -->
-		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
+		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#FFFFFF" BaseSize="150,150" />
 
 		<!-- Images -->
 		<MauiImage Include="Resources\Images\*" />
@@ -73,7 +73,6 @@
 		<PackageReference Include="Microsoft.Maui.Controls.Core" Version="8.0.90" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="Plugin.BLE" Version="3.1.0" />
-		<PackageReference Include="Plugin.Permissions" Version="6.0.1" />
 		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="2.88.8" />
 		<PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
 		<PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.10" />

@@ -51,4 +51,6 @@ public static class Mensajes
 	public const string MessageOkVisita = "Se ha registrado la visita correctamente";
     public const string MessagePermissionDenied = "El permisio es requerido para el funcionanamiento de la apliacion";
 	public const string MessagePermissionShouldAccept = "El permiso debe otorgarse manualmente (Permiso de Localizacion y Dispositivo Bluetooth) para obtener los dispositivos cercanos";
+	public const string MessagePermission = "El permiso {name} es necesario para continuar. Asigne el permiso {name} de forma manual, de lo contrario no podrá ingresar al sistema.";
+	public const string MessagePermissionAll = "No es posible ingresar al sistema, es necesario conceder todos los permisos, concederlos de forma manual.";
 }

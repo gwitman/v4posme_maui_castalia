@@ -192,39 +192,6 @@ namespace v4posme_maui.ViewModels
 		{
 			await Navigation!.PushModalAsync(new LoadingPage());
 			VariablesGlobales.CompanyKey = Company!.ToLower();
-
-			var grantedLocation = await RequestPermissionService
-				.SolicitarPermisoAsync<Plugin.Permissions.LocationPermission>(Plugin.Permissions.Abstractions.Permission.Location);
-
-			if (!grantedLocation.Exito)
-			{
-				var checkLocation = await RequestPermissionService.ShouldShowRequestPermission<Plugin.Permissions.LocationPermission>
-					(Plugin.Permissions.Abstractions.Permission.Location);
-
-				Mensaje = grantedLocation.Mensaje ?? Mensajes.MessagePermissionDenied;
-				PopupShow = true;
-				await Navigation!.PopModalAsync();
-
-				if (!checkLocation.Exito)
-				{
-					RequestPermissionService.OpenSettings();
-				}
-
-				return;
-			}
-
-			var granteds = await RequestPermissionAsync();
-
-			if (!granteds)
-			{
-				await RequestPermissionService
-				.SolicitarPermisoAsync<Plugin.Permissions.LocationPermission>(Plugin.Permissions.Abstractions.Permission.Location);
-
-				Mensaje = Mensajes.MessagePermissionDenied;
-				PopupShow = true;
-				await Navigation!.PopModalAsync();
-				return;
-			}
 			
 			var findUserRemember =
 				await _repositoryTbUser.PosMeFindUserByNicknameAndPassword(UserName!, Password!);
@@ -316,22 +283,6 @@ namespace v4posme_maui.ViewModels
 			UserName = findUserRemember.Nickname!;
 			Password = findUserRemember.Password!;
 			Company = findUserRemember.Company!;
-		}
-
-		private async Task<bool> RequestPermissionAsync()
-		{
-			var statusLocation = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
-			var isGrantedLocation = await RequestPermissionService.CheckStatusPermission<Permissions.LocationWhenInUse>(statusLocation);
-
-			var statusBluetooth = await Permissions.CheckStatusAsync<Permissions.Bluetooth>();
-			var isGrantedBluetooth = await RequestPermissionService.CheckStatusPermission<Permissions.Bluetooth>(statusBluetooth);
-
-			if (!isGrantedLocation || !isGrantedBluetooth)
-			{
-				return false;
-			}
-
-			return true;
 		}
 	}
 }

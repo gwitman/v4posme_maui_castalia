@@ -13,4 +13,7 @@
     </style>
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="MainTheme" parent="Maui.SplashTheme">
+        <item name="android:windowBackground">@color/splash_background</item>
+    </style>
 </resources>

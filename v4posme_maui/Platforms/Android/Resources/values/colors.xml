@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<color name="colorPrimary">#006E98</color>
-	<color name="colorPrimaryDark">#006E98</color>
-	<color name="colorAccent">#00C868</color>
+    <color name="colorPrimary">#006E98</color>
+    <color name="colorPrimaryDark">#006E98</color>
+    <color name="colorAccent">#00C868</color>
+    <color name="splash_background">#FF0000</color> <!-- Cambia este valor al color que desees -->
 </resources>
