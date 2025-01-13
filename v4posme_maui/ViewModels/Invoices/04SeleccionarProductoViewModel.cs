@@ -111,7 +111,8 @@ public class SeleccionarProductoViewModel : BaseViewModel
 
     private async void LoadProductos()
     {
-        var findProductos = await _repositoryItems.PosMeDescending10();
+        var valueTop        = await _helper.GetValueParameter("MOBILE_SHOW_TOP_ITEMS", "10");
+        var findProductos   = await _repositoryItems.PosMeDescending10(int.Parse(valueTop));
         Productos.Clear();
         foreach (var itemsResponse in findProductos)
         {
