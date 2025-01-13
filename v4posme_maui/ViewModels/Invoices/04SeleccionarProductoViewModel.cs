@@ -5,21 +5,24 @@ using v4posme_maui.Services.Repository;
 using v4posme_maui.Services.SystemNames;
 using v4posme_maui.Views;
 using Unity;
+using v4posme_maui.Services.Helpers;
 
 namespace v4posme_maui.ViewModels.Invoices;
 
 public class SeleccionarProductoViewModel : BaseViewModel
 {
     private readonly IRepositoryItems _repositoryItems;
+    private readonly HelperCore _helper;
 
     public SeleccionarProductoViewModel()
     {
-        Title = "Seleccionar producto 4/6";
-        Productos = new();
-        _repositoryItems = VariablesGlobales.UnityContainer.Resolve<IRepositoryItems>();
-        AnadirProducto = new Command<Api_AppMobileApi_GetDataDownloadItemsResponse>(OnAnadirProducto);
-        SearchBarCodeCommand = new Command(OnSearchBarCode);
-        SearchCommand = new Command(OnSearch);
+        Title                   = "Seleccionar producto 4/6";
+        Productos               = new();
+        _repositoryItems        = VariablesGlobales.UnityContainer.Resolve<IRepositoryItems>();
+        AnadirProducto          = new Command<Api_AppMobileApi_GetDataDownloadItemsResponse>(OnAnadirProducto);
+        _helper                 = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
+        SearchBarCodeCommand    = new Command(OnSearchBarCode);
+        SearchCommand           = new Command(OnSearch);
         ProductosSeleccionadosCommand = new Command(OnRevisarProductos);
     }
 
@@ -47,11 +50,14 @@ public class SeleccionarProductoViewModel : BaseViewModel
         IsBusy = true;
         await Task.Run(async () =>
         {
+            
+            var valueTop    = await _helper.GetValueParameter("MOBILE_SHOW_TOP_ITEMS", "10");
             Productos.Clear();
             List<Api_AppMobileApi_GetDataDownloadItemsResponse> searchItems;
+
             if (string.IsNullOrWhiteSpace(Search))
             {
-                searchItems = await _repositoryItems.PosMeDescending10();
+                searchItems = await _repositoryItems.PosMeDescending10(int.Parse(valueTop));
             }
             else
             {
