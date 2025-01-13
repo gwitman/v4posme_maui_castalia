@@ -23,7 +23,7 @@
 		<ApplicationTitle>v4posme_maui</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>com.v4posme_maui</ApplicationId>
+		<ApplicationId>com.posme.v4posme_maui</ApplicationId>
 
 		<!-- Versions -->
 		<ApplicationDisplayVersion>1.0.1</ApplicationDisplayVersion>
