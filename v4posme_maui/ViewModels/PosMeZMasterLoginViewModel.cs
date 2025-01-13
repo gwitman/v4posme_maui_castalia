@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Reflection;
 using CommunityToolkit.Maui.Core;
 using Newtonsoft.Json;
 using v4posme_maui.Models;
@@ -39,6 +40,9 @@ namespace v4posme_maui.ViewModels
 			PropertyChanged += (_, _) => LoginCommand.ChangeCanExecute();
 			_repositoryTbCompany = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCompany>();
 			RealizarPagoCommand = new Command(OnRealizarPagoCommand);
+			// Obtener la versión de la aplicación
+			var version = Assembly.GetExecutingAssembly().GetName().Version ?? new Version(0, 0);
+			VersionApp = $"Version {version.Major}.{version.Minor}.{version.Build}";
 		}
 
 		private async void OnRealizarPagoCommand(object obj)
@@ -180,6 +184,13 @@ namespace v4posme_maui.ViewModels
 		public Command RealizarPagoCommand { get; }
 
 		private decimal _montoSeleccionado;
+
+		private string _versionApp=string.Empty;
+		public string VersionApp
+		{
+			get=> _versionApp;
+			set=> SetProperty(ref _versionApp, value);
+		}
 
 		public decimal MontoSeleccionado
 		{
