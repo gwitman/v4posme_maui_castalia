@@ -53,9 +53,9 @@ public class PrinterProductViewModel : BaseViewModel
 
         //printer.Code39CustomPosMe2px1p(item.BarCode);
         printer.Code128(item.BarCode);
-        printer.Append(item.Name);
+        /*printer.Append(item.Name);*/
         printer.Append(item.BarCode);
-        printer.Append(item.PrecioPublico.ToString("N2"));
+        /*printer.Append(item.PrecioPublico.ToString("N2"));*/
         printer.Append("-");
         printer.Avanza(45 /*8puntos = 1mm*/);
         for (int i = 1; i <= CantidadImprimir * 2 ; i++)
