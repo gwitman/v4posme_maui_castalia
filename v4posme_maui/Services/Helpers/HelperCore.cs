@@ -1,15 +1,6 @@
 ﻿using v4posme_maui.Services.Repository;
-using System.Runtime.Intrinsics.Arm;
-using v4posme_maui.Models;
 using v4posme_maui.Services.SystemNames;
-using v4posme_maui.Services.Api;
-using AndroidX.Core.App;
-using AndroidX.Core.Content;
-using GoogleGson;
-using Android.Service.Autofill;
-using Android.Widget;
-using Android.Util;
-using System.Runtime.CompilerServices;
+
 namespace v4posme_maui.Services.Helpers;
 
 public class HelperCore(
@@ -118,9 +109,7 @@ public class HelperCore(
         return codigo;
     }
 
-   
-
-    public string GetFilePath(string filename)
+    private string GetFilePath(string filename)
     {
         var folderPath = Environment.GetFolderPath(DeviceInfo.Platform == DevicePlatform.Android
             ? Environment.SpecialFolder.LocalApplicationData
@@ -161,5 +150,28 @@ public class HelperCore(
         var value = 0;
         find.Value = $"{value}";
         await repositoryParameters.PosMeUpdate(find);
+    }
+    
+    public async Task<string> FileImage(IScreenshotResult? screenshotResult, string fileName)
+    {
+        if (screenshotResult is null)
+        {
+            return "";
+        }
+
+        await using var stream = await screenshotResult.OpenReadAsync();
+        using var memoryStream = new MemoryStream();
+        await stream.CopyToAsync(memoryStream);
+        var filePath = GetFilePath(fileName);
+        if (string.IsNullOrWhiteSpace(filePath))
+        {
+            return "";
+        }
+        if (File.Exists(filePath))
+        {
+            File.Delete(filePath);
+        }
+        await File.WriteAllBytesAsync(filePath, memoryStream.ToArray());
+        return filePath;
     }
 }

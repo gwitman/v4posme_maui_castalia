@@ -14,7 +14,7 @@
     </ContentPage.BindingContext>
     <ContentPage.ToolbarItems>
         <ToolbarItem IconImageSource="shared" Clicked="MenuItem_OnClicked" />
-        <ToolbarItem IconImageSource="printer" Command="{Binding PrinterCommand}" />
+        <ToolbarItem IconImageSource="printer" Clicked="Printer_OnClicked" />
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
         <controls:ShimmerView
@@ -38,6 +38,7 @@
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
                                 <zxing:BarcodeGeneratorView
+                                    x:Name="BarcodeGeneratorView"
                                     Grid.Row="0"
                                     Grid.Column="0"
                                     HeightRequest="100"

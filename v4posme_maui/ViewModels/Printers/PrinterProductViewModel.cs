@@ -21,7 +21,6 @@ public class PrinterProductViewModel : BaseViewModel
         Title = "Detalle de Producto";
         _parameterSystem = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbParameterSystem>();
         _repositoryParameters = VariablesGlobales.UnityContainer.Resolve<IRepositoryParameters>();
-        PrinterCommand = new Command(OnPrinterCommand);
         ClearCommand = new Command(OnClearCommand);
     }
 
@@ -30,42 +29,49 @@ public class PrinterProductViewModel : BaseViewModel
         CantidadImprimir = 1;
     }
 
-    private async void OnPrinterCommand(object obj)
+    public async void OnPrinterCommand(SKBitmap bitmapBarcode)
     {
-        if (CantidadImprimir ==0)
+        try
         {
-            ShowToast(Mensajes.MensajeCantidadImprimir, ToastDuration.Long, 14);
-            return;
-        }
-        var parametroPrinter = await _parameterSystem.PosMeFindPrinter();
-        if (string.IsNullOrWhiteSpace(parametroPrinter.Value))
-        {
-            return;
-        }
+            if (CantidadImprimir ==0)
+            {
+                ShowToast(Mensajes.MensajeCantidadImprimir, ToastDuration.Long, 14);
+                return;
+            }
+            var parametroPrinter = await _parameterSystem.PosMeFindPrinter();
+            if (string.IsNullOrWhiteSpace(parametroPrinter.Value))
+            {
+                return;
+            }
 
-        var item = VariablesGlobales.Item;
-        var printer = new Printer(parametroPrinter.Value);
-        if (!CrossBluetoothLE.Current.IsOn)
-        {
-            ShowToast(Mensajes.MensajeBluetoothState, ToastDuration.Long, 18);
-            return;
-        }
+            var item = VariablesGlobales.Item;
+            var printer = new Printer(parametroPrinter.Value);
+            if (!CrossBluetoothLE.Current.IsOn)
+            {
+                ShowToast(Mensajes.MensajeBluetoothState, ToastDuration.Long, 18);
+                return;
+            }
 
-        //printer.Code39CustomPosMe2px1p(item.BarCode);
-        printer.Code128(item.BarCode);
-        /*printer.Append(item.Name);*/
-        printer.Append(item.BarCode);
-        /*printer.Append(item.PrecioPublico.ToString("N2"));*/
-        printer.Append("-");
-        printer.Avanza(45 /*8puntos = 1mm*/);
-        for (int i = 1; i <= CantidadImprimir * 2 ; i++)
-        {
-            printer.Print(); 
-        }
+            //printer.Code39CustomPosMe2px1p(item.BarCode);
+            printer.Image(bitmapBarcode);
+            /*printer.Append(item.Name);*/
+            printer.Append(item.BarCode);
+            /*printer.Append(item.PrecioPublico.ToString("N2"));*/
+            printer.Append("-");
+            printer.Avanza(45 /*8puntos = 1mm*/);
+            for (int i = 1; i <= CantidadImprimir * 2 ; i++)
+            {
+                printer.Print(); 
+            }
         
-        if (printer.Device is null)
+            if (printer.Device is null)
+            {
+                ShowToast(Mensajes.MensajeDispositivoNoConectado, ToastDuration.Long, 18);
+            }
+        }
+        catch (Exception e)
         {
-            ShowToast(Mensajes.MensajeDispositivoNoConectado, ToastDuration.Long, 18);
+            ShowToast(e.Message, ToastDuration.Long, 18);
         }
     }
 
@@ -77,7 +83,6 @@ public class PrinterProductViewModel : BaseViewModel
         set => SetProperty(ref _itemsResponse, value);
     }
 
-    public Command PrinterCommand { get; }
     private int _cantidadImprimir = 1;
 
     public int CantidadImprimir

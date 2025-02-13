@@ -73,10 +73,7 @@
 		<PackageReference Include="DevExpress.Maui.DataGrid" Version="24.1.5" />
 		<PackageReference Include="DevExpress.Maui.Editors" Version="24.1.5" />
 		<PackageReference Include="DevExpress.Maui.Scheduler" Version="24.1.5" />
-		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
-		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
-		<PackageReference Include="Microsoft.Maui.Controls.Core" Version="8.0.90" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="Plugin.BLE" Version="3.1.0" />
 		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="2.88.8" />
