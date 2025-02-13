@@ -283,6 +283,10 @@ namespace v4posme_maui.Services.HelpersPrinters
         {
             Append(_command.BarCode.Code128(code, printString));
         }
+        public void Code128V2(byte[] code, Positions printString = Positions.NotPrint)
+        {
+            Append(_command.BarCode.Code128V2(code, printString));
+        }
 
         public void Code39(string code, Positions printString = Positions.NotPrint)
         {

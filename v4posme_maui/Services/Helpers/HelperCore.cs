@@ -174,4 +174,58 @@ public class HelperCore(
         await File.WriteAllBytesAsync(filePath, memoryStream.ToArray());
         return filePath;
     }
+
+
+    public  string FormatString(string input)
+    {
+        // Si la cadena tiene menos de 12 caracteres, rellenar con ceros a la izquierda
+        if (input.Length < 12)
+        {
+            return input.PadLeft(12, '0');
+        }
+        // Si la cadena tiene más de 12 caracteres, tomar los últimos 12 caracteres
+        else if (input.Length > 12)
+        {
+            return input.Substring(input.Length - 12);
+        }
+        // Si la cadena tiene exactamente 12 caracteres, devolverla tal cual
+        return input;
+    }
+
+    public  string ConcatenatePairs(string input)
+    {
+        // Verificar que la longitud del input sea 12
+        if (input.Length != 12)
+        {
+            throw new ArgumentException("La cadena debe tener exactamente 12 caracteres.");
+        }
+
+        string result = string.Empty;
+
+        // Recorrer la cadena de 2 en 2
+        for (int i = 0; i < input.Length; i += 2)
+        {
+            // Tomar dos caracteres a la vez
+            string pair = input.Substring(i, 2);
+            char temporal = ConvertToHexFormat(pair);
+
+            // Concatenar el par al resultado
+            result += temporal.ToString();
+        }
+
+        return result;
+    }
+
+    public  char ConvertToHexFormat(string input)
+    {
+        // Convertir el valor string a entero
+        int decimalValue = int.Parse(input);
+
+        // Convertir el valor entero a su representación hexadecimal
+        char character = (char)decimalValue;
+
+        // Retornar el formato con "\x" al inicio
+        return character;
+    }
+
 }

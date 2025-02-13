@@ -8,6 +8,9 @@ using SkiaSharp;
 using Unity;
 using ZXing.Net.Maui;
 using ZXing.Net.Maui.Controls;
+using static Android.Util.Xml;
+using static Android.Renderscripts.ScriptGroup;
+using v4posme_maui.Services.Helpers;
 
 namespace v4posme_maui.ViewModels.Printers;
 
@@ -15,12 +18,14 @@ public class PrinterProductViewModel : BaseViewModel
 {
     private readonly IRepositoryTbParameterSystem _parameterSystem;
     private readonly IRepositoryParameters _repositoryParameters;
+    private readonly HelperCore _helperCore;
 
     public PrinterProductViewModel()
     {
         Title = "Detalle de Producto";
         _parameterSystem = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbParameterSystem>();
         _repositoryParameters = VariablesGlobales.UnityContainer.Resolve<IRepositoryParameters>();
+        _helperCore = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
         ClearCommand = new Command(OnClearCommand);
     }
 
@@ -52,13 +57,10 @@ public class PrinterProductViewModel : BaseViewModel
                 return;
             }
 
-            //printer.Code39CustomPosMe2px1p(item.BarCode);
-            printer.Image(bitmapBarcode);
-            /*printer.Append(item.Name);*/
-            printer.Append(item.BarCode);
-            /*printer.Append(item.PrecioPublico.ToString("N2"));*/
-            printer.Append("-");
-            printer.Avanza(45 /*8puntos = 1mm*/);
+            string barCode  = _helperCore.FormatString(item.BarCode.Replace("T", "").Replace("I","").Replace("B",""));
+            barCode         = _helperCore.ConcatenatePairs(barCode);            
+            printer.Code128(barCode, Services.HelpersPrinters.Enums.Positions.BelowBarcode);            
+            printer.Avanza(85 /*8puntos = 1mm*/);
             for (int i = 1; i <= CantidadImprimir * 2 ; i++)
             {
                 printer.Print(); 
@@ -74,6 +76,8 @@ public class PrinterProductViewModel : BaseViewModel
             ShowToast(e.Message, ToastDuration.Long, 18);
         }
     }
+
+   
 
     private Api_AppMobileApi_GetDataDownloadItemsResponse _itemsResponse;
 

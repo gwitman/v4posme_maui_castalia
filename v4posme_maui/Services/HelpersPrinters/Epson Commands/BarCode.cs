@@ -19,6 +19,19 @@ namespace v4posme_maui.Services.HelpersPrinters.Epson_Commands
                 .AddLF();
         }
 
+        public byte[] Code128V2(byte[] code, Positions printString = Positions.NotPrint)
+        {
+            return new byte[] { 29, 119, 2 } // Width
+                .AddBytes(new byte[] { 29, 104, 100 }) // Height
+                .AddBytes(new byte[] { 29, 102, 1 }) // font hri character
+                .AddBytes(new byte[] { 29, 72, printString.ToByte() }) // If print code informed
+                .AddBytes(new byte[] { 29, 107, 73 }) // printCode
+                .AddBytes(new[] { (byte)(code.Length + 2) })
+                .AddBytes(new[] { '{'.ToByte(), 'C'.ToByte() })
+                .AddBytes(code)
+                .AddLF();
+        }
+
         public byte[] Code39(string code, Positions printString = Positions.NotPrint)
         {
             return new byte[] { 29, 119, 2 } // Width
