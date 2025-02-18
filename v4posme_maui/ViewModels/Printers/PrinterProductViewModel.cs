@@ -57,7 +57,10 @@ public class PrinterProductViewModel : BaseViewModel
                 return;
             }
 
-            string barCode  = _helperCore.FormatString(item.BarCode.Replace("T", "").Replace("I","").Replace("B",""));
+            
+            string barCode  = item.BarCode;
+            barCode         = System.Text.RegularExpressions.Regex.Replace(barCode, @"\D", "");
+            barCode         = _helperCore.FormatString(barCode);
             barCode         = _helperCore.ConcatenatePairs(barCode);            
             printer.Code128(barCode, Services.HelpersPrinters.Enums.Positions.BelowBarcode);            
             printer.Avanza(85 /*8puntos = 1mm*/);
