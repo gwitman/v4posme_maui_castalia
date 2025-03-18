@@ -178,26 +178,26 @@ public class HelperCore(
 
     public  string FormatString(string input)
     {
-        // Si la cadena tiene menos de 8 caracteres, rellenar con ceros a la izquierda
-        if (input.Length < 8)
+        // Si la cadena tiene menos de 12 caracteres, rellenar con ceros a la izquierda
+        if (input.Length < 12)
         {
-            return input.PadLeft(8, '0');
+            return input.PadLeft(12, '0');
         }
-        // Si la cadena tiene más de 8 caracteres, tomar los últimos 8 caracteres
-        else if (input.Length > 8)
+        // Si la cadena tiene más de 12 caracteres, tomar los últimos 12 caracteres
+        else if (input.Length > 12)
         {
-            return input.Substring(input.Length - 8);
+            return input.Substring(input.Length - 12);
         }
-        // Si la cadena tiene exactamente 8 caracteres, devolverla tal cual
+        // Si la cadena tiene exactamente 12 caracteres, devolverla tal cual
         return input;
     }
 
     public  string ConcatenatePairs(string input)
     {
         // Verificar que la longitud del input sea 8
-        if (input.Length != 8)
+        if (input.Length != 12)
         {
-            throw new ArgumentException("La cadena debe tener exactamente 8 caracteres.");
+            throw new ArgumentException("La cadena debe tener exactamente 12 caracteres.");
         }
 
         string result = string.Empty;
