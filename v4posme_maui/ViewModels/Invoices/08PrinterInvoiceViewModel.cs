@@ -80,7 +80,7 @@ public class PrinterInvoiceViewModel : BaseViewModel
         printer.AlignLeft();
         var detalleHeader = $"""
                              VENDEDOR     :{VariablesGlobales.User!.Nickname}
-                             CODIGO       :{dtoInvoice.CustomerNumber}
+                             CODIGO       :{dtoInvoice.CustomerResponse.CustomerNumber}
                              MONEDA       :{dtoInvoice.Currency!.Simbolo}
                              TIPO         :{DtoInvoice.TipoDocumento!.Name}
                              CLIENTE       
