@@ -1,4 +1,6 @@
-﻿using DevExpress.Maui.Core;
+﻿using CommunityToolkit.Maui.Alerts;
+using CommunityToolkit.Maui.Core;
+using DevExpress.Maui.Core;
 using DevExpress.Maui.DataForm;
 using v4posme_maui.Models;
 using v4posme_maui.Services;
@@ -6,6 +8,7 @@ using v4posme_maui.Services.Helpers;
 using v4posme_maui.Services.Repository;
 using v4posme_maui.Services.SystemNames;
 using Unity;
+using v4posme_maui.ViewModels;
 
 namespace v4posme_maui.Views.Items;
 
@@ -28,27 +31,43 @@ public partial class ItemEditPage : ContentPage
 
     private async void SaveItemClick(object sender, EventArgs e)
     {
-        if (!DataForm.Validate())
+        try
         {
-            TxtMensaje.Text = Mensajes.MensajeCampoRequerido;
-            Popup.IsOpen = true;
+            if (!DataForm.Validate())
+            {
+                TxtMensaje.Text = Mensajes.MensajeCampoRequerido;
+                Popup.IsOpen    = true;
+                return;
+            }
+
+            _saveItem            = (Api_AppMobileApi_GetDataDownloadItemsResponse)DataForm.DataObject;
+            _saveItem.Modificado = true;
+            var count            = await _repositoryItems.PosMeExistBarCode(_saveItem.BarCode, _saveItem.ItemId);
+            if (count >= 1)
+            {
+                TxtMensaje.Text = $"{Mensajes.ExisteItem} {_saveItem.BarCode}";
+                Popup.IsOpen    = true;
+                return;
+            }
+            if (ViewModel.IsNew)
+            {
+                await _repositoryItems.PosMeInsert(_saveItem);
+            }
+            else
+            {
+                await _repositoryItems.PosMeUpdate(_saveItem);
+            }
+
+            await _helperContador.PlusCounter();
+            DataForm.Commit();
+            ViewModel.Save();
+        }
+        catch (Exception ex)
+        {
+            TxtMensaje.Text = ex.Message;
+            Popup.IsOpen    = true;
             return;
         }
-
-        _saveItem = (Api_AppMobileApi_GetDataDownloadItemsResponse)DataForm.DataObject;
-        _saveItem.Modificado = true;
-        if (ViewModel.IsNew)
-        {
-            await _repositoryItems.PosMeInsert(_saveItem);
-        }
-        else
-        {
-            await _repositoryItems.PosMeUpdate(_saveItem);
-        }
-
-        await _helperContador.PlusCounter();
-        DataForm.Commit();
-        ViewModel.Save();
     }
 
     private void DataForm_OnValidateForm(object sender, DataFormValidationEventArgs e)

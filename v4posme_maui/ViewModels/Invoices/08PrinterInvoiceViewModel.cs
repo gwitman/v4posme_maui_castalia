@@ -82,6 +82,7 @@ public class PrinterInvoiceViewModel : BaseViewModel
                              VENDEDOR     :{VariablesGlobales.User!.Nickname}
                              CODIGO       :{dtoInvoice.CustomerNumber}
                              MONEDA       :{dtoInvoice.Currency!.Simbolo}
+                             TIPO         :{DtoInvoice.TipoDocumento!.Name}
                              CLIENTE       
                              {dtoInvoice.NombreCompleto}
                              {dtoInvoice.Comentarios}
@@ -183,8 +184,11 @@ public class PrinterInvoiceViewModel : BaseViewModel
     {
         Navigation = navigation;
         var paramter = await _parameterSystem.PosMeFindLogo();
-        var imageBytes = Convert.FromBase64String(paramter.Value!);
-        LogoSource = ImageSource.FromStream(() => new MemoryStream(imageBytes));
+        if (!string.IsNullOrWhiteSpace(paramter.Value))
+        {
+            var imageBytes = Convert.FromBase64String(paramter.Value!);
+            LogoSource = ImageSource.FromStream(() => new MemoryStream(imageBytes));
+        }
         CompanyTelefono = await _repositoryParameters.PosMeFindByKey("CORE_PHONE");
         CompanyRuc = await _repositoryParameters.PosMeFindByKey("CORE_COMPANY_IDENTIFIER");
         Company = VariablesGlobales.TbCompany;

@@ -15,45 +15,7 @@
 
             <ScrollView>
                 <StackLayout Padding="10" Spacing="10">
-                    <core:DXBorder Style="{StaticResource PropertyBorder}" BorderThickness="0,0,5,0" BorderColor="Red">
-                        <Grid Padding="10" ColumnSpacing="25">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <Image Source="payment_2" WidthRequest="40" HeightRequest="40" />
-                            <StackLayout Grid.Column="1" Spacing="0">
-                                <StackLayout Orientation="Horizontal">
-                                    <Label Text="{Binding CantidadAbonos}"
-                                           FontSize="24"
-                                           FontAttributes="Bold" />
-                                </StackLayout>
-                                <Label Text="Abonos Aplicados" FontSize="14" />
-                                <StackLayout Orientation="Horizontal">
-                                    <Label Text="Monto Córdobas: C$"
-                                           FontSize="12"
-                                           FontAttributes="Bold"
-                                           TextColor="Red" />
-                                    <Label Text="{Binding MontoAbonosCordobas,StringFormat='{0:N2}'}"
-                                           FontSize="12"
-                                           FontAttributes="Bold"
-                                           TextColor="Red" />
-                                    <Label Text=" " />
-                                </StackLayout>
-                                <StackLayout Orientation="Horizontal">
-                                    <Label Text="Monto Dólares: $"
-                                           FontSize="12"
-                                           FontAttributes="Bold"
-                                           TextColor="Red" />
-                                    <Label Text="{Binding MontoAbonosDolares,StringFormat='{0:N2}'}"
-                                           FontSize="12"
-                                           FontAttributes="Bold"
-                                           TextColor="Red" />
-                                </StackLayout>
-                            </StackLayout>
-                        </Grid>
-                    </core:DXBorder>
-
+                    <!--FACTURAS CONTADO-->
                     <core:DXBorder Style="{StaticResource PropertyBorder}" BorderThickness="0,0,5,0"
                                    BorderColor="Yellow">
                         <Grid Padding="10" ColumnSpacing="25">
@@ -89,7 +51,7 @@
                             </StackLayout>
                         </Grid>
                     </core:DXBorder>
-
+                    <!--FACTURAS CREDITO-->
                     <core:DXBorder Style="{StaticResource PropertyBorder}" BorderThickness="0,0,5,0"
                                    BorderColor="Green">
                         <Grid Padding="10" ColumnSpacing="25">
@@ -121,6 +83,70 @@
                                            FontSize="12"
                                            FontAttributes="Bold"
                                            TextColor="Green" />
+                                </StackLayout>
+                            </StackLayout>
+                        </Grid>
+                    </core:DXBorder>
+                    <!--ABONOS-->
+                    <core:DXBorder Style="{StaticResource PropertyBorder}" BorderThickness="0,0,5,0" BorderColor="Red">
+                        <Grid Padding="10" ColumnSpacing="25">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Image Source="payment_2" WidthRequest="40" HeightRequest="40" />
+                            <StackLayout Grid.Column="1" Spacing="0">
+                                <StackLayout Orientation="Horizontal">
+                                    <Label Text="{Binding CantidadAbonos}"
+                                           FontSize="24"
+                                           FontAttributes="Bold" />
+                                </StackLayout>
+                                <Label Text="Abonos Aplicados" FontSize="14" />
+                                <StackLayout Orientation="Horizontal">
+                                    <Label Text="Monto Córdobas: C$"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="Red" />
+                                    <Label Text="{Binding MontoAbonosCordobas,StringFormat='{0:N2}'}"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="Red" />
+                                    <Label Text=" " />
+                                </StackLayout>
+                                <StackLayout Orientation="Horizontal">
+                                    <Label Text="{Binding MontoTotalAbonosCordobas,StringFormat='Meta Córdobas: C$ {0:N2}'}"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="Red" />
+                                </StackLayout>
+                                <StackLayout Orientation="Horizontal">
+                                    <Label Text="{Binding PorcentajeAbonosTotalesCordobas, StringFormat='Cumplimiento Córdobas: {0:F2}%'}"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="Red" />
+                                </StackLayout>
+                                <Label Text="" FontSize="14" />
+                                <StackLayout Orientation="Horizontal">
+                                    <Label Text="Monto Dólares: $"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="Red" />
+                                    <Label Text="{Binding MontoAbonosDolares,StringFormat='{0:N2}'}"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="Red" />
+                                </StackLayout>
+                                <StackLayout Orientation="Horizontal">
+                                    <Label Text="{Binding MontoTotalAbonosDolares,StringFormat='Meta Dólares: C$ {0:N2}'}"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="Red" />
+                                </StackLayout>
+                                <StackLayout Orientation="Horizontal">
+                                    <Label Text="{Binding PorcentajeAbonosTotalesDolares, StringFormat='Cumplimiento Dólares: {0:F2}%'}"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="Red" />
                                 </StackLayout>
                             </StackLayout>
                         </Grid>

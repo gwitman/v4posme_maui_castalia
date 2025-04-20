@@ -26,48 +26,25 @@ class HelperCustomerCreditDocumentAmortization
 
         var tmpListaSave = new List<Api_AppMobileApi_GetDataDownloadDocumentCreditAmortizationResponse>();
         var amountApplyBackup = amountApply;
-        var length = objCustomDocumentAmortization.Count;
-        var aux = 0;
         //Actualiar Tabla de Amortiation
         foreach (var documentCreditAmortization in objCustomDocumentAmortization)
         {
-            if (decimal.Compare(amountApply, decimal.Zero) <= 0)
-            {
+            if (amountApply <= 0)
                 break;
-            }
 
-            if (decimal.Compare(documentCreditAmortization.Remaining, amountApply) <= 0)
-            {
-                if (string.IsNullOrWhiteSpace(resultado))
-                {
-                    resultado += $"{documentCreditAmortization.CreditAmortizationId}:{amountApply}";
-                }
-                else
-                {
-                    resultado += $",{documentCreditAmortization.CreditAmortizationId}:{amountApply}";
-                }
+            var applyAmount = Math.Min(amountApply, documentCreditAmortization.Remaining);
 
-                amountApply = decimal.Subtract(amountApply, documentCreditAmortization.Remaining);
-                documentCreditAmortization.Remaining = decimal.Zero;
-                
-            }
-            else
-            {
-                if (string.IsNullOrWhiteSpace(resultado))
-                {
-                    resultado += $"{documentCreditAmortization.CreditAmortizationId}:{amountApply}";
-                }
-                else
-                {
-                    resultado += $",{documentCreditAmortization.CreditAmortizationId}:{amountApply}";
-                }
+            if (!string.IsNullOrWhiteSpace(resultado)) resultado += ",";
+        
+            resultado += $"{documentCreditAmortization.CreditAmortizationId}:{applyAmount}";
 
-                documentCreditAmortization.Remaining = decimal.Subtract(documentCreditAmortization.Remaining, amountApply);                
-                amountApply = decimal.Zero;
-            }
+            // Actualización de valores
+            documentCreditAmortization.Remaining -= applyAmount;
+            amountApply -= applyAmount;
 
             tmpListaSave.Add(documentCreditAmortization);
         }
+
 
         //Actualizar Documento
         objCustomerDocument.Remaining -= amountApplyBackup;

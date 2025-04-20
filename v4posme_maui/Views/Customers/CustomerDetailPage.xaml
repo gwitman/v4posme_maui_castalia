@@ -48,6 +48,18 @@
                 </dx:DXBorder>
                 <dx:DXBorder Style="{StaticResource PropertyBorder}">
                     <dx:DXStackLayout Orientation="Vertical">
+                        <Label Text="Dirección: " FontAttributes="Bold" FontSize="18" />
+                        <Label Text="{Binding Item.Location}" FontSize="18" />
+                    </dx:DXStackLayout>
+                </dx:DXBorder>
+                <dx:DXBorder Style="{StaticResource PropertyBorder}">
+                    <dx:DXStackLayout Orientation="Vertical">
+                        <Label Text="Celular: " FontAttributes="Bold" FontSize="18" />
+                        <Label Text="{Binding Item.Phone}" FontSize="18" />
+                    </dx:DXStackLayout>
+                </dx:DXBorder>
+                <dx:DXBorder Style="{StaticResource PropertyBorder}">
+                    <dx:DXStackLayout Orientation="Vertical">
                         <Label Text="Balance: " FontAttributes="Bold" FontSize="18" />
                         <Label Text="{Binding Item.Balance}" FontSize="18" />
                     </dx:DXStackLayout>

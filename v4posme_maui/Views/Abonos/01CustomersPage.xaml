@@ -5,8 +5,6 @@
              xmlns:dxc="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
              xmlns:dxcv="clr-namespace:DevExpress.Maui.CollectionView;assembly=DevExpress.Maui.CollectionView"
              xmlns:dxe="clr-namespace:DevExpress.Maui.Editors;assembly=DevExpress.Maui.Editors"
-             xmlns:local="clr-namespace:v4posme_maui.ViewModels"
-             xmlns:models="clr-namespace:v4posme_maui.Models"
              xmlns:abonos="clr-namespace:v4posme_maui.ViewModels.Abonos"
              xmlns:controls="clr-namespace:DevExpress.Maui.Controls;assembly=DevExpress.Maui.Controls"
              x:Class="v4posme_maui.Views.Abonos.AbonosPage"
@@ -42,17 +40,27 @@
                                                ItemsSource="{Binding Customers}"
                                                SelectedItem="{Binding SelectedCustomer}"
                                                SelectionMode="Single"
-                                               IsRefreshing="{Binding  IsBusy, Mode=OneWay}">
+                                               AllowDragDropItems="True"
+                                               DropItem="ClientesCollectionView_OnDropItem"
+                                               IsRefreshing="{Binding  IsBusy, Mode=TwoWay}">
                             <dxcv:DXCollectionView.ItemTemplate>
                                 <DataTemplate>
                                     <dxc:DXStackLayout
                                         CornerRadius="15"
                                         Margin="10">
                                         <Grid
-                                              HorizontalOptions="Fill"
-                                              Padding="10"
-                                              VerticalOptions="Fill"
-                                              BackgroundColor="{StaticResource Primary}">
+                                            HorizontalOptions="Fill"
+                                            Padding="10"
+                                            VerticalOptions="Fill">
+                                            <Grid.Triggers>
+                                                <DataTrigger TargetType="Grid" Binding="{Binding HasAbono}" Value="True">
+                                                    <Setter Property="BackgroundColor" Value="Green" />
+                                                </DataTrigger>
+                                                <DataTrigger TargetType="Grid" Binding="{Binding HasAbono}" Value="False">
+                                                    <Setter Property="BackgroundColor" Value="{StaticResource Primary}" />
+                                                </DataTrigger>
+                                            </Grid.Triggers>
+
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="Auto" />
                                                 <RowDefinition Height="Auto" />

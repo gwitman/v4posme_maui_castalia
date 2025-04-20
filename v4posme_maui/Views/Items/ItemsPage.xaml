@@ -48,6 +48,9 @@
                             ItemsSource="{Binding Items}"
                             SelectedItem="{Binding SelectedItem}"
                             SelectionMode="Single"
+                            IsRefreshing="{Binding IsBusy, Mode=TwoWay}"
+                            IsLoadMoreEnabled="True"
+                            LoadMoreCommand="{Binding LoadMoreCommand}"
                             TapCommand="{Binding Source={x:Reference ItemsListView}, Path=Commands.ShowDetailForm}">
                             <dxcv:DXCollectionView.ItemTemplate>
                                 <DataTemplate>

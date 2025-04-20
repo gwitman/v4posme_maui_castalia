@@ -1,0 +1,292 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:dx="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
+             xmlns:abonos="clr-namespace:v4posme_maui.ViewModels.Abonos"
+             xmlns:controls="clr-namespace:DevExpress.Maui.Controls;assembly=DevExpress.Maui.Controls"
+             xmlns:collectionView="http://schemas.devexpress.com/maui"
+             Title="{Binding Title}"
+             x:Class="v4posme_maui.Views.Abonos.ValidarAbonoFinancieraPage"
+             Style="{StaticResource DetailPageStyle}">
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsEnabled="False" IsVisible="False" />
+    </Shell.BackButtonBehavior>
+    <Shell.PresentationMode>Animated</Shell.PresentationMode>
+    <ContentPage.BindingContext>
+        <abonos:ValidarAbonoFinancieraViewModel />
+    </ContentPage.BindingContext>
+    <ContentPage.ToolbarItems>
+        <ToolbarItem IconImageSource="shared" Clicked="MenuItem_OnClicked" />
+        <ToolbarItem Text="Imprimir" Order="Secondary" x:Name="ItemPrint" Command="{Binding PrintCommand}" />
+        <ToolbarItem Text="Nuevo Abono" Order="Secondary" Command="{Binding AplicarOtroCommand}" />
+        <ToolbarItem Text="Anular Abono" Order="Secondary" x:Name="ItemAnular" Command="{Binding AnularCommand}" />
+    </ContentPage.ToolbarItems>
+    <ContentPage.Content>
+        <controls:ShimmerView Style="{StaticResource ShimmerEffect}" IsLoading="{Binding IsBusy}">
+            <controls:ShimmerView.Content>
+                <ScrollView>
+                    <dx:DXStackLayout
+                        BackgroundColor="White"
+                        x:Name="DxStackLayout"
+                        Orientation="Vertical"
+                        Padding="20">
+
+                        <dx:DXStackLayout Orientation="Vertical"
+                                          Margin="0,0,0,10"
+                                          HorizontalOptions="Center">
+                            <dx:DXImage x:Name="Logo"
+                                        HeightRequest="150"
+                                        WidthRequest="150"
+                                        Source="{Binding LogoSource}" />
+                            <Label Text="{Binding Company.Name}"
+                                   FontAttributes="Bold"
+                                   HorizontalTextAlignment="Center"
+                                   FontSize="24" />
+                            <Label Text="Comprobante de Abono"
+                                   FontSize="20"
+                                   HorizontalTextAlignment="Center"
+                                   FontAttributes="Bold" />
+                            <Label FontSize="16">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="Le informamos que: " />
+                                        <Span Text="{Binding Item.FirstName}" />
+                                        <Span Text=" " />
+                                        <Span Text="{Binding Item.LastName}" />
+                                        <Span Text=" creó un código para abono de factura con los siguientes datos" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                        </dx:DXStackLayout>
+                        <dx:DXStackLayout Orientation="Horizontal">
+                            <Label Text="Código de abono: " FontAttributes="Bold" FontSize="14" />
+                            <Label Text="{Binding Item.CodigoAbono}" FontSize="14" />
+                        </dx:DXStackLayout>
+                        <dx:DXStackLayout Orientation="Horizontal">
+                            <Label Text="Número de factura: " FontAttributes="Bold" FontSize="14" />
+                            <Label Text="{Binding Item.DocumentNumber}" FontSize="14" />
+                        </dx:DXStackLayout>
+                        <StackLayout Spacing="5">
+                            <dx:DXStackLayout Orientation="Horizontal">
+                                <Label Text="Nombres: " FontAttributes="Bold" FontSize="14" />
+                                <Label Text="{Binding Item.FirstName}" FontSize="14" />
+                            </dx:DXStackLayout>
+                            <dx:DXStackLayout Orientation="Horizontal">
+                                <Label Text="Apellidos: " FontAttributes="Bold" FontSize="14" />
+                                <Label Text="{Binding Item.LastName}" FontSize="14" />
+                            </dx:DXStackLayout>
+                            <Grid
+                                RowSpacing="5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <!--Cuota Pactada-->
+                                <Label
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    Text="Cuota Pactada:"
+                                    FontAttributes="Bold"
+                                    FontSize="14" />
+                                <Label
+                                    Grid.Row="0"
+                                    Grid.Column="1">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="{Binding Item.CurrencyName}" />
+                                            <Span Text=" " />
+                                            <Span
+                                                Text="{Binding DocumentCreditResponse.CuotaPactada, StringFormat='{0:N2}'}" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                                <!--Cant Pactada-->
+                                <Label
+                                    Grid.Row="1"
+                                    Grid.Column="0"
+                                    Text="Cant. Cuota:"
+                                    FontAttributes="Bold" FontSize="14" />
+                                <Label
+                                    Grid.Row="1"
+                                    Grid.Column="1"
+                                    Text="{Binding DocumentCreditResponse.CantidadCuotas}"
+                                    FontSize="14" />
+                                <!--Cuota Pendientes-->
+                                <Label
+                                    Grid.Row="2"
+                                    Grid.Column="0"
+                                    Text="Cuota Pend.:"
+                                    FontAttributes="Bold" FontSize="14" />
+                                <Label
+                                    Grid.Row="2"
+                                    Grid.Column="1"
+                                    Text="{Binding CuotasPendientes}"
+                                    FontSize="14" />
+                                <!--Dias mora-->
+                                <Label
+                                    Grid.Row="3"
+                                    Grid.Column="0"
+                                    Text="Días Mora:"
+                                    FontAttributes="Bold" FontSize="14" />
+                                <Label
+                                    Grid.Row="3"
+                                    Grid.Column="1"
+                                    Text="{Binding Item.DiasMora}"
+                                    FontSize="14" />
+                                <!--Monto mora-->
+                                <Label
+                                    Grid.Row="4"
+                                    Grid.Column="0"
+                                    Text="Monto Mora:"
+                                    FontAttributes="Bold" FontSize="14" />
+                                <dx:DXStackLayout
+                                    Grid.Row="4"
+                                    Grid.Column="1"
+                                    Orientation="Horizontal">
+                                    <Label Text="{Binding Item.CurrencyName}" FontSize="14" />
+                                    <Label Text=" " />
+                                    <Label Text="{Binding Item.MontoMora, StringFormat='{0:N2}'}"
+                                           FontSize="14" />
+                                </dx:DXStackLayout>
+                                <!--Fecha-->
+                                <Label
+                                    Grid.Row="5"
+                                    Grid.Column="0"
+                                    Text="Fecha:"
+                                    FontAttributes="Bold" FontSize="14" />
+                                <Label
+                                    Grid.Row="5"
+                                    Grid.Column="1"
+                                    Text="{Binding Item.Fecha, StringFormat='{0:yyyy-MM-dd}'}"
+                                    FontSize="14" />
+                                <!--Saldo Anterior-->
+                                <Label
+                                    Grid.Row="6"
+                                    Grid.Column="0"
+                                    Text="Saldo Anterior: " FontAttributes="Bold"
+                                    FontSize="14" />
+                                <dx:DXStackLayout
+                                    Grid.Row="6"
+                                    Grid.Column="1"
+                                    Orientation="Horizontal">
+                                    <Label Text="{Binding Item.CurrencyName}" FontSize="14" />
+                                    <Label Text=" " />
+                                    <Label Text="{Binding Item.SaldoInicial, StringFormat='{0:N2}'}"
+                                           FontSize="14" />
+                                </dx:DXStackLayout>
+                                <!--Monto aplicar-->
+                                <Label
+                                    Grid.Row="7"
+                                    Grid.Column="0"
+                                    Text="Abono total: "
+                                    FontAttributes="Bold"
+                                    FontSize="14" />
+                                <dx:DXStackLayout
+                                    Grid.Row="7"
+                                    Grid.Column="1"
+                                    Orientation="Horizontal">
+                                    <Label Text="{Binding Item.CurrencyName}" FontSize="14" />
+                                    <Label Text=" " />
+                                    <Label Text="{Binding Item.MontoAplicar, StringFormat='{0:N2}'}"
+                                           FontSize="14" />
+                                </dx:DXStackLayout>
+                                <!--Saldo Final-->
+                                <Label
+                                    Grid.Row="8"
+                                    Grid.Column="0"
+                                    Text="Saldo final: "
+                                    FontAttributes="Bold" FontSize="14" />
+                                <dx:DXStackLayout
+                                    Grid.Row="8"
+                                    Grid.Column="1"
+                                    Orientation="Horizontal">
+                                    <Label Text="{Binding Item.CurrencyName}" FontSize="14" />
+                                    <Label Text=" " />
+                                    <Label Text="{Binding Item.SaldoFinal, StringFormat='{0:N2}'}"
+                                           FontSize="14" />
+                                </dx:DXStackLayout>
+                                <!--Mora Pagada-->
+                                <Label
+                                    Grid.Row="9"
+                                    Grid.Column="0"
+                                    Text="Mora pagada: "
+                                    FontAttributes="Bold"
+                                    FontSize="14" />
+                                <dx:DXStackLayout
+                                    Grid.Row="9"
+                                    Grid.Column="1"
+                                    Orientation="Horizontal">
+                                    <Label Text="{Binding Item.CurrencyName}" FontSize="14" />
+                                    <Label Text=" " />
+                                    <Label Text="{Binding Item.MoraPagada, StringFormat='{0:N2}'}"
+                                           FontSize="14" />
+                                </dx:DXStackLayout>
+                            </Grid>
+                            <dx:DXStackLayout Orientation="Vertical" HorizontalOptions="Center">
+                                <ListView ItemsSource="{Binding ListaCuotasAplicadas}">
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate>
+                                            <ViewCell>
+                                                <Grid Padding="10">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto" />
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackLayout Grid.Row="0" Grid.Column="0"
+                                                                 Padding="18,1,18,7"
+                                                                 Orientation="Horizontal">
+                                                        <Label
+                                                            Text="{Binding Sequence, StringFormat='NO. Cuota {0:N0}'}" />
+                                                        <Label Text=" " />
+                                                        <Label Text="{Binding CurrencyName}"
+                                                               TextColor="#1C0144" />
+                                                        <Label Text="{Binding MontoCuota, StringFormat='{0:N2}'}"
+                                                               TextColor="#1C0144" />
+                                                    </StackLayout>
+                                                </Grid>
+                                            </ViewCell>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                </ListView>
+                            </dx:DXStackLayout>
+                            <dx:DXStackLayout Orientation="Vertical">
+                                <Label Text="Comentarios: " FontAttributes="Bold" FontSize="14" />
+                                <Label Text="{Binding Item.Description}" FontSize="14" />
+                            </dx:DXStackLayout>
+                            <dx:DXStackLayout Orientation="Horizontal" HorizontalOptions="Center">
+                                <Label Text="{Binding CompanyTelefono.Value}"
+                                       HorizontalTextAlignment="Center"
+                                       FontSize="14" />
+                            </dx:DXStackLayout>
+                            <dx:DXStackLayout Orientation="Horizontal" HorizontalOptions="Center">
+                                <Label Text="{Binding Company.Address}"
+                                       HorizontalTextAlignment="Center"
+                                       FontSize="14" />
+                            </dx:DXStackLayout>
+                        </StackLayout>
+                    </dx:DXStackLayout>
+                </ScrollView>
+            </controls:ShimmerView.Content>
+            <controls:ShimmerView.LoadingView>
+                <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                   HeightRequest="50"
+                                   WidthRequest="50" />
+            </controls:ShimmerView.LoadingView>
+        </controls:ShimmerView>
+    </ContentPage.Content>
+</ContentPage>

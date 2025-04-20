@@ -199,7 +199,7 @@
                                                         <Label
                                                             Grid.Row="0"
                                                             Grid.Column="0"
-                                                            Text="{Binding DocumentNumber}" />
+                                                            Text="{Binding CodigoAbono}" />
                                                         <core:DXStackLayout Orientation="Horizontal"
                                                                             Grid.Row="0"
                                                                             Grid.Column="1"

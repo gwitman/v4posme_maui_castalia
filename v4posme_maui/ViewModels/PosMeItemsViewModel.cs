@@ -1,14 +1,14 @@
 ﻿using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Windows.Input;
+using CommunityToolkit.Maui.Core;
 using DevExpress.Maui.Core;
+using DevExpress.Maui.Core.Internal;
 using v4posme_maui.Models;
 using v4posme_maui.Services.Helpers;
 using v4posme_maui.Services.Repository;
 using v4posme_maui.Views;
 using Unity;
 using v4posme_maui.Services.SystemNames;
-using v4posme_maui.Services.Api;
 
 namespace v4posme_maui.ViewModels
 {
@@ -16,6 +16,9 @@ namespace v4posme_maui.ViewModels
     {
         private readonly IRepositoryItems _repositoryItems;
 		private readonly HelperCore _helper;
+        private int _loadBatchSize = 15;
+        private int _lastLoadedIndex;
+
 
 		public PosMeItemsViewModel()
         {
@@ -23,20 +26,22 @@ namespace v4posme_maui.ViewModels
             _repositoryItems = VariablesGlobales.UnityContainer.Resolve<IRepositoryItems>();
 			_helper = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
 			Title = "Productos";
-            _items = new ObservableCollection<Api_AppMobileApi_GetDataDownloadItemsResponse>();
+            _items = new DXObservableCollection<Api_AppMobileApi_GetDataDownloadItemsResponse>();
             CreateDetailFormViewModelCommand = new Command<CreateDetailFormViewModelEventArgs>(CreateDetailFormViewModel);
             SearchCommand = new Command(OnSearchItems);
             OnBarCode = new Command(OnSearchBarCode);
+            LoadMoreCommand = new Command(OnLoadMoreCommand);
         }
 
 
         public ICommand OnBarCode { get; }
         public ICommand SearchCommand { get; }
+        public ICommand LoadMoreCommand { get; }
         public ICommand CreateDetailFormViewModelCommand { get; }
         
-        private ObservableCollection<Api_AppMobileApi_GetDataDownloadItemsResponse> _items;
+        private DXObservableCollection<Api_AppMobileApi_GetDataDownloadItemsResponse> _items;
 
-        public ObservableCollection<Api_AppMobileApi_GetDataDownloadItemsResponse> Items
+        public DXObservableCollection<Api_AppMobileApi_GetDataDownloadItemsResponse> Items
         {
             get => _items;
             set => SetProperty(ref _items, value);
@@ -60,36 +65,46 @@ namespace v4posme_maui.ViewModels
             OnSearchItems(Search);
         }
 
-        private async void OnSearchItems(object? obj)
+        private void OnSearchItems(object? obj)
         {
             IsBusy = true;
             if (obj is not null)
             {
                 Search = obj.ToString()!;
             }
-
+            
+            _lastLoadedIndex = 0;
             Items.Clear();
-            var searchItems = await _repositoryItems.PosMeFilterdByItemNumberAndBarCodeAndName(Search);
-            Items = new ObservableCollection<Api_AppMobileApi_GetDataDownloadItemsResponse>(searchItems);
-
+            LoadItems();
             IsBusy = false;
         }
 
-        public async void LoadItems()
+        private async void LoadItems()
         {
-            Items.Clear();
+            IsBusy = true;
             await Task.Run(async () =>
             {
                 Thread.Sleep(1000);
-				//para mostar un determinado numero de clientes
-				var valueTop = await _helper.GetValueParameter("MOBILE_SHOW_TOP_ITEMS", "10");
-
-				var newItems = await _repositoryItems.PosMeDescending10(int.Parse(valueTop));
-                Items = new ObservableCollection<Api_AppMobileApi_GetDataDownloadItemsResponse>(newItems);
+                List<Api_AppMobileApi_GetDataDownloadItemsResponse> newItems;
+                if (string.IsNullOrWhiteSpace(Search))
+                { 
+                    newItems = await _repositoryItems.PosMeDescendingBySizeAndTop(_lastLoadedIndex, _loadBatchSize);
+                }
+                else
+                {
+                    newItems = await _repositoryItems.PosMeFilterdByItemNumberAndBarCodeAndNameByTop(Search, _lastLoadedIndex, _loadBatchSize);
+                }
+				
+                Items.AddRange(newItems);
             });
             IsBusy = false;
         }
-
+        
+        private void OnLoadMoreCommand()
+        {
+            LoadItems();
+            _lastLoadedIndex += _loadBatchSize;
+        }
         private void CreateDetailFormViewModel(CreateDetailFormViewModelEventArgs e)
         {
             if (e.DetailFormType != DetailFormType.Edit) return;
@@ -98,9 +113,21 @@ namespace v4posme_maui.ViewModels
             e.Result = new DetailEditFormViewModel(item, isNew: false);
         }
 
-        public void OnAppearing(INavigation navigation)
+        public async void OnAppearing(INavigation navigation)
         {
-            Navigation = navigation;
+            try
+            {
+                Navigation = navigation;
+                var topParameter = await _helper.GetValueParameter("MOBILE_SHOW_TOP_CUSTOMER", "10");
+                _loadBatchSize = int.Parse(topParameter);
+                _lastLoadedIndex = 0;
+                Items.Clear();
+                LoadItems();
+            }
+            catch (Exception e)
+            {
+                ShowToast(e.Message, ToastDuration.Long, 14);
+            }
         }
     }
 }

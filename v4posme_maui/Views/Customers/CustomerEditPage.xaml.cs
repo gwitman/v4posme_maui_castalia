@@ -4,7 +4,6 @@ using v4posme_maui.Models;
 using v4posme_maui.Services.Helpers;
 using v4posme_maui.Services.Repository;
 using v4posme_maui.Services.SystemNames;
-using v4posme_maui.Services.Api;
 using Unity;
 
 namespace v4posme_maui.Views.Customers;
@@ -37,30 +36,50 @@ public partial class CustomerEditPage : ContentPage
 
     private async void SaveItemClick(object? sender, EventArgs e)
     {
-        if (!DataForm.Validate())
+        try
+        {
+            if (!DataForm.Validate())
+            {
+                TxtMensaje.Text = Mensajes.MensajeCampoRequerido;
+                Popup.IsOpen    = true;
+                return;
+            }
+
+            var saveCustomer               = (Api_AppMobileApi_GetDataDownloadCustomerResponse)DataForm.DataObject;
+            saveCustomer.Modificado        = true;
+            var validateCustomerNoExist = await RepositoryTbCustomer.PosMeExisteCustomerIdentification(saveCustomer.Identification!, saveCustomer.CustomerId);
+            if (validateCustomerNoExist >= 1)
+            {
+                TxtMensaje.Text = $"{Mensajes.ExisteCustomerIdentificacion} {saveCustomer.Identification}";
+                Popup.IsOpen    = true;
+                return;
+            }
+            if (ViewModel.IsNew)
+            {
+                saveCustomer.CurrencyName = "Cordoba";
+                saveCustomer.CurrencyId = (int)TypeCurrency.Cordoba;
+                saveCustomer.CompanyId = Constantes.CompanyId;
+                saveCustomer.BranchId = Constantes.BranchId;
+                saveCustomer.EntityId = await _helperContador.GetAutoIncrement();
+                saveCustomer.CustomerCreditLineId = await _helperContador.GetAutoIncrement();
+                saveCustomer.CustomerNumber = (await _helperContador.GetAutoIncrement()).ToString();
+                await RepositoryTbCustomer.PosMeInsert(saveCustomer);
+            }
+            else
+            {
+                await RepositoryTbCustomer.PosMeUpdate(saveCustomer);
+            }
+
+            await _helperContador.PlusCounter();
+            DataForm.Commit();
+            ViewModel.Save();
+        }
+        catch (Exception ex)
+        {
+            TxtMensaje.Text = ex.Message;
+            Popup.IsOpen    = true;
             return;
-
-        var saveCustomer = (Api_AppMobileApi_GetDataDownloadCustomerResponse)DataForm.DataObject;
-        saveCustomer.Modificado             = true;
-        if (ViewModel.IsNew)
-        {
-            saveCustomer.CurrencyName = "Cordoba";
-            saveCustomer.CurrencyId = (int)TypeCurrency.Cordoba;
-            saveCustomer.CompanyId = Constantes.CompanyId;
-            saveCustomer.BranchId = Constantes.BranchId;
-            saveCustomer.EntityId = await _helperContador.GetAutoIncrement();
-            saveCustomer.CustomerCreditLineId = await _helperContador.GetAutoIncrement();
-            saveCustomer.CustomerNumber = (await _helperContador.GetAutoIncrement()).ToString();
-            await RepositoryTbCustomer.PosMeInsert(saveCustomer);
         }
-        else
-        {
-            await RepositoryTbCustomer.PosMeUpdate(saveCustomer);
-        }
-
-        await _helperContador.PlusCounter();
-        DataForm.Commit();
-        ViewModel.Save();
     }
 
     private void DataForm_OnValidateForm(object sender, DataFormValidationEventArgs e)
@@ -94,6 +113,16 @@ public partial class CustomerEditPage : ContentPage
             e.HasErrors = true;
             TextBalance.HasError = true;
         }
+        if (string.IsNullOrWhiteSpace(TxtLocation.Text))
+        {
+            e.HasErrors = true;
+            TxtLocation.HasError = true;
+        }
+        if (string.IsNullOrWhiteSpace(TxtPhone.Text))
+        {
+            e.HasErrors = true;
+            TxtPhone.HasError = true;
+        }
     }
 
     protected override async void OnAppearing()
@@ -115,5 +144,10 @@ public partial class CustomerEditPage : ContentPage
             TextBalance.Text = _defaultItem.Balance.ToString("N");
             DataForm.DataObject = _defaultItem;
         }
+    }
+
+    private void ClosePopup_Clicked(object? sender, EventArgs e)
+    {
+        Popup.IsOpen = false;
     }
 }

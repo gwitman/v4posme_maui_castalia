@@ -69,9 +69,11 @@ public class RestApiAppMobileApi
             var parametersDeleteAll = _repositoryParameters!.PosMeDeleteAll();
             var documentCreditDeleteAll = _repositoryDocumentCredit!.PosMeDeleteAll();
             var companyDeleteAll = _repositoryTbCompany.PosMeDeleteAll();
+            var transactionMasterAll =  _repositoryTbTransactionMaster.PosMeDeleteAll();
+            var transactionMasterDetailAll =  _repositoryTbTransactionMasterDetail.PosMeDeleteAll();
             await Task.WhenAll([
                 customerDeleteAll, itemsDeleteAll, documentCreditAmortizationDeleteAll, parametersDeleteAll,
-                documentCreditDeleteAll, companyDeleteAll
+                documentCreditDeleteAll, companyDeleteAll, transactionMasterAll,transactionMasterDetailAll
             ]);
 
             //insertar nuevos movimientos
@@ -134,16 +136,11 @@ public class RestApiAppMobileApi
                 Content = content
             };
             var response = await _httpClient.SendAsync(req);
-            response.EnsureSuccessStatusCode();
+            if (!response.IsSuccessStatusCode) return "{'status': 'false'; 'message': 'error'}";
             var responseBody = await response.Content.ReadAsStringAsync();
-            if (response.IsSuccessStatusCode)
-            {
-                return responseBody;
-            }
-
-            return "{'status': 'false'; 'message': 'error'}";
+            return responseBody;
         }
-        catch (HttpRequestException ex)
+        catch (Exception ex)
         {
             return $"Error: {ex.Message}";
         }

@@ -53,4 +53,6 @@ public static class Mensajes
 	public const string MessagePermissionShouldAccept = "El permiso debe otorgarse manualmente (Permiso de Localizacion y Dispositivo Bluetooth) para obtener los dispositivos cercanos";
 	public const string MessagePermission = "El permiso {name} es necesario para continuar. Asigne el permiso {name} de forma manual, de lo contrario no podrá ingresar al sistema.";
 	public const string MessagePermissionAll = "No es posible ingresar al sistema, es necesario conceder todos los permisos, concederlos de forma manual.";
+	public const string ExisteItem = "Ya existe el item con el código de barra";
+	public const string ExisteCustomerIdentificacion = "Ya existe el cliente con la identificación";
 }

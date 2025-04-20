@@ -19,6 +19,7 @@
         <ToolbarItem IconImageSource="shared" Clicked="MenuItem_OnClicked" />
         <ToolbarItem Text="Imprimir" Order="Secondary" x:Name="ItemPrint_" Command="{Binding PrintCommand}" />
         <ToolbarItem Text="Nuevo Abono" Order="Secondary" Command="{Binding AplicarOtroCommand}" />
+        <ToolbarItem Text="Anular Abono" Order="Secondary" x:Name="ItemAnular" Command="{Binding AnularCommand}" />
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
         <controls:ShimmerView Style="{StaticResource ShimmerEffect}" IsLoading="{Binding IsBusy}">

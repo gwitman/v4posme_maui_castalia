@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
 using CommunityToolkit.Maui.Core;
+using DevExpress.Maui.Core.Internal;
 using v4posme_maui.Models;
 using v4posme_maui.Services.Helpers;
 using v4posme_maui.Services.Repository;
@@ -14,23 +15,27 @@ namespace v4posme_maui.ViewModels;
 public class PosMeCustomerViewModel : BaseViewModel
 {
     private readonly IRepositoryTbCustomer _customerRepositoryTbCustomer;
-	private readonly HelperCore _helper;
+    private readonly HelperCore _helper;
+    private int _loadBatchSize = 15;
+    private int _lastLoadedIndex;
 
-	public PosMeCustomerViewModel()
+    public PosMeCustomerViewModel()
     {
         _customerRepositoryTbCustomer = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCustomer>();
-		_helper = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
-		Customers = new ObservableCollection<Api_AppMobileApi_GetDataDownloadCustomerResponse>();
+        _helper = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
+        Customers = new DXObservableCollection<Api_AppMobileApi_GetDataDownloadCustomerResponse>();
         SearchCommand = new Command(OnSearchCommand);
         OnBarCode = new Command(OnBarCodeShow);
+        LoadMoreCommand = new Command(OnLoadMoreCommand);
     }
 
     public ICommand OnBarCode { get; }
     public ICommand SearchCommand { get; }
+    public ICommand LoadMoreCommand { get; }
 
-    private ObservableCollection<Api_AppMobileApi_GetDataDownloadCustomerResponse> _customers = [];
+    private DXObservableCollection<Api_AppMobileApi_GetDataDownloadCustomerResponse> _customers = [];
 
-    public ObservableCollection<Api_AppMobileApi_GetDataDownloadCustomerResponse> Customers
+    public DXObservableCollection<Api_AppMobileApi_GetDataDownloadCustomerResponse> Customers
     {
         get => _customers;
         set => SetProperty(ref _customers, value);
@@ -44,23 +49,42 @@ public class PosMeCustomerViewModel : BaseViewModel
         set => SetProperty(ref _selectedCustomer, value);
     }
 
-    private async void OnSearchCommand(object obj)
+    private async void LoadCustomers()
     {
         IsBusy = true;
-        List<Api_AppMobileApi_GetDataDownloadCustomerResponse> finds;
-        if (string.IsNullOrWhiteSpace(Search))
+        await Task.Run(async () =>
         {
-			//para mostar un determinado numero de clientes
-			var valueTop = await _helper.GetValueParameter("MOBILE_SHOW_TOP_CUSTOMER", "10");
+            Thread.Sleep(1000);
+            List<Api_AppMobileApi_GetDataDownloadCustomerResponse> newCustomerResponses;
+            if (string.IsNullOrWhiteSpace(Search))
+            {
+                newCustomerResponses = await _customerRepositoryTbCustomer.PosMeCustomerAscLoad(_lastLoadedIndex, _loadBatchSize);
+            }
+            else
+            {
+                newCustomerResponses = await _customerRepositoryTbCustomer.PosMeFilterBySearch(Search,_lastLoadedIndex, _loadBatchSize);
+            }
+            Customers.AddRange(newCustomerResponses);
+        });
+        IsBusy = false;
+    }
 
-			finds = await _customerRepositoryTbCustomer.PosMeAscTake10(int.Parse(valueTop));
-        }
-        else
+    private void OnLoadMoreCommand()
+    {
+        LoadCustomers();
+        _lastLoadedIndex += _loadBatchSize;
+    }
+
+    private void OnSearchCommand(object? obj)
+    {
+        IsBusy = true;
+        if (obj is not null)
         {
-            finds = await _customerRepositoryTbCustomer.PosMeFilterBySearch(Search);
+            Search = obj.ToString()!;
         }
         Customers.Clear();
-        Customers = new ObservableCollection<Api_AppMobileApi_GetDataDownloadCustomerResponse>(finds);
+        _lastLoadedIndex = 0;
+        LoadCustomers();
         IsBusy = false;
     }
 
@@ -74,20 +98,20 @@ public class PosMeCustomerViewModel : BaseViewModel
         OnSearchCommand(Search);
     }
 
-    private async void LoadsClientes()
+    public async void OnAppearing(INavigation navigation)
     {
-        await Task.Run(async () =>
+        try
         {
-            Thread.Sleep(1000);
-            var findAll = await _customerRepositoryTbCustomer.PosMeAscTake10();
-            Customers = new ObservableCollection<Api_AppMobileApi_GetDataDownloadCustomerResponse>(findAll);
-        });
-        IsBusy = false;
-    }
-
-    public void OnAppearing(INavigation navigation)
-    {
-        Navigation = navigation;
-        LoadsClientes();
+            Navigation = navigation;
+            var topParameter = await _helper.GetValueParameter("MOBILE_SHOW_TOP_CUSTOMER", "10");
+            _loadBatchSize = int.Parse(topParameter);
+            _lastLoadedIndex = 0;
+            Customers.Clear();
+            LoadCustomers();
+        }
+        catch (Exception e)
+        {
+            ShowToast(e.Message, ToastDuration.Long, 14);
+        }
     }
 }

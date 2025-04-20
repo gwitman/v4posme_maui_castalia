@@ -19,7 +19,6 @@ namespace v4posme_maui.Views.Items
         {
             base.OnAppearing();
             _viewModel!.OnAppearing(Navigation);
-            _viewModel.LoadItems();
         }
     }
 }

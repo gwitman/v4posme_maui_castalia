@@ -18,9 +18,11 @@ public static class VariablesGlobales
         UnityContainer = new UnityContainer();
         DtoInvoice = new();
         Item = new();
+        CustomerOrderShares = new();
     }
 
 
     public static bool EnableBackButton { get; set; }
     public static Api_AppMobileApi_GetDataDownloadItemsResponse Item { get; set; }
+    public static List<CustomerOrderShare> CustomerOrderShares { get; set; }
 }

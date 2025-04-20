@@ -210,8 +210,11 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 			await Task.Run(async () =>
 			{
 				var paramter = await _parameterSystem.PosMeFindLogo();
-				var imageBytes = Convert.FromBase64String(paramter.Value!);
-				LogoSource = ImageSource.FromStream(() => new MemoryStream(imageBytes));
+				if (!string.IsNullOrWhiteSpace(paramter.Value))
+				{
+					var imageBytes = Convert.FromBase64String(paramter.Value!);
+					LogoSource = ImageSource.FromStream(() => new MemoryStream(imageBytes));
+				}
 				Company = VariablesGlobales.TbCompany;
 			});
 

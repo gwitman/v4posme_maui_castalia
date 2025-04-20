@@ -5,6 +5,7 @@
              xmlns:dxdf="clr-namespace:DevExpress.Maui.DataForm;assembly=DevExpress.Maui.Editors"
              xmlns:dxe="clr-namespace:DevExpress.Maui.Editors;assembly=DevExpress.Maui.Editors"
              xmlns:dx="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
+             xmlns:controls="http://schemas.devexpress.com/maui"
              Title="Editar Cliente"
              Style="{StaticResource DetailPageStyle}"
              x:Class="v4posme_maui.Views.Customers.CustomerEditPage">
@@ -22,6 +23,24 @@
     <ContentPage.Content>
         <ScrollView>
             <dx:DXStackLayout Orientation="Vertical">
+                <controls:DXPopup x:Name="Popup"
+                              AllowScrim="True"
+                              BackgroundColor="Red"
+                              VerticalAlignment="Bottom"
+                              ScrimColor="#b3adb9ce">
+                    <StackLayout WidthRequest="250">
+                        <Label x:Name="TxtMensaje"
+                               FontAttributes="Bold"
+                               FontSize="15"
+                               TextColor="{StaticResource White}"
+                               Margin="20, 20" />
+                        <Button Text="Aceptar"
+                                Clicked="ClosePopup_Clicked"
+                                BackgroundColor="{StaticResource Gray600}"
+                                FontSize="20"
+                                TextColor="White" />
+                    </StackLayout>
+                </controls:DXPopup>
                 <dx:DXStackLayout Orientation="Vertical">
                     <dx:DXStackLayout.Triggers>
                         <DataTrigger Binding="{Binding IsNew}" Value="True" TargetType="dx:DXStackLayout">
@@ -94,6 +113,26 @@
                                 StartIcon="quantity"
                                 Text="{Binding Balance}"
                                 LabelText="Balance:" />
+                        </dxdf:DataFormCustomItem>
+                        <dxdf:DataFormCustomItem>
+                            <dxe:TextEdit
+                                x:Name="TxtLocation"
+                                IconColor="#006E98"
+                                ErrorText="No puede estar vacío"
+                                IsErrorIconVisible="True"
+                                StartIcon="textbox"
+                                Text="{Binding Location}"
+                                LabelText="Dirección:" />
+                        </dxdf:DataFormCustomItem>
+                        <dxdf:DataFormCustomItem>
+                            <dxe:TextEdit
+                                x:Name="TxtPhone"
+                                IconColor="#006E98"
+                                ErrorText="No puede estar vacío"
+                                IsErrorIconVisible="True"
+                                StartIcon="textbox"
+                                Text="{Binding Phone}"
+                                LabelText="Celular:" />
                         </dxdf:DataFormCustomItem>
                     </dxdf:DataFormView>
                     <dx:DXBorder.Triggers>

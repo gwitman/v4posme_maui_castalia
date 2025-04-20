@@ -158,8 +158,11 @@ public class ValidarAbonoViewModel : BaseViewModel
         await Task.Run(async () =>
         {
             var paramter = await _parameterSystem.PosMeFindLogo();
-            var imageBytes = Convert.FromBase64String(paramter.Value!);
-            LogoSource = ImageSource.FromStream(() => new MemoryStream(imageBytes));
+            if (!string.IsNullOrWhiteSpace(paramter.Value))
+            {
+                var imageBytes = Convert.FromBase64String(paramter.Value!);
+                LogoSource = ImageSource.FromStream(() => new MemoryStream(imageBytes));
+            }
             Item = VariablesGlobales.DtoAplicarAbono!;
             CompanyTelefono = await _repositoryParameters.PosMeFindByKey("CORE_PHONE");
             CompanyRuc = await _repositoryParameters.PosMeFindByKey("CORE_COMPANY_IDENTIFIER");

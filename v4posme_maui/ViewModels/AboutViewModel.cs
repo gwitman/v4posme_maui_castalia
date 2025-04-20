@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+﻿using CommunityToolkit.Maui.Core;
 using v4posme_maui.Models;
 using v4posme_maui.Services.Repository;
 using v4posme_maui.Services.SystemNames;
@@ -9,6 +9,7 @@ namespace v4posme_maui.ViewModels
     public class AboutViewModel : BaseViewModel
     {
         private readonly IRepositoryTbTransactionMaster _repositoryTbTransactionMaster;
+        private readonly IRepositoryDocumentCreditAmortization _repositoryDocumentCreditAmortization;
 
         public const string ViewName = "AboutPage";
 
@@ -16,6 +17,7 @@ namespace v4posme_maui.ViewModels
         {
             Title = "Inicio";
             _repositoryTbTransactionMaster = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMaster>();
+            _repositoryDocumentCreditAmortization = VariablesGlobales.UnityContainer.Resolve<IRepositoryDocumentCreditAmortization>();
         }
 
         private decimal _totalCorodbas;
@@ -57,7 +59,37 @@ namespace v4posme_maui.ViewModels
             get => _montoAbonosDolares;
             set => SetProperty(ref _montoAbonosDolares, value);
         }
+        private decimal _montoTotalAbonosCordobas;
 
+        public decimal MontoTotalAbonosCordobas
+        {
+            get => _montoTotalAbonosCordobas;
+            set => SetProperty(ref _montoTotalAbonosCordobas, value);
+        }
+        
+        private decimal _montoTotalAbonosDolares;
+
+        public decimal MontoTotalAbonosDolares
+        {
+            get => _montoTotalAbonosDolares;
+            set => SetProperty(ref _montoTotalAbonosDolares, value);
+        }
+        private decimal _porcentajeAbonosTotalesCordobas;
+
+        public decimal PorcentajeAbonosTotalesCordobas
+        {
+            get => _porcentajeAbonosTotalesCordobas;
+            set => SetProperty(ref _porcentajeAbonosTotalesCordobas, value);
+        }
+        
+        private decimal _porcentajeAbonosTotalesDolares;
+
+        public decimal PorcentajeAbonosTotalesDolares
+        {
+            get => _porcentajeAbonosTotalesDolares;
+            set => SetProperty(ref _porcentajeAbonosTotalesDolares, value);
+        }
+        
         private int _cantidadFacutrasContado;
 
         public int CantidadFacutrasContado
@@ -108,71 +140,94 @@ namespace v4posme_maui.ViewModels
 
         public async void OnAppearing(INavigation navigation)
         {
-            IsBusy = true;
-            Navigation = navigation;
-            var findAll = await _repositoryTbTransactionMaster.PosMeFindAll();
-            var listaAbonosDolares = new List<TbTransactionMaster>();
-            var listaAbonosCordobas = new List<TbTransactionMaster>();
-            var listaFacturasCreditoCordobas = new List<TbTransactionMaster>();
-            var listaFacturasCreditoDolares = new List<TbTransactionMaster>();
-            var listaFacturasContadoCordobas = new List<TbTransactionMaster>();
-            var listaFacturasContadoDolares = new List<TbTransactionMaster>();
-            foreach (var master in findAll)
+            try
             {
-                if (master.TransactionId == TypeTransaction.TransactionShare)
+                IsBusy = true;
+                Navigation = navigation;
+                var findAllDocumentCreditAmortization = await _repositoryDocumentCreditAmortization.PosMeFindByMaxDate(DateTime.Now);
+                var findAll = await _repositoryTbTransactionMaster.PosMeFindAll();
+                var listaAbonosDolares = new List<TbTransactionMaster>();
+                var listaAbonosCordobas = new List<TbTransactionMaster>();
+                var listaFacturasCreditoCordobas = new List<TbTransactionMaster>();
+                var listaFacturasCreditoDolares = new List<TbTransactionMaster>();
+                var listaFacturasContadoCordobas = new List<TbTransactionMaster>();
+                var listaFacturasContadoDolares = new List<TbTransactionMaster>();
+                
+                foreach (var master in findAll)
                 {
-                    if (master.CurrencyId == TypeCurrency.Cordoba)
-                    {
-                        listaAbonosCordobas.Add(master);
-                    }
-                    else
-                    {
-                        listaAbonosDolares.Add(master);
-                    }
-                }
-                else if (master.TransactionId == TypeTransaction.TransactionInvoiceBilling)
-                {
-                    if (master.TransactionCausalId == TypeTransactionCausal.Credito)
+                    if (master.TransactionId == TypeTransaction.TransactionShare)
                     {
                         if (master.CurrencyId == TypeCurrency.Cordoba)
                         {
-                            listaFacturasCreditoCordobas.Add(master);
+                            listaAbonosCordobas.Add(master);
                         }
                         else
                         {
-                            listaFacturasCreditoDolares.Add(master);
+                            listaAbonosDolares.Add(master);
                         }
                     }
-                    else
+                    else if (master.TransactionId == TypeTransaction.TransactionInvoiceBilling)
                     {
-                        if (master.CurrencyId == TypeCurrency.Cordoba)
+                        if (master.TransactionCausalId == TypeTransactionCausal.Credito)
                         {
-                            listaFacturasContadoCordobas.Add(master);
+                            if (master.CurrencyId == TypeCurrency.Cordoba)
+                            {
+                                listaFacturasCreditoCordobas.Add(master);
+                            }
+                            else
+                            {
+                                listaFacturasCreditoDolares.Add(master);
+                            }
                         }
                         else
                         {
-                            listaFacturasContadoDolares.Add(master);
+                            if (master.CurrencyId == TypeCurrency.Cordoba)
+                            {
+                                listaFacturasContadoCordobas.Add(master);
+                            }
+                            else
+                            {
+                                listaFacturasContadoDolares.Add(master);
+                            }
                         }
                     }
                 }
+                
+                //Abonos
+                CantidadAbonos = listaAbonosCordobas.Count + listaAbonosDolares.Count;
+                MontoAbonosCordobas = listaAbonosCordobas.Sum(master => master.SubAmount);
+                MontoAbonosDolares = listaAbonosDolares.Sum(master => master.SubAmount);
+                foreach (var documentCredit in findAllDocumentCreditAmortization)
+                {
+                    if (documentCredit.CurrencyId ==TypeCurrency.Cordoba)
+                    {
+                        MontoTotalAbonosCordobas = findAllDocumentCreditAmortization.Sum(response => response.Balance);
+                        PorcentajeAbonosTotalesCordobas = Math.Round(MontoAbonosCordobas / MontoTotalAbonosCordobas * 100, 2);
+                    }
+                    else
+                    {
+                        MontoTotalAbonosDolares = findAllDocumentCreditAmortization.Sum(response => response.Balance);
+                        PorcentajeAbonosTotalesDolares = Math.Round(MontoAbonosDolares / MontoTotalAbonosCordobas * 100, 2);
+                    }
+                }
+                
+                //Facutras Contado
+                CantidadFacutrasContado = listaFacturasContadoCordobas.Count + listaFacturasContadoDolares.Count;
+                MontoFacturasContadoCordobas = listaFacturasContadoCordobas.Sum(master => master.SubAmount);
+                MontoFacturasContadoDolares = listaFacturasContadoDolares.Sum(master => master.SubAmount);
+                //Facturas Credito
+                CantidadFacutrasCredito = listaFacturasCreditoCordobas.Count + listaFacturasCreditoDolares.Count;
+                MontoFacturasCreditoCordobas = listaFacturasCreditoCordobas.Sum(master => master.SubAmount);
+                MontoFacturasCreditoDolares = listaFacturasCreditoDolares.Sum(master => master.SubAmount);
+                //Totales
+                TotalCordobas = MontoAbonosCordobas + MontoFacturasContadoCordobas;
+                TotalDolares = MontoAbonosDolares + MontoFacturasContadoDolares;
+                IsBusy = false;
             }
-
-            //Abonos
-            CantidadAbonos = listaAbonosCordobas.Count + listaAbonosDolares.Count;
-            MontoAbonosCordobas = listaAbonosCordobas.Sum(master => master.SubAmount);
-            MontoAbonosDolares = listaAbonosDolares.Sum(master => master.SubAmount);
-            //Facutras Contado
-            CantidadFacutrasContado = listaFacturasContadoCordobas.Count + listaFacturasContadoDolares.Count;
-            MontoFacturasContadoCordobas = listaFacturasContadoCordobas.Sum(master => master.SubAmount);
-            MontoFacturasContadoDolares = listaFacturasContadoDolares.Sum(master => master.SubAmount);
-            //Facturas Credito
-            CantidadFacutrasCredito = listaFacturasCreditoCordobas.Count + listaFacturasCreditoDolares.Count;
-            MontoFacturasCreditoCordobas = listaFacturasCreditoCordobas.Sum(master => master.SubAmount);
-            MontoFacturasCreditoDolares = listaFacturasCreditoDolares.Sum(master => master.SubAmount);
-            //Totales
-            TotalCordobas = MontoAbonosCordobas + MontoFacturasContadoCordobas;
-            TotalDolares = MontoAbonosDolares + MontoFacturasContadoDolares;
-            IsBusy = false;
+            catch (Exception e)
+            {
+                ShowToast(e.Message,ToastDuration.Long, 14);
+            }
         }
     }
 }

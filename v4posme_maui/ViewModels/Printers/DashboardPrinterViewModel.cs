@@ -10,6 +10,7 @@ using v4posme_maui.Views.Abonos;
 using v4posme_maui.Views.Invoices;
 using v4posme_maui.Views.Printers;
 using Unity;
+using v4posme_maui.Services.Helpers;
 
 namespace v4posme_maui.ViewModels.Printers;
 
@@ -21,7 +22,7 @@ public class DashboardPrinterViewModel : BaseViewModel
     private readonly IRepositoryTbCustomer _repositoryTbCustomer;
     private readonly IRepositoryItems _repositoryItems;
     private const int UnselectedIndex = -1;
-
+    private readonly HelperCore _helper;
     public DashboardPrinterViewModel()
     {
         _repositoryTbTransactionMaster = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMaster>();
@@ -29,6 +30,7 @@ public class DashboardPrinterViewModel : BaseViewModel
         _repositoryDocumentCredit = VariablesGlobales.UnityContainer.Resolve<IRepositoryDocumentCredit>();
         _repositoryItems = VariablesGlobales.UnityContainer.Resolve<IRepositoryItems>();
         _repositoryTbCustomer = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCustomer>();
+        _helper = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
         Facturas = new();
         Abonos = new();
         Productos = new();
@@ -71,8 +73,29 @@ public class DashboardPrinterViewModel : BaseViewModel
 
     private async void OnSelectedAbonoCommand(ViewTempDtoAbono obj)
     {
-        VariablesGlobales.DtoAplicarAbono = obj;
-        await Navigation!.PushAsync(new PrinterAbonoPage(), true);
+        try
+        {
+            VariablesGlobales.DtoAplicarAbono = obj;
+            var mostrarPrintSinSaldos = await _helper.GetValueParameter("CXC_SHOW_BALANCE_IN_SHARE_MOBILE","false");
+            var typePrinterShare = await _helper.GetValueParameter("CXC_TYPE_PRINTER_SHARE_MOBILE","DEFAULT");
+        
+            if (typePrinterShare=="FINANCIAL")
+            {
+                await Navigation!.PushAsync(new ValidarAbonoFinancieraPage(), true);
+            }
+            else if (mostrarPrintSinSaldos == "true")
+            {
+                await Navigation!.PushAsync(new PrinterAbonoPage(), true);
+            }
+            else
+            {
+                await Navigation!.PushAsync(new ValidarAbonoHideSaldoPage(), true);
+            }
+        }
+        catch (Exception e)
+        {
+            ShowToast(e.Message, ToastDuration.Long, 14);
+        }
     }
 
     private async void OnSearchAbonoCommand(object obj)
@@ -225,6 +248,7 @@ public class DashboardPrinterViewModel : BaseViewModel
     public void OnAppearing(INavigation navigation)
     {
         Navigation = navigation;
+        Load(SelectedIndex);
     }
 
     public async void Load(int index)
@@ -263,40 +287,59 @@ public class DashboardPrinterViewModel : BaseViewModel
 
     private async void FillAbonos(List<TbTransactionMaster> findAllAbonos)
     {
-        var totalCordobas = decimal.Zero;
-        var totalDolares = decimal.Zero;
-        foreach (var abono in findAllAbonos)
+        try
         {
-            var customer = await _repositoryTbCustomer.PosMeFindEntityId(abono.EntityId);
-            string currencyName;
-            if (abono.CurrencyId == TypeCurrency.Cordoba)
+            var totalCordobas = decimal.Zero;
+            var totalDolares = decimal.Zero;
+            foreach (var abono in findAllAbonos)
             {
-                totalCordobas += abono.SubAmount;
-                currencyName = "C$";
-            }
-            else
-            {
-                totalDolares += abono.SubAmount;
-                currencyName = "$";
+                var customer = await _repositoryTbCustomer.PosMeFindEntityId(abono.EntityId);
+                string currencyName;
+                if (abono.CurrencyId == TypeCurrency.Cordoba)
+                {
+                    totalCordobas += abono.SubAmount;
+                    currencyName = "C$";
+                }
+                else
+                {
+                    totalDolares += abono.SubAmount;
+                    currencyName = "$";
+                }
+
+                var tmpAbono = new ViewTempDtoAbono(
+                    abono.TransactionNumber!,
+                    abono.EntityId, customer.FirstName!,
+                    customer.LastName!,
+                    customer.Identification!,
+                    abono.TransactionOn,
+                    abono.Reference4,
+                    currencyName,
+                    abono.SubAmount,
+                    abono.Discount,
+                    abono.Amount,
+                    abono.Comment!);
+                
+                if (!string.IsNullOrWhiteSpace(abono.Reference2))
+                {
+                    tmpAbono.MontoMora = Convert.ToDecimal(abono.Reference2);
+                }
+                if (!string.IsNullOrWhiteSpace(abono.Reference3))
+                {
+                    tmpAbono.MoraPagada = Convert.ToDecimal(abono.Reference3);
+                }
+                tmpAbono.Documentos = abono.Reference1;
+                tmpAbono.DiasMora = abono.Plazo;
+                tmpAbono.CuotasPendientes = abono.CuotasPendientes;
+                Abonos.Add(tmpAbono);
             }
 
-            var tmpAbono = new ViewTempDtoAbono(
-                abono.TransactionNumber!,
-                abono.EntityId, customer.FirstName!,
-                customer.LastName!,
-                customer.Identification!,
-                abono.TransactionOn,
-                abono.TransactionNumber!,
-                currencyName,
-                abono.SubAmount,
-                abono.Discount,
-                abono.Amount,
-                abono.Comment!);
-            Abonos.Add(tmpAbono);
+            TotalCordobasAbonos = $"C$ {totalCordobas:N2}";
+            TotalDolaresAbonos = $"$ {totalDolares:N2}";
         }
-
-        TotalCordobasAbonos = $"C$ {totalCordobas:N2}";
-        TotalDolaresAbonos = $"$ {totalDolares:N2}";
+        catch (Exception e)
+        {
+            ShowToast(e.Message, ToastDuration.Long, 14);
+        }
     }
 
     private async void FillFacturas(List<TbTransactionMaster> findAllFactura)

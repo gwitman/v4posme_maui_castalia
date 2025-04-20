@@ -68,7 +68,16 @@ public class AplicarAbonoViewModel : BaseViewModel, IQueryAttributable
 
 			//para mostrar los saldo final e inicial
 			var mostrarPrintSinSaldos = await _helper.GetValueParameter("CXC_SHOW_BALANCE_IN_SHARE_MOBILE","false");
-
+			var typePrinterShare = await _helper.GetValueParameter("CXC_TYPE_PRINTER_SHARE_MOBILE","DEFAULT");
+			var findAllDocumentCreditAmortizationResponses = await _repositoryDocumentCreditAmortization.PosMeFilterByDocumentNumberAll(DocumentCreditResponse.DocumentNumber!);
+			var sumbBalancesAmortization= findAllDocumentCreditAmortizationResponses
+				.Where(dc=>dc.DateApply.Date < DateTime.Now.Date)
+				.Sum(dc=>dc.Balance);
+			var moraPagada = Monto - sumbBalancesAmortization;
+			if (moraPagada < 0)
+			{
+				moraPagada = Monto;
+			}
 			VariablesGlobales.DtoAplicarAbono = new ViewTempDtoAbono(
 				codigoAbono,
 				_customerResponse.EntityId,
@@ -83,33 +92,58 @@ public class AplicarAbonoViewModel : BaseViewModel, IQueryAttributable
 				SaldoFinal,
 				Description!
 			);
-
+			
 			//Aplicar Abono
 			string reference = await HelperCustomerCreditDocumentAmortization.ApplyShare(_customerResponse.EntityId, DocumentCreditResponse.DocumentNumber!, Monto);
-
+			
+			var documentosConRemanentes= await _repositoryDocumentCreditAmortization.PosMeFilterByDocumentNumber(DocumentCreditAmortizationResponse.DocumentNumber!);
+			var documentCrediAmortizationHastaHoy = documentosConRemanentes.Where(dc => dc.DateApply.Date <= DateTime.Now.Date).ToList();
+			var montoMora= documentCrediAmortizationHastaHoy.Where(dc => dc.Remaining > 0).Sum(dc => dc.Remaining);
+			var fechaAntiguaRemanente = documentCrediAmortizationHastaHoy
+				.Where(dc => dc.Remaining > 0)
+				.Min(dc => dc.DateApply);
+			var diasMora = (DateTime.Now - fechaAntiguaRemanente).Days;
+			if (diasMora < 0)
+			{
+				diasMora = 0;
+			}
+			VariablesGlobales.DtoAplicarAbono.DiasMora = diasMora;
+			VariablesGlobales.DtoAplicarAbono.MontoMora = montoMora;
+			VariablesGlobales.DtoAplicarAbono.MoraPagada = moraPagada;
+			VariablesGlobales.DtoAplicarAbono.Documentos = reference;
+			VariablesGlobales.DtoAplicarAbono.CuotasPendientes = await GetCuotasPendientes();
 			//Ingrear Abono 
 			var tmpMonto = Monto;
 			var transactionMaster = new TbTransactionMaster
 			{
-				TransactionId = TypeTransaction.TransactionShare,
-				SubAmount = Monto,
-				Discount = SaldoInicial,
-				Amount = SaldoFinal,
-				Comment = Description,
-				TransactionNumber = codigoAbono,
-				TransactionOn = DateTime.Now,
-				EntitySecondaryId = _customerResponse.CustomerNumber,
-				EntityId = _customerResponse.EntityId,
-				CurrencyId = (TypeCurrency)CurrencyId,
-				Reference1 = reference,
-				CustomerCreditLineId = _customerResponse.CustomerCreditLineId,
-				CustomerIdentification = _customerResponse.Identification!
+				TransactionId          = TypeTransaction.TransactionShare,
+				SubAmount              = Monto,
+				Discount               = SaldoInicial,
+				Amount                 = SaldoFinal,
+				Comment                = Description,
+				TransactionNumber      = codigoAbono,
+				TransactionOn          = DateTime.Now,
+				EntitySecondaryId      = _customerResponse.CustomerNumber,
+				EntityId               = _customerResponse.EntityId,
+				CurrencyId             = (TypeCurrency)CurrencyId,
+				Reference1             = reference,
+				CustomerCreditLineId   = _customerResponse.CustomerCreditLineId,
+				CustomerIdentification = _customerResponse.Identification!,
+				Plazo                  = diasMora,
+				Reference2             = $"{montoMora}",
+				Reference3             = $"{moraPagada}",
+				Reference4             = DocumentCreditResponse.DocumentNumber ?? "",
+				CuotasPendientes       = VariablesGlobales.DtoAplicarAbono.CuotasPendientes
 			};
 			var taskTransactionMaster = _repositoryTransactionMaster.PosMeInsert(transactionMaster);
 			var taskPlus = _helper.PlusCounter();
 			await Task.WhenAll([taskPlus, taskTransactionMaster]);
 
-			if (mostrarPrintSinSaldos == "true")
+			if (typePrinterShare=="FINANCIAL")
+			{
+				await NavigationService.NavigateToAsync<ValidarAbonoFinancieraViewModel>();
+			}
+			else if (mostrarPrintSinSaldos == "true")
 			{
 				await NavigationService.NavigateToAsync<ValidarAbonoViewModel>();
 			}
@@ -126,6 +160,11 @@ public class AplicarAbonoViewModel : BaseViewModel, IQueryAttributable
 		}
 	}
 
+	private async Task<int> GetCuotasPendientes()
+	{
+		var cantidadDocumentos = await _repositoryDocumentCreditAmortization.PosMeCountByDocumentNumberRemainingZero(DocumentCreditResponse.DocumentNumber ?? "");
+		return DocumentCreditResponse.CantidadCuotas - cantidadDocumentos;
+	}
 	private bool Validate()
 	{
 		if (string.IsNullOrWhiteSpace(Description))

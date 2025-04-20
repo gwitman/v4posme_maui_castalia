@@ -47,14 +47,16 @@
                             DetailNewItemFormTemplate="{DataTemplate customers:CustomerEditPage}"
                             SelectedItem="{Binding SelectedCustomer}"
                             SelectionMode="Single"
+                            IsLoadMoreEnabled="True"
+                            LoadMoreCommand="{Binding LoadMoreCommand}"
                             TapCommand="{Binding Source={x:Reference ClientesCollectionView}, Path=Commands.ShowDetailForm}"
-                            IsRefreshing="{Binding  IsBusy, Mode=OneWay}">
+                            IsRefreshing="{Binding  IsBusy, Mode=TwoWay}">
                             <dxcv:DXCollectionView.ItemTemplate>
-                                <DataTemplate>
+                                <DataTemplate x:DataType="models:Api_AppMobileApi_GetDataDownloadCustomerResponse">
                                     <dxc:DXStackLayout
                                         CornerRadius="15"
                                         Margin="10">
-                                        <Grid x:DataType="models:Api_AppMobileApi_GetDataDownloadCustomerResponse"
+                                        <Grid
                                               HorizontalOptions="Fill"
                                               Padding="10"
                                               VerticalOptions="Fill"

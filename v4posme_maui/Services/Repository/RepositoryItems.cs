@@ -7,6 +7,17 @@ public class RepositoryItems(DataBase dataBase)
 {
     private readonly DataBase _dataBase = dataBase;
 
+    public Task<int> PosMeExistBarCode(string barcode, int itemId = 0)
+    {
+        var query = _dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadItemsResponse>()
+            .Where(response => response.BarCode == barcode);
+        if (itemId > 0)
+        {
+            query = query.Where(response => response.ItemId != itemId);
+        }
+        return query.CountAsync();
+    }
+
     public async Task<Api_AppMobileApi_GetDataDownloadItemsResponse?> PosMeFindByBarCode(string barCode)
     {
         return await _dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadItemsResponse>()
@@ -41,11 +52,23 @@ public class RepositoryItems(DataBase dataBase)
                                || response.Name.ToLower().Contains(textSearch))
             .ToListAsync();
     }
+    public async Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeFilterdByItemNumberAndBarCodeAndNameByTop(string? textSearch,int size,int top)
+    {
+        textSearch = textSearch!.ToLower();
+        return await _dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadItemsResponse>()
+            .Where(response => response.ItemNumber!.ToLower().Contains(textSearch)
+                               || response.BarCode.ToLower().Contains(textSearch)
+                               || response.Name.ToLower().Contains(textSearch))
+            .Skip(size)
+            .Take(top)
+            .ToListAsync();
+    }
 
-    public Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeDescending10(int top = 10)
+    public Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeDescendingBySizeAndTop(int size,int take)
     {
         return _dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadItemsResponse>()
-            .Take(top)
+            .Skip(size)
+            .Take(take)
             .OrderByDescending(response => response.ItemNumber)
             .ToListAsync();
     }
@@ -54,5 +77,13 @@ public class RepositoryItems(DataBase dataBase)
     {
         return _dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadItemsResponse>()
             .Where(response => response.Modificado).ToListAsync();
+    }
+
+    public Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeDescending10(int take = 10)
+    {
+        return _dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadItemsResponse>()
+            .Take(take)
+            .OrderByDescending(response => response.ItemNumber)
+            .ToListAsync();
     }
 }
