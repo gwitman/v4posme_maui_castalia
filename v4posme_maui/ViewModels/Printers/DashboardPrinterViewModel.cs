@@ -278,7 +278,6 @@ public class DashboardPrinterViewModel : BaseViewModel
                     var findAllAbonos = await _repositoryTbTransactionMaster.PosMeFilterAbonos();
                     await MainThread.InvokeOnMainThreadAsync(() => 
                     {
-                        Abonos.Clear();
                         FillAbonos(findAllAbonos);
                     });
                     break;
@@ -308,6 +307,7 @@ public class DashboardPrinterViewModel : BaseViewModel
         {
             var totalCordobas = decimal.Zero;
             var totalDolares = decimal.Zero;
+            Abonos.Clear();
             foreach (var abono in findAllAbonos)
             {
                 var customer = await _repositoryTbCustomer.PosMeFindEntityId(abono.EntityId);

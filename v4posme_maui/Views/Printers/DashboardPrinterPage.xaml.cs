@@ -21,6 +21,5 @@ public partial class DashboardPrinterPage : ContentPage
     {
         base.OnAppearing();
         _viewModel.OnAppearing(Navigation);
-        _viewModel.Load(0);
     }
 }
