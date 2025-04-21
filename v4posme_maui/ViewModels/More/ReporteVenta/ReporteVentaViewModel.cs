@@ -173,9 +173,9 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 			protected set => SetProperty(ref _totalNIO, value);
 		}
 
-		public ObservableCollection<ViewTempDtoReporteCierre> Invoices { get; }
+		public ObservableCollection<ViewTempDtoReporteCierre> InvoicesUS { get; }
 		public ObservableCollection<ViewTempDtoReporteCierre> InvoicesNIO { get; }
-		public ObservableCollection<ViewTempDtoReporteCierre> Credits { get; }
+		public ObservableCollection<ViewTempDtoReporteCierre> CreditsUS { get; }
 		public ObservableCollection<ViewTempDtoReporteCierre> CreditsNIO { get; }
 		public ObservableCollection<ViewTempDtoReporteCierre> Visits { get; }
 
@@ -194,8 +194,8 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 			FechaInical = new DateTime(today.Year, today.Month, 1);
 			FechaFinal = new DateTime(today.Year, today.Month, DateTime.DaysInMonth(today.Year, today.Month));
 
-			Invoices = [];
-			Credits = [];
+			InvoicesUS = [];
+			CreditsUS = [];
 			Visits = [];
 			InvoicesNIO = [];
 			CreditsNIO = [];
@@ -240,8 +240,8 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 			CreditHeight_2 = 0;
 			VisitHeight = 0;
 
-			Invoices.Clear();
-			Credits.Clear();
+			InvoicesUS.Clear();
+			CreditsUS.Clear();
 			Visits.Clear();
 			InvoicesNIO.Clear();
 			CreditsNIO.Clear();
@@ -251,8 +251,8 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 		{
 			try
 			{
-				Invoices.Clear();
-				Credits.Clear();
+				InvoicesUS.Clear();
+				CreditsUS.Clear();
 				Visits.Clear();
 				InvoicesNIO.Clear();
 				CreditsNIO.Clear();
@@ -333,7 +333,7 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 
 				foreach (var item in invoicesUS)
 				{
-					Invoices.Add(item);
+					InvoicesUS.Add(item);
 					_TotalFactura += item.Remaining;
 					totalUSD += item.Remaining;
 				}
@@ -347,7 +347,7 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 
 				foreach (var item in creditsUS)
 				{
-					Credits.Add(item);
+					CreditsUS.Add(item);
 					_TotalCredito += item.Remaining;
 					totalUSD += item.Remaining;
 				}
@@ -375,9 +375,9 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 				}
 
 				IsBusy = false;
-				InvoicesHeight = 24 * Invoices.Count;
+				InvoicesHeight = 24 * InvoicesUS.Count;
 				InvoicesHeight_2 = 24 * InvoicesNIO.Count;
-				CreditHeight = 24 * Credits.Count;
+				CreditHeight = 24 * CreditsUS.Count;
 				CreditHeight_2 = 24 * CreditsNIO.Count;
 				VisitHeight = 24 * Visits.Count;
 				TotalNIO = $"C$ {totalNIO:N2}";
@@ -429,11 +429,11 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 			printer.BoldMode($"CIERRE");
 			printer.NewLine();
 			printer.AlignCenter();
-			printer.BoldMode($"DEL {FechaInical:dd/MM/yyyy} AL {FechaFinal:dd/MM/yyyy}");
+			printer.BoldMode($"DEL {FechaInical:yyyy-MM-dd} AL {FechaFinal:yyyy-MM-dd}");
 			printer.NewLine();
 			printer.AlignLeft();
 
-			printer.Append($"Facturas de contado C$");
+			printer.Append($"FACTURAS DE CONTADO C$");
 			printer.NewLine();
 
 			var totalInvoicesNIO = 0.0m;
@@ -444,10 +444,10 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 				printer.NewLine();
 			}
 
-			printer.Append($"Total:         {totalInvoicesNIO:N2}");
+			printer.Append($"TOTAL:         {totalInvoicesNIO:N2}");
 			printer.NewLine();
 
-			printer.Append($"Abonos C$");
+			printer.Append($"ABONOS C$");
 			printer.NewLine();
 
 			var totalAbonosNIO = 0.0m;
@@ -461,39 +461,39 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 			printer.Append($"Total:         {totalAbonosNIO:N2}");
 			printer.NewLine();
 
-			printer.Append($"Facturas de contado $");
+			printer.Append($"FACTURAS DE CONTADO $");
 			printer.NewLine();
 
 			var totalInvoicesUSD = 0.0m;
-			foreach (var item in InvoicesNIO)
+			foreach (var item in InvoicesUS)
 			{
 				totalInvoicesUSD += item.Remaining;
 				printer.Append($"{item.DocumentNumber}     {item.Remaining:N2}");
 				printer.NewLine();
 			}
 
-			printer.Append($"Total:         {totalInvoicesUSD:N2}");
+			printer.Append($"TOTAL:         {totalInvoicesUSD:N2}");
 			printer.NewLine();
 
-			printer.Append($"Abonos $");
+			printer.Append($"ABONOS $");
 			printer.NewLine();
 
 			var totalAbonosUSD = 0.0m;
-			foreach (var item in CreditsNIO)
+			foreach (var item in CreditsUS)
 			{
 				totalAbonosUSD += item.Remaining;
 				printer.Append($"{item.DocumentNumber}     {item.Remaining:N2}");
 				printer.NewLine();
 			}
 
-			printer.Append($"Total:         {totalAbonosUSD:N2}");
+			printer.Append($"TOTAL:         {totalAbonosUSD:N2}");
 			printer.NewLine();
 			printer.NewLine();
-			printer.Append("--------------------------------------");
+			printer.Append("-------------------------------");
 			printer.NewLine();
 			printer.NewLine();
 
-			printer.Append($"Visitas");
+			printer.Append($"VISITA");
 			printer.NewLine();
 
 			foreach (var item in Visits)
@@ -509,7 +509,7 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 					item.ClientName = "-";
 				}
 
-				printer.Append($"{item.ClientName}     {item.Date:dd/MM/yyyy}");
+				printer.Append($"{item.ClientName}     {item.Date:yyyy-MM-dd}");
 				printer.NewLine();
 			}
 
