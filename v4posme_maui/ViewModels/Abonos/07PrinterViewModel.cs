@@ -150,7 +150,7 @@ public class ValidarAbonoFinancieraViewModel : BaseViewModel
                        $"con número de cedula {viewTempDtoAbono.Identification} ha realizado un abono a su cuenta.");
         printer.NewLine();
         printer.Append($"No. Documento    : {viewTempDtoAbono.DocumentNumber}");
-        printer.Append($"Cuota Pactada    : {DocumentCreditResponse.CuotaPactada:N2}");
+        printer.Append($"Cuota Pactada    : {viewTempDtoAbono.CurrencyName} {DocumentCreditResponse.CuotaPactada:N2}");
         printer.Append($"Cant. Cuotas     : {DocumentCreditResponse.CantidadCuotas:N2}");
         printer.Append($"Cuotas Pend.     : {CuotasPendientes:N2}");
         printer.Append($"Días Mora        : {viewTempDtoAbono.DiasMora}");
