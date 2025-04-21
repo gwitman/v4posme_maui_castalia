@@ -142,16 +142,19 @@ public class ValidarAbonoFinancieraViewModel : BaseViewModel
         printer.AlignCenter();
         printer.BoldMode(Company!.Name!);
         printer.BoldMode($"RUC: {CompanyRuc!.Value}");
+        printer.BoldMode("Comprobante de Abono");
+        printer.BoldMode($"{viewTempDtoAbono!.CodigoAbono}");
         printer.NewLine();
         printer.AlignLeft();
         printer.Append($"Le informamos: \n{viewTempDtoAbono!.FirstName} {viewTempDtoAbono.LastName} " +
                        $"con número de cedula {viewTempDtoAbono.Identification} ha realizado un abono a su cuenta.");
         printer.NewLine();
+        printer.Append($"No. Documento    : {viewTempDtoAbono.DocumentNumber}");
         printer.Append($"Cuota Pactada    : {DocumentCreditResponse.CuotaPactada:N2}");
         printer.Append($"Cant. Cuotas     : {DocumentCreditResponse.CantidadCuotas:N2}");
         printer.Append($"Cuotas Pend.     : {CuotasPendientes:N2}");
         printer.Append($"Días Mora        : {viewTempDtoAbono.DiasMora}");
-        printer.Append($"Monto Mora       : {viewTempDtoAbono.MontoMora}");
+        printer.Append($"Monto Mora       : {viewTempDtoAbono.CurrencyName} {viewTempDtoAbono.MontoMora}");
         printer.Append($"Fecha            : {viewTempDtoAbono.Fecha:yyyy-MM-dd}");
         printer.Append($"Recibo           : {viewTempDtoAbono!.CodigoAbono}");
         printer.Append($"Saldo Anterior   : {viewTempDtoAbono.CurrencyName} {viewTempDtoAbono.SaldoInicial:N2}");
