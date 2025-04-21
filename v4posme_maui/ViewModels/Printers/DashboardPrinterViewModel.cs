@@ -119,9 +119,16 @@ public class DashboardPrinterViewModel : BaseViewModel
 
     private async void OnSelectedFacturaCommand(ViewTempDtoInvoice obj)
     {
-        VariablesGlobales.DtoInvoice = obj;
-        VariablesGlobales.EnableBackButton = true;
-        await Navigation!.PushAsync(new VoucherInvoicePage());
+        try
+        {
+            VariablesGlobales.DtoInvoice = obj;
+            VariablesGlobales.EnableBackButton = true;
+            await Navigation!.PushAsync(new VoucherInvoicePage());
+        }
+        catch (Exception e)
+        {
+            ShowToast(e.Message, ToastDuration.Long, 12);
+        }
     }
 
     private async void OnSearchFacturaCommand()

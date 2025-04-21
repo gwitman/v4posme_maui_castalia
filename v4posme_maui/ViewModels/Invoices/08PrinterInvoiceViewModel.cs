@@ -33,88 +33,100 @@ public class PrinterInvoiceViewModel : BaseViewModel
 
     private async void OnAnularFacturaCommand()
     {
-        var transactionMasterId = VariablesGlobales.DtoInvoice.TransactionMasterId;
-        var findTransactionMaster = await _repositoryTbTransactionMaster.PosMeFindByTransactionId(transactionMasterId);
-        var details = await _repositoryTbTransactionMasterDetail.PosMeItemByTransactionId(transactionMasterId);
-        await _repositoryTbTransactionMaster.PosMeDelete(findTransactionMaster);
-        foreach (var masterDetail in details)
+        try
         {
-            await _repositoryTbTransactionMasterDetail.PosMeDelete(masterDetail);
-        }
+            var details = await _repositoryTbTransactionMasterDetail.PosMeItemByTransactionId(TransactionMaster.TransactionMasterId);
+            await _repositoryTbTransactionMaster.PosMeDelete(TransactionMaster);
+            foreach (var masterDetail in details)
+            {
+                await _repositoryTbTransactionMasterDetail.PosMeDelete(masterDetail);
+            }
 
-        await Navigation!.PopAsync(true);
+            await Navigation!.PopAsync(true);
+        }
+        catch (Exception e)
+        {
+            ShowToast(e.Message, ToastDuration.Long, 13);
+        }
     }
 
     private async void OnPrintCommand()
     {
-        var parametroPrinter = await _parameterSystem.PosMeFindPrinter();
-        var logo = await _parameterSystem.PosMeFindLogo();
-        if (string.IsNullOrWhiteSpace(parametroPrinter.Value))
+        try
         {
-            return;
-        }
+            var parametroPrinter = await _parameterSystem.PosMeFindPrinter();
+            var logo = await _parameterSystem.PosMeFindLogo();
+            if (string.IsNullOrWhiteSpace(parametroPrinter.Value))
+            {
+                return;
+            }
 
-        var dtoInvoice = VariablesGlobales.DtoInvoice;
-        var printer = new Printer(parametroPrinter.Value);
-        if (!CrossBluetoothLE.Current.IsOn)
+            var dtoInvoice = DtoInvoice;
+            var printer = new Printer(parametroPrinter.Value);
+            if (!CrossBluetoothLE.Current.IsOn)
+            {
+                ShowToast(Mensajes.MensajeBluetoothState, ToastDuration.Long, 18);
+                return;
+            }
+
+            IsBusy = true;
+            if (!string.IsNullOrWhiteSpace(logo.Value))
+            {
+                var readImage = Convert.FromBase64String(logo.Value!);
+                printer.AlignRight();
+                printer.Image(SKBitmap.Decode(readImage));
+            }
+
+            printer.AlignCenter();
+            printer.BoldMode(Company!.Name!);
+            printer.BoldMode($"RUC: {CompanyRuc!.Value}");
+            printer.BoldMode("FACTURA");
+            printer.BoldMode(dtoInvoice.Codigo);
+            printer.BoldMode($"FECHA: {dtoInvoice.TransactionOn:yyyy-MM-dd hh:mm tt}");
+            printer.NewLine();
+            printer.AlignLeft();
+            var detalleHeader = $"""
+                                 VENDEDOR     :{VariablesGlobales.User!.Nickname}
+                                 CODIGO       :{dtoInvoice.CustomerResponse.CustomerNumber}
+                                 MONEDA       :{dtoInvoice.Currency!.Simbolo}
+                                 TIPO         :{dtoInvoice.TipoDocumento!.Name}
+                                 CLIENTE       
+                                 {dtoInvoice.NombreCompleto}
+                                 {dtoInvoice.Comentarios}
+                                 """;
+            printer.NewLine();
+            printer.Append(detalleHeader);
+            printer.NewLine();
+            printer.Append("CANT.       PREC         TOTAL");
+            foreach (var item in dtoInvoice.Items)
+            {
+                printer.Append(item.Name);
+                printer.Append($"{item.Quantity}        {item.PrecioPublico:N2}         {item.Importe:N2}");
+            }
+
+            printer.NewLine();
+            printer.Append($"TOTAL:               {dtoInvoice.Balance:N2}");
+            printer.Append($"RECIBIDO:            {dtoInvoice.Monto:N2}");
+            printer.Append($"CAMBIO:              {dtoInvoice.Cambio:N2}");
+            printer.NewLine();
+            printer.AlignCenter();
+            printer.Append($"{Company.Address}");
+            printer.Append($"{CompanyTelefono!.Value}");
+            printer.NewLine();
+            printer.NewLine();
+            printer.FullPaperCut();
+            printer.Print();
+            if (printer.Device is null)
+            {
+                ShowToast(Mensajes.MensajeDispositivoNoConectado, ToastDuration.Long, 18);
+            }
+
+            IsBusy = false;
+        }
+        catch (Exception e)
         {
-            ShowToast(Mensajes.MensajeBluetoothState, ToastDuration.Long, 18);
-            return;
+            ShowToast(e.Message, ToastDuration.Long, 12);
         }
-
-        IsBusy = true;
-        if (!string.IsNullOrWhiteSpace(logo.Value))
-        {
-            var readImage = Convert.FromBase64String(logo.Value!);
-            printer.AlignRight();
-            printer.Image(SKBitmap.Decode(readImage));
-        }
-
-        printer.AlignCenter();
-        printer.BoldMode(Company!.Name!);
-        printer.BoldMode($"RUC: {CompanyRuc!.Value}");
-        printer.BoldMode("FACTURA");
-        printer.BoldMode(dtoInvoice.Codigo);
-        printer.BoldMode($"FECHA: {dtoInvoice.TransactionOn:yyyy-MM-dd hh:mm tt}");
-        printer.NewLine();
-        printer.AlignLeft();
-        var detalleHeader = $"""
-                             VENDEDOR     :{VariablesGlobales.User!.Nickname}
-                             CODIGO       :{dtoInvoice.CustomerResponse.CustomerNumber}
-                             MONEDA       :{dtoInvoice.Currency!.Simbolo}
-                             TIPO         :{DtoInvoice.TipoDocumento!.Name}
-                             CLIENTE       
-                             {dtoInvoice.NombreCompleto}
-                             {dtoInvoice.Comentarios}
-                             """;
-        printer.NewLine();
-        printer.Append(detalleHeader);
-        printer.NewLine();
-        printer.Append("CANT.       PREC         TOTAL");
-        foreach (var item in dtoInvoice.Items)
-        {
-            printer.Append(item.Name);
-            printer.Append($"{item.Quantity}        {item.PrecioPublico:N2}         {item.Importe:N2}");
-        }
-
-        printer.NewLine();
-        printer.Append($"TOTAL:               {dtoInvoice.Balance:N2}");
-        printer.Append($"RECIBIDO:            {dtoInvoice.Monto:N2}");
-        printer.Append($"CAMBIO:              {dtoInvoice.Cambio:N2}");
-        printer.NewLine();
-        printer.AlignCenter();
-        printer.Append($"{Company.Address}");
-        printer.Append($"{CompanyTelefono!.Value}");
-        printer.NewLine();
-        printer.NewLine();
-        printer.FullPaperCut();
-        printer.Print();
-        if (printer.Device is null)
-        {
-            ShowToast(Mensajes.MensajeDispositivoNoConectado, ToastDuration.Long, 18);
-        }
-
-        IsBusy = false;
     }
 
     private void OnAplicarOtroCommand(object obj)
@@ -126,6 +138,13 @@ public class PrinterInvoiceViewModel : BaseViewModel
         }
     }
 
+    private TbTransactionMaster _transactionMaster;
+
+    public TbTransactionMaster TransactionMaster
+    {
+        get=>_transactionMaster; 
+        set=>SetProperty(ref _transactionMaster,value);
+    }
     private ImageSource? _logoSource;
 
     public ImageSource? LogoSource
@@ -182,17 +201,27 @@ public class PrinterInvoiceViewModel : BaseViewModel
 
     public async void OnAppearing(INavigation navigation)
     {
-        Navigation = navigation;
-        var paramter = await _parameterSystem.PosMeFindLogo();
-        if (!string.IsNullOrWhiteSpace(paramter.Value))
+        try
         {
-            var imageBytes = Convert.FromBase64String(paramter.Value!);
-            LogoSource = ImageSource.FromStream(() => new MemoryStream(imageBytes));
+            Navigation = navigation;
+            var paramter = await _parameterSystem.PosMeFindLogo();
+            if (!string.IsNullOrWhiteSpace(paramter.Value))
+            {
+                var imageBytes = Convert.FromBase64String(paramter.Value!);
+                LogoSource = ImageSource.FromStream(() => new MemoryStream(imageBytes));
+            }
+            CompanyTelefono = await _repositoryParameters.PosMeFindByKey("CORE_PHONE");
+            CompanyRuc = await _repositoryParameters.PosMeFindByKey("CORE_COMPANY_IDENTIFIER");
+            Company = VariablesGlobales.TbCompany;
+            EnableBackButton = VariablesGlobales.EnableBackButton;
+            var transactionMasterId = VariablesGlobales.DtoInvoice.TransactionMasterId;
+            TransactionMaster = await _repositoryTbTransactionMaster.PosMeFindByTransactionId(transactionMasterId);
+            DtoInvoice.TipoDocumento = new DtoCatalogItem((int)TransactionMaster.TransactionCausalId, TransactionMaster.TransactionCausalId.ToString(), "");
+            IsBusy = false;
         }
-        CompanyTelefono = await _repositoryParameters.PosMeFindByKey("CORE_PHONE");
-        CompanyRuc = await _repositoryParameters.PosMeFindByKey("CORE_COMPANY_IDENTIFIER");
-        Company = VariablesGlobales.TbCompany;
-        EnableBackButton = VariablesGlobales.EnableBackButton;
-        IsBusy = false;
+        catch (Exception e)
+        {
+            ShowToast(e.Message, ToastDuration.Long, 12);
+        }
     }
 }
