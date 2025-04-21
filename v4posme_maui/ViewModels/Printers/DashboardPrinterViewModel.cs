@@ -122,6 +122,13 @@ public class DashboardPrinterViewModel : BaseViewModel
         try
         {
             VariablesGlobales.DtoInvoice = obj;
+            var transactionMasterId = VariablesGlobales.DtoInvoice.TransactionMasterId;
+            VariablesGlobales.DtoInvoice.TransactionMaster = await _repositoryTbTransactionMaster.PosMeFindByTransactionId(transactionMasterId);
+            VariablesGlobales.DtoInvoice.TransactionMasterId= transactionMasterId;
+            VariablesGlobales.DtoInvoice.TipoDocumento = new DtoCatalogItem(
+                (int)VariablesGlobales.DtoInvoice.TransactionMaster.TransactionCausalId, 
+                VariablesGlobales.DtoInvoice.TransactionMaster.TransactionCausalId.ToString(), 
+                VariablesGlobales.DtoInvoice.TransactionMaster.TransactionCausalId.ToString());
             VariablesGlobales.EnableBackButton = true;
             await Navigation!.PushAsync(new VoucherInvoicePage());
         }

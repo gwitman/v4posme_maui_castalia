@@ -137,7 +137,7 @@ public class PrinterInvoiceViewModel : BaseViewModel
             Shell.Current.Navigation.RemovePage(stack[i]);
         }
     }
-
+    
     private TbTransactionMaster _transactionMaster;
 
     public TbTransactionMaster TransactionMaster
@@ -214,9 +214,7 @@ public class PrinterInvoiceViewModel : BaseViewModel
             CompanyRuc = await _repositoryParameters.PosMeFindByKey("CORE_COMPANY_IDENTIFIER");
             Company = VariablesGlobales.TbCompany;
             EnableBackButton = VariablesGlobales.EnableBackButton;
-            var transactionMasterId = VariablesGlobales.DtoInvoice.TransactionMasterId;
-            TransactionMaster = await _repositoryTbTransactionMaster.PosMeFindByTransactionId(transactionMasterId);
-            DtoInvoice.TipoDocumento = new DtoCatalogItem((int)TransactionMaster.TransactionCausalId, TransactionMaster.TransactionCausalId.ToString(), "");
+            TransactionMaster = DtoInvoice.TransactionMaster;
             IsBusy = false;
         }
         catch (Exception e)
@@ -224,4 +222,5 @@ public class PrinterInvoiceViewModel : BaseViewModel
             ShowToast(e.Message, ToastDuration.Long, 12);
         }
     }
+    
 }
