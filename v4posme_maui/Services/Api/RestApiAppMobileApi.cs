@@ -93,6 +93,9 @@ public class RestApiAppMobileApi
             objParameterSystem.Value = $"-1";
             await _parameterSystem.PosMeUpdate(objParameterSystem);
 
+            //actualizar compania
+            VariablesGlobales.TbCompany = await _repositoryTbCompany.PosMeFindFirst();
+
 
             return true;
         }
