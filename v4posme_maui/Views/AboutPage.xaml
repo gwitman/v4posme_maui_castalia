@@ -137,7 +137,7 @@
                                            TextColor="Red" />
                                 </StackLayout>
                                 <StackLayout Orientation="Horizontal">
-                                    <Label Text="{Binding MontoTotalAbonosDolares,StringFormat='Meta Dólares: $ {0:N2}'}"
+                                    <Label Text="{Binding MontoTotalAbonosDolares,StringFormat='Meta Dólares: C$ {0:N2}'}"
                                            FontSize="12"
                                            FontAttributes="Bold"
                                            TextColor="Red" />

@@ -145,7 +145,7 @@
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="*" />
                                                         <ColumnDefinition Width="*" />
-                                                        <!--<ColumnDefinition Width="*" />-->
+                                                        <ColumnDefinition Width="*" />
                                                     </Grid.ColumnDefinitions>
                                                     <Grid>
                                                         <dx:DXButton
@@ -208,7 +208,6 @@
                                                             </Grid>
                                                         </dx:DXButton>
                                                     </Grid>
-                                                    <!--
                                                     <Grid
                                                         RowSpacing="2"
                                                         ColumnSpacing="3"
@@ -237,7 +236,6 @@
                                                             </Grid>
                                                         </dx:DXButton>
                                                     </Grid>
-                                                    -->
                                                 </Grid>
                                             </ContentView>
                                         </StackLayout>

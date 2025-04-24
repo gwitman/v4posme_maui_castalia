@@ -97,7 +97,6 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        
                         <dx:DXToggleButton
                             Style="{StaticResource SinFondoColorSinRedondeado}"
                             IconWidth="40"
@@ -109,8 +108,6 @@
                             Icon="dollar_bill"
                             Grid.Row="0"
                             Grid.Column="0" />
-                        
-                        <!--
                         <dx:DXToggleButton
                             Style="{StaticResource SinFondoColorSinRedondeado}"
                             IconWidth="40"
@@ -166,7 +163,6 @@
                             Icon="otros_pago"
                             Grid.Row="1"
                             Grid.Column="2" />
-                        -->
                     </Grid>
                     <dx:DXStackLayout
                         Orientation="Vertical">
