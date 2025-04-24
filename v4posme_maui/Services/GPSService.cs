@@ -9,6 +9,7 @@ using Android.Runtime;
 using Android.Util;
 using v4posme_maui.Services.Helpers;
 using v4posme_maui.Services.SystemNames;
+using Unity;
 
 namespace v4posme_maui.Services
 {
@@ -91,8 +92,10 @@ namespace v4posme_maui.Services
 
         private async void RequestLocationUpdates()
         {
-            var criteria = new Criteria { Accuracy = Accuracy.Fine };
-            var time = Convert.ToInt32(Constantes.TimeGpsInMilleseconds);
+            var criteria                        = new Criteria { Accuracy = Accuracy.Fine };
+            HelperCore _helperTemporal          = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
+            var timesString                     = await _helperTemporal.GetValueParameter("MOBILE_SYNC_GPS", "86400000"); //1 dia
+            var time                            = Convert.ToInt64(timesString);
             _locationManager.RequestLocationUpdates(time, 0, criteria, this, Looper.MainLooper);
         }
 
