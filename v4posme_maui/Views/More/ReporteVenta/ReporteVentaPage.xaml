@@ -125,7 +125,7 @@
                                     <RowDefinition Height="*" /> <!-- Lista de visitas -->
                                 </Grid.RowDefinitions>
 
-                                <Label Text="Factura de contado C$"
+                                <Label Text="FACTURA DE CONTADO C$"
                                     FontSize="15"
                                     HorizontalTextAlignment="Start"
                                     FontAttributes="Bold"
@@ -196,7 +196,7 @@
                                 
                                 <!--///////////////////////////////////////////////-->
                                 
-                                <Label Text="Abonos C$"
+                                <Label Text="ABONO C$"
                                      FontSize="15"
                                      HorizontalTextAlignment="Start"
                                      FontAttributes="Bold"
@@ -263,7 +263,7 @@
                                      Grid.Row="5" Grid.Column="1" 
                                      Margin="0, 0, 0, 15"/>
                                 <!--///////////////////////////////////////////////-->
-                                <Label Text="Factura de contado $"
+                                <Label Text="FACTURA DE CONTADO $"
                                      FontSize="15"
                                      HorizontalTextAlignment="Start"
                                      FontAttributes="Bold"
@@ -331,7 +331,7 @@
                                     Margin="0, 0, 0, 15"/>
 
                                 <!--///////////////////////////////////////////////-->
-                                <Label Text="Abonos $"
+                                <Label Text="ABONO $"
                                        FontSize="15"
                                        HorizontalTextAlignment="Start"
                                        FontAttributes="Bold"

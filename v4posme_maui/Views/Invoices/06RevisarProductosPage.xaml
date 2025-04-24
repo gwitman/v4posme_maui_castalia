@@ -208,6 +208,8 @@
                                                             </Grid>
                                                         </dx:DXButton>
                                                     </Grid>
+                                                    
+                                                    <!--
                                                     <Grid
                                                         RowSpacing="2"
                                                         ColumnSpacing="3"
@@ -236,6 +238,8 @@
                                                             </Grid>
                                                         </dx:DXButton>
                                                     </Grid>
+                                                    -->
+                                                    
                                                 </Grid>
                                             </ContentView>
                                         </StackLayout>

@@ -87,7 +87,7 @@ public partial class ReporteVentaPage : ContentPage
 	{
 		await Share.Default.RequestAsync(new ShareFileRequest
 		{
-			Title = "Compartir Comprobante de abono",
+			Title = "Compartir Repote",
 			File = new ShareFile(imagePath)
 		});
 	}

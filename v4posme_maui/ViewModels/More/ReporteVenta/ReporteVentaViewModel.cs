@@ -289,7 +289,7 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 						DocumentNumber = x.TransactionNumber!,
 						CurrencyId = (int)x.CurrencyId,
 						CurrencyName = "$",
-						Remaining = x.Amount,
+						Remaining = x.SubAmount,
 					})
 					.ToList();
 
@@ -315,7 +315,7 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 						DocumentNumber = x.TransactionNumber!,
 						CurrencyId = (int)x.CurrencyId,
 						CurrencyName = "C$",
-						Remaining = x.Amount,
+						Remaining = x.SubAmount,
 					})
 					.ToList();
 
