@@ -37,9 +37,9 @@ public class AplicarAbonoViewModel : BaseViewModel, IQueryAttributable
 		_repositoryTbCustomer						= VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCustomer>();
 		_repositoryTransactionMaster				= VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMaster>();
 		_repositoryParameters						= VariablesGlobales.UnityContainer.Resolve<IRepositoryParameters>();
-		AplicarAbonoCommand = new Command(OnAplicarAbono, OnValidateMonto);
-		ClearMontoCommand = new Command(OnClearMontoCommand);
-		PropertyChanged += (_, _) => AplicarAbonoCommand.ChangeCanExecute();
+		AplicarAbonoCommand		= new Command(OnAplicarAbono, OnValidateMonto);
+		ClearMontoCommand		= new Command(OnClearMontoCommand);
+		PropertyChanged			+= (_, _) => AplicarAbonoCommand.ChangeCanExecute();
 	}
 
 	private void OnClearMontoCommand(object obj)
@@ -62,9 +62,9 @@ public class AplicarAbonoViewModel : BaseViewModel, IQueryAttributable
 		try
 		{
 			IsBusy = true;
-			var codigoAbono = await _helper.GetCodigoAbono();
+			var codigoAbono		= await _helper.GetCodigoAbono();
 			//Obtener Cliente
-			_customerResponse = await _repositoryTbCustomer.PosMeFindCustomer(DocumentCreditAmortizationResponse.CustomerNumber!);
+			_customerResponse	= await _repositoryTbCustomer.PosMeFindCustomer(DocumentCreditAmortizationResponse.CustomerNumber!);
 
 			//para mostrar los saldo final e inicial
 			var mostrarPrintSinSaldos	= await _helper.GetValueParameter("CXC_SHOW_BALANCE_IN_SHARE_MOBILE","false");
@@ -97,10 +97,10 @@ public class AplicarAbonoViewModel : BaseViewModel, IQueryAttributable
 			var documentosConRemanentes				= await _repositoryDocumentCreditAmortization.PosMeFilterByDocumentNumber(DocumentCreditAmortizationResponse.DocumentNumber!);
 			var documentCrediAmortizationHastaHoy	= documentosConRemanentes.Where(dc => dc.DateApply.Date <= DateTime.Now.Date).ToList();
 			var montoMora							= documentCrediAmortizationHastaHoy.Where(dc => dc.Remaining > 0).Sum(dc => dc.Remaining);
-			var diasMora = 0;
+			var diasMora							= 0;
 			if (documentCrediAmortizationHastaHoy.Count>0)
 			{
-				var fechaAntiguaRemanente				= documentCrediAmortizationHastaHoy.Where(dc => dc.Remaining > 0).Min(dc => dc.DateApply);
+				var fechaAntiguaRemanente			= documentCrediAmortizationHastaHoy.Where(dc => dc.Remaining > 0).Min(dc => dc.DateApply);
 				diasMora							= (DateTime.Now - fechaAntiguaRemanente).Days;
 				if (diasMora < 0)
 				{
@@ -136,8 +136,8 @@ public class AplicarAbonoViewModel : BaseViewModel, IQueryAttributable
 				Reference4             = DocumentCreditResponse.DocumentNumber ?? "",
 				CuotasPendientes       = VariablesGlobales.DtoAplicarAbono.CuotasPendientes
 			};
-			var taskTransactionMaster = _repositoryTransactionMaster.PosMeInsert(transactionMaster);
-			var taskPlus = _helper.PlusCounter();
+			var taskTransactionMaster	= _repositoryTransactionMaster.PosMeInsert(transactionMaster);
+			var taskPlus				= _helper.PlusCounter();
 			await Task.WhenAll([taskPlus, taskTransactionMaster]);
 
 			if (typePrinterShare=="FINANCIAL")
