@@ -26,17 +26,17 @@ public class AplicarAbonoViewModel : BaseViewModel, IQueryAttributable
 
 	public AplicarAbonoViewModel()
 	{
-		_documentCreditResponse = new();
-		_documentCreditAmortization = new();
-		_customerResponse = new();
-		_helper = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
-		_helperCustomerCreditDocumentAmortization = VariablesGlobales.UnityContainer.Resolve<HelperCustomerCreditDocumentAmortization>();
-		Title = "Completar Abono 4/5";
-		_repositoryDocumentCredit = VariablesGlobales.UnityContainer.Resolve<IRepositoryDocumentCredit>();
-		_repositoryDocumentCreditAmortization = VariablesGlobales.UnityContainer.Resolve<IRepositoryDocumentCreditAmortization>();
-		_repositoryTbCustomer = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCustomer>();
-		_repositoryTransactionMaster = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMaster>();
-		_repositoryParameters = VariablesGlobales.UnityContainer.Resolve<IRepositoryParameters>();
+		_documentCreditResponse			= new();
+		_documentCreditAmortization		= new();
+		_customerResponse				= new();
+		_helper							= VariablesGlobales.UnityContainer.Resolve<HelperCore>();
+		Title							= "Completar Abono 4/5";
+		_helperCustomerCreditDocumentAmortization	= VariablesGlobales.UnityContainer.Resolve<HelperCustomerCreditDocumentAmortization>();
+		_repositoryDocumentCredit					= VariablesGlobales.UnityContainer.Resolve<IRepositoryDocumentCredit>();
+		_repositoryDocumentCreditAmortization		= VariablesGlobales.UnityContainer.Resolve<IRepositoryDocumentCreditAmortization>();
+		_repositoryTbCustomer						= VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCustomer>();
+		_repositoryTransactionMaster				= VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMaster>();
+		_repositoryParameters						= VariablesGlobales.UnityContainer.Resolve<IRepositoryParameters>();
 		AplicarAbonoCommand = new Command(OnAplicarAbono, OnValidateMonto);
 		ClearMontoCommand = new Command(OnClearMontoCommand);
 		PropertyChanged += (_, _) => AplicarAbonoCommand.ChangeCanExecute();
@@ -67,13 +67,11 @@ public class AplicarAbonoViewModel : BaseViewModel, IQueryAttributable
 			_customerResponse = await _repositoryTbCustomer.PosMeFindCustomer(DocumentCreditAmortizationResponse.CustomerNumber!);
 
 			//para mostrar los saldo final e inicial
-			var mostrarPrintSinSaldos = await _helper.GetValueParameter("CXC_SHOW_BALANCE_IN_SHARE_MOBILE","false");
-			var typePrinterShare = await _helper.GetValueParameter("CXC_TYPE_PRINTER_SHARE_MOBILE","DEFAULT");
-			var findAllDocumentCreditAmortizationResponses = await _repositoryDocumentCreditAmortization.PosMeFilterByDocumentNumberAll(DocumentCreditResponse.DocumentNumber!);
-			var sumbBalancesAmortization= findAllDocumentCreditAmortizationResponses
-				.Where(dc=>dc.DateApply.Date < DateTime.Now.Date)
-				.Sum(dc=>dc.Balance);
-			var moraPagada = Monto - sumbBalancesAmortization;
+			var mostrarPrintSinSaldos	= await _helper.GetValueParameter("CXC_SHOW_BALANCE_IN_SHARE_MOBILE","false");
+			var typePrinterShare		= await _helper.GetValueParameter("CXC_TYPE_PRINTER_SHARE_MOBILE","DEFAULT");
+			var findAllDocumentCreditAmortizationResponses	= await _repositoryDocumentCreditAmortization.PosMeFilterByDocumentNumberAll(DocumentCreditResponse.DocumentNumber!);
+			var sumbBalancesAmortization					= findAllDocumentCreditAmortizationResponses.Where(dc=>dc.DateApply.Date < DateTime.Now.Date).Sum(dc=>dc.Balance);
+			var moraPagada									= Monto - sumbBalancesAmortization;
 			if (moraPagada < 0)
 			{
 				moraPagada = Monto;
@@ -96,22 +94,25 @@ public class AplicarAbonoViewModel : BaseViewModel, IQueryAttributable
 			//Aplicar Abono
 			string reference = await HelperCustomerCreditDocumentAmortization.ApplyShare(_customerResponse.EntityId, DocumentCreditResponse.DocumentNumber!, Monto);
 			
-			var documentosConRemanentes= await _repositoryDocumentCreditAmortization.PosMeFilterByDocumentNumber(DocumentCreditAmortizationResponse.DocumentNumber!);
-			var documentCrediAmortizationHastaHoy = documentosConRemanentes.Where(dc => dc.DateApply.Date <= DateTime.Now.Date).ToList();
-			var montoMora= documentCrediAmortizationHastaHoy.Where(dc => dc.Remaining > 0).Sum(dc => dc.Remaining);
-			var fechaAntiguaRemanente = documentCrediAmortizationHastaHoy
-				.Where(dc => dc.Remaining > 0)
-				.Min(dc => dc.DateApply);
-			var diasMora = (DateTime.Now - fechaAntiguaRemanente).Days;
-			if (diasMora < 0)
+			var documentosConRemanentes				= await _repositoryDocumentCreditAmortization.PosMeFilterByDocumentNumber(DocumentCreditAmortizationResponse.DocumentNumber!);
+			var documentCrediAmortizationHastaHoy	= documentosConRemanentes.Where(dc => dc.DateApply.Date <= DateTime.Now.Date).ToList();
+			var montoMora							= documentCrediAmortizationHastaHoy.Where(dc => dc.Remaining > 0).Sum(dc => dc.Remaining);
+			var diasMora = 0;
+			if (documentCrediAmortizationHastaHoy.Count>0)
 			{
-				diasMora = 0;
+				var fechaAntiguaRemanente				= documentCrediAmortizationHastaHoy.Where(dc => dc.Remaining > 0).Min(dc => dc.DateApply);
+				diasMora							= (DateTime.Now - fechaAntiguaRemanente).Days;
+				if (diasMora < 0)
+				{
+					diasMora = 0;
+				}
 			}
-			VariablesGlobales.DtoAplicarAbono.DiasMora = diasMora;
-			VariablesGlobales.DtoAplicarAbono.MontoMora = montoMora;
-			VariablesGlobales.DtoAplicarAbono.MoraPagada = moraPagada;
-			VariablesGlobales.DtoAplicarAbono.Documentos = reference;
-			VariablesGlobales.DtoAplicarAbono.CuotasPendientes = await GetCuotasPendientes();
+			
+			VariablesGlobales.DtoAplicarAbono.DiasMora			= diasMora;
+			VariablesGlobales.DtoAplicarAbono.MontoMora			= montoMora;
+			VariablesGlobales.DtoAplicarAbono.MoraPagada		= moraPagada;
+			VariablesGlobales.DtoAplicarAbono.Documentos		= reference;
+			VariablesGlobales.DtoAplicarAbono.CuotasPendientes	= await GetCuotasPendientes();
 			//Ingrear Abono 
 			var tmpMonto = Monto;
 			var transactionMaster = new TbTransactionMaster
@@ -261,12 +262,12 @@ public class AplicarAbonoViewModel : BaseViewModel, IQueryAttributable
 			return;
 		}
 
-		DocumentCreditResponse = await _repositoryDocumentCredit.PosMeFindDocumentNumber(parameter);
-		DocumentCreditAmortizationResponse = await _repositoryDocumentCreditAmortization.PosMeFindByDocumentNumber(parameter);
-		CurrencyId = DocumentCreditResponse.CurrencyId;
-		CurrencyName = DocumentCreditResponse.CurrencyName!;
-		SaldoInicial = DocumentCreditResponse.Remaining;
-		IsBusy = false;
+		DocumentCreditResponse				= await _repositoryDocumentCredit.PosMeFindDocumentNumber(parameter);
+		DocumentCreditAmortizationResponse	= await _repositoryDocumentCreditAmortization.PosMeFindByDocumentNumber(parameter);
+		CurrencyId		= DocumentCreditResponse.CurrencyId;
+		CurrencyName	= DocumentCreditResponse.CurrencyName!;
+		SaldoInicial	= DocumentCreditResponse.Remaining;
+		IsBusy			= false;
 	}
 
 	public int CurrencyId { get; set; }
