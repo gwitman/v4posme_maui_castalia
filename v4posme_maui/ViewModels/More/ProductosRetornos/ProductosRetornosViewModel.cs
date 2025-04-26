@@ -6,6 +6,7 @@ using SkiaSharp;
 using Unity;
 using v4posme_maui.Models;
 using v4posme_maui.Services.HelpersPrinters;
+using v4posme_maui.Services.HelpersPrinters.Interfaces.Command;
 using v4posme_maui.Services.Repository;
 using v4posme_maui.Services.SystemNames;
 
@@ -92,6 +93,7 @@ public class ProductosRetornosViewModel : BaseViewModel
             printer.BoldMode(Company.Name!);
             printer.BoldMode($"RUC: {CompanyRuc!.Value}");
             printer.BoldMode("Productos con Remanentes");
+            printer.BoldMode(DateTime.Now.ToString("yyyy-MM-dd hh:mm tt"));
             printer.NewLine();
             printer.AlignLeft();
             printer.Append($"El usuario {user.Nickname} a generado el reporte de productos con cantidades distintos de 0");
@@ -99,12 +101,22 @@ public class ProductosRetornosViewModel : BaseViewModel
             if (Items.Count > 0)
             {
                 printer.Append("Detalle de productos");
-                printer.Append("Descripción         Código Barra         Cantidad");
+                printer.Append("Descripción     Barra      Qt");
+                printer.NewLine();                
                 foreach (var item in Items)
                 {
+                    var barCode = item.BarCode;
+                    barCode     = barCode.Split(",")[0];
+                    
+                    if (barCode.Length  < 12)
+                        barCode = barCode.PadLeft(12, '0'); // Rellena con ceros a la izquierda
+                    else
+                        barCode = barCode.Substring(0, 12); // Corta a 12 caracteres
+
                     printer.Append($"{item.Name}");
-                    printer.Append($"{item.BarCode}               {item.Quantity:N2}");
-                    printer.Separator('-');
+                    printer.Append($"{barCode}               {item.Quantity:N2}");
+                    printer.Append("..............................");
+                    
                 }
             }
             printer.NewLine();
