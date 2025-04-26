@@ -1,5 +1,5 @@
-using AndroidX.Lifecycle;
 using v4posme_maui.ViewModels.More;
+using v4posme_maui.Views.More.Productos;
 using v4posme_maui.Views.More.ReporteVenta;
 using v4posme_maui.Views.More.Visita;
 
@@ -22,18 +22,23 @@ public partial class MorePage : ContentPage
 
 	private async void OnButtonClicked(object sender, EventArgs e)
 	{
-		if (sender is Button button)
+		if (sender is not Button button) return;
+		var parameter = button.CommandParameter;
+		if (parameter is null)
 		{
-			var parameter = button.CommandParameter; // Aquí obtienes el parámetro
-
-			if (parameter.ToString() == "2")
-			{
-				await Navigation.PushAsync(new VisitaPage());
-			}
-			else if (parameter.ToString() == "1")
-			{
+			return;
+		}
+		switch (parameter.ToString())
+		{
+			case "1":
 				await Navigation.PushAsync(new ReporteVentaPage());
-			}
+				break;
+			case "2":
+				await Navigation.PushAsync(new VisitaPage());
+				break;
+			case "3":
+				await Navigation.PushAsync(new ProductosRetornosPage());
+				break;
 		}
 	}
 }

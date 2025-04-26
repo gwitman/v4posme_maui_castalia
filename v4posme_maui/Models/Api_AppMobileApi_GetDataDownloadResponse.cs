@@ -53,13 +53,16 @@ public class Api_AppMobileApi_GetDataDownloadCustomerResponse : BindableBase
     
     [DataMember(Name = "phone")] public string? Phone { get=>GetValue<string>(); set=>SetValue(value); }
     
+    [DataMember(Name = "me")] public int Me { get=>GetValue<int>(); set=>SetValue(value); }
+    
     public bool Modificado { get=>GetValue<bool>(); set=>SetValue(value); }
 
     [NotMapped] public string? NombreCompleto => $"{FirstName} {LastName}";
     [NotMapped] public int? Secuencia { get; set; }
     [NotMapped] public decimal? Remaining { get; set; }
     [NotMapped] public bool HasAbono => Balance != Remaining;
-
+    public bool Asignado => Me == 1;
+    public bool Facturado { get; set; }
 }
 
 [SQLite.Table("tb_company")]

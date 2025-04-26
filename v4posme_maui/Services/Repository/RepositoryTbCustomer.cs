@@ -6,6 +6,18 @@ public class RepositoryTbCustomer(DataBase dataBase) : RepositoryFacade<Api_AppM
 {
     private readonly DataBase _dataBase = dataBase;
 
+    public Task PosMeInsertAll(List<Api_AppMobileApi_GetDataDownloadCustomerResponse> list, bool secuencia)
+    {
+        var listaOrdenada = list.OrderByDescending(c=>c.Me).ThenBy(c => c.FirstName).ToList();
+        if (!secuencia) return PosMeInsertAll(listaOrdenada);
+        for (var i=0; i < listaOrdenada.Count; i++)
+        {
+            listaOrdenada[i].Secuencia = i;
+        }
+
+        return PosMeInsertAll(listaOrdenada);
+    }
+
     public Task<Api_AppMobileApi_GetDataDownloadCustomerResponse> PosMeFindCustomer(string customerNumber)
     {
         return _dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadCustomerResponse>()
@@ -101,13 +113,38 @@ public class RepositoryTbCustomer(DataBase dataBase) : RepositoryFacade<Api_AppM
             .ToListAsync();
     }
     
-    public Task<List<Api_AppMobileApi_GetDataDownloadCustomerResponse>> PosMeCustomerAscLoad(int skip, int take)
+    public async Task<List<Api_AppMobileApi_GetDataDownloadCustomerResponse>> PosMeCustomerAscLoad(int skip, int take)
     {
-        return _dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadCustomerResponse>()
-            .OrderBy(response => response.CustomerNumber)
-            .Skip(skip)
-            .Take(take)
-            .ToListAsync();
+        var query = $"""
+                    select 
+                           tbc.CustomerId,
+                           tbc.CompanyId,
+                           tbc.BranchId,
+                           tbc.EntityId,
+                           tbc.CustomerNumber,
+                           tbc.Identification,
+                           tbc.FirstName,
+                           tbc.LastName,
+                           tbc.Balance,
+                           tbc.CurrencyId,
+                           tbc.CurrencyName,
+                           tbc.CustomerCreditLineId,
+                           tbc.Location,
+                           tbc.Phone,
+                           tbc.Me,
+                           tbc.Modificado,
+                           tbc.Secuencia,
+                           tbc.Remaining,
+                        CASE
+                            WHEN ttm.EntityId IS NOT NULL THEN 1
+                            ELSE 0
+                            END AS Facturado
+                    from tb_customers tbc
+                    left join tb_transaction_master ttm on tbc.EntityId = ttm.EntityId
+                    order by tbc.Secuencia
+                    limit {skip}, {take}
+                    """;
+        return await _dataBase.Database.QueryAsync<Api_AppMobileApi_GetDataDownloadCustomerResponse>(query);
     }
 
     public Task<List<Api_AppMobileApi_GetDataDownloadCustomerResponse>> PosMeTakeModificados()

@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Core;
+using v4posme_maui.Models;
 using v4posme_maui.Services;
 
 namespace v4posme_maui.ViewModels
@@ -22,6 +23,13 @@ namespace v4posme_maui.ViewModels
             var toast = Toast.Make(mensaje, duration, fontSize);
             await toast.Show(cancellationTokenSource.Token);
         }
+
+        public void ShowMensajePopUp(string mensaje, Color? color=null)
+        {
+            Mensaje = mensaje;
+            PopupBackgroundColor = color ?? Colors.Red;
+            PopUpShow = true;
+        }
         public bool IsBusy
         {
             get => _isBusy;
@@ -37,11 +45,7 @@ namespace v4posme_maui.ViewModels
         public bool PopUpShow
         {
             get => _popUpShow;
-            set
-            {
-                SetProperty(ref _popUpShow, value);
-                OnPropertyChanged();
-            }
+            set => SetProperty(ref _popUpShow, value);
         }
         
         public string Title
@@ -78,6 +82,14 @@ namespace v4posme_maui.ViewModels
             set => SetProperty(ref _navigation, value);
         }
 
+        private TbCompany? _company;
+
+        protected TbCompany? Company
+        {
+            get => _company;
+            set => SetProperty(ref _company, value);
+        }
+        
         public virtual Task InitializeAsync(object parameter)
         {
             return Task.CompletedTask;

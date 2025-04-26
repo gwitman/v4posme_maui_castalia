@@ -6,57 +6,57 @@
              xmlns:dx="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
              Title="Mas">
 
-    <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand" VerticalOptions="StartAndExpand">
-        <!-- Botón a la izquierda -->
-        <Button Text="Cierre"
-            BackgroundColor="#3498db"
-            TextColor="White"
-            Padding="10,10"
-            Margin="0, 20,10, 0"
-            WidthRequest="150"
-            HeightRequest="50"
-            HorizontalOptions="EndAndExpand"
-            Clicked="OnButtonClicked"
-            CommandParameter="1">
+    <StackLayout Orientation="Vertical">
+        <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+            <!-- Botón a la izquierda -->
+            <Button Text="Cierre"
+                    BackgroundColor="#3498db"
+                    TextColor="White"
+                    Padding="10,10"
+                    Margin="0, 20,10, 0"
+                    WidthRequest="150"
+                    HeightRequest="50"
+                    HorizontalOptions="EndAndExpand"
+                    Clicked="OnButtonClicked"
+                    CommandParameter="1">
 
-            <Button.ImageSource>
-                <FileImageSource File="invoice_white.svg"/>
-            </Button.ImageSource>
-        </Button>
+                <Button.ImageSource>
+                    <FileImageSource File="invoice_white.svg"/>
+                </Button.ImageSource>
+            </Button>
 
-        <!-- Botón a la derecha -->
-        <Button Text="Visita"
-            BackgroundColor="#e74c3c"
-            TextColor="White"
-            Padding="10,10"
-            Margin="0,20,10,0"
-            WidthRequest="150"
-            HeightRequest="50"
-            HorizontalOptions="StartAndExpand"
-            Clicked="OnButtonClicked"
-            CommandParameter="2">
-            <Button.ImageSource>
-                <FileImageSource File="person_white.svg" />
-            </Button.ImageSource>
-        </Button>
+            <!-- Botón a la derecha -->
+            <Button Text="Visita"
+                    BackgroundColor="#e74c3c"
+                    TextColor="White"
+                    Padding="10,10"
+                    Margin="0,20,10,0"
+                    WidthRequest="150"
+                    HeightRequest="50"
+                    HorizontalOptions="StartAndExpand"
+                    Clicked="OnButtonClicked"
+                    CommandParameter="2">
+                <Button.ImageSource>
+                    <FileImageSource File="person_white.svg" />
+                </Button.ImageSource>
+            </Button>
+        </StackLayout>
+        <StackLayout Orientation="Vertical" HorizontalOptions="FillAndExpand" VerticalOptions="StartAndExpand">
+            <Button Text="Productos"
+                    BackgroundColor="{StaticResource PrimaryDark}"
+                    TextColor="White"
+                    Padding="10,10"
+                    Margin="0, 20,10, 0"
+                    WidthRequest="150"
+                    HeightRequest="50"
+                    HorizontalOptions="Center"
+                    Clicked="OnButtonClicked"
+                    CommandParameter="3">
+
+                <Button.ImageSource>
+                    <FileImageSource File="productos_retorno.svg"/>
+                </Button.ImageSource>
+            </Button>
+        </StackLayout>
     </StackLayout>
-
-    <!--
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-
-        <Button Text="Presionar"
-        BackgroundColor="#e74c3c"
-        TextColor="White"
-        BorderColor="Transparent"
-        BorderWidth="2"
-        CornerRadius="25"
-        Padding="15,10">
-           
-        </Button>
-
-    </VerticalStackLayout>-->
 </ContentPage>

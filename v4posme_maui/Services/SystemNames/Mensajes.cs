@@ -55,4 +55,10 @@ public static class Mensajes
 	public const string MessagePermissionAll = "No es posible ingresar al sistema, es necesario conceder todos los permisos, concederlos de forma manual.";
 	public const string ExisteItem = "Ya existe el item con el código de barra";
 	public const string ExisteCustomerIdentificacion = "Ya existe el cliente con la identificación";
+	public const string ParametroImpresora = "No hay un parametro para conectar la impresora, establezca primero el parametro para proceder a imprimir";
+	public const string UsuarioNoExiste = "No existe el usuario en la aplicaicón";
+	public const string CompanyNoExiste = "No existe la compañía o no se ha inicializado";
+	public const string ArchivoNoExiste = "El archivo no existe o no fue posible crearlo";
+	public const string AnularFacturaCorrectamente = "Factura anulada correctamente";
+	public const string AnularAbonoCorrectamente = "Abono anulado correctamente";
 }

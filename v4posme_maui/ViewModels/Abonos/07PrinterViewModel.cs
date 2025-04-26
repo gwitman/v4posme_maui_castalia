@@ -20,20 +20,22 @@ public class ValidarAbonoFinancieraViewModel : BaseViewModel
     private readonly IRepositoryParameters _repositoryParameters;
     private readonly IRepositoryDocumentCredit _repositoryDocumentCredit;
     private readonly IRepositoryDocumentCreditAmortization _repositoryDocumentCreditAmortization;
+    private List<Api_AppMobileApi_GetDataDownloadDocumentCreditAmortizationResponse> DocumentosConRemanentes = [];
+    private List<Api_AppMobileApi_GetDataDownloadDocumentCreditAmortizationResponse> DocumentCrediAmortizationHastaHoy = [];
     
     public ValidarAbonoFinancieraViewModel()
     {
-        Title = "Comprobanto de Abono 5/5";
-        _parameterSystem = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbParameterSystem>();
-        _repositoryParameters = VariablesGlobales.UnityContainer.Resolve<IRepositoryParameters>();
-        _repositoryTbTransactionMaster = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMaster>();
-        _repositoryDocumentCredit = VariablesGlobales.UnityContainer.Resolve<IRepositoryDocumentCredit>();
-        _repositoryDocumentCreditAmortization = VariablesGlobales.UnityContainer.Resolve<IRepositoryDocumentCreditAmortization>();
-        Item = VariablesGlobales.DtoAplicarAbono!;
-        AplicarOtroCommand = new Command(OnAplicarOtroCommand);
-        PrintCommand = new Command(OnPrintCommand);
-        AnularCommand = new Command(OnAnularCommand);
-        ListaCuotasAplicadas = new();
+        Title                           = "Comprobanto de Abono 5/5";
+        _parameterSystem                = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbParameterSystem>();
+        _repositoryParameters           = VariablesGlobales.UnityContainer.Resolve<IRepositoryParameters>();
+        _repositoryTbTransactionMaster  = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMaster>();
+        _repositoryDocumentCredit       = VariablesGlobales.UnityContainer.Resolve<IRepositoryDocumentCredit>();
+        _repositoryDocumentCreditAmortization   = VariablesGlobales.UnityContainer.Resolve<IRepositoryDocumentCreditAmortization>();
+        Item                                    = VariablesGlobales.DtoAplicarAbono!;
+        AplicarOtroCommand                      = new Command(OnAplicarOtroCommand);
+        PrintCommand                            = new Command(OnPrintCommand);
+        AnularCommand                           = new Command(OnAnularCommand);
+        ListaCuotasAplicadas                    = new();
     }
 
     public ObservableCollection<Api_AppMobileApi_GetDataDownloadDocumentCreditAmortizationResponse> ListaCuotasAplicadas
@@ -83,9 +85,6 @@ public class ValidarAbonoFinancieraViewModel : BaseViewModel
     public ViewTempDtoAbono Item { get; private set; }
 
     private ImageSource? _logoSource;
-    
-    private List<Api_AppMobileApi_GetDataDownloadDocumentCreditAmortizationResponse> DocumentosConRemanentes = [];
-    private List<Api_AppMobileApi_GetDataDownloadDocumentCreditAmortizationResponse> DocumentCrediAmortizationHastaHoy = [];
 
     public ImageSource? LogoSource
     {
@@ -100,24 +99,25 @@ public class ValidarAbonoFinancieraViewModel : BaseViewModel
 
     private async void OnAnularCommand()
     {
-        IsBusy = true;
-        var findAbonos = await _repositoryTbTransactionMaster.PosMeFilterAbonosByCustomer(Item.EntityId);
+        IsBusy          = true;
+        var findAbonos  = await _repositoryTbTransactionMaster.PosMeFilterAbonosByCustomer(Item.EntityId);
         if (findAbonos.First().TransactionNumber != Item.CodigoAbono)
         {
-            ShowToast(Mensajes.AnularAbonoValidacion, ToastDuration.Long, 18);
+            ShowMensajePopUp(Mensajes.AnularAbonoValidacion);
             IsBusy = false;
             return;
         }
 
         await HelperCustomerCreditDocumentAmortization.AnularAbono(Item.CodigoAbono);
+        ShowMensajePopUp(Mensajes.AnularAbonoCorrectamente, Colors.Green);
         OnAplicarOtroCommand();
         IsBusy = false;
     }
 
     private async void OnPrintCommand(object obj)
     {
-        var parametroPrinter = await _parameterSystem.PosMeFindPrinter();
-        var logo = await _parameterSystem.PosMeFindLogo();
+        var parametroPrinter    = await _parameterSystem.PosMeFindPrinter();
+        var logo                = await _parameterSystem.PosMeFindLogo();
         if (string.IsNullOrWhiteSpace(parametroPrinter.Value))
         {
             return;
@@ -126,7 +126,7 @@ public class ValidarAbonoFinancieraViewModel : BaseViewModel
         var printer = new Printer(parametroPrinter.Value);
         if (!CrossBluetoothLE.Current.IsOn)
         {
-            ShowToast(Mensajes.MensajeBluetoothState, ToastDuration.Long, 18);
+            ShowMensajePopUp(Mensajes.MensajeBluetoothState);
             return;
         }
 
@@ -150,7 +150,7 @@ public class ValidarAbonoFinancieraViewModel : BaseViewModel
                        $"con número de cedula {viewTempDtoAbono.Identification} ha realizado un abono a su cuenta.");
         printer.NewLine();
         printer.Append($"No. Documento    : {viewTempDtoAbono.DocumentNumber}");
-        printer.Append($"Cuota Pactada    : {viewTempDtoAbono.CurrencyName} {DocumentCreditResponse.CuotaPactada:N2}");
+        printer.Append($"Cuota Pactada    : {viewTempDtoAbono.CurrencyName}  {DocumentCreditResponse.CuotaPactada:N2}");
         printer.Append($"Cant. Cuotas     : {DocumentCreditResponse.CantidadCuotas:N2}");
         printer.Append($"Cuotas Pend.     : {CuotasPendientes:N2}");
         printer.Append($"Días Mora        : {viewTempDtoAbono.DiasMora}");
@@ -180,7 +180,7 @@ public class ValidarAbonoFinancieraViewModel : BaseViewModel
         printer.Print();
         if (printer.Device is null)
         {
-            ShowToast(Mensajes.MensajeDispositivoNoConectado, ToastDuration.Long, 18);
+            ShowMensajePopUp(Mensajes.MensajeDispositivoNoConectado);
         }
 
         IsBusy = false;
@@ -199,30 +199,28 @@ public class ValidarAbonoFinancieraViewModel : BaseViewModel
     {
         try
         {
-            IsBusy = true;
-            Navigation = navigation;
-            var paramter = await _parameterSystem.PosMeFindLogo();
+            IsBusy          = true;
+            Navigation      = navigation;
+            var paramter    = await _parameterSystem.PosMeFindLogo();
             if (!string.IsNullOrWhiteSpace(paramter.Value))
             {
-                var imageBytes = Convert.FromBase64String(paramter.Value!);
-                LogoSource = ImageSource.FromStream(() => new MemoryStream(imageBytes));
+                var imageBytes  = Convert.FromBase64String(paramter.Value!);
+                LogoSource      = ImageSource.FromStream(() => new MemoryStream(imageBytes));
             }
 
             Item = VariablesGlobales.DtoAplicarAbono!;
             await LoadDocumentosCuotas();
-            DocumentCreditResponse = await _repositoryDocumentCredit.PosMeFindDocumentNumber(Item.DocumentNumber ?? "");
-            DocumentosConRemanentes = await _repositoryDocumentCreditAmortization.PosMeFilterByDocumentNumber(Item.DocumentNumber ?? "");
-            DocumentCrediAmortizationHastaHoy = DocumentosConRemanentes.Where(dc => dc.DateApply.Date <= DateTime.Now.Date).ToList();
-            CompanyTelefono = await _repositoryParameters.PosMeFindByKey("CORE_PHONE");
-            CompanyRuc = await _repositoryParameters.PosMeFindByKey("CORE_COMPANY_IDENTIFIER");
-            Company = VariablesGlobales.TbCompany;
-            CuotasPendientes = Item.CuotasPendientes;
+            DocumentCreditResponse              = await _repositoryDocumentCredit.PosMeFindDocumentNumber(Item.DocumentNumber ?? "");
+            DocumentosConRemanentes             = await _repositoryDocumentCreditAmortization.PosMeFilterByDocumentNumber(Item.DocumentNumber ?? "");
+            DocumentCrediAmortizationHastaHoy   = DocumentosConRemanentes.Where(dc => dc.DateApply.Date <= DateTime.Now.Date).ToList();
+            CompanyTelefono                     = await _repositoryParameters.PosMeFindByKey("CORE_PHONE");
+            CompanyRuc                          = await _repositoryParameters.PosMeFindByKey("CORE_COMPANY_IDENTIFIER");
+            Company                             = VariablesGlobales.TbCompany;
+            CuotasPendientes                    = Item.CuotasPendientes;
         }
         catch (Exception e)
         {
-            Debug.WriteLine(e.StackTrace);
-            Console.WriteLine(e.Message);
-            ShowToast(e.Message, ToastDuration.Long, 18);
+            ShowMensajePopUp(e.Message);
         }
         finally
         {
@@ -238,12 +236,12 @@ public class ValidarAbonoFinancieraViewModel : BaseViewModel
             var pares = documentos.Split(',');
             foreach (var par in pares)
             {
-                var partes = par.Split(':');
-                var idNumero = int.Parse(partes[0]);
-                var montoDecimal = decimal.Parse(partes[1]);
-                var dc = await _repositoryDocumentCreditAmortization.PosMeFindByAmortizationId(idNumero);
-                dc.CurrencyName = Item.CurrencyName;
-                dc.MontoCuota = montoDecimal;
+                var partes          = par.Split(':');
+                var idNumero        = int.Parse(partes[0]);
+                var montoDecimal    = decimal.Parse(partes[1]);
+                var dc              = await _repositoryDocumentCreditAmortization.PosMeFindByAmortizationId(idNumero);
+                dc.CurrencyName     = Item.CurrencyName;
+                dc.MontoCuota       = montoDecimal;
                 ListaCuotasAplicadas.Add(dc);
             }
         }

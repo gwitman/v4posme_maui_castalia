@@ -100,4 +100,9 @@ public partial class ValidarAbonoFinancieraPage : ContentPage
 
         return filePath;
     }
+
+    private void ClosePopup_Clicked(object? sender, EventArgs e)
+    {
+        Popup.IsOpen = false;
+    }
 }

@@ -85,4 +85,9 @@ public partial class ValidarAbonoPage : ContentPage
         await File.WriteAllBytesAsync(filePath, memoryStream.ToArray());
         return filePath;
     }
+
+    private void ClosePopup_Clicked(object? sender, EventArgs e)
+    {
+        Popup.IsOpen = false;
+    }
 }

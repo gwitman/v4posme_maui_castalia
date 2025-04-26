@@ -8,6 +8,7 @@ using v4posme_maui.Models;
 using v4posme_maui.Services.Repository;
 using v4posme_maui.Views;
 using Unity;
+using v4posme_maui.Services.Helpers;
 using v4posme_maui.Services.SystemNames;
 
 namespace v4posme_maui.ViewModels.Abonos;
@@ -17,6 +18,7 @@ public class AbonosViewModel : BaseViewModel
     private readonly IRepositoryTbCustomer _customerRepositoryTbCustomer;
     private readonly IRepositoryDocumentCredit _repositoryDocumentCredit;
     private readonly IRepositoryTbParameterSystem _repositoryTbParameterSystem;
+    private readonly HelperCore _helperCore;
 
     public AbonosViewModel()
     {
@@ -24,6 +26,7 @@ public class AbonosViewModel : BaseViewModel
         _customerRepositoryTbCustomer = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCustomer>();
         _repositoryDocumentCredit = VariablesGlobales.UnityContainer.Resolve<IRepositoryDocumentCredit>();
         _repositoryTbParameterSystem = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbParameterSystem>();
+        _helperCore = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
         _customers = new();
         SearchCommand = new Command(OnSearchCommand);
         OnBarCode = new Command(OnBarCodeShow);
@@ -152,7 +155,7 @@ public class AbonosViewModel : BaseViewModel
             }
 
             //7. Combinar y reordenar
-            var finalList = ReordenarLista(remainingCustomers, clientesOrdenados);
+            var finalList = _helperCore.ReordenarLista(remainingCustomers, clientesOrdenados);
 
             //8. Agregar a la lista principal
             Customers = new DXObservableCollection<Api_AppMobileApi_GetDataDownloadCustomerResponse>(finalList);
@@ -166,35 +169,6 @@ public class AbonosViewModel : BaseViewModel
         {
             IsBusy = false;
         }
-    }
-
-    private static List<Api_AppMobileApi_GetDataDownloadCustomerResponse> ReordenarLista(List<Api_AppMobileApi_GetDataDownloadCustomerResponse> listaBase,
-        List<Api_AppMobileApi_GetDataDownloadCustomerResponse> cambios)
-    {
-        // Paso 1: Aplicar los cambios de secuencia
-        foreach (var cambio in cambios)
-        {
-            var cliente = listaBase.FirstOrDefault(c => c.EntityId == cambio.EntityId);
-            if (cliente != null)
-            {
-                cliente.Secuencia = cambio.Secuencia;
-            }
-        }
-
-        // Paso 2: Ordenar por secuencia y luego por EntityId para desempate
-        var listaOrdenada = listaBase
-            .OrderBy(c => c.Secuencia)
-            .ThenBy(c => c.EntityId)
-            .ToList();
-
-        // Paso 3: Reasignar secuencias para que sean consecutivas
-        var nuevaSecuencia = 1;
-        foreach (var cliente in listaOrdenada)
-        {
-            cliente.Secuencia = nuevaSecuencia++;
-        }
-
-        return listaOrdenada;
     }
 
     public void OnAppearing(INavigation navigation)

@@ -35,67 +35,76 @@ public class ValidarAbonoViewModel : BaseViewModel
         var findAbonos = await _repositoryTbTransactionMaster.PosMeFilterAbonosByCustomer(Item.EntityId);
         if (findAbonos.First().TransactionNumber != Item.CodigoAbono)
         {
-            ShowToast(Mensajes.AnularAbonoValidacion, ToastDuration.Long, 18);
-            IsBusy = false;
+            ShowMensajePopUp(Mensajes.AnularAbonoValidacion);
+            IsBusy                  = !IsBusy;
             return;
         }
 
         await HelperCustomerCreditDocumentAmortization.AnularAbono(Item.CodigoAbono);
+        ShowMensajePopUp(Mensajes.AnularAbonoCorrectamente, Colors.Green);
         OnAplicarOtroCommand();
         IsBusy = false;
     }
 
     private async void OnPrintCommand(object obj)
     {
-        var parametroPrinter = await _parameterSystem.PosMeFindPrinter();
-        var logo = await _parameterSystem.PosMeFindLogo();
-        if (string.IsNullOrWhiteSpace(parametroPrinter.Value))
+        try
         {
-            return;
-        }
+            var parametroPrinter    = await _parameterSystem.PosMeFindPrinter();
+            var logo                = await _parameterSystem.PosMeFindLogo();
+            if (string.IsNullOrWhiteSpace(parametroPrinter.Value))
+            {
+                ShowMensajePopUp(Mensajes.ParametroImpresora);
+                return;
+            }
 
-        var printer = new Printer(parametroPrinter.Value);
-        if (!CrossBluetoothLE.Current.IsOn)
-        {
-            ShowToast(Mensajes.MensajeBluetoothState, ToastDuration.Long, 18);
-            return;
-        }
+            var printer = new Printer(parametroPrinter.Value);
+            if (!CrossBluetoothLE.Current.IsOn)
+            {
+                ShowMensajePopUp(Mensajes.MensajeBluetoothState);
+                return;
+            }
 
-        IsBusy = true;
-        if (!string.IsNullOrWhiteSpace(logo.Value))
-        {
-            var readImage = Convert.FromBase64String(logo.Value!);
-            printer.AlignRight();
-            printer.Image(SKBitmap.Decode(readImage));
-        }
+            IsBusy = true;
+            if (!string.IsNullOrWhiteSpace(logo.Value))
+            {
+                var readImage = Convert.FromBase64String(logo.Value!);
+                printer.AlignRight();
+                printer.Image(SKBitmap.Decode(readImage));
+            }
        
-        printer.AlignCenter();
-        printer.BoldMode(Company!.Name!);
-        printer.BoldMode($"RUC: {CompanyRuc!.Value}");
-        printer.BoldMode($"ABONO: {VariablesGlobales.DtoAplicarAbono!.CodigoAbono}");
-        printer.NewLine();
-        printer.AlignLeft();
-        printer.Append($"Le informamos: \n{VariablesGlobales.DtoAplicarAbono.FirstName} {VariablesGlobales.DtoAplicarAbono.LastName} " +
-                       $"con número de cedula {VariablesGlobales.DtoAplicarAbono.Identification} ha realizado un abono a su cuenta.");
-        printer.NewLine();
-        printer.Append($"Fecha            : {VariablesGlobales.DtoAplicarAbono.Fecha:yyyy-MM-dd}");
-        printer.Append($"Saldo inicial    : {VariablesGlobales.DtoAplicarAbono.CurrencyName} {VariablesGlobales.DtoAplicarAbono.SaldoInicial:N2}");
-        printer.Append($"Monto de abono   : {VariablesGlobales.DtoAplicarAbono.CurrencyName} {VariablesGlobales.DtoAplicarAbono.MontoAplicar:N2}");
-        printer.Append($"Saldo final      : {VariablesGlobales.DtoAplicarAbono.CurrencyName} {VariablesGlobales.DtoAplicarAbono.SaldoFinal:N2}");
-        printer.NewLine();
-        printer.Append($"Comentarios: {VariablesGlobales.DtoAplicarAbono.Description}");
-        printer.NewLine();
-        printer.AlignCenter();
-        printer.Append(CompanyTelefono!.Value!);
-        printer.Append(Company.Address!);
-        printer.FullPaperCut();
-        printer.Print();
-        if (printer.Device is null)
-        {
-            ShowToast(Mensajes.MensajeDispositivoNoConectado, ToastDuration.Long, 18);
-        }
+            printer.AlignCenter();
+            printer.BoldMode(Company!.Name!);
+            printer.BoldMode($"RUC: {CompanyRuc!.Value}");
+            printer.BoldMode($"ABONO: {VariablesGlobales.DtoAplicarAbono!.CodigoAbono}");
+            printer.NewLine();
+            printer.AlignLeft();
+            printer.Append($"Le informamos: \n{VariablesGlobales.DtoAplicarAbono.FirstName} {VariablesGlobales.DtoAplicarAbono.LastName} " +
+                           $"con número de cedula {VariablesGlobales.DtoAplicarAbono.Identification} ha realizado un abono a su cuenta.");
+            printer.NewLine();
+            printer.Append($"Fecha            : {VariablesGlobales.DtoAplicarAbono.Fecha:yyyy-MM-dd}");
+            printer.Append($"Saldo inicial    : {VariablesGlobales.DtoAplicarAbono.CurrencyName} {VariablesGlobales.DtoAplicarAbono.SaldoInicial:N2}");
+            printer.Append($"Monto de abono   : {VariablesGlobales.DtoAplicarAbono.CurrencyName} {VariablesGlobales.DtoAplicarAbono.MontoAplicar:N2}");
+            printer.Append($"Saldo final      : {VariablesGlobales.DtoAplicarAbono.CurrencyName} {VariablesGlobales.DtoAplicarAbono.SaldoFinal:N2}");
+            printer.NewLine();
+            printer.Append($"Comentarios: {VariablesGlobales.DtoAplicarAbono.Description}");
+            printer.NewLine();
+            printer.AlignCenter();
+            printer.Append(CompanyTelefono!.Value!);
+            printer.Append(Company.Address!);
+            printer.FullPaperCut();
+            printer.Print();
+            if (printer.Device is null)
+            {
+                ShowMensajePopUp(Mensajes.MensajeDispositivoNoConectado);
+            }
 
-        IsBusy = false;
+            IsBusy = false;
+        }
+        catch (Exception e)
+        {
+            ShowMensajePopUp(e.Message);
+        }
     }
 
     private void OnAplicarOtroCommand()
@@ -155,6 +164,7 @@ public class ValidarAbonoViewModel : BaseViewModel
     public async Task OnAppearing(INavigation navigation)
     {
         Navigation = navigation;
+        
         await Task.Run(async () =>
         {
             var paramter = await _parameterSystem.PosMeFindLogo();
@@ -163,11 +173,12 @@ public class ValidarAbonoViewModel : BaseViewModel
                 var imageBytes = Convert.FromBase64String(paramter.Value!);
                 LogoSource = ImageSource.FromStream(() => new MemoryStream(imageBytes));
             }
-            Item = VariablesGlobales.DtoAplicarAbono!;
+            Item            = VariablesGlobales.DtoAplicarAbono!;
             CompanyTelefono = await _repositoryParameters.PosMeFindByKey("CORE_PHONE");
-            CompanyRuc = await _repositoryParameters.PosMeFindByKey("CORE_COMPANY_IDENTIFIER");
-            Company = VariablesGlobales.TbCompany;
+            CompanyRuc      = await _repositoryParameters.PosMeFindByKey("CORE_COMPANY_IDENTIFIER");
+            Company         = VariablesGlobales.TbCompany;
         });
+        
         IsBusy = false;
     }
 }

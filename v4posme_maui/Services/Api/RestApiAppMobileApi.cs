@@ -78,7 +78,7 @@ public class RestApiAppMobileApi
 
             //insertar nuevos movimientos
             var taskCompany = _repositoryTbCompany.PosMeInsert(apiResponse.ObjCompany);
-            var taskCustomer = _repositoryTbCustomer!.PosMeInsertAll(apiResponse.ListCustomer);
+            var taskCustomer = _repositoryTbCustomer.PosMeInsertAll(apiResponse.ListCustomer, true);
             var taskItem = _repositoryItems!.PosMeInsertAll(apiResponse.ListItem);
             var taskDocumentCreditAmortization = _repositoryDocumentCreditAmortization!.PosMeInsertAll(apiResponse.ListDocumentCreditAmortization);
             var taskParameters = _repositoryParameters!.PosMeInsertAll(apiResponse.ListParameter);

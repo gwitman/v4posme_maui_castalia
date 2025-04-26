@@ -39,6 +39,27 @@
                         x:Name="DxStackLayout"
                         BackgroundColor="White"
                         Margin="10">
+                        <controls:DXPopup x:Name="Popup"
+                                          AllowScrim="True"
+                                          BackgroundColor="{Binding PopupBackgroundColor}"
+                                          VerticalAlignment="Bottom"
+                                          ScrimColor="#b3adb9ce"
+                                          IsOpen="{Binding PopUpShow}">
+                            <StackLayout WidthRequest="250">
+                                <Label Text="{Binding Mensaje}"
+                                       FontAttributes="Bold"
+                                       FontSize="15"
+                                       TextColor="{StaticResource White}"
+                                       Margin="20, 20" />
+                                <Button Text="Aceptar"
+                                        Clicked="ClosePopup_Clicked"
+                                        BackgroundColor="{StaticResource Gray600}"
+                                        FontSize="20"
+                                        TextColor="White" />
+                            </StackLayout>
+                        </controls:DXPopup>
+
+
                         <dx:DXStackLayout
                             Orientation="Vertical">
                             <dx:DXImage x:Name="Logo"

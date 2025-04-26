@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:productosRetornos="clr-namespace:v4posme_maui.ViewModels.More.ProductosRetornos"
+             xmlns:dx="http://schemas.devexpress.com/maui"
+             x:Class="v4posme_maui.Views.More.Productos.ProductosRetornosPage"
+             Title="Productos">
+    <ContentPage.BindingContext>
+        <productosRetornos:ProductosRetornosViewModel />
+    </ContentPage.BindingContext>
+    <ContentPage.ToolbarItems>
+
+        <ToolbarItem Text="Imprimir" IconImageSource="printer"  Command="{Binding PrintCommand}" />
+        <ToolbarItem Text="Compartir" IconImageSource="shared" Clicked="MenuItem_OnClicked" />
+    </ContentPage.ToolbarItems>
+    <ContentPage.Content>
+        <StackLayout>
+            <dx:DXPopup x:Name="Popup"
+                        AllowScrim="True"
+                        BackgroundColor="{Binding PopupBackgroundColor}"
+                        VerticalAlignment="Bottom"
+                        ScrimColor="#b3adb9ce"
+                        IsOpen="{Binding PopUpShow}">
+                <StackLayout WidthRequest="250">
+                    <Label Text="{Binding Mensaje}"
+                           FontAttributes="Bold"
+                           FontSize="15"
+                           TextColor="{StaticResource White}"
+                           Margin="20, 20" />
+                    <Button Text="Aceptar"
+                            Clicked="ClosePopup_Clicked"
+                            BackgroundColor="{StaticResource Gray600}"
+                            FontSize="20"
+                            TextColor="White" />
+                </StackLayout>
+            </dx:DXPopup>
+            <dx:DataGridView ItemsSource="{Binding Items}" x:Name="ItemsGridView">
+                <dx:DataGridView.Columns>
+                    <dx:TemplateColumn FieldName="Quantity" Caption="Cantidad" Width="100">
+                        <dx:TemplateColumn.DisplayTemplate>
+                            <DataTemplate>
+                                <Grid VerticalOptions="Center">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <Label Text="{Binding Item.Quantity, StringFormat = '{0:N2}'}" HorizontalTextAlignment="End" />
+                                </Grid>
+                            </DataTemplate>
+                        </dx:TemplateColumn.DisplayTemplate>
+                    </dx:TemplateColumn>
+                    <dx:TextColumn FieldName="Name" Caption="Descripción" Width="300" />
+                    <dx:TextColumn FieldName="BarCode" Caption="Código Barra" Width="150" />
+                </dx:DataGridView.Columns>
+            </dx:DataGridView>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

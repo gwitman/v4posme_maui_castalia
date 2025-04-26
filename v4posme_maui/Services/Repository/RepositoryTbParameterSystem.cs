@@ -48,8 +48,7 @@ public class RepositoryTbParameterSystem(DataBase dataBase) : RepositoryFacade<T
             .FirstOrDefaultAsync(system => system.Name == Constantes.ParemeterEntityIDAutoIncrement);
     }
 
-    //Carlos Conto
-	public Task<TbParameterSystem> PosMeFindCodigoVisita()
+    public Task<TbParameterSystem> PosMeFindCodigoVisita()
 	{ //ParameterCodigoVisita
 		return dataBase.Database.Table<TbParameterSystem>()
 			.FirstOrDefaultAsync(system => system.Name == Constantes.ParameterCodigoVisita);
@@ -60,5 +59,16 @@ public class RepositoryTbParameterSystem(DataBase dataBase) : RepositoryFacade<T
         return dataBase.Database.Table<TbParameterSystem>()
             .FirstOrDefaultAsync(p => p.Name == Constantes.CustomerOrderShare);
     }
-
+    
+    public Task<TbParameterSystem> PosMeFindCustomerOrderCustomer()
+    {
+        return dataBase.Database.Table<TbParameterSystem>()
+            .FirstOrDefaultAsync(p => p.Name == Constantes.CustomerOrderCustomer);
+    }
+    
+    public Task<TbParameterSystem> PosMeFindCustomerOrderInvoice()
+    {
+        return dataBase.Database.Table<TbParameterSystem>()
+            .FirstOrDefaultAsync(p => p.Name == Constantes.CustomerOrderInvoice);
+    }
 }

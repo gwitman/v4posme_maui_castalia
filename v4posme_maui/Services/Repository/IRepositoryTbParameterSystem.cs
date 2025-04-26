@@ -12,6 +12,8 @@ public interface IRepositoryTbParameterSystem : IRepositoryFacade<TbParameterSys
     Task<TbParameterSystem> PosMeFindAutoIncrement();
     Task<TbParameterSystem> PosMeFindByName(string name);
     Task<TbParameterSystem> PosMeFindCustomerOrderShare();
+    Task<TbParameterSystem> PosMeFindCustomerOrderCustomer();
+    Task<TbParameterSystem> PosMeFindCustomerOrderInvoice();
 	//Carlos Conto
 	Task<TbParameterSystem> PosMeFindCodigoVisita();
 }

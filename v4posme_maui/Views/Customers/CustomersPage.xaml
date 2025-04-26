@@ -10,6 +10,7 @@
              xmlns:dxc="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
              xmlns:customers="clr-namespace:v4posme_maui.Views.Customers"
              xmlns:controls="clr-namespace:DevExpress.Maui.Controls;assembly=DevExpress.Maui.Controls"
+             xmlns:converters="clr-namespace:v4posme_maui.Services.Converters"
              x:Class="v4posme_maui.Views.Customers.CustomersPage">
     <ContentPage.BindingContext>
         <local:PosMeCustomerViewModel />
@@ -17,6 +18,10 @@
     <ContentPage.ToolbarItems>
         <ToolbarItem IconImageSource="barcode_scan" Command="{Binding OnBarCode}" />
     </ContentPage.ToolbarItems>
+    <ContentPage.Resources>
+        <converters:EstadoToColorConverter x:Key="EstadoToColorConverter" />
+    </ContentPage.Resources>
+
     <ContentPage.Content>
         <controls:ShimmerView
             Style="{StaticResource ShimmerEffect}"
@@ -26,6 +31,25 @@
                     <Grid
                         RowDefinitions="Auto,*"
                         HorizontalOptions="Center">
+                        <controls:DXPopup x:Name="Popup"
+                                          AllowScrim="True"
+                                          BackgroundColor="{Binding PopupBackgroundColor}"
+                                          VerticalAlignment="Bottom"
+                                          ScrimColor="#b3adb9ce"
+                                          IsOpen="{Binding PopUpShow}">
+                            <StackLayout WidthRequest="250">
+                                <Label Text="{Binding Mensaje}"
+                                       FontAttributes="Bold"
+                                       FontSize="15"
+                                       TextColor="{StaticResource White}"
+                                       Margin="20, 20" />
+                                <Button Text="Aceptar"
+                                        Clicked="ClosePopup_Clicked"
+                                        BackgroundColor="{StaticResource Gray600}"
+                                        FontSize="20"
+                                        TextColor="White" />
+                            </StackLayout>
+                        </controls:DXPopup>
                         <Grid ColumnDefinitions="0.2*">
                             <dxe:TextEdit
                                 x:Name="SearchBar"
@@ -47,6 +71,8 @@
                             DetailNewItemFormTemplate="{DataTemplate customers:CustomerEditPage}"
                             SelectedItem="{Binding SelectedCustomer}"
                             SelectionMode="Single"
+                            AllowDragDropItems="True"
+                            DropItem="ClientesCollectionView_OnDropItem"
                             IsLoadMoreEnabled="True"
                             LoadMoreCommand="{Binding LoadMoreCommand}"
                             TapCommand="{Binding Source={x:Reference ClientesCollectionView}, Path=Commands.ShowDetailForm}"
@@ -59,8 +85,13 @@
                                         <Grid
                                               HorizontalOptions="Fill"
                                               Padding="10"
-                                              VerticalOptions="Fill"
-                                              BackgroundColor="{StaticResource Primary}">
+                                              VerticalOptions="Fill">
+                                            <Grid.BackgroundColor>
+                                                <MultiBinding Converter="{StaticResource EstadoToColorConverter}">
+                                                    <Binding Path="Asignado" />
+                                                    <Binding Path="Facturado" />
+                                                </MultiBinding>
+                                            </Grid.BackgroundColor>
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="Auto" />
                                                 <RowDefinition Height="Auto" />

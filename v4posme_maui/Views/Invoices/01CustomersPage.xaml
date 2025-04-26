@@ -8,10 +8,14 @@
              xmlns:models="clr-namespace:v4posme_maui.Models"
              xmlns:invoices="clr-namespace:v4posme_maui.ViewModels.Invoices"
              xmlns:controls="clr-namespace:DevExpress.Maui.Controls;assembly=DevExpress.Maui.Controls"
+             xmlns:converters="clr-namespace:v4posme_maui.Services.Converters"
              x:Class="v4posme_maui.Views.Invoices.InvoicesPage">
     <ContentPage.BindingContext>
         <invoices:InvoicesViewModel />
     </ContentPage.BindingContext>
+    <ContentPage.Resources>
+        <converters:EstadoToColorConverter x:Key="EstadoToColorConverter" />
+    </ContentPage.Resources>
     <ContentPage.ToolbarItems>
         <ToolbarItem IconImageSource="barcode_scan" Command="{Binding OnBarCode}" />
     </ContentPage.ToolbarItems>
@@ -39,7 +43,11 @@
                                                ItemsSource="{Binding Customers}"
                                                SelectedItem="{Binding SelectedCustomer}"
                                                SelectionMode="Single"
-                                               IsRefreshing="{Binding  IsBusy, Mode=OneWay}">
+                                               AllowDragDropItems="True"
+                                               IsLoadMoreEnabled="True"
+                                               LoadMoreCommand="{Binding LoadMoreCommand}"
+                                               DropItem="ClientesCollectionView_OnDropItem"
+                                               IsRefreshing="{Binding  IsBusy, Mode=TwoWay}">
                             <dxcv:DXCollectionView.ItemTemplate>
                                 <DataTemplate>
                                     <dxc:DXStackLayout
@@ -48,8 +56,13 @@
                                         <Grid x:DataType="models:Api_AppMobileApi_GetDataDownloadCustomerResponse"
                                               HorizontalOptions="Fill"
                                               Padding="10"
-                                              VerticalOptions="Fill"
-                                              BackgroundColor="{StaticResource Primary}">
+                                              VerticalOptions="Fill">
+                                            <Grid.BackgroundColor>
+                                                <MultiBinding Converter="{StaticResource EstadoToColorConverter}">
+                                                    <Binding Path="Asignado" />
+                                                    <Binding Path="Facturado" />
+                                                </MultiBinding>
+                                            </Grid.BackgroundColor>
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="Auto" />
                                                 <RowDefinition Height="Auto" />

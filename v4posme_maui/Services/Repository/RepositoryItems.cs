@@ -86,4 +86,12 @@ public class RepositoryItems(DataBase dataBase)
             .OrderByDescending(response => response.ItemNumber)
             .ToListAsync();
     }
+
+    public Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeQuantityDistintoZero()
+    {
+        return _dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadItemsResponse>()
+            .OrderByDescending(response => response.ItemNumber)
+            .Where(respose => respose.Quantity != 0m)
+            .ToListAsync();
+    }
 }

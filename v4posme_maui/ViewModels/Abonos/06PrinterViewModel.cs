@@ -35,29 +35,30 @@ public class ValidarAbonoHideSaldoViewModel : BaseViewModel
         var findAbonos = await _repositoryTbTransactionMaster.PosMeFilterAbonosByCustomer(Item.EntityId);
         if (findAbonos.First().TransactionNumber != Item.CodigoAbono)
         {
-            ShowToast(Mensajes.AnularAbonoValidacion, ToastDuration.Long, 18);
-            IsBusy = false;
+            ShowMensajePopUp(Mensajes.AnularAbonoValidacion);
             return;
         }
 
         await HelperCustomerCreditDocumentAmortization.AnularAbono(Item.CodigoAbono);
+        ShowMensajePopUp(Mensajes.AnularAbonoCorrectamente, Colors.Green);
         OnAplicarOtroCommand();
         IsBusy = false;
     }
 
     private async void OnPrintCommand(object obj)
     {
-        var parametroPrinter = await _parameterSystem.PosMeFindPrinter();
-        var logo = await _parameterSystem.PosMeFindLogo();
+        var parametroPrinter    = await _parameterSystem.PosMeFindPrinter();
+        var logo                = await _parameterSystem.PosMeFindLogo();
         if (string.IsNullOrWhiteSpace(parametroPrinter.Value))
         {
+            ShowMensajePopUp(Mensajes.ParametroImpresora);
             return;
         }
 
         var printer = new Printer(parametroPrinter.Value);
         if (!CrossBluetoothLE.Current.IsOn)
         {
-            ShowToast(Mensajes.MensajeBluetoothState, ToastDuration.Long, 18);
+            ShowMensajePopUp(Mensajes.MensajeBluetoothState);
             return;
         }
 
@@ -92,7 +93,7 @@ public class ValidarAbonoHideSaldoViewModel : BaseViewModel
         printer.Print();
         if (printer.Device is null)
         {
-            ShowToast(Mensajes.MensajeDispositivoNoConectado, ToastDuration.Long, 18);
+            ShowMensajePopUp(Mensajes.MensajeDispositivoNoConectado);
         }
 
         IsBusy = false;
@@ -163,10 +164,10 @@ public class ValidarAbonoHideSaldoViewModel : BaseViewModel
                 var imageBytes = Convert.FromBase64String(paramter.Value!);
                 LogoSource = ImageSource.FromStream(() => new MemoryStream(imageBytes)); 
             }
-            Item = VariablesGlobales.DtoAplicarAbono!;
+            Item            = VariablesGlobales.DtoAplicarAbono!;
             CompanyTelefono = await _repositoryParameters.PosMeFindByKey("CORE_PHONE");
-            CompanyRuc = await _repositoryParameters.PosMeFindByKey("CORE_COMPANY_IDENTIFIER");
-            Company = VariablesGlobales.TbCompany;
+            CompanyRuc      = await _repositoryParameters.PosMeFindByKey("CORE_COMPANY_IDENTIFIER");
+            Company         = VariablesGlobales.TbCompany;
         });
         IsBusy = false;
     }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Diagnostics;
 using CommunityToolkit.Maui.Core;
 using Plugin.BLE;
 using v4posme_maui.Models;
@@ -22,12 +23,12 @@ public class PrinterInvoiceViewModel : BaseViewModel
     public PrinterInvoiceViewModel()
     {
         Title = "Comprobante Pago Factura";
-        _repositoryTbTransactionMaster = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMaster>();
+        _repositoryTbTransactionMaster       = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMaster>();
         _repositoryTbTransactionMasterDetail = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMasterDetail>();
-        _parameterSystem = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbParameterSystem>();
-        _repositoryParameters = VariablesGlobales.UnityContainer.Resolve<IRepositoryParameters>();
-        AplicarOtroCommand = new Command(OnAplicarOtroCommand);
-        PrintCommand = new Command(OnPrintCommand);
+        _parameterSystem                     = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbParameterSystem>();
+        _repositoryParameters                = VariablesGlobales.UnityContainer.Resolve<IRepositoryParameters>();
+        AplicarOtroCommand   = new Command(OnAplicarOtroCommand);
+        PrintCommand         = new Command(OnPrintCommand);
         AnularFacturaCommand = new Command(OnAnularFacturaCommand);
     }
 
@@ -35,14 +36,16 @@ public class PrinterInvoiceViewModel : BaseViewModel
     {
         try
         {
+            IsBusy = true;
             var details = await _repositoryTbTransactionMasterDetail.PosMeItemByTransactionId(TransactionMaster.TransactionMasterId);
             await _repositoryTbTransactionMaster.PosMeDelete(TransactionMaster);
             foreach (var masterDetail in details)
             {
                 await _repositoryTbTransactionMasterDetail.PosMeDelete(masterDetail);
             }
-
-            await Navigation!.PopAsync(true);
+            OnAplicarOtroCommand();
+            ShowMensajePopUp(Mensajes.AnularFacturaCorrectamente, Colors.Green);
+            IsBusy = false;
         }
         catch (Exception e)
         {
@@ -65,7 +68,7 @@ public class PrinterInvoiceViewModel : BaseViewModel
             var printer = new Printer(parametroPrinter.Value);
             if (!CrossBluetoothLE.Current.IsOn)
             {
-                ShowToast(Mensajes.MensajeBluetoothState, ToastDuration.Long, 18);
+                ShowMensajePopUp(Mensajes.MensajeBluetoothState);
                 return;
             }
 
@@ -118,18 +121,19 @@ public class PrinterInvoiceViewModel : BaseViewModel
             printer.Print();
             if (printer.Device is null)
             {
-                ShowToast(Mensajes.MensajeDispositivoNoConectado, ToastDuration.Long, 18);
+                ShowMensajePopUp(Mensajes.MensajeDispositivoNoConectado);
             }
 
             IsBusy = false;
         }
         catch (Exception e)
         {
-            ShowToast(e.Message, ToastDuration.Long, 12);
+            Debug.WriteLine(e.StackTrace);
+            ShowMensajePopUp(e.Message);
         }
     }
 
-    private void OnAplicarOtroCommand(object obj)
+    private void OnAplicarOtroCommand()
     {
         var stack = Shell.Current.Navigation.NavigationStack.ToArray();
         for (var i = stack.Length - 1; i > 0; i--)
@@ -219,7 +223,7 @@ public class PrinterInvoiceViewModel : BaseViewModel
         }
         catch (Exception e)
         {
-            ShowToast(e.Message, ToastDuration.Long, 12);
+            ShowMensajePopUp(e.Message);
         }
     }
     

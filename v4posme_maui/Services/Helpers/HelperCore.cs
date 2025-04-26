@@ -1,4 +1,5 @@
-﻿using v4posme_maui.Services.Repository;
+﻿using v4posme_maui.Models;
+using v4posme_maui.Services.Repository;
 using v4posme_maui.Services.SystemNames;
 
 namespace v4posme_maui.Services.Helpers;
@@ -228,4 +229,31 @@ public class HelperCore(
         return character;
     }
 
+    public List<Api_AppMobileApi_GetDataDownloadCustomerResponse> ReordenarLista(List<Api_AppMobileApi_GetDataDownloadCustomerResponse> listaBase, List<Api_AppMobileApi_GetDataDownloadCustomerResponse> cambios)
+    {
+        // Paso 1: Aplicar los cambios de secuencia
+        foreach (var cambio in cambios)
+        {
+            var cliente = listaBase.FirstOrDefault(c => c.EntityId == cambio.EntityId);
+            if (cliente != null)
+            {
+                cliente.Secuencia = cambio.Secuencia;
+            }
+        }
+
+        // Paso 2: Ordenar por secuencia y luego por EntityId para desempate
+        var listaOrdenada = listaBase
+            .OrderBy(c => c.Secuencia)
+            .ThenBy(c => c.EntityId)
+            .ToList();
+
+        // Paso 3: Reasignar secuencias para que sean consecutivas
+        var nuevaSecuencia = 1;
+        foreach (var cliente in listaOrdenada)
+        {
+            cliente.Secuencia = nuevaSecuencia++;
+        }
+
+        return listaOrdenada;
+    }
 }
