@@ -125,9 +125,26 @@ public class RepositoryTbCustomer(DataBase dataBase) : RepositoryFacade<Api_AppM
     public Task<List<Api_AppMobileApi_GetDataDownloadCustomerResponse>> PosMeFilterByCustomerInvoice(string search)
     {
         var query = $"""
-                     select tbc.CustomerId, tbc.CompanyId, BranchId, tbc.EntityId, CustomerNumber, Identification, 
-                                     FirstName, LastName,tbc.CurrencyName, tbc.CurrencyId, tbc.Balance, Modificado 
-                     from tb_customers tbc
+                     select distinct 
+                         tbc.CustomerId,
+                         tbc.CompanyId,
+                         tbc.BranchId,
+                         tbc.EntityId,
+                         tbc.CustomerNumber,
+                         tbc.Identification,
+                         tbc.FirstName,
+                         tbc.LastName,
+                         tbc.Balance,
+                         tbc.CurrencyId,
+                         tbc.CurrencyName,
+                         tbc.CustomerCreditLineId,
+                         tbc.Location,
+                         tbc.Phone,
+                         tbc.Me,
+                         tbc.Modificado,
+                         tbc.Secuencia,
+                         tdc.Balance as Remaining
+                     from tb_customers tbc join tb_document_credit tdc on tbc.EntityId = tdc.EntityId
                      where tbc.CustomerNumber like '%{search}%' or tbc.FirstName like '%{search}%' or tbc.identification like '%{search}%'
                      """;
         return _dataBase.Database.QueryAsync<Api_AppMobileApi_GetDataDownloadCustomerResponse>(query);

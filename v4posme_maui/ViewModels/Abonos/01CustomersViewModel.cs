@@ -67,22 +67,7 @@ public class AbonosViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            List<Api_AppMobileApi_GetDataDownloadCustomerResponse> finds;
-            if (string.IsNullOrWhiteSpace(Search))
-            {
-                finds = await _customerRepositoryTbCustomer.PosMeFilterByInvoice();
-            }
-            else
-            {
-                finds = await _customerRepositoryTbCustomer.PosMeFilterByCustomerInvoice(Search);
-            }
-
-            Customers.Clear();
-            foreach (var customer in finds)
-            {
-                Customers.Add(customer);
-            }
-
+            LoadsClientes();
             IsBusy = false;
         }
         catch (Exception e)
@@ -124,6 +109,7 @@ public class AbonosViewModel : BaseViewModel
             IsBusy = true;
             // 1. Obtener el orden personalizado desde el repositorio
             var customerOrderJson = await _repositoryTbParameterSystem.PosMeFindCustomerOrderShare();
+            
             List<CustomerOrderShare> customOrder = [];
 
             if (!string.IsNullOrWhiteSpace(customerOrderJson.Value))
@@ -132,7 +118,15 @@ public class AbonosViewModel : BaseViewModel
             }
 
             // 2. Obtener todos los clientes
-            var allCustomers = await _customerRepositoryTbCustomer.PosMeFilterByInvoice();
+            List<Api_AppMobileApi_GetDataDownloadCustomerResponse> allCustomers;
+            if (string.IsNullOrWhiteSpace(Search))
+            {
+                allCustomers = await _customerRepositoryTbCustomer.PosMeFilterByInvoice();
+            }
+            else
+            {
+                allCustomers = await _customerRepositoryTbCustomer.PosMeFilterByCustomerInvoice(Search);
+            }
             var remainingCustomers = new List<Api_AppMobileApi_GetDataDownloadCustomerResponse>();
             for (var i = 0; i < allCustomers.Count; i++)
             {
