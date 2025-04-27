@@ -7,12 +7,15 @@
              xmlns:dxe="clr-namespace:DevExpress.Maui.Editors;assembly=DevExpress.Maui.Editors"
              xmlns:abonos="clr-namespace:v4posme_maui.ViewModels.Abonos"
              xmlns:controls="clr-namespace:DevExpress.Maui.Controls;assembly=DevExpress.Maui.Controls"
+             xmlns:converters="clr-namespace:v4posme_maui.Services.Converters"
              x:Class="v4posme_maui.Views.Abonos.AbonosPage"
              Title="{Binding Title}">
     <ContentPage.BindingContext>
         <abonos:AbonosViewModel />
     </ContentPage.BindingContext>
-    
+    <ContentPage.Resources>
+        <converters:EstadoToColorConverter x:Key="EstadoToColorConverter" />
+    </ContentPage.Resources>
     <ContentPage.ToolbarItems>
         <ToolbarItem IconImageSource="barcode_scan" Command="{Binding OnBarCode}" />
     </ContentPage.ToolbarItems>
@@ -52,15 +55,12 @@
                                             HorizontalOptions="Fill"
                                             Padding="10"
                                             VerticalOptions="Fill">
-                                            <Grid.Triggers>
-                                                <DataTrigger TargetType="Grid" Binding="{Binding HasAbono}" Value="True">
-                                                    <Setter Property="BackgroundColor" Value="Green" />
-                                                </DataTrigger>
-                                                <DataTrigger TargetType="Grid" Binding="{Binding HasAbono}" Value="False">
-                                                    <Setter Property="BackgroundColor" Value="{StaticResource Primary}" />
-                                                </DataTrigger>
-                                            </Grid.Triggers>
-
+                                            <Grid.BackgroundColor>
+                                                <MultiBinding Converter="{StaticResource EstadoToColorConverter}">
+                                                    <Binding Path="Asignado" />
+                                                    <Binding Path="HasAbono" />
+                                                </MultiBinding>
+                                            </Grid.BackgroundColor>
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="Auto" />
                                                 <RowDefinition Height="Auto" />

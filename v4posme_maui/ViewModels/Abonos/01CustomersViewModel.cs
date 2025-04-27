@@ -64,24 +64,31 @@ public class AbonosViewModel : BaseViewModel
 
     private async void OnSearchCommand()
     {
-        IsBusy = true;
-        List<Api_AppMobileApi_GetDataDownloadCustomerResponse> finds;
-        if (string.IsNullOrWhiteSpace(Search))
+        try
         {
-            finds = await _customerRepositoryTbCustomer.PosMeFilterByInvoice();
-        }
-        else
-        {
-            finds = await _customerRepositoryTbCustomer.PosMeFilterByCustomerInvoice(Search);
-        }
+            IsBusy = true;
+            List<Api_AppMobileApi_GetDataDownloadCustomerResponse> finds;
+            if (string.IsNullOrWhiteSpace(Search))
+            {
+                finds = await _customerRepositoryTbCustomer.PosMeFilterByInvoice();
+            }
+            else
+            {
+                finds = await _customerRepositoryTbCustomer.PosMeFilterByCustomerInvoice(Search);
+            }
 
-        Customers.Clear();
-        foreach (var customer in finds)
-        {
-            Customers.Add(customer);
-        }
+            Customers.Clear();
+            foreach (var customer in finds)
+            {
+                Customers.Add(customer);
+            }
 
-        IsBusy = false;
+            IsBusy = false;
+        }
+        catch (Exception e)
+        {
+            ShowMensajePopUp(e.Message);
+        }
     }
 
     public ICommand SearchCommand { get; }

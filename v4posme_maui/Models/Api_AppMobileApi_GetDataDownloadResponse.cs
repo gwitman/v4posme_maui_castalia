@@ -61,8 +61,8 @@ public class Api_AppMobileApi_GetDataDownloadCustomerResponse : BindableBase
     [NotMapped] public int? Secuencia { get; set; }
     [NotMapped] public decimal? Remaining { get; set; }
     [NotMapped] public bool HasAbono => Balance != Remaining;
-    public bool Asignado => Me == 1;
-    public bool Facturado { get; set; }
+    [NotMapped] public bool Asignado => Me == 1;
+    [NotMapped] public bool Facturado { get; set; }
 }
 
 [SQLite.Table("tb_company")]

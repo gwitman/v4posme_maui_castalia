@@ -21,7 +21,6 @@ public class InvoicesViewModel : BaseViewModel
 	public ICommand ItemTapped { get; }
     public ICommand SearchCommand { get; }
     public ICommand LoadMoreCommand { get; }
-    public DXObservableCollection<Api_AppMobileApi_GetDataDownloadCustomerResponse> Customers { get; }
     public ICommand OnBarCode { get; }
     public Api_AppMobileApi_GetDataDownloadCustomerResponse? SelectedCustomer { get; set; }
     private List<CustomerOrderShare> _customerOrderShares = new();
@@ -38,8 +37,17 @@ public class InvoicesViewModel : BaseViewModel
         SearchCommand   = new Command(OnSearchCommand);
         OnBarCode       = new Command(OnBarCodeShow);
         LoadMoreCommand = new Command(OnLoadMoreCommand);
-        Customers       = new();
+        _customers      = new();
     }
+
+    private DXObservableCollection<Api_AppMobileApi_GetDataDownloadCustomerResponse> _customers;
+
+    public DXObservableCollection<Api_AppMobileApi_GetDataDownloadCustomerResponse> Customers
+    {
+        get=>_customers;
+        set=>SetProperty(ref _customers, value);
+    }
+
 
     private void OnLoadMoreCommand()
     {
@@ -87,27 +95,15 @@ public class InvoicesViewModel : BaseViewModel
         IsBusy = false;
     }
 
-    private async void OnSearchCommand(object obj)
+    private void OnSearchCommand(object? obj)
     {
         IsBusy = true;
-        Customers.Clear();
-        List<Api_AppMobileApi_GetDataDownloadCustomerResponse> finds;
-        if (string.IsNullOrWhiteSpace(Search))
+        if (obj is not null)
         {
-			//para mostar un determinado numero de clientes
-			var valueTop = await _helper.GetValueParameter("MOBILE_SHOW_TOP_CUSTOMER_IN_SHARE", "10");
-			finds = await _customerRepositoryTbCustomer.PosMeAscTake10(int.Parse(valueTop));
+            Search = obj.ToString() ?? string.Empty;
         }
-        else
-        {
-            finds = await _customerRepositoryTbCustomer.PosMeFilterByCustomerInvoice(Search);
-        }
-
-        foreach (var customer in finds)
-        {
-            Customers.Add(customer);
-        }
-
+        _lastLoadedIndex = 0;
+        OnLoadMoreCommand();
         IsBusy = false;
     }
     
@@ -121,6 +117,10 @@ public class InvoicesViewModel : BaseViewModel
             
             // 2. Obtener todos los clientes
             List<Api_AppMobileApi_GetDataDownloadCustomerResponse> allCustomers;
+            if (_lastLoadedIndex == 0)
+            {
+                Customers.Clear();
+            }
             if (string.IsNullOrWhiteSpace(Search))
             {
                 allCustomers = await _customerRepositoryTbCustomer.PosMeCustomerAscLoad(_lastLoadedIndex, _loadBatchSize);
@@ -155,7 +155,15 @@ public class InvoicesViewModel : BaseViewModel
             finalList = clientesOrdenados.Count > 0 ? _helper.ReordenarLista(allCustomers, clientesOrdenados) : allCustomers.OrderBy(c=>c.Secuencia).ToList();
 
             //8. Agregar a la lista principal
-            Customers.AddRange(finalList);
+            if (_lastLoadedIndex == 0)
+            {
+                Customers = new DXObservableCollection<Api_AppMobileApi_GetDataDownloadCustomerResponse>(finalList);
+            }
+            else
+            {
+                Customers.AddRange(finalList);
+            }
+            
         }
         catch (Exception ex)
         {
@@ -185,7 +193,7 @@ public class InvoicesViewModel : BaseViewModel
             var newPosition = e.DropItemHandle;
 
             // Obtener la lista actual de posiciones
-            var parameter = await _repositoryTbParameterSystem.PosMeFindCustomerOrderCustomer();
+            var parameter = await _repositoryTbParameterSystem.PosMeFindCustomerOrderInvoice();
             var currentPositions = (!string.IsNullOrWhiteSpace(parameter.Value)
                 ? JsonConvert.DeserializeObject<List<CustomerOrderShare>>(parameter.Value)
                 : []) ?? [];
@@ -228,16 +236,19 @@ public class InvoicesViewModel : BaseViewModel
 
             oldCustomer.Secuencia = oldPosition;
             customer.Secuencia = newPosition;
-            var task1= _customerRepositoryTbCustomer.PosMeUpdate(oldCustomer);
-            var task2= _customerRepositoryTbCustomer.PosMeUpdate(customer);
-            var update= _repositoryTbParameterSystem.PosMeUpdate(parameter);
+            var task1 = _customerRepositoryTbCustomer.PosMeUpdate(oldCustomer);
+            var task2 = _customerRepositoryTbCustomer.PosMeUpdate(customer);
+            var update = _repositoryTbParameterSystem.PosMeUpdate(parameter);
             Task.WaitAll(task1, task2, update);
-            LoadCustomers();
         }
         catch (Exception ex)
         {
             Debug.WriteLine(ex.StackTrace);
             ShowMensajePopUp(ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
         }
     }
     
@@ -246,12 +257,11 @@ public class InvoicesViewModel : BaseViewModel
         try
         {
             Navigation              = navigation;
-            var valueTop            = await _helper.GetValueParameter("MOBILE_SHOW_TOP_CUSTOMER_IN_SHARE", "10");
+            var valueTop            = await _helper.GetValueParameter("MOBILE_SHOW_TOP_CUSTOMER", "10");
             _loadBatchSize          = int.Parse(valueTop);
             _lastLoadedIndex        = 0;
             _customerOrderShares    = await LoadOrderCustomer();
-            Customers.Clear();
-            LoadCustomers();
+            OnLoadMoreCommand();
         }
         catch (Exception e)
         {

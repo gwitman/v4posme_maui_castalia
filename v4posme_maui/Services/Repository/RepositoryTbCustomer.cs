@@ -46,34 +46,70 @@ public class RepositoryTbCustomer(DataBase dataBase) : RepositoryFacade<Api_AppM
     public Task<List<Api_AppMobileApi_GetDataDownloadCustomerResponse>> PosMeFilterBySearch(string search, int skip, int take)
     {
         search = search.ToLower();
-        return _dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadCustomerResponse>()
-            .Where(response => response.CustomerNumber!.ToLower().Contains(search)
-                               || response.Identification!.ToLower().Contains(search)
-                               || response.FirstName!.ToLower().Contains(search)
-                               || response.LastName!.ToLower().Contains(search))
-            .Skip(skip)
-            .Take(take)
-            .ToListAsync();
+        var query = $"""
+                      SELECT 
+                          tbc.CustomerId,
+                          tbc.CompanyId,
+                          tbc.BranchId,
+                          tbc.EntityId,
+                          tbc.CustomerNumber,
+                          tbc.Identification,
+                          tbc.FirstName,
+                          tbc.LastName,
+                          tbc.Balance,
+                          tbc.CurrencyId,
+                          tbc.CurrencyName,
+                          tbc.CustomerCreditLineId,
+                          tbc.Location,
+                          tbc.Phone,
+                          tbc.Me,
+                          tbc.Modificado,
+                          tbc.Secuencia,
+                          tbc.Remaining,
+                          CASE
+                              WHEN EXISTS (
+                                  SELECT 1
+                                  FROM tb_transaction_master ttm
+                                  WHERE ttm.EntityId = tbc.EntityId
+                                  AND ttm.TransactionId = 19
+                              ) THEN 1
+                              ELSE 0
+                          END AS Facturado
+                      FROM tb_customers tbc
+                      where tbc.Identification like '%{search}%' OR 
+                            tbc.FirstName like '%{search}%' OR
+                            tbc.LastName like '%{search}%' OR
+                            tbc.CustomerNumber like '%{search}%'
+                      ORDER BY tbc.Secuencia
+                      limit {skip}, {take}
+                      """;
+        return _dataBase.Database.QueryAsync<Api_AppMobileApi_GetDataDownloadCustomerResponse>(query);
+
+
     }
 
     public async Task<List<Api_AppMobileApi_GetDataDownloadCustomerResponse>> PosMeFilterByInvoice()
     {
         var query = """
                     select distinct 
-                        tbc.CustomerId, 
-                        tbc.CompanyId, 
-                        BranchId, 
-                        tbc.EntityId, 
-                        CustomerNumber, 
-                        Identification, 
-                        tbc.CustomerCreditLineId, 
-                        FirstName, 
-                        LastName,
-                        tbc.CurrencyName, 
-                        tbc.CurrencyId, 
-                        tdc.Balance, 
-                        Modificado,
-                        tdc.Remaining
+                        tbc.CustomerId,
+                        tbc.CompanyId,
+                        tbc.BranchId,
+                        tbc.EntityId,
+                        tbc.CustomerNumber,
+                        tbc.Identification,
+                        tbc.FirstName,
+                        tbc.LastName,
+                        tbc.Balance,
+                        tbc.CurrencyId,
+                        tbc.CurrencyName,
+                        tbc.CustomerCreditLineId,
+                        tbc.Location,
+                        tbc.Phone,
+                        tbc.Me,
+                        tbc.Modificado,
+                        tbc.Secuencia,
+                        tdc.Balance as Remaining
                     from tb_customers tbc join tb_document_credit tdc on tbc.EntityId = tdc.EntityId
                     """;
         return await _dataBase.Database.QueryAsync<Api_AppMobileApi_GetDataDownloadCustomerResponse>(query);
@@ -113,38 +149,42 @@ public class RepositoryTbCustomer(DataBase dataBase) : RepositoryFacade<Api_AppM
             .ToListAsync();
     }
     
-    public async Task<List<Api_AppMobileApi_GetDataDownloadCustomerResponse>> PosMeCustomerAscLoad(int skip, int take)
+    public Task<List<Api_AppMobileApi_GetDataDownloadCustomerResponse>> PosMeCustomerAscLoad(int skip, int take)
     {
         var query = $"""
-                    select 
-                           tbc.CustomerId,
-                           tbc.CompanyId,
-                           tbc.BranchId,
-                           tbc.EntityId,
-                           tbc.CustomerNumber,
-                           tbc.Identification,
-                           tbc.FirstName,
-                           tbc.LastName,
-                           tbc.Balance,
-                           tbc.CurrencyId,
-                           tbc.CurrencyName,
-                           tbc.CustomerCreditLineId,
-                           tbc.Location,
-                           tbc.Phone,
-                           tbc.Me,
-                           tbc.Modificado,
-                           tbc.Secuencia,
-                           tbc.Remaining,
+                    SELECT 
+                        tbc.CustomerId,
+                        tbc.CompanyId,
+                        tbc.BranchId,
+                        tbc.EntityId,
+                        tbc.CustomerNumber,
+                        tbc.Identification,
+                        tbc.FirstName,
+                        tbc.LastName,
+                        tbc.Balance,
+                        tbc.CurrencyId,
+                        tbc.CurrencyName,
+                        tbc.CustomerCreditLineId,
+                        tbc.Location,
+                        tbc.Phone,
+                        tbc.Me,
+                        tbc.Modificado,
+                        tbc.Secuencia,
+                        tbc.Remaining,
                         CASE
-                            WHEN ttm.EntityId IS NOT NULL THEN 1
+                            WHEN EXISTS (
+                                SELECT 1
+                                FROM tb_transaction_master ttm
+                                WHERE ttm.EntityId = tbc.EntityId
+                                  AND ttm.TransactionId = 19
+                            ) THEN 1
                             ELSE 0
-                            END AS Facturado
-                    from tb_customers tbc
-                    left join tb_transaction_master ttm on tbc.EntityId = ttm.EntityId
-                    order by tbc.Secuencia
+                        END AS Facturado
+                    FROM tb_customers tbc
+                    ORDER BY tbc.Secuencia
                     limit {skip}, {take}
                     """;
-        return await _dataBase.Database.QueryAsync<Api_AppMobileApi_GetDataDownloadCustomerResponse>(query);
+        return _dataBase.Database.QueryAsync<Api_AppMobileApi_GetDataDownloadCustomerResponse>(query);
     }
 
     public Task<List<Api_AppMobileApi_GetDataDownloadCustomerResponse>> PosMeTakeModificados()

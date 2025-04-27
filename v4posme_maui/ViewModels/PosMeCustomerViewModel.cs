@@ -63,11 +63,10 @@ public class PosMeCustomerViewModel : BaseViewModel
         IsBusy = true;
         if (obj is not null)
         {
-            Search = obj.ToString()!;
+            Search = obj.ToString() ?? string.Empty;
         }
-        Customers.Clear();
         _lastLoadedIndex = 0;
-        LoadCustomers();
+        OnLoadMoreCommand();
         IsBusy = false;
     }
 
@@ -92,13 +91,12 @@ public class PosMeCustomerViewModel : BaseViewModel
     {
         try
         {
-            Navigation = navigation;
-            var topParameter = await _helperCore.GetValueParameter("MOBILE_SHOW_TOP_CUSTOMER", "10");
-            _loadBatchSize = int.Parse(topParameter);
-            _lastLoadedIndex = 0;
-            Customers.Clear();
+            Navigation           = navigation;
+            _lastLoadedIndex     = 0;
+            var topParameter     = await _helperCore.GetValueParameter("MOBILE_SHOW_TOP_CUSTOMER", "10");
+            _loadBatchSize       = int.Parse(topParameter);
             _customerOrderShares = await LoadOrderCustomer();
-            LoadCustomers();
+            OnLoadMoreCommand();
         }
         catch (Exception e)
         {
@@ -132,6 +130,10 @@ public class PosMeCustomerViewModel : BaseViewModel
             
             // 2. Obtener todos los clientes
             List<Api_AppMobileApi_GetDataDownloadCustomerResponse> allCustomers;
+            if (_lastLoadedIndex == 0)
+            {
+                Customers.Clear();
+            }
             if (string.IsNullOrWhiteSpace(Search))
             {
                 allCustomers = await _customerRepositoryTbCustomer.PosMeCustomerAscLoad(_lastLoadedIndex, _loadBatchSize);
