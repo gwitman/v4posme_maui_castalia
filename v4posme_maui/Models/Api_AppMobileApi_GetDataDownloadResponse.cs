@@ -60,7 +60,7 @@ public class Api_AppMobileApi_GetDataDownloadCustomerResponse : BindableBase
     [NotMapped] public string? NombreCompleto => $"{FirstName} {LastName}";
     [NotMapped] public int? Secuencia { get; set; }
     [NotMapped] public decimal? Remaining { get; set; }
-    [NotMapped] public bool HasAbono => Balance != Remaining;
+    [NotMapped] public bool HasAbono {get=>GetValue<bool>(); set=>SetValue(value); }
     [NotMapped] public bool Asignado => Me == 1;
     [NotMapped] public bool Facturado { get; set; }
 }

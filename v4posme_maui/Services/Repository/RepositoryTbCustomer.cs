@@ -1,4 +1,5 @@
 ﻿using v4posme_maui.Models;
+using v4posme_maui.Services.SystemNames;
 
 namespace v4posme_maui.Services.Repository;
 
@@ -45,7 +46,8 @@ public class RepositoryTbCustomer(DataBase dataBase) : RepositoryFacade<Api_AppM
 
     public Task<List<Api_AppMobileApi_GetDataDownloadCustomerResponse>> PosMeFilterBySearch(string search, int skip, int take)
     {
-        search = search.ToLower();
+        search          = search.ToLower();
+        var typeInvoice = (int)TypeTransaction.TransactionInvoiceBilling;
         var query = $"""
                       SELECT 
                           tbc.CustomerId,
@@ -71,7 +73,7 @@ public class RepositoryTbCustomer(DataBase dataBase) : RepositoryFacade<Api_AppM
                                   SELECT 1
                                   FROM tb_transaction_master ttm
                                   WHERE ttm.EntityId = tbc.EntityId
-                                  AND ttm.TransactionId = 19
+                                  AND ttm.TransactionId = {typeInvoice}
                               ) THEN 1
                               ELSE 0
                           END AS Facturado
@@ -90,7 +92,8 @@ public class RepositoryTbCustomer(DataBase dataBase) : RepositoryFacade<Api_AppM
 
     public async Task<List<Api_AppMobileApi_GetDataDownloadCustomerResponse>> PosMeFilterByInvoice()
     {
-        var query = """
+        var typeShare = (int)TypeTransaction.TransactionShare;
+        var query = $"""
                     select distinct 
                         tbc.CustomerId,
                         tbc.CompanyId,
@@ -109,7 +112,16 @@ public class RepositoryTbCustomer(DataBase dataBase) : RepositoryFacade<Api_AppM
                         tbc.Me,
                         tbc.Modificado,
                         tbc.Secuencia,
-                        tdc.Balance as Remaining
+                        tdc.Balance as Remaining,
+                        CASE
+                            WHEN EXISTS (
+                                SELECT 1
+                                FROM tb_transaction_master ttm
+                                WHERE ttm.EntityId = tbc.EntityId
+                                AND ttm.TransactionId = {typeShare}
+                            ) THEN 1
+                            ELSE 0
+                        END AS HasAbono
                     from tb_customers tbc join tb_document_credit tdc on tbc.EntityId = tdc.EntityId
                     """;
         return await _dataBase.Database.QueryAsync<Api_AppMobileApi_GetDataDownloadCustomerResponse>(query);
@@ -124,6 +136,7 @@ public class RepositoryTbCustomer(DataBase dataBase) : RepositoryFacade<Api_AppM
 
     public Task<List<Api_AppMobileApi_GetDataDownloadCustomerResponse>> PosMeFilterByCustomerInvoice(string search)
     {
+        var typeShare = (int)TypeTransaction.TransactionShare;
         var query = $"""
                      select distinct 
                          tbc.CustomerId,
@@ -143,7 +156,16 @@ public class RepositoryTbCustomer(DataBase dataBase) : RepositoryFacade<Api_AppM
                          tbc.Me,
                          tbc.Modificado,
                          tbc.Secuencia,
-                         tdc.Balance as Remaining
+                         tdc.Balance as Remaining,
+                         CASE
+                             WHEN EXISTS (
+                                 SELECT 1
+                                 FROM tb_transaction_master ttm
+                                 WHERE ttm.EntityId = tbc.EntityId
+                                 AND ttm.TransactionId = {typeShare}
+                             ) THEN 1
+                             ELSE 0
+                         END AS HasAbono
                      from tb_customers tbc join tb_document_credit tdc on tbc.EntityId = tdc.EntityId
                      where tbc.CustomerNumber like '%{search}%' or tbc.FirstName like '%{search}%' or tbc.identification like '%{search}%'
                      """;
@@ -168,6 +190,7 @@ public class RepositoryTbCustomer(DataBase dataBase) : RepositoryFacade<Api_AppM
     
     public Task<List<Api_AppMobileApi_GetDataDownloadCustomerResponse>> PosMeCustomerAscLoad(int skip, int take)
     {
+        var typeInvoice = (int)TypeTransaction.TransactionInvoiceBilling;
         var query = $"""
                     SELECT 
                         tbc.CustomerId,
@@ -193,7 +216,7 @@ public class RepositoryTbCustomer(DataBase dataBase) : RepositoryFacade<Api_AppM
                                 SELECT 1
                                 FROM tb_transaction_master ttm
                                 WHERE ttm.EntityId = tbc.EntityId
-                                  AND ttm.TransactionId = 19
+                                  AND ttm.TransactionId = {typeInvoice}
                             ) THEN 1
                             ELSE 0
                         END AS Facturado
