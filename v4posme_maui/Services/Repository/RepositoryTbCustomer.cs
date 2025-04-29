@@ -113,6 +113,12 @@ public class RepositoryTbCustomer(DataBase dataBase) : RepositoryFacade<Api_AppM
                         tbc.Modificado,
                         tbc.Secuencia,
                         tdc.Balance as Remaining,
+                        (
+                            SELECT MIN(tdc.DateApply)
+                            FROM document_credit_amortization tdc
+                            WHERE tdc.CustomerNumber = tbc.CustomerNumber
+                              AND tdc.Remaining > 0
+                        ) AS FirstBalanceDate,
                         CASE
                             WHEN EXISTS (
                                 SELECT 1
@@ -123,6 +129,7 @@ public class RepositoryTbCustomer(DataBase dataBase) : RepositoryFacade<Api_AppM
                             ELSE 0
                         END AS HasAbono
                     from tb_customers tbc join tb_document_credit tdc on tbc.EntityId = tdc.EntityId
+                    order by FirstBalanceDate
                     """;
         return await _dataBase.Database.QueryAsync<Api_AppMobileApi_GetDataDownloadCustomerResponse>(query);
     }
@@ -157,6 +164,12 @@ public class RepositoryTbCustomer(DataBase dataBase) : RepositoryFacade<Api_AppM
                          tbc.Modificado,
                          tbc.Secuencia,
                          tdc.Balance as Remaining,
+                         (
+                             SELECT MIN(tdc.DateApply)
+                             FROM document_credit_amortization tdc
+                             WHERE tdc.CustomerNumber = tbc.CustomerNumber
+                               AND tdc.Remaining > 0
+                         ) AS FirstBalanceDate,
                          CASE
                              WHEN EXISTS (
                                  SELECT 1
@@ -168,6 +181,7 @@ public class RepositoryTbCustomer(DataBase dataBase) : RepositoryFacade<Api_AppM
                          END AS HasAbono
                      from tb_customers tbc join tb_document_credit tdc on tbc.EntityId = tdc.EntityId
                      where tbc.CustomerNumber like '%{search}%' or tbc.FirstName like '%{search}%' or tbc.identification like '%{search}%'
+                     order by FirstBalanceDate
                      """;
         return _dataBase.Database.QueryAsync<Api_AppMobileApi_GetDataDownloadCustomerResponse>(query);
     }

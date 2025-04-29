@@ -156,7 +156,7 @@ public class AbonosViewModel : BaseViewModel
             }
 
             //7. Combinar y reordenar
-            var finalList = _helperCore.ReordenarLista(remainingCustomers, clientesOrdenados);
+            var finalList = _helperCore.ReordenarLista(remainingCustomers, clientesOrdenados, true);
 
             //8. Agregar a la lista principal
             Customers = new DXObservableCollection<Api_AppMobileApi_GetDataDownloadCustomerResponse>(finalList);

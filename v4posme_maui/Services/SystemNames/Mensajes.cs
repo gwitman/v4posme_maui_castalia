@@ -61,4 +61,5 @@ public static class Mensajes
 	public const string ArchivoNoExiste = "El archivo no existe o no fue posible crearlo";
 	public const string AnularFacturaCorrectamente = "Factura anulada correctamente";
 	public const string AnularAbonoCorrectamente = "Abono anulado correctamente";
+	public const string UsuarioNoPermitido = "No se permite el usuario en la aplicación ya que hay datos por subir. Envie los datos antes de cambiar de usuario";
 }

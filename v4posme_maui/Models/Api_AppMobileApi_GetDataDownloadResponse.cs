@@ -63,6 +63,7 @@ public class Api_AppMobileApi_GetDataDownloadCustomerResponse : BindableBase
     [NotMapped] public bool HasAbono {get=>GetValue<bool>(); set=>SetValue(value); }
     [NotMapped] public bool Asignado => Me == 1;
     [NotMapped] public bool Facturado { get; set; }
+    [NotMapped] public DateTime FirstBalanceDate { get=>GetValue<DateTime>(); set=>SetValue(value); }
 }
 
 [SQLite.Table("tb_company")]

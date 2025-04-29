@@ -1,4 +1,5 @@
-﻿using v4posme_maui.Models;
+﻿using DevExpress.Utils.Filtering;
+using v4posme_maui.Models;
 using v4posme_maui.Services.Repository;
 using v4posme_maui.Services.SystemNames;
 
@@ -8,6 +9,21 @@ public class HelperCore(
         IRepositoryTbParameterSystem repositoryParameters, IRepositoryParameters _repositoryParametersWeb
 )
 {
+    public string ExtractCompanyKey(string companyUrl)
+    {
+        if (Uri.TryCreate(companyUrl, UriKind.Absolute, out var uri))
+        {
+            var segments = uri.Segments;
+            if (segments.Length >= 3)
+            {
+                // El tercer segmento es la compañía (en el ejemplo: /demo/)
+                return segments[2].Trim('/');
+            }
+        }
+        // Si no es URL, puede ser que ya sea simplemente el nombre de la compañía
+        return companyUrl.Trim('/');
+    }
+    
     public async Task<int> GetCounter()
     {
         var find = await repositoryParameters.PosMeFindCounter();
@@ -229,10 +245,10 @@ public class HelperCore(
         return character;
     }
 
-    public List<Api_AppMobileApi_GetDataDownloadCustomerResponse> ReordenarLista(List<Api_AppMobileApi_GetDataDownloadCustomerResponse> listaBase, List<Api_AppMobileApi_GetDataDownloadCustomerResponse> cambios)
+    public List<Api_AppMobileApi_GetDataDownloadCustomerResponse> ReordenarLista(List<Api_AppMobileApi_GetDataDownloadCustomerResponse> listaBase, List<Api_AppMobileApi_GetDataDownloadCustomerResponse> listSecundaria, bool porFecha = false)
     {
         // Paso 1: Aplicar los cambios de secuencia
-        foreach (var cambio in cambios)
+        foreach (var cambio in listSecundaria)
         {
             var cliente = listaBase.FirstOrDefault(c => c.EntityId == cambio.EntityId);
             if (cliente != null)
@@ -242,10 +258,23 @@ public class HelperCore(
         }
 
         // Paso 2: Ordenar por secuencia y luego por EntityId para desempate
-        var listaOrdenada = listaBase
-            .OrderBy(c => c.Secuencia)
-            .ThenBy(c => c.EntityId)
-            .ToList();
+        List<Api_AppMobileApi_GetDataDownloadCustomerResponse> listaOrdenada;
+        if (porFecha)
+        {
+            listaOrdenada = listaBase
+                .OrderBy(c => c.FirstBalanceDate)
+                .ThenBy(c => c.Secuencia)
+                .ThenBy(c => c.EntityId)
+                .ToList();
+        }
+        else
+        {
+            listaOrdenada = listaBase
+                .OrderBy(c => c.Secuencia)
+                .ThenBy(c => c.EntityId)
+                .ToList(); 
+        }
+        
 
         // Paso 3: Reasignar secuencias para que sean consecutivas
         var nuevaSecuencia = 1;

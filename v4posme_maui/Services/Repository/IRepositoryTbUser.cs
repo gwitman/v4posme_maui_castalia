@@ -9,8 +9,9 @@ public interface IRepositoryTbUser : IRepositoryFacade<Api_CoreAccount_LoginMobi
 
     Task<Api_CoreAccount_LoginMobileObjUserResponse?> PosmeFindUserRemember();
 
-    Task<Api_CoreAccount_LoginMobileObjUserResponse?> PosMeFindUserByNicknameAndPassword(string nickname,
-        string password);
+    Task<Api_CoreAccount_LoginMobileObjUserResponse?> PosMeFindUserByNicknameAndPassword(string nickname, string password);
 
     Task<int> PosMeRowCount();
+
+    Task<bool> PosMeValidateUser(Api_CoreAccount_LoginMobileObjUserResponse user1, Api_CoreAccount_LoginMobileObjUserResponse user2);
 }

@@ -44,6 +44,63 @@ namespace v4posme_maui.ViewModels
 			var version = Assembly.GetExecutingAssembly().GetName().Version ?? new Version(0, 0);
 			VersionApp = $"Version {version.Major}.{version.Minor}.{version.Build}";
 		}
+		
+		public Command LoginCommand { get; }
+		private Command MensajeCommand { get; }
+
+
+		public bool PopupShow
+		{
+			get => _popupShow;
+			set => SetProperty(ref _popupShow, value);
+		}
+
+		public string? UserName
+		{
+			get => _userName;
+			set => SetProperty(ref this._userName, value);
+		}
+
+		public string? Password
+		{
+			get => _password;
+			set => SetProperty(ref this._password, value);
+		}
+
+		public string? Company
+		{
+			get => _company;
+			set => SetProperty(ref _company, value);
+		}
+
+		public bool Remember
+		{
+			get => _remember;
+			set => SetProperty(ref _remember, value);
+		}
+
+		public bool OpcionPagar
+		{
+			get => _opcionPagar;
+			set => SetProperty(ref this._opcionPagar, value);
+		}
+
+		public Command RealizarPagoCommand { get; }
+
+		private decimal _montoSeleccionado;
+
+		private string _versionApp=string.Empty;
+		public string VersionApp
+		{
+			get=> _versionApp;
+			set=> SetProperty(ref _versionApp, value);
+		}
+
+		public decimal MontoSeleccionado
+		{
+			get => _montoSeleccionado;
+			set => SetProperty(ref _montoSeleccionado, value);
+		}
 
 		private async void OnRealizarPagoCommand(object obj)
 		{
@@ -71,7 +128,7 @@ namespace v4posme_maui.ViewModels
 			if (Remember)
 			{
 				var response = await _restServiceUser.LoginMobile(UserName!, Password!);
-				if (!response)
+				if (response is null)
 				{
 					Mensaje = Mensajes.MensajeCredencialesInvalida;
 					PopupShow = true;
@@ -141,130 +198,81 @@ namespace v4posme_maui.ViewModels
 			await Navigation.PopModalAsync();
 		}
 
-		public Command LoginCommand { get; }
-		private Command MensajeCommand { get; }
-
-
-		public bool PopupShow
-		{
-			get => _popupShow;
-			set => SetProperty(ref _popupShow, value);
-		}
-
-		public string? UserName
-		{
-			get => _userName;
-			set => SetProperty(ref this._userName, value);
-		}
-
-		public string? Password
-		{
-			get => _password;
-			set => SetProperty(ref this._password, value);
-		}
-
-		public string? Company
-		{
-			get => _company;
-			set => SetProperty(ref _company, value);
-		}
-
-		public bool Remember
-		{
-			get => _remember;
-			set => SetProperty(ref _remember, value);
-		}
-
-		public bool OpcionPagar
-		{
-			get => _opcionPagar;
-			set => SetProperty(ref this._opcionPagar, value);
-		}
-
-		public Command RealizarPagoCommand { get; }
-
-		private decimal _montoSeleccionado;
-
-		private string _versionApp=string.Empty;
-		public string VersionApp
-		{
-			get=> _versionApp;
-			set=> SetProperty(ref _versionApp, value);
-		}
-
-		public decimal MontoSeleccionado
-		{
-			get => _montoSeleccionado;
-			set => SetProperty(ref _montoSeleccionado, value);
-		}
-
 
 		private async void OnLoginClicked()
 		{
-			await Navigation!.PushModalAsync(new LoadingPage());
-			VariablesGlobales.CompanyKey = Company!.ToLower();
-			
-			var findUserRemember =
-				await _repositoryTbUser.PosMeFindUserByNicknameAndPassword(UserName!, Password!);
-
-			if (Remember)
+			try
 			{
-				var response = await _restServiceUser.LoginMobile(UserName!, Password!);
-				if (!response)
+				if (string.IsNullOrWhiteSpace(Company))
 				{
-					Mensaje = Mensajes.MensajeCredencialesInvalida;
-					PopupShow = true;
-					await Navigation.PopModalAsync();
 					return;
 				}
-				else
+				
+				await Navigation!.PushModalAsync(new LoadingPage());
+				var counterUser				 = await _repositoryTbUser.PosMeRowCount();
+				VariablesGlobales.CompanyKey = Company.ToLower();
+				
+				if (Remember)
 				{
-					PopupShow = false;
-				}
-
-				await _repositoryTbUser.PosMeOnRemember();
-				if (findUserRemember is not null)
-				{
-					findUserRemember.Remember = true;
-					findUserRemember.Company = Company;
-					await _repositoryTbUser.PosMeUpdate(findUserRemember);
-				}
-				else
-				{
-					VariablesGlobales.User!.Company = Company;
+					VariablesGlobales.User = await _restServiceUser.LoginMobile(UserName!, Password!);
+					if (VariablesGlobales.User is null)
+					{
+						ShowMensajePopUp(Mensajes.MensajeCredencialesInvalida);
+						PopupShow = true;
+						await Navigation.PopModalAsync();
+						return;
+					}
+					VariablesGlobales.User.Company = Company;
 					VariablesGlobales.User.Remember = true;
+					PopupShow = false;
+					if (counterUser > 0)
+					{
+						var findUser = await _repositoryTbUser.PosMeFindFirst();
+						var validate = await _repositoryTbUser.PosMeValidateUser(VariablesGlobales.User, findUser);
+						if (validate)
+						{
+							await Navigation.PopModalAsync();
+							ShowMensajePopUp(Mensajes.UsuarioNoPermitido);
+							PopupShow = true;
+							return;
+						}
+
+						await _repositoryTbUser.PosMeDeleteAll();
+					}
+
 					await _repositoryTbUser.PosMeInsert(VariablesGlobales.User);
 				}
+				else
+				{
+					if (counterUser <= 0)
+					{
+						ShowMensajePopUp(Mensajes.MensajeSinDatosTabla);
+						PopupShow = true;
+						await Navigation.PopModalAsync();
+						return;
+					}
+					var findUserRemember = await _repositoryTbUser.PosMeFindUserByNicknameAndPassword(UserName!, Password!);
+					if (findUserRemember is null)
+					{
+						await Navigation.PopModalAsync();
+						ShowMensajePopUp(Mensajes.MensajeCredencialesInvalida);
+						PopupShow = true;
+						return;
+					}
+
+					VariablesGlobales.User = findUserRemember;
+				}
+
+
+				App.StartGpsService();
+				VariablesGlobales.TbCompany = await _repositoryTbCompany.PosMeFindFirst();
+				Current!.MainPage			= new MainPage();
+				await Navigation.PopModalAsync();
 			}
-			else
+			catch (Exception e)
 			{
-				if (await _repositoryTbUser.PosMeRowCount() <= 0)
-				{
-					Mensaje = Mensajes.MensajeSinDatosTabla;
-					MensajeCommand.Execute(null);
-					PopupShow = true;
-					await Navigation.PopModalAsync();
-					return;
-				}
-
-				if (findUserRemember is null)
-				{
-					Mensaje = Mensajes.MensajeCredencialesInvalida;
-					MensajeCommand.Execute(null);
-					PopupShow = true;
-					await Navigation.PopModalAsync();
-					return;
-				}
-
-				VariablesGlobales.User = findUserRemember;
+				ShowMensajePopUp(e.Message);
 			}
-
-			VariablesGlobales.TbCompany = await _repositoryTbCompany.PosMeFindFirst();
-
-			v4posme_maui.App.StartGpsService();
-
-			Current!.MainPage = new MainPage();
-			await Navigation.PopModalAsync();
 		}
 
 		private void OnMensaje()

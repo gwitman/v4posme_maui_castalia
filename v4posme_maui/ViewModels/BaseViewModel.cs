@@ -24,7 +24,7 @@ namespace v4posme_maui.ViewModels
             await toast.Show(cancellationTokenSource.Token);
         }
 
-        public void ShowMensajePopUp(string mensaje, Color? color=null)
+        protected void ShowMensajePopUp(string mensaje, Color? color=null)
         {
             Mensaje = mensaje;
             PopupBackgroundColor = color ?? Colors.Red;
