@@ -126,6 +126,7 @@ public class InvoicesViewModel : BaseViewModel
 
             if (VariablesGlobales.OrdenarClientes)
             {
+                _helper.ReordenarListaClientesFacturas();
                 if (string.IsNullOrWhiteSpace(Search))
                 {
                     allCustomers = await _customerRepositoryTbCustomer.PosMeCustomerAscLoad(_lastLoadedIndex, _loadBatchSize);
@@ -135,8 +136,8 @@ public class InvoicesViewModel : BaseViewModel
                     allCustomers = await _customerRepositoryTbCustomer.PosMeFilterBySearch(Search, _lastLoadedIndex, _loadBatchSize);
                 }
 
-                finalList       = await _helper.ReordenarLista(allCustomers);
-                Customers.AddRange(finalList);
+                
+                Customers.AddRange(allCustomers);
                 IsBusy          = false;
                 
             }

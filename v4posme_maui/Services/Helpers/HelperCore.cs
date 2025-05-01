@@ -50,7 +50,7 @@ public class HelperCore(
         var codigo = find.Value!;
 
         if (codigo.IndexOf("-", StringComparison.Ordinal) < 0)
-            throw new Exception(Mensajes.MnesajeCountadoDeAbonoMalFormado);
+            throw new System.Exception(Mensajes.MnesajeCountadoDeAbonoMalFormado);
 
         var prefix = find.Value!.Split("-")[0];
         var counter = find.Value!.Split("-")[1];
@@ -70,7 +70,7 @@ public class HelperCore(
 
         if (codigo.IndexOf("-", StringComparison.Ordinal) < 0)
         {
-            throw new Exception(Mensajes.MensajeCountadorDeVisitaMalFormado);
+            throw new System.Exception(Mensajes.MensajeCountadorDeVisitaMalFormado);
         }
 
         var prefix = find.Value!.Split("-")[0];
@@ -117,7 +117,7 @@ public class HelperCore(
         var codigo = find.Value!;
 
         if (codigo.IndexOf("-", StringComparison.Ordinal) < 0)
-            throw new Exception(Mensajes.MnesajeCountadoDeAbonoMalFormado);
+            throw new System.Exception(Mensajes.MnesajeCountadoDeAbonoMalFormado);
 
         var prefix = find.Value!.Split("-")[0];
         var counter = find.Value!.Split("-")[1];
@@ -252,7 +252,7 @@ public class HelperCore(
         return character;
     }
 
-    public async Task <List<Api_AppMobileApi_GetDataDownloadCustomerResponse>> ReordenarLista(List<Api_AppMobileApi_GetDataDownloadCustomerResponse> listaBase)
+    public async void ReordenarListaClientes()
     {
         
         //Escribir la posicion de los customer ordenados por el usuario
@@ -265,7 +265,9 @@ public class HelperCore(
 
         if (customOrder.Count > 0)
         {
-            foreach (var customer in listaBase)
+            //Ordenar los que el usuario ordeno
+            var findAllCustomerP = await _repositoryTbCustomer.PosMeFindAll();
+            foreach (var customer in findAllCustomerP)
             {
                 var cliente = customOrder.FirstOrDefault(c => c.EntityId == customer.EntityId);
                 if (cliente is not null)
@@ -277,72 +279,145 @@ public class HelperCore(
                     customer.Secuencia = -1;
                 }
             }
+
+            //Aun que el usuario lo ahiga ordenado, si no son de el siempre van de ultimo
+            var sequencia = findAllCustomerP.Count + 1;
+            foreach (var customerResponse in findAllCustomerP.Where(customerResponse => customerResponse.Me == 0).OrderBy(k => k.FirstName))
+            {
+                customerResponse.Secuencia = sequencia;
+                sequencia++;
+            }
+
+
+
+            //rellenar las pocicones en 0, o nullas, con su secuenca correcta
+            for (var i = 0; i < findAllCustomerP.Count; i++)
+            {
+                var cliente = findAllCustomerP.Where(p => p.Secuencia == i).FirstOrDefault();
+                if (cliente is null)
+                {
+                    var customerLibre = findAllCustomerP.Where(p => p.Secuencia == -1 && p.Me == 1   ).OrderBy(p => p.FirstName).FirstOrDefault();
+                    if (customerLibre is not null)
+                    {
+                        customerLibre.Secuencia = i;
+                    }
+                }
+            }
+
+            //Resetear los valoes para que inicie en 0 de manera secuencial
+            var index = 0;
+            foreach (var cliente in findAllCustomerP.OrderBy(k => k.Secuencia))
+            {
+                cliente.Secuencia = index;
+                index++;
+            }
+
+            await _repositoryTbCustomer.PosMeUpdateAll(findAllCustomerP);
+            VariablesGlobales.OrdenarClientes = false;
         }
         else
         {
-            foreach (var customer in listaBase.OrderByDescending(k => k.Me ).ThenByDescending(l=> l.FirstName ))
-            {  
-                customer.Secuencia = -1;
-            }
-        }
+            
 
-
-        //Los que no son mios dejarlos de ultimo
-        var sequencia = listaBase.Count + 1;
-        foreach (var customerResponse in listaBase.Where(customerResponse => customerResponse.Me == 0 ).OrderBy(k=> k.FirstName))
-        {
-            customerResponse.Secuencia = sequencia;
-            sequencia++;
-        }
-
-        //rellenar las pocicones en 0, o nullas, con su secuenca correcta
-        for (var i = 0; i < listaBase.Count; i++)
-        {
-            var cliente = listaBase.Where(p => p.Secuencia == i).FirstOrDefault();
-            if (cliente is null)
+            // actualizar el campo sequena de todos los clintes
+            var index               = 0;
+            var findAllCustomerP    = await _repositoryTbCustomer.PosMeFindAll();
+            foreach (var itemCustomer in findAllCustomerP.OrderByDescending(k=>k.Me).ThenByDescending(c => c.FirstName ))
             {
-                var customerLibre = listaBase.Where(p => p.Secuencia == -1).OrderByDescending(k => k.Me).ThenBy(p => p.FirstName).FirstOrDefault();
-                if (customerLibre is not null)
+                itemCustomer.Secuencia = index;
+                index++;
+            }
+
+
+            await _repositoryTbCustomer.PosMeUpdateAll(findAllCustomerP);
+            VariablesGlobales.OrdenarClientes = false;
+           
+        }
+
+
+    }
+
+    public async void ReordenarListaClientesFacturas()
+    {
+
+        //Escribir la posicion de los customer ordenados por el usuario
+        var paramShare = await repositoryParameters.PosMeFindCustomerOrderCustomer();
+        List<CustomerOrderShare> customOrder = [];
+        if (!string.IsNullOrWhiteSpace(paramShare.Value))
+        {
+            customOrder = JsonConvert.DeserializeObject<List<CustomerOrderShare>>(paramShare.Value) ?? [];
+        }
+
+        if (customOrder.Count > 0)
+        {
+            //Ordenar los que el usuario ordeno
+            var findAllCustomerP = await _repositoryTbCustomer.PosMeFindAll();
+            foreach (var customer in findAllCustomerP)
+            {
+                var cliente = customOrder.FirstOrDefault(c => c.EntityId == customer.EntityId);
+                if (cliente is not null)
                 {
-                    customerLibre.Secuencia = i;
+                    customer.Secuencia = cliente.Position;
+                }
+                else
+                {
+                    customer.Secuencia = -1;
                 }
             }
-        }
 
-        //Resetear los valoes para que inicie en 0 de manera secuencial
-        var index = 0;
-        foreach (var cliente in listaBase.OrderBy(k => k.Secuencia))
-        {
-            cliente.Secuencia = index;
-            index++;
-        }
-
-
-        //actualizar el campo sequena de todos los clintes
-        var findAllCustomer = await _repositoryTbCustomer.PosMeFindAll();
-        foreach (var itemCustomer in findAllCustomer)
-        {
-            var customer_ = listaBase.Where(p => p.EntityId == itemCustomer.EntityId).FirstOrDefault();
-            if (customer_ is not null)
+            //Aun que el usuario lo ahiga ordenado, si no son de el siempre van de ultimo
+            var sequencia = findAllCustomerP.Count + 1;
+            foreach (var customerResponse in findAllCustomerP.Where(customerResponse => customerResponse.Me == 0).OrderBy(k => k.FirstName))
             {
-                itemCustomer.Secuencia = customer_.Secuencia;
+                customerResponse.Secuencia = sequencia;
+                sequencia++;
             }
-            else
+
+
+
+            //rellenar las pocicones en 0, o nullas, con su secuenca correcta
+            for (var i = 0; i < findAllCustomerP.Count; i++)
             {
-                itemCustomer.Secuencia = -1;
+                var cliente = findAllCustomerP.Where(p => p.Secuencia == i).FirstOrDefault();
+                if (cliente is null)
+                {
+                    var customerLibre = findAllCustomerP.Where(p => p.Secuencia == -1 && p.Me == 1).OrderBy(p => p.FirstName).FirstOrDefault();
+                    if (customerLibre is not null)
+                    {
+                        customerLibre.Secuencia = i;
+                    }
+                }
             }
+
+            //Resetear los valoes para que inicie en 0 de manera secuencial
+            var index = 0;
+            foreach (var cliente in findAllCustomerP.OrderBy(k => k.Secuencia))
+            {
+                cliente.Secuencia = index;
+                index++;
+            }
+
+            await _repositoryTbCustomer.PosMeUpdateAll(findAllCustomerP);
+            VariablesGlobales.OrdenarClientes = false;
         }
-
-        await _repositoryTbCustomer.PosMeUpdateAll(findAllCustomer);
-        VariablesGlobales.OrdenarClientes = false;
-        var listaOrdenada = listaBase
-            .OrderBy(x => x.Secuencia)
-            .ToList();
-
-        return listaOrdenada;
+        else
+        {
 
 
+            // actualizar el campo sequena de todos los clintes
+            var index = 0;
+            var findAllCustomerP = await _repositoryTbCustomer.PosMeFindAll();
+            foreach (var itemCustomer in findAllCustomerP.OrderByDescending(k => k.Me).ThenByDescending(c => c.FirstName))
+            {
+                itemCustomer.Secuencia = index;
+                index++;
+            }
 
+
+            await _repositoryTbCustomer.PosMeUpdateAll(findAllCustomerP);
+            VariablesGlobales.OrdenarClientes = false;
+
+        }
 
     }
 

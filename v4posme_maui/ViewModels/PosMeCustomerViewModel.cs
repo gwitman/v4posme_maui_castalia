@@ -95,8 +95,7 @@ public class PosMeCustomerViewModel : BaseViewModel
             _lastLoadedIndex     = 0;
             var topParameter     = await _helperCore.GetValueParameter("MOBILE_SHOW_TOP_CUSTOMER", "10");
             _loadBatchSize       = int.Parse(topParameter);
-            _customerOrderShares = await LoadOrderCustomer();
-            OnLoadMoreCommand();
+            
         }
         catch (Exception e)
         {
@@ -137,6 +136,7 @@ public class PosMeCustomerViewModel : BaseViewModel
 
             if (VariablesGlobales.OrdenarClientes)
             {
+                _helperCore.ReordenarListaClientes();
                 if (string.IsNullOrWhiteSpace(Search))
                 {
                     allCustomers = await _customerRepositoryTbCustomer.PosMeCustomerAscLoad(_lastLoadedIndex, _loadBatchSize);
@@ -145,10 +145,7 @@ public class PosMeCustomerViewModel : BaseViewModel
                 {
                     allCustomers = await _customerRepositoryTbCustomer.PosMeFilterBySearch(Search, _lastLoadedIndex, _loadBatchSize);
                 }
-
-
-                var finalList   = await _helperCore.ReordenarLista(allCustomers);
-                Customers.AddRange(finalList);
+                Customers.AddRange(allCustomers);
                 IsBusy          = false;
                 return;
 
