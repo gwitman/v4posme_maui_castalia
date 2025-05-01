@@ -42,59 +42,60 @@ public class RestApiAppMobileApi
 
         try
         {
-            var nickname = VariablesGlobales.User.Nickname!;
-            var password = VariablesGlobales.User.Password!;
-            var nvc = new List<KeyValuePair<string, string>>
+            var nickname    = VariablesGlobales.User.Nickname!;
+            var password    = VariablesGlobales.User.Password!;
+            var nvc         = new List<KeyValuePair<string, string>>
             {
                 new("txtNickname", nickname),
                 new("txtPassword", password)
             };
-            var req = new HttpRequestMessage(HttpMethod.Post, tempUrl)
+            var req     = new HttpRequestMessage(HttpMethod.Post, tempUrl)
             {
                 Content = new FormUrlEncodedContent(nvc)
             };
 
             //validar repuesta
-            var response = await _httpClient.SendAsync(req);
+            var response    = await _httpClient.SendAsync(req);
             if (!response.IsSuccessStatusCode) return false;
 
-            var responseBody = await response.Content.ReadAsStringAsync();
-            var apiResponse = JsonConvert.DeserializeObject<Api_AppMobileApi_GetDataDownloadResponse>(responseBody);
+            var responseBody    = await response.Content.ReadAsStringAsync();
+            var apiResponse     = JsonConvert.DeserializeObject<Api_AppMobileApi_GetDataDownloadResponse>(responseBody);
             if (apiResponse is null || apiResponse.Error) return false;
 
             //eliminar movimientos
-            var customerDeleteAll = _repositoryTbCustomer!.PosMeDeleteAll();
-            var itemsDeleteAll = _repositoryItems!.PosMeDeleteAll();
+            var customerDeleteAll           = _repositoryTbCustomer!.PosMeDeleteAll();
+            var itemsDeleteAll              = _repositoryItems!.PosMeDeleteAll();
             var documentCreditAmortizationDeleteAll = _repositoryDocumentCreditAmortization!.PosMeDeleteAll();
-            var parametersDeleteAll = _repositoryParameters!.PosMeDeleteAll();
-            var documentCreditDeleteAll = _repositoryDocumentCredit!.PosMeDeleteAll();
-            var companyDeleteAll = _repositoryTbCompany.PosMeDeleteAll();
-            var transactionMasterAll =  _repositoryTbTransactionMaster.PosMeDeleteAll();
-            var transactionMasterDetailAll =  _repositoryTbTransactionMasterDetail.PosMeDeleteAll();
+            var parametersDeleteAll         = _repositoryParameters!.PosMeDeleteAll();
+            var documentCreditDeleteAll     = _repositoryDocumentCredit!.PosMeDeleteAll();
+            var companyDeleteAll            = _repositoryTbCompany.PosMeDeleteAll();
+            var transactionMasterAll        =  _repositoryTbTransactionMaster.PosMeDeleteAll();
+            var transactionMasterDetailAll  =  _repositoryTbTransactionMasterDetail.PosMeDeleteAll();
             await Task.WhenAll([
                 customerDeleteAll, itemsDeleteAll, documentCreditAmortizationDeleteAll, parametersDeleteAll,
                 documentCreditDeleteAll, companyDeleteAll, transactionMasterAll,transactionMasterDetailAll
             ]);
 
             //insertar nuevos movimientos
-            var taskCompany = _repositoryTbCompany.PosMeInsert(apiResponse.ObjCompany);
-            var taskCustomer = _repositoryTbCustomer.PosMeInsertAll(apiResponse.ListCustomer, true);
-            var taskItem = _repositoryItems!.PosMeInsertAll(apiResponse.ListItem);
-            var taskDocumentCreditAmortization = _repositoryDocumentCreditAmortization!.PosMeInsertAll(apiResponse.ListDocumentCreditAmortization);
-            var taskParameters = _repositoryParameters!.PosMeInsertAll(apiResponse.ListParameter);
-            var taskDocumentCredit = _repositoryDocumentCredit!.PosMeInsertAll(apiResponse.ListDocumentCredit);
+            var taskCompany                     = _repositoryTbCompany.PosMeInsert(apiResponse.ObjCompany);
+            var taskCustomer                    = _repositoryTbCustomer.PosMeInsertAll(apiResponse.ListCustomer);
+            var taskItem                        = _repositoryItems!.PosMeInsertAll(apiResponse.ListItem);
+            var taskDocumentCreditAmortization  = _repositoryDocumentCreditAmortization!.PosMeInsertAll(apiResponse.ListDocumentCreditAmortization);
+            var taskParameters                  = _repositoryParameters!.PosMeInsertAll(apiResponse.ListParameter);
+            var taskDocumentCredit              = _repositoryDocumentCredit!.PosMeInsertAll(apiResponse.ListDocumentCredit);
             await Task.WhenAll([
                 taskCustomer, taskItem, taskDocumentCreditAmortization, taskParameters,
                 taskDocumentCredit, taskCompany
             ]);
 
             //inicializar contador 
-            var objParameterSystem = await _parameterSystem.PosMeFindByName(Constantes.ParemeterEntityIDAutoIncrement);
-            objParameterSystem.Value = $"-1";
+            var objParameterSystem      = await _parameterSystem.PosMeFindByName(Constantes.ParemeterEntityIDAutoIncrement);
+            objParameterSystem.Value    = $"-1";
             await _parameterSystem.PosMeUpdate(objParameterSystem);
 
             //actualizar compania
-            VariablesGlobales.TbCompany = await _repositoryTbCompany.PosMeFindFirst();
+            VariablesGlobales.TbCompany     = await _repositoryTbCompany.PosMeFindFirst();
+            VariablesGlobales.OrdenarAbonos = true;
 
 
             return true;

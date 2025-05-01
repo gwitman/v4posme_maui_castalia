@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using DevExpress.Utils.Filtering;
+using Newtonsoft.Json;
 using v4posme_maui.Models;
 using v4posme_maui.Services.Repository;
 using v4posme_maui.Services.SystemNames;
@@ -8,7 +9,8 @@ namespace v4posme_maui.Services.Helpers;
 
 public class HelperCore(
     IRepositoryTbParameterSystem repositoryParameters,
-    IRepositoryParameters _repositoryParametersWeb
+    IRepositoryParameters _repositoryParametersWeb,
+    IRepositoryTbCustomer _repositoryTbCustomer
 )
 {
     public string ExtractCompanyKey(string companyUrl)
@@ -280,32 +282,81 @@ public class HelperCore(
         return listaOrdenada;
     }
 
-    public List<Api_AppMobileApi_GetDataDownloadCustomerResponse> ReordenarListaAbono(List<Api_AppMobileApi_GetDataDownloadCustomerResponse> listaBase, bool porFecha = false)
+
+    public async Task<List<Api_AppMobileApi_GetDataDownloadCustomerResponse>> ReordenarListaAbono(List<Api_AppMobileApi_GetDataDownloadCustomerResponse> listaBase)
     {
         List<Api_AppMobileApi_GetDataDownloadCustomerResponse> listaOrdenada;
-        
-        if (porFecha)
+
+        //ordenar.
+        //marcar la posicion de los que lestoca cobrar y tienene posicion asignada
+        var paramShare                          = await repositoryParameters.PosMeFindCustomerOrderShare();
+        List<CustomerOrderShare> customOrder    = [];
+        if (!string.IsNullOrWhiteSpace(paramShare.Value))
         {
-            var secuenciaAbono = listaBase.Count + 1;
-            foreach (var customerResponse in listaBase.Where(customerResponse => customerResponse.FirstBalanceDate.Date > DateTime.Today))
+            customOrder = JsonConvert.DeserializeObject<List<CustomerOrderShare>>(paramShare.Value) ?? [];
+        }
+
+        if (customOrder.Count > 0)
+        {
+            foreach (var customer in listaBase)
             {
-                customerResponse.SecuenciaAbono = secuenciaAbono;
-                secuenciaAbono++;
+                var cliente = customOrder.FirstOrDefault(c => c.EntityId == customer.EntityId);
+                if (cliente is not null)
+                {
+                    customer.SecuenciaAbono = cliente.Position;
+                }
+                else
+                {
+                    customer.SecuenciaAbono = -1;
+                }
             }
-
-            listaOrdenada = listaBase
-                .OrderBy(x => x.FirstBalanceDate)
-                .ThenBy(x => x.SecuenciaAbono)
-                .ToList();
         }
-        else
+
+
+        //dejar de ultimo los que no les toca pago
+        var secuenciaAbono = listaBase.Count + 1;
+        foreach (var customerResponse in listaBase.Where(customerResponse => customerResponse.FirstBalanceDate.Date > DateTime.Today.AddDays(1)))
         {
-            listaOrdenada = listaBase
-                .OrderBy(c => c.SecuenciaAbono)
-                .ThenBy(c => c.FirstBalanceDate)
-                .ToList();
+            customerResponse.SecuenciaAbono = secuenciaAbono;
+            secuenciaAbono++;
         }
 
+
+        //rellenar las pocicones en 0, o nullas, con su secuenca correcta
+        for (var i= 0 ; i < listaBase.Count; i++)
+        {
+            var cliente = listaBase.Where(p => p.SecuenciaAbono == i).FirstOrDefault();
+            if (cliente is null)
+            {
+                var customerLibre = listaBase.Where(p => p.SecuenciaAbono == -1 ).FirstOrDefault();
+                if (customerLibre is not null)
+                {
+                    customerLibre.SecuenciaAbono = i;
+                }
+            }
+        }
+
+        //actualizar el campo sequena de todos los clintes
+        var findAllCustomer = await _repositoryTbCustomer.PosMeFindAll();
+        foreach ( var itemCustomer in findAllCustomer)
+        {
+            var customer_ = listaBase.Where(p => p.EntityId == itemCustomer.EntityId).FirstOrDefault();
+            if(customer_ is not null)
+            {
+                itemCustomer.SecuenciaAbono = customer_.SecuenciaAbono;
+            }
+            else
+            {
+                itemCustomer.SecuenciaAbono = -1;
+            }
+        }
+
+        await _repositoryTbCustomer.PosMeUpdateAll(findAllCustomer);
+        VariablesGlobales.OrdenarAbonos = false;
+        listaOrdenada                   = listaBase
+            .OrderBy(x => x.SecuenciaAbono)
+            .ToList();
+        
         return listaOrdenada;
     }
 }

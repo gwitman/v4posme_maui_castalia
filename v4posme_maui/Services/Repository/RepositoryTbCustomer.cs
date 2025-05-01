@@ -8,31 +8,7 @@ public class RepositoryTbCustomer(DataBase dataBase, IRepositoryTbParameterSyste
 {
     private readonly DataBase _dataBase = dataBase;
 
-    public async Task<int> PosMeInsertAll(List<Api_AppMobileApi_GetDataDownloadCustomerResponse> list, bool secuencia)
-    {
-        var listaOrdenada = list.OrderByDescending(c=>c.Me).ThenBy(c => c.FirstName).ToList();
-        for (var i=0; i < listaOrdenada.Count; i++)
-        {
-            listaOrdenada[i].Secuencia      = i;
-        }
-        if (!secuencia) return await PosMeInsertAll(listaOrdenada);
-        
-        var paramShare = await repositoryParameters.PosMeFindCustomerOrderShare();
-        List<CustomerOrderShare> customOrder = [];
-        if (!string.IsNullOrWhiteSpace(paramShare.Value))
-        {
-            customOrder = JsonConvert.DeserializeObject<List<CustomerOrderShare>>(paramShare.Value) ?? [];
-        }
-
-        foreach (var customer in listaOrdenada)
-        {
-            var cliente = customOrder.FirstOrDefault(c => c.EntityId == customer.EntityId);
-            customer.SecuenciaAbono = cliente?.Position ?? 0;
-        }
-        
-        
-        return await PosMeInsertAll(listaOrdenada);
-    }
+    
 
     public Task<Api_AppMobileApi_GetDataDownloadCustomerResponse> PosMeFindCustomer(string customerNumber)
     {
@@ -355,7 +331,7 @@ public class RepositoryTbCustomer(DataBase dataBase, IRepositoryTbParameterSyste
                         tbc.Modificado,
                         tbc.Secuencia,
                         tbc.SecuenciaAbono
-                    order by FirstBalanceDate
+                    order by SecuenciaAbono,FirstBalanceDate 
                     """;
         return await _dataBase.Database.QueryAsync<Api_AppMobileApi_GetDataDownloadCustomerResponse>(query);
     }
@@ -420,7 +396,7 @@ public class RepositoryTbCustomer(DataBase dataBase, IRepositoryTbParameterSyste
                          tbc.Secuencia,
                          tbc.SecuenciaAbono
                      where tbc.CustomerNumber like '%{search}%' or tbc.FirstName like '%{search}%' or tbc.identification like '%{search}%'
-                     order by FirstBalanceDate
+                     order by SecuenciaAbono,FirstBalanceDate 
                      """;
         return _dataBase.Database.QueryAsync<Api_AppMobileApi_GetDataDownloadCustomerResponse>(query);
     }

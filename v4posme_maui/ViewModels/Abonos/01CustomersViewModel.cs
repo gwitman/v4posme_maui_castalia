@@ -23,22 +23,22 @@ public class AbonosViewModel : BaseViewModel
     public AbonosViewModel()
     {
         Title = "Selección de cliente 1/5";
-        _customerRepositoryTbCustomer = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCustomer>();
-        _repositoryDocumentCredit = VariablesGlobales.UnityContainer.Resolve<IRepositoryDocumentCredit>();
-        _repositoryTbParameterSystem = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbParameterSystem>();
-        _helperCore = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
-        _customers = new();
-        SearchCommand = new Command(OnSearchCommand);
-        OnBarCode = new Command(OnBarCodeShow);
-        ItemTapped = new Command<Api_AppMobileApi_GetDataDownloadCustomerResponse>(OnItemSelected);
+        _customerRepositoryTbCustomer   = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCustomer>();
+        _repositoryDocumentCredit       = VariablesGlobales.UnityContainer.Resolve<IRepositoryDocumentCredit>();
+        _repositoryTbParameterSystem    = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbParameterSystem>();
+        _helperCore                     = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
+        _customers                      = new();
+        SearchCommand                   = new Command(OnSearchCommand);
+        OnBarCode                       = new Command(OnBarCodeShow);
+        ItemTapped                      = new Command<Api_AppMobileApi_GetDataDownloadCustomerResponse>(OnItemSelected);
     }
 
     private async void OnBarCodeShow()
     {
         var barCodePage = new BarCodePage();
         await Navigation!.PushModalAsync(barCodePage);
-        var bar = await barCodePage.WaitForResultAsync();
-        Search = bar!;
+        var bar         = await barCodePage.WaitForResultAsync();
+        Search          = bar!;
         if (string.IsNullOrWhiteSpace(Search)) return;
         OnSearchCommand();
     }
@@ -50,8 +50,8 @@ public class AbonosViewModel : BaseViewModel
             return;
         }
 
-        IsBusy = true;
-        var invoices = await _repositoryDocumentCredit.PosMeFindByEntityId(item.EntityId);
+        IsBusy          = true;
+        var invoices    = await _repositoryDocumentCredit.PosMeFindByEntityId(item.EntityId);
         if (invoices.Count == 0)
         {
             ShowToast(Mensajes.MensajeDocumentCreditCustomerVacio, ToastDuration.Short, 14);
@@ -106,23 +106,40 @@ public class AbonosViewModel : BaseViewModel
     {
         try
         {
-            IsBusy = true;
-            // 1. Obtener todos los clientes
             List<Api_AppMobileApi_GetDataDownloadCustomerResponse> allCustomers;
-            if (string.IsNullOrWhiteSpace(Search))
+            IsBusy                  = true;
+            //if(VariablesGlobales.OrdenarAbonos )
+            if (true)
             {
-                allCustomers = await _customerRepositoryTbCustomer.PosMeFilterByShare();
+                // 1. Obtener todos los clientes                
+                if (string.IsNullOrWhiteSpace(Search))
+                {
+                    allCustomers = await _customerRepositoryTbCustomer.PosMeFilterByShare();
+                }
+                else
+                {
+                    allCustomers = await _customerRepositoryTbCustomer.PosMeFilterByCustomerShare(Search);
+                }
+
+                //2. Ordenar
+                allCustomers = await _helperCore.ReordenarListaAbono(allCustomers);
             }
             else
             {
-                allCustomers = await _customerRepositoryTbCustomer.PosMeFilterByCustomerShare(Search);
+                // 1. Obtener todos los clientes
+                if (string.IsNullOrWhiteSpace(Search))
+                {
+                    allCustomers = await _customerRepositoryTbCustomer.PosMeFilterByShare();
+                }
+                else
+                {
+                    allCustomers = await _customerRepositoryTbCustomer.PosMeFilterByCustomerShare(Search);
+                }
             }
-            
-            //7. Combinar y reordenar
-            var finalList = _helperCore.ReordenarListaAbono(allCustomers, VariablesGlobales.PermitirOrdenarFechaAbono);
+           
 
             //8. Agregar a la lista principal
-            Customers = new DXObservableCollection<Api_AppMobileApi_GetDataDownloadCustomerResponse>(finalList);
+            Customers = new DXObservableCollection<Api_AppMobileApi_GetDataDownloadCustomerResponse>(allCustomers);
         }
         catch (Exception ex)
         {
@@ -158,8 +175,8 @@ public class AbonosViewModel : BaseViewModel
             var newPosition = e.DropItemHandle;
 
             // Obtener la lista actual de posiciones
-            var parameter = await _repositoryTbParameterSystem.PosMeFindCustomerOrderShare();
-            var currentPositions = (!string.IsNullOrWhiteSpace(parameter.Value)
+            var parameter           = await _repositoryTbParameterSystem.PosMeFindCustomerOrderShare();
+            var currentPositions    = (!string.IsNullOrWhiteSpace(parameter.Value)
                 ? JsonConvert.DeserializeObject<List<CustomerOrderShare>>(parameter.Value)
                 : []) ?? [];
             if (currentPositions.Count <= 0)
@@ -198,15 +215,16 @@ public class AbonosViewModel : BaseViewModel
                 // Actualizar el parámetro en la base de datos
                 parameter.Value = JsonConvert.SerializeObject(currentPositions.OrderBy(v => v.Position).ToList());
             }
-            oldCustomer.SecuenciaAbono  = oldPosition;
-            customer.SecuenciaAbono     = newPosition;
-            
+            oldCustomer.SecuenciaAbono      = oldPosition;
+            customer.SecuenciaAbono         = newPosition;
+            VariablesGlobales.OrdenarAbonos = true;
+
             var task1 = _customerRepositoryTbCustomer.PosMeUpdate(oldCustomer);
             var task2 = _customerRepositoryTbCustomer.PosMeUpdate(customer);
             var task3 = _repositoryTbParameterSystem.PosMeUpdate(parameter);
+            
             Task.WaitAll(task1, task2, task3);
             LoadsClientes();
-            VariablesGlobales.PermitirOrdenarFechaAbono = false;
         }
         catch (Exception ex)
         {

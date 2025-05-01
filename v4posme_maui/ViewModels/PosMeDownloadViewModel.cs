@@ -13,10 +13,10 @@ public class PosMeDownloadViewModel : BaseViewModel
 
     public PosMeDownloadViewModel()
     {
-        _helperContador = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
-        _restApiDownload = new RestApiAppMobileApi();
-        DownloadCommand = new Command(OnDownloadClicked, ValidateDownload);
-        PropertyChanged += (_, _) => DownloadCommand.ChangeCanExecute();
+        _helperContador             = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
+        _restApiDownload            = new RestApiAppMobileApi();
+        DownloadCommand             = new Command(OnDownloadClicked, ValidateDownload);
+        PropertyChanged += (_, _)   => DownloadCommand.ChangeCanExecute();
     }
 
     private bool ValidateDownload()
@@ -26,32 +26,32 @@ public class PosMeDownloadViewModel : BaseViewModel
 
     private async void OnDownloadClicked()
     {
-        IsBusy = true;
+        IsBusy      = true;
         var counter = await _helperContador.GetCounter();
         if (counter != 0)
         {
-            Mensaje = Mensajes.MensajeDownloadCantidadTransacciones;
-            PopupBackgroundColor = Colors.Red;
-            PopUpShow = true;
-            IsBusy = !IsBusy;
+            Mensaje                 = Mensajes.MensajeDownloadCantidadTransacciones;
+            PopupBackgroundColor    = Colors.Red;
+            PopUpShow               = true;
+            IsBusy                  = !IsBusy;
             return;
         }
 
         var result = await _restApiDownload.GetDataDownload();
         if (result)
         {
-            PopupBackgroundColor = Colors.Green;
-            Mensaje = Mensajes.MensajeDownloadSuccess;
-            VariablesGlobales.PermitirOrdenarFechaAbono = true;
+            PopupBackgroundColor    = Colors.Green;
+            Mensaje                 = Mensajes.MensajeDownloadSuccess;
+            
         }
         else
         {
-            Mensaje = Mensajes.MensajeDownloadError;
-            PopupBackgroundColor = Colors.Red;
+            Mensaje                 = Mensajes.MensajeDownloadError;
+            PopupBackgroundColor    = Colors.Red;
         }
 
-        PopUpShow = true;
-        IsBusy = false;
+        PopUpShow   = true;
+        IsBusy      = false;
     }
 
     public bool Switch
