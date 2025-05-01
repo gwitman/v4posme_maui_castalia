@@ -315,7 +315,7 @@ public class HelperCore(
 
         //dejar de ultimo los que no les toca pago
         var secuenciaAbono = listaBase.Count + 1;
-        foreach (var customerResponse in listaBase.Where(customerResponse => customerResponse.FirstBalanceDate.Date > DateTime.Today.AddDays(1)))
+        foreach (var customerResponse in listaBase.Where(customerResponse => customerResponse.FirstBalanceDate.Date > DateTime.Today))
         {
             customerResponse.SecuenciaAbono = secuenciaAbono;
             secuenciaAbono++;
@@ -335,6 +335,15 @@ public class HelperCore(
                 }
             }
         }
+
+        //Resetear los valoes para que inicie en 0 de manera secuencial
+        var index = 0;
+        foreach (var cliente in listaBase.OrderBy(k => k.SecuenciaAbono))
+        {
+            cliente.SecuenciaAbono = index;
+            index++;
+        }
+
 
         //actualizar el campo sequena de todos los clintes
         var findAllCustomer = await _repositoryTbCustomer.PosMeFindAll();

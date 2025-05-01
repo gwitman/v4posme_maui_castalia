@@ -108,8 +108,7 @@ public class AbonosViewModel : BaseViewModel
         {
             List<Api_AppMobileApi_GetDataDownloadCustomerResponse> allCustomers;
             IsBusy                  = true;
-            //if(VariablesGlobales.OrdenarAbonos )
-            if (true)
+            if(VariablesGlobales.OrdenarAbonos )
             {
                 // 1. Obtener todos los clientes                
                 if (string.IsNullOrWhiteSpace(Search))
@@ -168,63 +167,63 @@ public class AbonosViewModel : BaseViewModel
                 return;
             }
 
-            var oldCustomer = (Api_AppMobileApi_GetDataDownloadCustomerResponse)e.DropItem;
-            var oldEntityId = oldCustomer.EntityId;
-            var oldPosition = e.ItemHandle;
-            var entityId    = customer.EntityId;
-            var newPosition = e.DropItemHandle;
+            var oldCustomer         = (Api_AppMobileApi_GetDataDownloadCustomerResponse)e.DropItem;
+            var oldCustomerNumber   = oldCustomer.CustomerNumber;
+            var oldEntityId         = oldCustomer.EntityId;
+            var oldPosition         = e.ItemHandle;
+            var newEntityID         = customer.EntityId;
+            var newPosition         = e.DropItemHandle;
+            var newCustomerNumber   = customer.CustomerNumber;
 
-            // Obtener la lista actual de posiciones
+            //Obtener parametro de configuracion
             var parameter           = await _repositoryTbParameterSystem.PosMeFindCustomerOrderShare();
-            var currentPositions    = (!string.IsNullOrWhiteSpace(parameter.Value)
-                ? JsonConvert.DeserializeObject<List<CustomerOrderShare>>(parameter.Value)
-                : []) ?? [];
-            if (currentPositions.Count <= 0)
-            {
-                currentPositions.Add(new CustomerOrderShare
+            var currentPositions    = new List<CustomerOrderShare>();
+            var customerList        = await _customerRepositoryTbCustomer.PosMeFindAll();
+
+            //Obtener la posicion actual
+            var customerItem        = customerList.Where(p => p.EntityId == newEntityID).FirstOrDefault();
+            var positionActual      = customerItem is null ? 0 : customerItem.SecuenciaAbono;
+
+            //Desplazar posiciones de los item que no se tocaron
+            if (positionActual > newPosition)
+            {   
+                foreach (var cus in customerList.Where(p => p.SecuenciaAbono >= newPosition).ToList())
                 {
-                    EntityId = oldEntityId,
-                    Position = oldPosition
-                });
-                currentPositions.Add(new CustomerOrderShare
-                {
-                    EntityId = entityId,
-                    Position = newPosition
-                });
-                // Actualizar el parámetro en la base de datos
-                parameter.Value = JsonConvert.SerializeObject(currentPositions.OrderBy(v => v.Position).ToList());
+                    cus.SecuenciaAbono++;
+                }
             }
             else
             {
-                // Eliminar duplicados y preparar la lista
-                currentPositions.RemoveAll(v => v.EntityId == entityId);
-                currentPositions.RemoveAll(v => v.EntityId == oldEntityId);
-
-                // Agregar la nueva posición
-                currentPositions.Add(new CustomerOrderShare
+                foreach (var cus in customerList.Where(p => p.SecuenciaAbono <= newPosition).ToList())
                 {
-                    EntityId = oldEntityId,
-                    Position = oldPosition
-                });
-                currentPositions.Add(new CustomerOrderShare
-                {
-                    EntityId = entityId,
-                    Position = newPosition
-                });
-
-                // Actualizar el parámetro en la base de datos
-                parameter.Value = JsonConvert.SerializeObject(currentPositions.OrderBy(v => v.Position).ToList());
+                    cus.SecuenciaAbono--;
+                }
             }
-            oldCustomer.SecuenciaAbono      = oldPosition;
-            customer.SecuenciaAbono         = newPosition;
-            VariablesGlobales.OrdenarAbonos = true;
 
-            var task1 = _customerRepositoryTbCustomer.PosMeUpdate(oldCustomer);
-            var task2 = _customerRepositoryTbCustomer.PosMeUpdate(customer);
-            var task3 = _repositoryTbParameterSystem.PosMeUpdate(parameter);
-            
-            Task.WaitAll(task1, task2, task3);
+            //Desplazamiento de posiciones del item que se toco
+            if(customerItem is not null)
+            customerItem.SecuenciaAbono = newPosition;
+
+
+            //Crear el nuevo array con sus posciciones
+            foreach(var cus in customerList.OrderBy(p => p.SecuenciaAbono))
+            {
+                currentPositions.Add(new CustomerOrderShare
+                {
+                    EntityId        = cus.EntityId,
+                    Position        = cus.SecuenciaAbono,
+                    customerNumber  = cus.CustomerNumber is null ? "" : cus.CustomerNumber
+                });
+            }
+
+
+            //Actualizar las posiciones en las tablas
+            parameter.Value                 = JsonConvert.SerializeObject(currentPositions);
+            await _customerRepositoryTbCustomer.PosMeUpdateAll(customerList);
+            await _repositoryTbParameterSystem.PosMeUpdate(parameter);
             LoadsClientes();
+            
+       
         }
         catch (Exception ex)
         {
