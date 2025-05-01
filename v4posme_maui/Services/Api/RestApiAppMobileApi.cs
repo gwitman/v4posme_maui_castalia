@@ -112,14 +112,14 @@ public class RestApiAppMobileApi
     {
         try
         {
-            var nickname = VariablesGlobales.User!.Nickname!;
-            var password = VariablesGlobales.User.Password!;
-            var helper = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
-            var findCustomers = await _repositoryTbCustomer.PosMeTakeModificados();
-            var findItems = await _repositoryItems.PosMeTakeModificado();
-            var findTransactionMaster = await _repositoryTbTransactionMaster.PosMeFindAll();
+            var nickname                    = VariablesGlobales.User!.Nickname!;
+            var password                    = VariablesGlobales.User.Password!;
+            var helper                      = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
+            var findCustomers               = await _repositoryTbCustomer.PosMeTakeModificados();
+            var findItems                   = await _repositoryItems.PosMeTakeModificado();
+            var findTransactionMaster       = await _repositoryTbTransactionMaster.PosMeFindAll();
             var findTransactionMasterDetail = await _repositoryTbTransactionMasterDetail.PosMeFindAll();
-            var data = new Dictionary<string, object>
+            var data                        = new Dictionary<string, object>
             {
                 { "ObjCustomers", findCustomers },
                 { "ObjItems", findItems },
@@ -136,11 +136,11 @@ public class RestApiAppMobileApi
             var content = new FormUrlEncodedContent(nvc);
 
             var tempUrl = Constantes.UrlUpload.Replace("{UrlBase}", VariablesGlobales.CompanyKey);            
-            var req = new HttpRequestMessage(HttpMethod.Post, tempUrl)
+            var req     = new HttpRequestMessage(HttpMethod.Post, tempUrl)
             {
                 Content = content
             };
-            var response = await _httpClient.SendAsync(req);
+            var response    = await _httpClient.SendAsync(req);
             if (!response.IsSuccessStatusCode) return "{'status': 'false'; 'message': 'error'}";
             var responseBody = await response.Content.ReadAsStringAsync();
             return responseBody;
