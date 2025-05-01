@@ -252,34 +252,98 @@ public class HelperCore(
         return character;
     }
 
-    public List<Api_AppMobileApi_GetDataDownloadCustomerResponse> ReordenarLista(
-        List<Api_AppMobileApi_GetDataDownloadCustomerResponse> listaBase,
-        List<Api_AppMobileApi_GetDataDownloadCustomerResponse> listSecundaria)
+    public async Task <List<Api_AppMobileApi_GetDataDownloadCustomerResponse>> ReordenarLista(List<Api_AppMobileApi_GetDataDownloadCustomerResponse> listaBase)
     {
-        // Paso 1: Aplicar los cambios de secuencia
-        foreach (var cambio in listSecundaria)
+        
+        //Escribir la posicion de los customer ordenados por el usuario
+        var paramShare                          = await repositoryParameters.PosMeFindCustomerOrderCustomer();
+        List<CustomerOrderShare> customOrder    = [];
+        if (!string.IsNullOrWhiteSpace(paramShare.Value))
         {
-            var cliente = listaBase.FirstOrDefault(c => c.EntityId == cambio.EntityId);
-            if (cliente != null)
+            customOrder = JsonConvert.DeserializeObject<List<CustomerOrderShare>>(paramShare.Value) ?? [];
+        }
+
+        if (customOrder.Count > 0)
+        {
+            foreach (var customer in listaBase)
             {
-                cliente.Secuencia = cambio.Secuencia;
+                var cliente = customOrder.FirstOrDefault(c => c.EntityId == customer.EntityId);
+                if (cliente is not null)
+                {
+                    customer.Secuencia = cliente.Position;
+                }
+                else
+                {
+                    customer.Secuencia = -1;
+                }
+            }
+        }
+        else
+        {
+            foreach (var customer in listaBase.OrderByDescending(k => k.Me ).ThenByDescending(l=> l.FirstName ))
+            {  
+                customer.Secuencia = -1;
             }
         }
 
-        // Paso 2: Ordenar por secuencia y luego por EntityId para desempate
-        var listaOrdenada = listaBase
-            .OrderBy(c => c.Secuencia)
-            .ThenBy(c => c.EntityId)
-            .ToList();
 
-        // Paso 3: Reasignar secuencias para que sean consecutivas
-        var nuevaSecuencia = 1;
-        foreach (var cliente in listaOrdenada)
+        //Los que no son mios dejarlos de ultimo
+        var sequencia = listaBase.Count + 1;
+        foreach (var customerResponse in listaBase.Where(customerResponse => customerResponse.Me == 0 ).OrderBy(k=> k.FirstName))
         {
-            cliente.Secuencia = nuevaSecuencia++;
+            customerResponse.Secuencia = sequencia;
+            sequencia++;
         }
 
+        //rellenar las pocicones en 0, o nullas, con su secuenca correcta
+        for (var i = 0; i < listaBase.Count; i++)
+        {
+            var cliente = listaBase.Where(p => p.Secuencia == i).FirstOrDefault();
+            if (cliente is null)
+            {
+                var customerLibre = listaBase.Where(p => p.Secuencia == -1).OrderByDescending(k => k.Me).ThenBy(p => p.FirstName).FirstOrDefault();
+                if (customerLibre is not null)
+                {
+                    customerLibre.Secuencia = i;
+                }
+            }
+        }
+
+        //Resetear los valoes para que inicie en 0 de manera secuencial
+        var index = 0;
+        foreach (var cliente in listaBase.OrderBy(k => k.Secuencia))
+        {
+            cliente.Secuencia = index;
+            index++;
+        }
+
+
+        //actualizar el campo sequena de todos los clintes
+        var findAllCustomer = await _repositoryTbCustomer.PosMeFindAll();
+        foreach (var itemCustomer in findAllCustomer)
+        {
+            var customer_ = listaBase.Where(p => p.EntityId == itemCustomer.EntityId).FirstOrDefault();
+            if (customer_ is not null)
+            {
+                itemCustomer.Secuencia = customer_.Secuencia;
+            }
+            else
+            {
+                itemCustomer.Secuencia = -1;
+            }
+        }
+
+        await _repositoryTbCustomer.PosMeUpdateAll(findAllCustomer);
+        VariablesGlobales.OrdenarClientes = false;
+        var listaOrdenada = listaBase
+            .OrderBy(x => x.Secuencia)
+            .ToList();
+
         return listaOrdenada;
+
+
+
+
     }
 
 
