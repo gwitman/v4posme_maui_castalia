@@ -94,8 +94,9 @@ public class RestApiAppMobileApi
             await _parameterSystem.PosMeUpdate(objParameterSystem);
 
             //actualizar compania
-            VariablesGlobales.TbCompany     = await _repositoryTbCompany.PosMeFindFirst();
-            VariablesGlobales.OrdenarAbonos = true;
+            VariablesGlobales.TbCompany         = await _repositoryTbCompany.PosMeFindFirst();
+            VariablesGlobales.OrdenarAbonos     = true;
+            VariablesGlobales.OrdenarClientes   = true;
 
 
             return true;

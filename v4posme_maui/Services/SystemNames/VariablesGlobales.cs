@@ -20,6 +20,7 @@ public static class VariablesGlobales
         DtoInvoice          = new();
         Item                = new();
         OrdenarAbonos       = true;
+        OrdenarClientes     = true;
         CustomerOrderShares = new();
     }
 
@@ -28,4 +29,5 @@ public static class VariablesGlobales
     public static Api_AppMobileApi_GetDataDownloadItemsResponse Item { get; set; }
     public static List<CustomerOrderShare> CustomerOrderShares { get; set; }
     public static bool OrdenarAbonos { get; set; }
+    public static bool OrdenarClientes { get; set; }
 }

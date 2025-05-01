@@ -266,7 +266,7 @@ public class RepositoryTbCustomer(DataBase dataBase, IRepositoryTbParameterSyste
                             ELSE 0
                         END AS Facturado
                     FROM tb_customers tbc
-                    ORDER BY tbc.Secuencia
+                    ORDER BY tbc.Secuencia 
                     limit {skip}, {take}
                     """;
         return _dataBase.Database.QueryAsync<Api_AppMobileApi_GetDataDownloadCustomerResponse>(query);
