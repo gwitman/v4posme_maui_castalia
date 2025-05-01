@@ -117,42 +117,44 @@ public class InvoicesViewModel : BaseViewModel
             
             // 2. Obtener todos los clientes
             List<Api_AppMobileApi_GetDataDownloadCustomerResponse> allCustomers;
+            List<Api_AppMobileApi_GetDataDownloadCustomerResponse> finalList;
+
             if (_lastLoadedIndex == 0)
             {
                 Customers.Clear();
             }
-            if (string.IsNullOrWhiteSpace(Search))
+
+            if (VariablesGlobales.OrdenarClientes)
             {
-                allCustomers = await _customerRepositoryTbCustomer.PosMeCustomerAscLoad(_lastLoadedIndex, _loadBatchSize);
+                if (string.IsNullOrWhiteSpace(Search))
+                {
+                    allCustomers = await _customerRepositoryTbCustomer.PosMeCustomerAscLoad(_lastLoadedIndex, _loadBatchSize);
+                }
+                else
+                {
+                    allCustomers = await _customerRepositoryTbCustomer.PosMeFilterBySearch(Search, _lastLoadedIndex, _loadBatchSize);
+                }
+
+                finalList       = await _helper.ReordenarLista(allCustomers);
+                Customers.AddRange(finalList);
+                IsBusy          = false;
+                
             }
             else
             {
-                allCustomers = await _customerRepositoryTbCustomer.PosMeFilterBySearch(Search,_lastLoadedIndex, _loadBatchSize);
-            }
+                if (string.IsNullOrWhiteSpace(Search))
+                {
+                    allCustomers = await _customerRepositoryTbCustomer.PosMeCustomerAscLoad(_lastLoadedIndex, _loadBatchSize);
+                }
+                else
+                {
+                    allCustomers = await _customerRepositoryTbCustomer.PosMeFilterBySearch(Search, _lastLoadedIndex, _loadBatchSize);
+                }
 
-            // 3. Si no hay orden personalizado, cargar directamente
-            if (customOrder.Count == 0)
-            {
                 Customers.AddRange(allCustomers);
-                IsBusy = false;
-                return;
+                finalList       = allCustomers;
+                IsBusy          = false;
             }
-
-            //5. Inicializar lista de clientes ordenados
-            var clientesOrdenados = new List<Api_AppMobileApi_GetDataDownloadCustomerResponse>();
-
-            //6. Colocar los personalizados
-            foreach (var personalizado in customOrder.OrderBy(c => c.Position))
-            {
-                var cliente = allCustomers.FirstOrDefault(c => c.EntityId == personalizado.EntityId);
-                if (cliente == null) continue;
-                cliente.Secuencia = personalizado.Position;
-                clientesOrdenados.Add(cliente);
-            }
-
-            //7. Combinar y reordenar
-            List<Api_AppMobileApi_GetDataDownloadCustomerResponse> finalList;
-            finalList = clientesOrdenados.Count > 0 ? _helper.ReordenarLista(allCustomers, clientesOrdenados) : allCustomers.OrderBy(c=>c.Secuencia).ToList();
 
             //8. Agregar a la lista principal
             if (_lastLoadedIndex == 0)
@@ -163,7 +165,8 @@ public class InvoicesViewModel : BaseViewModel
             {
                 Customers.AddRange(finalList);
             }
-            
+
+
         }
         catch (Exception ex)
         {

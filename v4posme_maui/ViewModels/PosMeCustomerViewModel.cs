@@ -17,15 +17,15 @@ public class PosMeCustomerViewModel : BaseViewModel
     private readonly IRepositoryTbCustomer _customerRepositoryTbCustomer;
     private readonly IRepositoryTbParameterSystem _repositoryTbParameterSystem;
     private readonly HelperCore _helperCore;
-    private int _loadBatchSize = 10;
     private int _lastLoadedIndex;
-    private List<CustomerOrderShare> _customerOrderShares = new();
-    
+    private List<CustomerOrderShare> _customerOrderShares   = new();
+    private int _loadBatchSize                              = 10;
+
     public PosMeCustomerViewModel()
     {
         _customerRepositoryTbCustomer   = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCustomer>();
         _repositoryTbParameterSystem    = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbParameterSystem>();
-        _helperCore                         = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
+        _helperCore                     = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
         Customers                       = new DXObservableCollection<Api_AppMobileApi_GetDataDownloadCustomerResponse>();
         SearchCommand                   = new Command(OnSearchCommand);
         OnBarCode                       = new Command(OnBarCodeShow);
@@ -74,10 +74,10 @@ public class PosMeCustomerViewModel : BaseViewModel
     {
         try
         {
-            var barCodePage = new BarCodePage();
+            var barCodePage     = new BarCodePage();
             await Navigation!.PushModalAsync(barCodePage);
-            var bar = await barCodePage.WaitForResultAsync();
-            Search = bar!;
+            var bar             = await barCodePage.WaitForResultAsync();
+            Search              = bar!;
             if (string.IsNullOrWhiteSpace(Search)) return;
             OnSearchCommand(Search);
         }
@@ -134,41 +134,42 @@ public class PosMeCustomerViewModel : BaseViewModel
             {
                 Customers.Clear();
             }
-            if (string.IsNullOrWhiteSpace(Search))
+
+            if (VariablesGlobales.OrdenarClientes)
             {
-                allCustomers = await _customerRepositoryTbCustomer.PosMeCustomerAscLoad(_lastLoadedIndex, _loadBatchSize);
+                if (string.IsNullOrWhiteSpace(Search))
+                {
+                    allCustomers = await _customerRepositoryTbCustomer.PosMeCustomerAscLoad(_lastLoadedIndex, _loadBatchSize);
+                }
+                else
+                {
+                    allCustomers = await _customerRepositoryTbCustomer.PosMeFilterBySearch(Search, _lastLoadedIndex, _loadBatchSize);
+                }
+
+
+                var finalList   = await _helperCore.ReordenarLista(allCustomers);
+                Customers.AddRange(finalList);
+                IsBusy          = false;
+                return;
+
             }
             else
             {
-                allCustomers = await _customerRepositoryTbCustomer.PosMeFilterBySearch(Search,_lastLoadedIndex, _loadBatchSize);
-            }
+                if (string.IsNullOrWhiteSpace(Search))
+                {
+                    allCustomers = await _customerRepositoryTbCustomer.PosMeCustomerAscLoad(_lastLoadedIndex, _loadBatchSize);
+                }
+                else
+                {
+                    allCustomers = await _customerRepositoryTbCustomer.PosMeFilterBySearch(Search, _lastLoadedIndex, _loadBatchSize);
+                }
 
-            // 3. Si no hay orden personalizado, cargar directamente
-            if (customOrder.Count == 0)
-            {
                 Customers.AddRange(allCustomers);
                 IsBusy = false;
                 return;
             }
 
-            //5. Inicializar lista de clientes ordenados
-            var clientesOrdenados = new List<Api_AppMobileApi_GetDataDownloadCustomerResponse>();
-
-            //6. Colocar los personalizados
-            foreach (var personalizado in customOrder.OrderBy(c => c.Position))
-            {
-                var cliente = allCustomers.FirstOrDefault(c => c.EntityId == personalizado.EntityId);
-                if (cliente == null) continue;
-                cliente.Secuencia = personalizado.Position;
-                clientesOrdenados.Add(cliente);
-            }
-
-            //7. Combinar y reordenar
-            List<Api_AppMobileApi_GetDataDownloadCustomerResponse> finalList;
-            finalList = clientesOrdenados.Count > 0 ? _helperCore.ReordenarLista(allCustomers, clientesOrdenados) : allCustomers.OrderBy(c=>c.Secuencia).ToList();
-
-            //8. Agregar a la lista principal
-            Customers.AddRange(finalList);
+         
         }
         catch (Exception ex)
         {
@@ -191,60 +192,63 @@ public class PosMeCustomerViewModel : BaseViewModel
                 return;
             }
 
-            var oldCustomer = (Api_AppMobileApi_GetDataDownloadCustomerResponse)e.DropItem;
-            var oldEntityId = oldCustomer.EntityId;
-            var oldPosition = e.ItemHandle;
-            var entityId = customer.EntityId;
-            var newPosition = e.DropItemHandle;
+            var oldCustomer         = (Api_AppMobileApi_GetDataDownloadCustomerResponse)e.DropItem;
+            var oldCustomerNumber   = oldCustomer.CustomerNumber;
+            var oldEntityId         = oldCustomer.EntityId;
+            var oldPosition         = e.ItemHandle;
+            var newEntityID         = customer.EntityId;
+            var newPosition         = e.DropItemHandle;
+            var newCustomerNumber   = customer.CustomerNumber;
 
             // Obtener la lista actual de posiciones
-            var parameter = await _repositoryTbParameterSystem.PosMeFindCustomerOrderCustomer();
-            var currentPositions = (!string.IsNullOrWhiteSpace(parameter.Value)
-                ? JsonConvert.DeserializeObject<List<CustomerOrderShare>>(parameter.Value)
-                : []) ?? [];
-            if (currentPositions.Count <= 0)
+            var parameter           = await _repositoryTbParameterSystem.PosMeFindCustomerOrderCustomer();
+            var currentPositions    = new List<CustomerOrderShare>();
+            var customerList        = await _customerRepositoryTbCustomer.PosMeFindAll();
+
+
+
+            //Obtener la posicion actual
+            var customerItem    = customerList.Where(p => p.EntityId == newEntityID).FirstOrDefault();
+            var positionActual  = customerItem is null ? 0 : customerItem.Secuencia;
+
+            //Desplazar posiciones de los item que no se tocaron
+            if (positionActual > newPosition)
             {
-                currentPositions.Add(new CustomerOrderShare
+                foreach (var cus in customerList.Where(p => p.Secuencia >= newPosition).ToList())
                 {
-                    EntityId = oldEntityId,
-                    Position = oldPosition
-                });
-                currentPositions.Add(new CustomerOrderShare
-                {
-                    EntityId = entityId,
-                    Position = newPosition
-                });
-                // Actualizar el parámetro en la base de datos
-                parameter.Value = JsonConvert.SerializeObject(currentPositions.OrderBy(v => v.Position).ToList());
+                    cus.Secuencia++;
+                }
             }
             else
             {
-                // Eliminar duplicados y preparar la lista
-                currentPositions.RemoveAll(v => v.EntityId == entityId);
-                currentPositions.RemoveAll(v => v.EntityId == oldEntityId);
-
-                // Agregar la nueva posición
-                currentPositions.Add(new CustomerOrderShare
+                foreach (var cus in customerList.Where(p => p.Secuencia <= newPosition).ToList())
                 {
-                    EntityId = oldEntityId,
-                    Position = oldPosition
-                });
-                currentPositions.Add(new CustomerOrderShare
-                {
-                    EntityId = entityId,
-                    Position = newPosition
-                });
-
-                // Actualizar el parámetro en la base de datos
-                parameter.Value = JsonConvert.SerializeObject(currentPositions.OrderBy(v => v.Position).ToList());
+                    cus.Secuencia--;
+                }
             }
 
-            oldCustomer.Secuencia = oldPosition;
-            customer.Secuencia = newPosition;
-            var task1 = _customerRepositoryTbCustomer.PosMeUpdate(oldCustomer);
-            var task2 = _customerRepositoryTbCustomer.PosMeUpdate(customer);
-            var update = _repositoryTbParameterSystem.PosMeUpdate(parameter);
-            Task.WaitAll(task1, task2, update);
+            //Desplazamiento de posiciones del item que se toco
+            if (customerItem is not null)
+            customerItem.Secuencia = newPosition;
+
+
+            //Crear el nuevo array con sus posciciones
+            foreach (var cus in customerList.OrderBy(p => p.Secuencia))
+            {
+                currentPositions.Add(new CustomerOrderShare
+                {
+                    EntityId = cus.EntityId,
+                    Position = cus.Secuencia is null ? 0 : cus?.Secuencia??0,
+                    customerNumber = cus?.CustomerNumber is null ? "" : cus.CustomerNumber
+                });
+            }
+
+
+            //Actualizar las posiciones en las tablas
+            parameter.Value = JsonConvert.SerializeObject(currentPositions);
+            await _customerRepositoryTbCustomer.PosMeUpdateAll(customerList);
+            await _repositoryTbParameterSystem.PosMeUpdate(parameter);
+            
         }
         catch (Exception ex)
         {
