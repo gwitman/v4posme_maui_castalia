@@ -2,9 +2,9 @@
 
 public abstract class RepositoryFacade<T>(DataBase dataBase) : IRepositoryFacade<T> where T : new()
 {
-    public async Task PosMeInsertAll(List<T> list)
+    public Task<int> PosMeInsertAll(List<T> list)
     {
-        await dataBase.Database.InsertAllAsync(list);
+        return dataBase.Database.InsertAllAsync(list);
     }
 
     public Task<int> PosMeInsert(T model)

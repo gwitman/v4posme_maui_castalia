@@ -25,4 +25,5 @@ public static class VariablesGlobales
     public static bool EnableBackButton { get; set; }
     public static Api_AppMobileApi_GetDataDownloadItemsResponse Item { get; set; }
     public static List<CustomerOrderShare> CustomerOrderShares { get; set; }
+    public static bool PermitirOrdenarFechaAbono { get; set; }
 }

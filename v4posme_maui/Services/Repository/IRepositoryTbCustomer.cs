@@ -4,7 +4,7 @@ namespace v4posme_maui.Services.Repository;
 
 public interface IRepositoryTbCustomer : IRepositoryFacade<Api_AppMobileApi_GetDataDownloadCustomerResponse>
 {
-    Task PosMeInsertAll(List<Api_AppMobileApi_GetDataDownloadCustomerResponse> list, bool secuencia);
+    Task<int> PosMeInsertAll(List<Api_AppMobileApi_GetDataDownloadCustomerResponse> list, bool secuencia);
     
     Task<Api_AppMobileApi_GetDataDownloadCustomerResponse> PosMeFindCustomer(string customerNumber);
     
@@ -25,5 +25,9 @@ public interface IRepositoryTbCustomer : IRepositoryFacade<Api_AppMobileApi_GetD
     Task<List<Api_AppMobileApi_GetDataDownloadCustomerResponse>> PosMeCustomerAscLoad(int skip, int take);
     
     Task<List<Api_AppMobileApi_GetDataDownloadCustomerResponse>> PosMeTakeModificados();
+
+    Task<List<Api_AppMobileApi_GetDataDownloadCustomerResponse>> PosMeFilterByShare();
     
+    Task<List<Api_AppMobileApi_GetDataDownloadCustomerResponse>> PosMeFilterByCustomerShare(string search);
+
 }

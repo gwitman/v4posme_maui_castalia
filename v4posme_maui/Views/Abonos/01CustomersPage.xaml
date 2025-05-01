@@ -66,6 +66,7 @@
                                                 <RowDefinition Height="Auto" />
                                                 <RowDefinition Height="Auto" />
                                                 <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
                                             </Grid.RowDefinitions>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="Auto" />
@@ -85,12 +86,8 @@
                                                              Aspect="Fill" />
                                             </Frame>
                                             <Label Grid.Column="1" Grid.Row="0" FontAttributes="Bold"
-                                                   TextColor="White"
+                                                   TextColor="White" Grid.ColumnSpan="2"
                                                    Text="{Binding Identification}" />
-                                            <Label Grid.Column="2" Grid.Row="0"
-                                                   FontAttributes="Bold"
-                                                   TextColor="White"
-                                                   Text="{Binding FirstBalanceDate, StringFormat='{0:yyyy-MM-dd}'}"/>
                                             <HorizontalStackLayout Grid.Column="1" Grid.Row="1">
                                                 <Label Text="{Binding CustomerNumber}"
                                                        TextColor="White"
@@ -123,11 +120,16 @@
                                                 Grid.Column="1"
                                                 Grid.ColumnSpan="2">
                                                 <Label
-                                                    Text="Linea de crédito: "
+                                                    Text="NO-LC: "
                                                     TextColor="White" />
                                                 <Label
                                                     TextColor="White"
                                                     Text="{Binding CustomerCreditLineId}" />
+                                            </HorizontalStackLayout>
+                                            <HorizontalStackLayout Grid.Row="4" Grid.ColumnSpan="2" Grid.Column="1">
+                                                <Label FontAttributes="Bold"
+                                                       TextColor="White"
+                                                       Text="{Binding FirstBalanceDate, StringFormat='{0:yyyy-MM-dd}'}"/>
                                             </HorizontalStackLayout>
                                             <Grid.GestureRecognizers>
                                                 <TapGestureRecognizer

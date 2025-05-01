@@ -1,22 +1,37 @@
-﻿using v4posme_maui.Models;
+﻿using Newtonsoft.Json;
+using v4posme_maui.Models;
 using v4posme_maui.Services.SystemNames;
 
 namespace v4posme_maui.Services.Repository;
 
-public class RepositoryTbCustomer(DataBase dataBase) : RepositoryFacade<Api_AppMobileApi_GetDataDownloadCustomerResponse>(dataBase), IRepositoryTbCustomer
+public class RepositoryTbCustomer(DataBase dataBase, IRepositoryTbParameterSystem repositoryParameters) : RepositoryFacade<Api_AppMobileApi_GetDataDownloadCustomerResponse>(dataBase), IRepositoryTbCustomer
 {
     private readonly DataBase _dataBase = dataBase;
 
-    public Task PosMeInsertAll(List<Api_AppMobileApi_GetDataDownloadCustomerResponse> list, bool secuencia)
+    public async Task<int> PosMeInsertAll(List<Api_AppMobileApi_GetDataDownloadCustomerResponse> list, bool secuencia)
     {
         var listaOrdenada = list.OrderByDescending(c=>c.Me).ThenBy(c => c.FirstName).ToList();
-        if (!secuencia) return PosMeInsertAll(listaOrdenada);
         for (var i=0; i < listaOrdenada.Count; i++)
         {
-            listaOrdenada[i].Secuencia = i;
+            listaOrdenada[i].Secuencia      = i;
+        }
+        if (!secuencia) return await PosMeInsertAll(listaOrdenada);
+        
+        var paramShare = await repositoryParameters.PosMeFindCustomerOrderShare();
+        List<CustomerOrderShare> customOrder = [];
+        if (!string.IsNullOrWhiteSpace(paramShare.Value))
+        {
+            customOrder = JsonConvert.DeserializeObject<List<CustomerOrderShare>>(paramShare.Value) ?? [];
         }
 
-        return PosMeInsertAll(listaOrdenada);
+        foreach (var customer in listaOrdenada)
+        {
+            var cliente = customOrder.FirstOrDefault(c => c.EntityId == customer.EntityId);
+            customer.SecuenciaAbono = cliente?.Position ?? 0;
+        }
+        
+        
+        return await PosMeInsertAll(listaOrdenada);
     }
 
     public Task<Api_AppMobileApi_GetDataDownloadCustomerResponse> PosMeFindCustomer(string customerNumber)
@@ -94,7 +109,43 @@ public class RepositoryTbCustomer(DataBase dataBase) : RepositoryFacade<Api_AppM
     {
         var typeShare = (int)TypeTransaction.TransactionShare;
         var query = $"""
-                    select distinct 
+                    select  
+                        tbc.CustomerId,
+                        tbc.CompanyId,
+                        tbc.BranchId,
+                        tbc.EntityId,
+                        tbc.CustomerNumber,
+                        tbc.Identification,
+                        tbc.FirstName,
+                        tbc.LastName,
+                        SUM(tbc.Balance) as Balance,
+                        tbc.CurrencyId,
+                        tbc.CurrencyName,
+                        tbc.CustomerCreditLineId,
+                        tbc.Location,
+                        tbc.Phone,
+                        tbc.Me,
+                        tbc.Modificado,
+                        tbc.Secuencia,
+                        tbc.SecuenciaAbono,
+                        SUM(tdc.Balance) as Remaining,
+                        (
+                            SELECT MIN(tdc.DateApply)
+                            FROM document_credit_amortization tdc
+                            WHERE tdc.CustomerNumber = tbc.CustomerNumber
+                              AND tdc.Remaining > 0
+                        ) AS FirstBalanceDate,
+                        CASE
+                            WHEN EXISTS (
+                                SELECT 1
+                                FROM tb_transaction_master ttm
+                                WHERE ttm.EntityId = tbc.EntityId
+                                AND ttm.TransactionId = {typeShare}
+                            ) THEN 1
+                            ELSE 0
+                        END AS HasAbono
+                    from tb_customers tbc join tb_document_credit tdc on tbc.EntityId = tdc.EntityId
+                    GROUP BY 
                         tbc.CustomerId,
                         tbc.CompanyId,
                         tbc.BranchId,
@@ -112,23 +163,7 @@ public class RepositoryTbCustomer(DataBase dataBase) : RepositoryFacade<Api_AppM
                         tbc.Me,
                         tbc.Modificado,
                         tbc.Secuencia,
-                        tdc.Balance as Remaining,
-                        (
-                            SELECT MIN(tdc.DateApply)
-                            FROM document_credit_amortization tdc
-                            WHERE tdc.CustomerNumber = tbc.CustomerNumber
-                              AND tdc.Remaining > 0
-                        ) AS FirstBalanceDate,
-                        CASE
-                            WHEN EXISTS (
-                                SELECT 1
-                                FROM tb_transaction_master ttm
-                                WHERE ttm.EntityId = tbc.EntityId
-                                AND ttm.TransactionId = {typeShare}
-                            ) THEN 1
-                            ELSE 0
-                        END AS HasAbono
-                    from tb_customers tbc join tb_document_credit tdc on tbc.EntityId = tdc.EntityId
+                        tbc.SecuenciaAbono
                     order by FirstBalanceDate
                     """;
         return await _dataBase.Database.QueryAsync<Api_AppMobileApi_GetDataDownloadCustomerResponse>(query);
@@ -145,7 +180,43 @@ public class RepositoryTbCustomer(DataBase dataBase) : RepositoryFacade<Api_AppM
     {
         var typeShare = (int)TypeTransaction.TransactionShare;
         var query = $"""
-                     select distinct 
+                     select  
+                         tbc.CustomerId,
+                         tbc.CompanyId,
+                         tbc.BranchId,
+                         tbc.EntityId,
+                         tbc.CustomerNumber,
+                         tbc.Identification,
+                         tbc.FirstName,
+                         tbc.LastName,
+                         SUM(tbc.Balance) as Balance,
+                         tbc.CurrencyId,
+                         tbc.CurrencyName,
+                         tbc.CustomerCreditLineId,
+                         tbc.Location,
+                         tbc.Phone,
+                         tbc.Me,
+                         tbc.Modificado,
+                         tbc.Secuencia,
+                         tbc.SecuenciaAbono,
+                         SUM(tdc.Balance) as Remaining,
+                         (
+                             SELECT MIN(tdc.DateApply)
+                             FROM document_credit_amortization tdc
+                             WHERE tdc.CustomerNumber = tbc.CustomerNumber
+                               AND tdc.Remaining > 0
+                         ) AS FirstBalanceDate,
+                         CASE
+                             WHEN EXISTS (
+                                 SELECT 1
+                                 FROM tb_transaction_master ttm
+                                 WHERE ttm.EntityId = tbc.EntityId
+                                 AND ttm.TransactionId = {typeShare}
+                             ) THEN 1
+                             ELSE 0
+                         END AS HasAbono
+                     from tb_customers tbc join tb_document_credit tdc on tbc.EntityId = tdc.EntityId
+                     GROUP BY 
                          tbc.CustomerId,
                          tbc.CompanyId,
                          tbc.BranchId,
@@ -163,23 +234,7 @@ public class RepositoryTbCustomer(DataBase dataBase) : RepositoryFacade<Api_AppM
                          tbc.Me,
                          tbc.Modificado,
                          tbc.Secuencia,
-                         tdc.Balance as Remaining,
-                         (
-                             SELECT MIN(tdc.DateApply)
-                             FROM document_credit_amortization tdc
-                             WHERE tdc.CustomerNumber = tbc.CustomerNumber
-                               AND tdc.Remaining > 0
-                         ) AS FirstBalanceDate,
-                         CASE
-                             WHEN EXISTS (
-                                 SELECT 1
-                                 FROM tb_transaction_master ttm
-                                 WHERE ttm.EntityId = tbc.EntityId
-                                 AND ttm.TransactionId = {typeShare}
-                             ) THEN 1
-                             ELSE 0
-                         END AS HasAbono
-                     from tb_customers tbc join tb_document_credit tdc on tbc.EntityId = tdc.EntityId
+                         tbc.SecuenciaAbono
                      where tbc.CustomerNumber like '%{search}%' or tbc.FirstName like '%{search}%' or tbc.identification like '%{search}%'
                      order by FirstBalanceDate
                      """;
@@ -241,6 +296,135 @@ public class RepositoryTbCustomer(DataBase dataBase) : RepositoryFacade<Api_AppM
         return _dataBase.Database.QueryAsync<Api_AppMobileApi_GetDataDownloadCustomerResponse>(query);
     }
 
+    public async Task<List<Api_AppMobileApi_GetDataDownloadCustomerResponse>> PosMeFilterByShare()
+    {
+        var typeShare = (int)TypeTransaction.TransactionShare;
+        var query = $"""
+                    select  
+                        tbc.CustomerId,
+                        tbc.CompanyId,
+                        tbc.BranchId,
+                        tbc.EntityId,
+                        tbc.CustomerNumber,
+                        tbc.Identification,
+                        tbc.FirstName,
+                        tbc.LastName,
+                        SUM(tbc.Balance) as Balance,
+                        tbc.CurrencyId,
+                        tbc.CurrencyName,
+                        tbc.CustomerCreditLineId,
+                        tbc.Location,
+                        tbc.Phone,
+                        tbc.Me,
+                        tbc.Modificado,
+                        tbc.Secuencia,
+                        tbc.SecuenciaAbono,
+                        SUM(tdc.Balance) as Remaining,
+                        (
+                            SELECT MIN(tdc.DateApply)
+                            FROM document_credit_amortization tdc
+                            WHERE tdc.CustomerNumber = tbc.CustomerNumber
+                              AND tdc.Remaining > 0
+                        ) AS FirstBalanceDate,
+                        CASE
+                            WHEN EXISTS (
+                                SELECT 1
+                                FROM tb_transaction_master ttm
+                                WHERE ttm.EntityId = tbc.EntityId
+                                AND ttm.TransactionId = {typeShare}
+                            ) THEN 1
+                            ELSE 0
+                        END AS HasAbono
+                    from tb_customers tbc join tb_document_credit tdc on tbc.EntityId = tdc.EntityId
+                    GROUP BY 
+                        tbc.CustomerId,
+                        tbc.CompanyId,
+                        tbc.BranchId,
+                        tbc.EntityId,
+                        tbc.CustomerNumber,
+                        tbc.Identification,
+                        tbc.FirstName,
+                        tbc.LastName,
+                        tbc.Balance,
+                        tbc.CurrencyId,
+                        tbc.CurrencyName,
+                        tbc.CustomerCreditLineId,
+                        tbc.Location,
+                        tbc.Phone,
+                        tbc.Me,
+                        tbc.Modificado,
+                        tbc.Secuencia,
+                        tbc.SecuenciaAbono
+                    order by FirstBalanceDate
+                    """;
+        return await _dataBase.Database.QueryAsync<Api_AppMobileApi_GetDataDownloadCustomerResponse>(query);
+    }
+    
+    public Task<List<Api_AppMobileApi_GetDataDownloadCustomerResponse>> PosMeFilterByCustomerShare(string search)
+    {
+        var typeShare = (int)TypeTransaction.TransactionShare;
+        var query = $"""
+                     select  
+                         tbc.CustomerId,
+                         tbc.CompanyId,
+                         tbc.BranchId,
+                         tbc.EntityId,
+                         tbc.CustomerNumber,
+                         tbc.Identification,
+                         tbc.FirstName,
+                         tbc.LastName,
+                         SUM(tbc.Balance) as Balance,
+                         tbc.CurrencyId,
+                         tbc.CurrencyName,
+                         tbc.CustomerCreditLineId,
+                         tbc.Location,
+                         tbc.Phone,
+                         tbc.Me,
+                         tbc.Modificado,
+                         tbc.Secuencia,
+                         tbc.SecuenciaAbono,
+                         SUM(tdc.Balance) as Remaining,
+                         (
+                             SELECT MIN(tdc.DateApply)
+                             FROM document_credit_amortization tdc
+                             WHERE tdc.CustomerNumber = tbc.CustomerNumber
+                               AND tdc.Remaining > 0
+                         ) AS FirstBalanceDate,
+                         CASE
+                             WHEN EXISTS (
+                                 SELECT 1
+                                 FROM tb_transaction_master ttm
+                                 WHERE ttm.EntityId = tbc.EntityId
+                                 AND ttm.TransactionId = {typeShare}
+                             ) THEN 1
+                             ELSE 0
+                         END AS HasAbono
+                     from tb_customers tbc join tb_document_credit tdc on tbc.EntityId = tdc.EntityId
+                     GROUP BY 
+                         tbc.CustomerId,
+                         tbc.CompanyId,
+                         tbc.BranchId,
+                         tbc.EntityId,
+                         tbc.CustomerNumber,
+                         tbc.Identification,
+                         tbc.FirstName,
+                         tbc.LastName,
+                         tbc.Balance,
+                         tbc.CurrencyId,
+                         tbc.CurrencyName,
+                         tbc.CustomerCreditLineId,
+                         tbc.Location,
+                         tbc.Phone,
+                         tbc.Me,
+                         tbc.Modificado,
+                         tbc.Secuencia,
+                         tbc.SecuenciaAbono
+                     where tbc.CustomerNumber like '%{search}%' or tbc.FirstName like '%{search}%' or tbc.identification like '%{search}%'
+                     order by FirstBalanceDate
+                     """;
+        return _dataBase.Database.QueryAsync<Api_AppMobileApi_GetDataDownloadCustomerResponse>(query);
+    }
+    
     public Task<List<Api_AppMobileApi_GetDataDownloadCustomerResponse>> PosMeTakeModificados()
     {
         return _dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadCustomerResponse>()

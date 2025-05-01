@@ -42,6 +42,7 @@ public class PosMeDownloadViewModel : BaseViewModel
         {
             PopupBackgroundColor = Colors.Green;
             Mensaje = Mensajes.MensajeDownloadSuccess;
+            VariablesGlobales.PermitirOrdenarFechaAbono = true;
         }
         else
         {

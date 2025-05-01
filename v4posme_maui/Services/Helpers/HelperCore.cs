@@ -1,4 +1,5 @@
-﻿using DevExpress.Utils.Filtering;
+﻿using System.Diagnostics;
+using DevExpress.Utils.Filtering;
 using v4posme_maui.Models;
 using v4posme_maui.Services.Repository;
 using v4posme_maui.Services.SystemNames;
@@ -6,7 +7,8 @@ using v4posme_maui.Services.SystemNames;
 namespace v4posme_maui.Services.Helpers;
 
 public class HelperCore(
-        IRepositoryTbParameterSystem repositoryParameters, IRepositoryParameters _repositoryParametersWeb
+    IRepositoryTbParameterSystem repositoryParameters,
+    IRepositoryParameters _repositoryParametersWeb
 )
 {
     public string ExtractCompanyKey(string companyUrl)
@@ -20,17 +22,18 @@ public class HelperCore(
                 return segments[2].Trim('/');
             }
         }
+
         // Si no es URL, puede ser que ya sea simplemente el nombre de la compañía
         return companyUrl.Trim('/');
     }
-    
+
     public async Task<int> GetCounter()
     {
         var find = await repositoryParameters.PosMeFindCounter();
         return Convert.ToInt32(find.Value);
     }
 
-    
+
     public async Task PlusCounter()
     {
         var find = await repositoryParameters.PosMeFindCounter();
@@ -58,42 +61,41 @@ public class HelperCore(
         return codigo;
     }
 
-	public async Task<string> GetCodigoVisita()
-	{
-		var find = await repositoryParameters.PosMeFindCodigoVisita();
-		var codigo = find.Value!;
+    public async Task<string> GetCodigoVisita()
+    {
+        var find = await repositoryParameters.PosMeFindCodigoVisita();
+        var codigo = find.Value!;
 
-		if (codigo.IndexOf("-", StringComparison.Ordinal) < 0)
+        if (codigo.IndexOf("-", StringComparison.Ordinal) < 0)
         {
-			throw new Exception(Mensajes.MensajeCountadorDeVisitaMalFormado);
-		}
+            throw new Exception(Mensajes.MensajeCountadorDeVisitaMalFormado);
+        }
 
-		var prefix = find.Value!.Split("-")[0];
-		var counter = find.Value!.Split("-")[1];
-		var numero = Convert.ToInt32(counter);
-		numero += 1;
-		var nuevoCodigoAbono = prefix + "-" + Convert.ToString(numero).PadLeft(4, '0');
-		find.Value = nuevoCodigoAbono;
-		await repositoryParameters.PosMeUpdate(find);
+        var prefix = find.Value!.Split("-")[0];
+        var counter = find.Value!.Split("-")[1];
+        var numero = Convert.ToInt32(counter);
+        numero += 1;
+        var nuevoCodigoAbono = prefix + "-" + Convert.ToString(numero).PadLeft(4, '0');
+        find.Value = nuevoCodigoAbono;
+        await repositoryParameters.PosMeUpdate(find);
 
-		return codigo;
-	}
+        return codigo;
+    }
 
-	public async Task<int> GetAutoIncrement()
+    public async Task<int> GetAutoIncrement()
     {
         var find = await repositoryParameters.PosMeFindAutoIncrement();
         var codigo = find.Value!;
-        
+
         var numero = Convert.ToInt32(codigo);
         numero -= 1;
         find.Value = numero.ToString();
         await repositoryParameters.PosMeUpdate(find);
         return Convert.ToInt32(codigo);
-
     }
+
     public async Task<string> GetValueParameter(string name, string valueDefault)
     {
-
         var parametro = await _repositoryParametersWeb.PosMeFindByKey(name);
 
         if (parametro is not null)
@@ -168,7 +170,7 @@ public class HelperCore(
         find.Value = $"{value}";
         await repositoryParameters.PosMeUpdate(find);
     }
-    
+
     public async Task<string> FileImage(IScreenshotResult? screenshotResult, string fileName)
     {
         if (screenshotResult is null)
@@ -184,16 +186,18 @@ public class HelperCore(
         {
             return "";
         }
+
         if (File.Exists(filePath))
         {
             File.Delete(filePath);
         }
+
         await File.WriteAllBytesAsync(filePath, memoryStream.ToArray());
         return filePath;
     }
 
 
-    public  string FormatString(string input)
+    public string FormatString(string input)
     {
         // Si la cadena tiene menos de 12 caracteres, rellenar con ceros a la izquierda
         if (input.Length < 12)
@@ -205,11 +209,12 @@ public class HelperCore(
         {
             return input.Substring(input.Length - 12);
         }
+
         // Si la cadena tiene exactamente 12 caracteres, devolverla tal cual
         return input;
     }
 
-    public  string ConcatenatePairs(string input)
+    public string ConcatenatePairs(string input)
     {
         // Verificar que la longitud del input sea 8
         if (input.Length != 12)
@@ -233,7 +238,7 @@ public class HelperCore(
         return result;
     }
 
-    public  char ConvertToHexFormat(string input)
+    public char ConvertToHexFormat(string input)
     {
         // Convertir el valor string a entero
         int decimalValue = int.Parse(input);
@@ -245,7 +250,9 @@ public class HelperCore(
         return character;
     }
 
-    public List<Api_AppMobileApi_GetDataDownloadCustomerResponse> ReordenarLista(List<Api_AppMobileApi_GetDataDownloadCustomerResponse> listaBase, List<Api_AppMobileApi_GetDataDownloadCustomerResponse> listSecundaria, bool porFecha = false)
+    public List<Api_AppMobileApi_GetDataDownloadCustomerResponse> ReordenarLista(
+        List<Api_AppMobileApi_GetDataDownloadCustomerResponse> listaBase,
+        List<Api_AppMobileApi_GetDataDownloadCustomerResponse> listSecundaria)
     {
         // Paso 1: Aplicar los cambios de secuencia
         foreach (var cambio in listSecundaria)
@@ -258,29 +265,45 @@ public class HelperCore(
         }
 
         // Paso 2: Ordenar por secuencia y luego por EntityId para desempate
-        List<Api_AppMobileApi_GetDataDownloadCustomerResponse> listaOrdenada;
-        if (porFecha)
-        {
-            listaOrdenada = listaBase
-                .OrderBy(c => c.FirstBalanceDate)
-                .ThenBy(c => c.Secuencia)
-                .ThenBy(c => c.EntityId)
-                .ToList();
-        }
-        else
-        {
-            listaOrdenada = listaBase
-                .OrderBy(c => c.Secuencia)
-                .ThenBy(c => c.EntityId)
-                .ToList(); 
-        }
-        
+        var listaOrdenada = listaBase
+            .OrderBy(c => c.Secuencia)
+            .ThenBy(c => c.EntityId)
+            .ToList();
 
         // Paso 3: Reasignar secuencias para que sean consecutivas
         var nuevaSecuencia = 1;
         foreach (var cliente in listaOrdenada)
         {
             cliente.Secuencia = nuevaSecuencia++;
+        }
+
+        return listaOrdenada;
+    }
+
+    public List<Api_AppMobileApi_GetDataDownloadCustomerResponse> ReordenarListaAbono(List<Api_AppMobileApi_GetDataDownloadCustomerResponse> listaBase, bool porFecha = false)
+    {
+        List<Api_AppMobileApi_GetDataDownloadCustomerResponse> listaOrdenada;
+        
+        if (porFecha)
+        {
+            var secuenciaAbono = listaBase.Count + 1;
+            foreach (var customerResponse in listaBase.Where(customerResponse => customerResponse.FirstBalanceDate.Date > DateTime.Today))
+            {
+                customerResponse.SecuenciaAbono = secuenciaAbono;
+                secuenciaAbono++;
+            }
+
+            listaOrdenada = listaBase
+                .OrderBy(x => x.FirstBalanceDate)
+                .ThenBy(x => x.SecuenciaAbono)
+                .ToList();
+        }
+        else
+        {
+            listaOrdenada = listaBase
+                .OrderBy(c => c.SecuenciaAbono)
+                .ThenBy(c => c.FirstBalanceDate)
+                .ToList();
         }
 
         return listaOrdenada;

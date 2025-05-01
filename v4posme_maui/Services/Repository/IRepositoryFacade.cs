@@ -2,7 +2,8 @@
 
 public interface IRepositoryFacade<T>
 {
-    Task PosMeInsertAll(List<T> list);
+    Task<int> PosMeInsertAll(List<T> list);
+    
     Task<int> PosMeInsert(T model);
 
     Task PosMeUpdate(T model);

@@ -107,56 +107,19 @@ public class AbonosViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            // 1. Obtener el orden personalizado desde el repositorio
-            var customerOrderJson = await _repositoryTbParameterSystem.PosMeFindCustomerOrderShare();
-            
-            List<CustomerOrderShare> customOrder = [];
-
-            if (!string.IsNullOrWhiteSpace(customerOrderJson.Value))
-            {
-                customOrder = JsonConvert.DeserializeObject<List<CustomerOrderShare>>(customerOrderJson.Value) ?? [];
-            }
-
-            // 2. Obtener todos los clientes
+            // 1. Obtener todos los clientes
             List<Api_AppMobileApi_GetDataDownloadCustomerResponse> allCustomers;
             if (string.IsNullOrWhiteSpace(Search))
             {
-                allCustomers = await _customerRepositoryTbCustomer.PosMeFilterByInvoice();
+                allCustomers = await _customerRepositoryTbCustomer.PosMeFilterByShare();
             }
             else
             {
-                allCustomers = await _customerRepositoryTbCustomer.PosMeFilterByCustomerInvoice(Search);
+                allCustomers = await _customerRepositoryTbCustomer.PosMeFilterByCustomerShare(Search);
             }
-            var remainingCustomers = new List<Api_AppMobileApi_GetDataDownloadCustomerResponse>();
-            for (var i = 0; i < allCustomers.Count; i++)
-            {
-                var c = allCustomers[i];
-                c.Secuencia = i;
-                remainingCustomers.Add(c);
-            }
-
-            // 3. Si no hay orden personalizado, cargar directamente
-            if (customOrder.Count == 0)
-            {
-                Customers  = new DXObservableCollection<Api_AppMobileApi_GetDataDownloadCustomerResponse>(allCustomers);
-                IsBusy     = false;
-                return;
-            }
-
-            //5. Inicializar lista de clientes ordenados
-            var clientesOrdenados = new List<Api_AppMobileApi_GetDataDownloadCustomerResponse>();
-
-            //6. Colocar los personalizados
-            foreach (var personalizado in customOrder.OrderBy(c => c.Position))
-            {
-                var cliente = remainingCustomers.FirstOrDefault(c => c.EntityId == personalizado.EntityId);
-                if (cliente == null) continue;
-                cliente.Secuencia = personalizado.Position;
-                clientesOrdenados.Add(cliente);
-            }
-
+            
             //7. Combinar y reordenar
-            var finalList = _helperCore.ReordenarLista(remainingCustomers, clientesOrdenados, true);
+            var finalList = _helperCore.ReordenarListaAbono(allCustomers, VariablesGlobales.PermitirOrdenarFechaAbono);
 
             //8. Agregar a la lista principal
             Customers = new DXObservableCollection<Api_AppMobileApi_GetDataDownloadCustomerResponse>(finalList);
@@ -188,9 +151,10 @@ public class AbonosViewModel : BaseViewModel
                 return;
             }
 
-            var oldEntityId = ((Api_AppMobileApi_GetDataDownloadCustomerResponse)e.DropItem).EntityId;
+            var oldCustomer = (Api_AppMobileApi_GetDataDownloadCustomerResponse)e.DropItem;
+            var oldEntityId = oldCustomer.EntityId;
             var oldPosition = e.ItemHandle;
-            var entityId = customer.EntityId;
+            var entityId    = customer.EntityId;
             var newPosition = e.DropItemHandle;
 
             // Obtener la lista actual de posiciones
@@ -234,9 +198,15 @@ public class AbonosViewModel : BaseViewModel
                 // Actualizar el parámetro en la base de datos
                 parameter.Value = JsonConvert.SerializeObject(currentPositions.OrderBy(v => v.Position).ToList());
             }
-
-            await _repositoryTbParameterSystem.PosMeUpdate(parameter);
+            oldCustomer.SecuenciaAbono  = oldPosition;
+            customer.SecuenciaAbono     = newPosition;
+            
+            var task1 = _customerRepositoryTbCustomer.PosMeUpdate(oldCustomer);
+            var task2 = _customerRepositoryTbCustomer.PosMeUpdate(customer);
+            var task3 = _repositoryTbParameterSystem.PosMeUpdate(parameter);
+            Task.WaitAll(task1, task2, task3);
             LoadsClientes();
+            VariablesGlobales.PermitirOrdenarFechaAbono = false;
         }
         catch (Exception ex)
         {
