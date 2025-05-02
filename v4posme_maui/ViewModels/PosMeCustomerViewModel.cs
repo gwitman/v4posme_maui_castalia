@@ -55,8 +55,14 @@ public class PosMeCustomerViewModel : BaseViewModel
 
     private void OnLoadMoreCommand()
     {
-        LoadCustomers();
-        _lastLoadedIndex += _loadBatchSize;
+        if (_lastLoadedIndex == 0)
+        {   
+        }
+        else
+        {
+            LoadCustomers();
+        }
+        
     }
 
     private void OnSearchCommand(object? obj)
@@ -158,8 +164,11 @@ public class PosMeCustomerViewModel : BaseViewModel
                 {
                     Customers.AddRange(finalList);
                 }
-                IsBusy      = false;
+
+                _lastLoadedIndex    += _loadBatchSize;
+                IsBusy              = false;
                 
+
 
             }
             else
@@ -184,11 +193,11 @@ public class PosMeCustomerViewModel : BaseViewModel
                     Customers.AddRange(finalList);
                 }
 
-                IsBusy  = false;
+                _lastLoadedIndex    += _loadBatchSize;
+                IsBusy              = false;
                 
             }
 
-            
             
 
 

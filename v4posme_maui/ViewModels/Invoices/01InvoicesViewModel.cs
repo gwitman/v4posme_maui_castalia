@@ -51,8 +51,13 @@ public class InvoicesViewModel : BaseViewModel
 
     private void OnLoadMoreCommand()
     {
-        LoadCustomers();
-        _lastLoadedIndex += _loadBatchSize;
+        if (_lastLoadedIndex == 0)
+        {
+        }
+        else
+        {
+            LoadCustomers();
+        }
     }
 
     private async Task<List<CustomerOrderShare>> LoadOrderCustomer()
@@ -145,7 +150,9 @@ public class InvoicesViewModel : BaseViewModel
                 {
                     Customers.AddRange(finalList);
                 }
-                IsBusy  = false;
+
+                _lastLoadedIndex    += _loadBatchSize;
+                IsBusy              = false;
                 
             }
             else
@@ -169,7 +176,9 @@ public class InvoicesViewModel : BaseViewModel
                 {
                     Customers.AddRange(finalList);
                 }
-                IsBusy      = false;
+
+                _lastLoadedIndex    += _loadBatchSize;
+                IsBusy              = false;
             }
 
 

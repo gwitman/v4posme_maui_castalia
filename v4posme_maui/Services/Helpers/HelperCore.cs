@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using AndroidX.Annotations;
 using DevExpress.Utils.Filtering;
 using Newtonsoft.Json;
 using v4posme_maui.Models;
@@ -260,7 +261,7 @@ public class HelperCore(
         List<CustomerOrderShare> customOrder    = [];
         if (!string.IsNullOrWhiteSpace(paramShare.Value))
         {
-            customOrder = JsonConvert.DeserializeObject<List<CustomerOrderShare>>(paramShare.Value) ?? [];
+            customOrder = (JsonConvert.DeserializeObject<List<CustomerOrderShare>>(paramShare.Value))?.OrderBy(pl => pl.Position ).ToList() ?? [];
         }
 
         if (customOrder.Count > 0)
@@ -291,18 +292,22 @@ public class HelperCore(
 
 
             //rellenar las pocicones en 0, o nullas, con su secuenca correcta
-            for (var i = 0; i < findAllCustomerP.Count; i++)
+            foreach(var customer in findAllCustomerP.Where(p => p.Secuencia == -1).OrderBy(p => p.FirstName))
             {
-                var cliente = findAllCustomerP.Where(p => p.Secuencia == i).FirstOrDefault();
-                if (cliente is null)
+                var indexTemporal   = 0;
+                for (var i = 0; i < findAllCustomerP.Count; i++)
                 {
-                    var customerLibre = findAllCustomerP.Where(p => p.Secuencia == -1   ).OrderBy(p => p.FirstName).FirstOrDefault();
-                    if (customerLibre is not null)
+                    var cliente = findAllCustomerP.Where(p => p.Secuencia == i).FirstOrDefault();
+                    if (cliente is null)
                     {
-                        customerLibre.Secuencia = i;
+                        indexTemporal = i;
+                        break;
                     }
                 }
+                customer.Secuencia  = indexTemporal;
             }
+
+           
 
             //Resetear los valoes para que inicie en 0 de manera secuencial
             var index = 0;
@@ -312,8 +317,7 @@ public class HelperCore(
                 index++;
             }
 
-
-            temporal = findAllCustomerP.OrderBy(P => P.Secuencia).ElementAt(0).CustomerNumber + " " + findAllCustomerP.OrderBy(P => P.Secuencia).ElementAt(0).Secuencia;
+            
             await _repositoryTbCustomer.PosMeUpdateAll(findAllCustomerP);
             VariablesGlobales.OrdenarClientes = false;
         }
@@ -324,7 +328,7 @@ public class HelperCore(
             // actualizar el campo sequena de todos los clintes
             var index               = 0;
             var findAllCustomerP    = await _repositoryTbCustomer.PosMeFindAll();
-            foreach (var itemCustomer in findAllCustomerP.OrderByDescending(k=>k.Me).ThenByDescending(c => c.FirstName ))
+            foreach (var itemCustomer in findAllCustomerP.OrderByDescending(k=>k.Me).ThenBy(c => c.FirstName ))
             {   
                 itemCustomer.Secuencia = index;
                 index++;
@@ -344,11 +348,12 @@ public class HelperCore(
     {
 
         //Escribir la posicion de los customer ordenados por el usuario
-        var paramShare                          = await repositoryParameters.PosMeFindCustomerOrderInvoice();
-        List<CustomerOrderShare> customOrder    = [];
+        var paramShare  = await repositoryParameters.PosMeFindCustomerOrderInvoice();
+        string temporal = "";
+        List<CustomerOrderShare> customOrder = [];
         if (!string.IsNullOrWhiteSpace(paramShare.Value))
         {
-            customOrder = JsonConvert.DeserializeObject<List<CustomerOrderShare>>(paramShare.Value) ?? [];
+            customOrder = (JsonConvert.DeserializeObject<List<CustomerOrderShare>>(paramShare.Value))?.OrderBy(pl => pl.Position).ToList() ?? [];
         }
 
         if (customOrder.Count > 0)
@@ -379,18 +384,22 @@ public class HelperCore(
 
 
             //rellenar las pocicones en 0, o nullas, con su secuenca correcta
-            for (var i = 0; i < findAllCustomerP.Count; i++)
+            foreach (var customer in findAllCustomerP.Where(p => p.Secuencia == -1).OrderBy(p => p.FirstName))
             {
-                var cliente = findAllCustomerP.Where(p => p.Secuencia == i).FirstOrDefault();
-                if (cliente is null)
+                var indexTemporal = 0;
+                for (var i = 0; i < findAllCustomerP.Count; i++)
                 {
-                    var customerLibre = findAllCustomerP.Where(p => p.Secuencia == -1).OrderBy(p => p.FirstName).FirstOrDefault();
-                    if (customerLibre is not null)
+                    var cliente = findAllCustomerP.Where(p => p.Secuencia == i).FirstOrDefault();
+                    if (cliente is null)
                     {
-                        customerLibre.Secuencia = i;
+                        indexTemporal = i;
+                        break;
                     }
                 }
+                customer.Secuencia = indexTemporal;
             }
+
+
 
             //Resetear los valoes para que inicie en 0 de manera secuencial
             var index = 0;
@@ -399,7 +408,6 @@ public class HelperCore(
                 cliente.Secuencia = index;
                 index++;
             }
-
 
 
             await _repositoryTbCustomer.PosMeUpdateAll(findAllCustomerP);
@@ -412,7 +420,7 @@ public class HelperCore(
             // actualizar el campo sequena de todos los clintes
             var index = 0;
             var findAllCustomerP = await _repositoryTbCustomer.PosMeFindAll();
-            foreach (var itemCustomer in findAllCustomerP.OrderByDescending(k => k.Me).ThenByDescending(c => c.FirstName))
+            foreach (var itemCustomer in findAllCustomerP.OrderByDescending(k => k.Me).ThenBy(c => c.FirstName))
             {
                 itemCustomer.Secuencia = index;
                 index++;
