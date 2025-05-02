@@ -13,5 +13,5 @@ public interface IRepositoryTbUser : IRepositoryFacade<Api_CoreAccount_LoginMobi
 
     Task<int> PosMeRowCount();
 
-    Task<bool> PosMeValidateUser(Api_CoreAccount_LoginMobileObjUserResponse user1, Api_CoreAccount_LoginMobileObjUserResponse user2);
+    Task<bool> PosMeUserIsDiferente(Api_CoreAccount_LoginMobileObjUserResponse user1, Api_CoreAccount_LoginMobileObjUserResponse user2);
 }

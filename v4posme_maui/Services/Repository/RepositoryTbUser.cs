@@ -44,14 +44,9 @@ public class RepositoryTbUser(DataBase dataBase, HelperCore helperCore) : Reposi
         return await dataBase.Database.Table<Api_CoreAccount_LoginMobileObjUserResponse>().CountAsync();
     }
 
-    public async Task<bool> PosMeValidateUser(Api_CoreAccount_LoginMobileObjUserResponse user1, Api_CoreAccount_LoginMobileObjUserResponse user2)
+    public async Task<bool> PosMeUserIsDiferente(Api_CoreAccount_LoginMobileObjUserResponse user1, Api_CoreAccount_LoginMobileObjUserResponse user2)
     {
-        var counter = await helperCore.GetCounter();
-        if (counter <= 0)
-        {
-            return false;
-        }
-       
+        
         if (string.IsNullOrEmpty(user1.Nickname) || string.IsNullOrEmpty(user1.Company) ||
             string.IsNullOrEmpty(user2.Nickname) || string.IsNullOrEmpty(user2.Company))
         {

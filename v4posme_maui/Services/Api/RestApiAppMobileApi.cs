@@ -14,23 +14,23 @@ namespace v4posme_maui.Services.Api;
 public class RestApiAppMobileApi
 {
     private readonly HttpClient _httpClient = new();
-    private readonly IRepositoryTbCustomer _repositoryTbCustomer = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCustomer>();
+    private readonly IRepositoryTbCustomer _repositoryTbCustomer                                    = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCustomer>();
 
-    private readonly IRepositoryItems _repositoryItems = VariablesGlobales.UnityContainer.Resolve<IRepositoryItems>();
+    private readonly IRepositoryItems _repositoryItems                                              = VariablesGlobales.UnityContainer.Resolve<IRepositoryItems>();
 
-    private readonly IRepositoryParameters _repositoryParameters = VariablesGlobales.UnityContainer.Resolve<IRepositoryParameters>();
+    private readonly IRepositoryParameters _repositoryParameters                                    = VariablesGlobales.UnityContainer.Resolve<IRepositoryParameters>();
 
-    private readonly IRepositoryDocumentCreditAmortization _repositoryDocumentCreditAmortization = VariablesGlobales.UnityContainer.Resolve<IRepositoryDocumentCreditAmortization>();
+    private readonly IRepositoryDocumentCreditAmortization _repositoryDocumentCreditAmortization    = VariablesGlobales.UnityContainer.Resolve<IRepositoryDocumentCreditAmortization>();
 
-    private readonly IRepositoryDocumentCredit _repositoryDocumentCredit = VariablesGlobales.UnityContainer.Resolve<IRepositoryDocumentCredit>();
+    private readonly IRepositoryDocumentCredit _repositoryDocumentCredit                            = VariablesGlobales.UnityContainer.Resolve<IRepositoryDocumentCredit>();
 
-    private readonly IRepositoryTbCompany _repositoryTbCompany = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCompany>();
+    private readonly IRepositoryTbCompany _repositoryTbCompany                                      = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCompany>();
 
-    private readonly IRepositoryTbTransactionMaster _repositoryTbTransactionMaster = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMaster>();
+    private readonly IRepositoryTbTransactionMaster _repositoryTbTransactionMaster                  = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMaster>();
     
-    private readonly IRepositoryTbTransactionMasterDetail _repositoryTbTransactionMasterDetail = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMasterDetail>();
+    private readonly IRepositoryTbTransactionMasterDetail _repositoryTbTransactionMasterDetail      = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMasterDetail>();
 
-    private readonly IRepositoryTbParameterSystem _parameterSystem = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbParameterSystem>();
+    private readonly IRepositoryTbParameterSystem _parameterSystem                                  = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbParameterSystem>();
     
     public async Task<bool> GetDataDownload()
     {
@@ -140,9 +140,9 @@ public class RestApiAppMobileApi
             {
                 Content = content
             };
-            var response    = await _httpClient.SendAsync(req);
+            var response        = await _httpClient.SendAsync(req);
             if (!response.IsSuccessStatusCode) return "{'status': 'false'; 'message': 'error'}";
-            var responseBody = await response.Content.ReadAsStringAsync();
+            var responseBody    = await response.Content.ReadAsStringAsync();
             return responseBody;
         }
         catch (Exception ex)
