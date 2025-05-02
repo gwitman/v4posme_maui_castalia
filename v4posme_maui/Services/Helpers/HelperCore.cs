@@ -251,11 +251,12 @@ public class HelperCore(
         return character;
     }
 
-    public async void ReordenarListaClientes()
+    public async Task<bool> ReordenarListaClientes()
     {
         
         //Escribir la posicion de los customer ordenados por el usuario
         var paramShare                          = await repositoryParameters.PosMeFindCustomerOrderCustomer();
+        string temporal                         = "";
         List<CustomerOrderShare> customOrder    = [];
         if (!string.IsNullOrWhiteSpace(paramShare.Value))
         {
@@ -282,7 +283,7 @@ public class HelperCore(
             //Aun que el usuario lo ahiga ordenado, si no son de el siempre van de ultimo
             var sequencia = findAllCustomerP.Count + 1;
             foreach (var customerResponse in findAllCustomerP.Where(customerResponse => customerResponse.Me == 0).OrderBy(k => k.FirstName))
-            {
+            {   
                 customerResponse.Secuencia = sequencia;
                 sequencia++;
             }
@@ -295,7 +296,7 @@ public class HelperCore(
                 var cliente = findAllCustomerP.Where(p => p.Secuencia == i).FirstOrDefault();
                 if (cliente is null)
                 {
-                    var customerLibre = findAllCustomerP.Where(p => p.Secuencia == -1 && p.Me == 1   ).OrderBy(p => p.FirstName).FirstOrDefault();
+                    var customerLibre = findAllCustomerP.Where(p => p.Secuencia == -1   ).OrderBy(p => p.FirstName).FirstOrDefault();
                     if (customerLibre is not null)
                     {
                         customerLibre.Secuencia = i;
@@ -311,6 +312,8 @@ public class HelperCore(
                 index++;
             }
 
+
+            temporal = findAllCustomerP.OrderBy(P => P.Secuencia).ElementAt(0).CustomerNumber + " " + findAllCustomerP.OrderBy(P => P.Secuencia).ElementAt(0).Secuencia;
             await _repositoryTbCustomer.PosMeUpdateAll(findAllCustomerP);
             VariablesGlobales.OrdenarClientes = false;
         }
@@ -322,25 +325,26 @@ public class HelperCore(
             var index               = 0;
             var findAllCustomerP    = await _repositoryTbCustomer.PosMeFindAll();
             foreach (var itemCustomer in findAllCustomerP.OrderByDescending(k=>k.Me).ThenByDescending(c => c.FirstName ))
-            {
+            {   
                 itemCustomer.Secuencia = index;
                 index++;
             }
-
 
             await _repositoryTbCustomer.PosMeUpdateAll(findAllCustomerP);
             VariablesGlobales.OrdenarClientes = false;
            
         }
 
+        return true;
+
 
     }
 
-    public async void ReordenarListaClientesFacturas()
+    public async Task<bool> ReordenarListaClientesFacturas()
     {
 
         //Escribir la posicion de los customer ordenados por el usuario
-        var paramShare                          = await repositoryParameters.PosMeFindCustomerOrderCustomer();
+        var paramShare                          = await repositoryParameters.PosMeFindCustomerOrderInvoice();
         List<CustomerOrderShare> customOrder    = [];
         if (!string.IsNullOrWhiteSpace(paramShare.Value))
         {
@@ -380,7 +384,7 @@ public class HelperCore(
                 var cliente = findAllCustomerP.Where(p => p.Secuencia == i).FirstOrDefault();
                 if (cliente is null)
                 {
-                    var customerLibre = findAllCustomerP.Where(p => p.Secuencia == -1 && p.Me == 1).OrderBy(p => p.FirstName).FirstOrDefault();
+                    var customerLibre = findAllCustomerP.Where(p => p.Secuencia == -1).OrderBy(p => p.FirstName).FirstOrDefault();
                     if (customerLibre is not null)
                     {
                         customerLibre.Secuencia = i;
@@ -396,6 +400,8 @@ public class HelperCore(
                 index++;
             }
 
+
+
             await _repositoryTbCustomer.PosMeUpdateAll(findAllCustomerP);
             VariablesGlobales.OrdenarClientes = false;
         }
@@ -404,19 +410,20 @@ public class HelperCore(
 
 
             // actualizar el campo sequena de todos los clintes
-            var index               = 0;
-            var findAllCustomerP    = await _repositoryTbCustomer.PosMeFindAll();
+            var index = 0;
+            var findAllCustomerP = await _repositoryTbCustomer.PosMeFindAll();
             foreach (var itemCustomer in findAllCustomerP.OrderByDescending(k => k.Me).ThenByDescending(c => c.FirstName))
             {
                 itemCustomer.Secuencia = index;
                 index++;
             }
 
-
             await _repositoryTbCustomer.PosMeUpdateAll(findAllCustomerP);
             VariablesGlobales.OrdenarClientes = false;
 
         }
+
+        return true;
 
     }
 

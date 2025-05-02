@@ -20,6 +20,7 @@ public class PosMeCustomerViewModel : BaseViewModel
     private int _lastLoadedIndex;
     private List<CustomerOrderShare> _customerOrderShares   = new();
     private int _loadBatchSize                              = 10;
+    
 
     public PosMeCustomerViewModel()
     {
@@ -95,7 +96,7 @@ public class PosMeCustomerViewModel : BaseViewModel
             _lastLoadedIndex     = 0;
             var topParameter     = await _helperCore.GetValueParameter("MOBILE_SHOW_TOP_CUSTOMER", "10");
             _loadBatchSize       = int.Parse(topParameter);
-            
+            LoadCustomers();
         }
         catch (Exception e)
         {
@@ -121,14 +122,16 @@ public class PosMeCustomerViewModel : BaseViewModel
     
     private async void LoadCustomers()
     {
+        
         try
         {
-            IsBusy = true;
+            IsBusy                          = true;
             // 1. Obtener el orden personalizado desde el repositorio
             var customOrder = _customerOrderShares;
             
             // 2. Obtener todos los clientes
             List<Api_AppMobileApi_GetDataDownloadCustomerResponse> allCustomers;
+            List<Api_AppMobileApi_GetDataDownloadCustomerResponse> finalList;
             if (_lastLoadedIndex == 0)
             {
                 Customers.Clear();
@@ -136,7 +139,7 @@ public class PosMeCustomerViewModel : BaseViewModel
 
             if (VariablesGlobales.OrdenarClientes)
             {
-                _helperCore.ReordenarListaClientes();
+                await _helperCore.ReordenarListaClientes();
                 if (string.IsNullOrWhiteSpace(Search))
                 {
                     allCustomers = await _customerRepositoryTbCustomer.PosMeCustomerAscLoad(_lastLoadedIndex, _loadBatchSize);
@@ -145,9 +148,18 @@ public class PosMeCustomerViewModel : BaseViewModel
                 {
                     allCustomers = await _customerRepositoryTbCustomer.PosMeFilterBySearch(Search, _lastLoadedIndex, _loadBatchSize);
                 }
-                Customers.AddRange(allCustomers);
-                IsBusy          = false;
-                return;
+                
+                finalList   = allCustomers;
+                if (_lastLoadedIndex == 0)
+                {
+                    Customers = new DXObservableCollection<Api_AppMobileApi_GetDataDownloadCustomerResponse>(finalList);
+                }
+                else
+                {
+                    Customers.AddRange(finalList);
+                }
+                IsBusy      = false;
+                
 
             }
             else
@@ -161,12 +173,25 @@ public class PosMeCustomerViewModel : BaseViewModel
                     allCustomers = await _customerRepositoryTbCustomer.PosMeFilterBySearch(Search, _lastLoadedIndex, _loadBatchSize);
                 }
 
-                Customers.AddRange(allCustomers);
-                IsBusy = false;
-                return;
+                
+                finalList = allCustomers;
+                if (_lastLoadedIndex == 0)
+                {
+                    Customers = new DXObservableCollection<Api_AppMobileApi_GetDataDownloadCustomerResponse>(finalList);
+                }
+                else
+                {
+                    Customers.AddRange(finalList);
+                }
+
+                IsBusy  = false;
+                
             }
 
-         
+            
+            
+
+
         }
         catch (Exception ex)
         {

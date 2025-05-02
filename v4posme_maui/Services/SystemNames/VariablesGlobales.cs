@@ -30,4 +30,5 @@ public static class VariablesGlobales
     public static List<CustomerOrderShare> CustomerOrderShares { get; set; }
     public static bool OrdenarAbonos { get; set; }
     public static bool OrdenarClientes { get; set; }
+    
 }

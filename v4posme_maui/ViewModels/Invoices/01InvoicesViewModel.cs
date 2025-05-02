@@ -126,7 +126,7 @@ public class InvoicesViewModel : BaseViewModel
 
             if (VariablesGlobales.OrdenarClientes)
             {
-                _helper.ReordenarListaClientesFacturas();
+                await _helper.ReordenarListaClientesFacturas();
                 if (string.IsNullOrWhiteSpace(Search))
                 {
                     allCustomers = await _customerRepositoryTbCustomer.PosMeCustomerAscLoad(_lastLoadedIndex, _loadBatchSize);
@@ -136,9 +136,16 @@ public class InvoicesViewModel : BaseViewModel
                     allCustomers = await _customerRepositoryTbCustomer.PosMeFilterBySearch(Search, _lastLoadedIndex, _loadBatchSize);
                 }
 
-                
-                Customers.AddRange(allCustomers);
-                IsBusy          = false;
+                finalList   = allCustomers;
+                if (_lastLoadedIndex == 0)
+                {
+                    Customers = new DXObservableCollection<Api_AppMobileApi_GetDataDownloadCustomerResponse>(finalList);
+                }
+                else
+                {
+                    Customers.AddRange(finalList);
+                }
+                IsBusy  = false;
                 
             }
             else
@@ -152,21 +159,21 @@ public class InvoicesViewModel : BaseViewModel
                     allCustomers = await _customerRepositoryTbCustomer.PosMeFilterBySearch(Search, _lastLoadedIndex, _loadBatchSize);
                 }
 
-                Customers.AddRange(allCustomers);
-                finalList       = allCustomers;
-                IsBusy          = false;
+                
+                finalList   = allCustomers;
+                if (_lastLoadedIndex == 0)
+                {
+                    Customers = new DXObservableCollection<Api_AppMobileApi_GetDataDownloadCustomerResponse>(finalList);
+                }
+                else
+                {
+                    Customers.AddRange(finalList);
+                }
+                IsBusy      = false;
             }
 
-            //8. Agregar a la lista principal
-            if (_lastLoadedIndex == 0)
-            {
-                Customers = new DXObservableCollection<Api_AppMobileApi_GetDataDownloadCustomerResponse>(finalList);
-            }
-            else
-            {
-                Customers.AddRange(finalList);
-            }
 
+            
 
         }
         catch (Exception ex)
@@ -267,8 +274,8 @@ public class InvoicesViewModel : BaseViewModel
             var valueTop            = await _helper.GetValueParameter("MOBILE_SHOW_TOP_CUSTOMER", "10");
             _loadBatchSize          = int.Parse(valueTop);
             _lastLoadedIndex        = 0;
-            _customerOrderShares    = await LoadOrderCustomer();
-            OnLoadMoreCommand();
+            LoadCustomers();
+
         }
         catch (Exception e)
         {
