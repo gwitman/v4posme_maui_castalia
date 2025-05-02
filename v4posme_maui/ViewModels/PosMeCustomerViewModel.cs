@@ -30,7 +30,7 @@ public class PosMeCustomerViewModel : BaseViewModel
         Customers                       = new DXObservableCollection<Api_AppMobileApi_GetDataDownloadCustomerResponse>();
         SearchCommand                   = new Command(OnSearchCommand);
         OnBarCode                       = new Command(OnBarCodeShow);
-        LoadMoreCommand                 = new Command(OnLoadMoreCommand);
+        LoadMoreCommand                 = new Command( OnLoadMoreCommand);
     }
 
     public ICommand OnBarCode { get; }
@@ -73,7 +73,7 @@ public class PosMeCustomerViewModel : BaseViewModel
             Search = obj.ToString() ?? string.Empty;
         }
         _lastLoadedIndex = 0;
-        OnLoadMoreCommand();
+        LoadCustomers();
         IsBusy = false;
     }
 
@@ -102,7 +102,7 @@ public class PosMeCustomerViewModel : BaseViewModel
             _lastLoadedIndex     = 0;
             var topParameter     = await _helperCore.GetValueParameter("MOBILE_SHOW_TOP_CUSTOMER", "10");
             _loadBatchSize       = int.Parse(topParameter);
-            LoadCustomers();
+            await LoadCustomers();
         }
         catch (Exception e)
         {
@@ -126,7 +126,7 @@ public class PosMeCustomerViewModel : BaseViewModel
         return customOrder;
     }
     
-    private async void LoadCustomers()
+    private async Task<bool> LoadCustomers()
     {
         
         try
@@ -211,6 +211,8 @@ public class PosMeCustomerViewModel : BaseViewModel
         {
             IsBusy = false;
         }
+
+        return true;
     }
     
     public async void SavePositionCustomer(DropItemEventArgs e)

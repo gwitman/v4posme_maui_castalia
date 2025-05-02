@@ -108,11 +108,11 @@ public class InvoicesViewModel : BaseViewModel
             Search = obj.ToString() ?? string.Empty;
         }
         _lastLoadedIndex = 0;
-        OnLoadMoreCommand();
+        LoadCustomers();
         IsBusy = false;
     }
     
-    private async void LoadCustomers()
+    private async Task<bool> LoadCustomers()
     {
         try
         {
@@ -194,6 +194,9 @@ public class InvoicesViewModel : BaseViewModel
         {
             IsBusy = false;
         }
+
+        return true;
+
     }
     
     public async void SavePositionCustomer(DropItemEventArgs e)
@@ -283,7 +286,7 @@ public class InvoicesViewModel : BaseViewModel
             var valueTop            = await _helper.GetValueParameter("MOBILE_SHOW_TOP_CUSTOMER", "10");
             _loadBatchSize          = int.Parse(valueTop);
             _lastLoadedIndex        = 0;
-            LoadCustomers();
+            await LoadCustomers();
 
         }
         catch (Exception e)
