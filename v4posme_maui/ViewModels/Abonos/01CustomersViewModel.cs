@@ -10,6 +10,7 @@ using v4posme_maui.Views;
 using Unity;
 using v4posme_maui.Services.Helpers;
 using v4posme_maui.Services.SystemNames;
+using AndroidX.Lifecycle;
 
 namespace v4posme_maui.ViewModels.Abonos;
 
@@ -122,23 +123,38 @@ public class AbonosViewModel : BaseViewModel
 
                 //2. Ordenar
                 allCustomers = await _helperCore.ReordenarListaAbono(allCustomers);
+
+                //Lenar el elemento vacio
+                if (string.IsNullOrWhiteSpace(Search))
+                {
+                    var empty = new Api_AppMobileApi_GetDataDownloadCustomerResponse();
+                    allCustomers.Add(empty);
+                }else{}
+
             }
             else
             {
                 // 1. Obtener todos los clientes
                 if (string.IsNullOrWhiteSpace(Search))
                 {
-                    allCustomers = await _customerRepositoryTbCustomer.PosMeFilterByShare();
+                    allCustomers    = await _customerRepositoryTbCustomer.PosMeFilterByShare();
+
+                    //Lenar el elemento vacio
+                    var empty       = new Api_AppMobileApi_GetDataDownloadCustomerResponse();
+                    allCustomers.Add(empty);
                 }
                 else
                 {
                     allCustomers = await _customerRepositoryTbCustomer.PosMeFilterByCustomerShare(Search);
                 }
             }
-           
 
+            
             //8. Agregar a la lista principal
             Customers = new DXObservableCollection<Api_AppMobileApi_GetDataDownloadCustomerResponse>(allCustomers);
+            
+
+
         }
         catch (Exception ex)
         {
@@ -155,6 +171,7 @@ public class AbonosViewModel : BaseViewModel
     {
         Navigation = navigation;
         LoadsClientes();
+        
     }
 
     public async void SavePositionCustomer(DropItemEventArgs e)

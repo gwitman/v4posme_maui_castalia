@@ -16,32 +16,39 @@
     <ContentPage.Resources>
         <converters:EstadoToColorConverter x:Key="EstadoToColorConverter" />
     </ContentPage.Resources>
+    
     <ContentPage.ToolbarItems>
         <ToolbarItem IconImageSource="barcode_scan" Command="{Binding OnBarCode}" />
     </ContentPage.ToolbarItems>
-    
+
     <ContentPage.Content>
         <controls:ShimmerView Style="{StaticResource ShimmerEffect}" 
                               IsLoading="{Binding IsBusy}">
             <controls:ShimmerView.Content>
-                <dxc:DXStackLayout Orientation="Vertical">
+                <dxc:DXStackLayout Orientation="Vertical"   >
                     <Grid
                         RowDefinitions="Auto,*"
-                        HorizontalOptions="Center">
-                        <Grid ColumnDefinitions="0.2*">
-                            <dxe:TextEdit x:Name="SearchBar"
-                                          Grid.Column="1"
-                                          Margin="5"
-                                          StartIcon="search"
-                                          Text="{Binding Search}"
-                                          StartIconCommand="{Binding SearchCommand}"
-                                          ReturnCommand="{Binding SearchCommand}"
-                                          PlaceholderText="Buscar por código, identificacion y nombres" />
-                        </Grid>
+                        ColumnDefinitions="*"
+                        HorizontalOptions="FillAndExpand"
+                        VerticalOptions="FillAndExpand"
+                        >
+                        
+                        <dxe:TextEdit x:Name="SearchBar"
+                                        Grid.Row="0"
+                                        Margin="5"
+                                        StartIcon="search"
+                                        Text="{Binding Search}"
+                                        StartIconCommand="{Binding SearchCommand}"
+                                        ReturnCommand="{Binding SearchCommand}"
+                                        PlaceholderText="Buscar por código, identificacion y nombres" />
+                        
+                        
                         <dxcv:DXCollectionView x:Name="ClientesCollectionView"
+                                               Margin="0,0,0,60" 
+                                               VerticalOptions="FillAndExpand" 
                                                Grid.Row="1"
                                                ItemsSource="{Binding Customers}"
-                                               SelectedItem="{Binding SelectedCustomer}"
+                                               SelectedItem="{Binding SelectedCustomer}"                                               
                                                SelectionMode="Single"
                                                AllowDragDropItems="True"
                                                DropItem="ClientesCollectionView_OnDropItem"
@@ -143,6 +150,10 @@
                                 </DataTemplate>
                             </dxcv:DXCollectionView.ItemTemplate>
                         </dxcv:DXCollectionView>
+                        
+
+
+
                         <controls:DXPopup x:Name="Popup"
                                           AllowScrim="True"
                                           BackgroundColor="{Binding PopupBackgroundColor}"
@@ -162,7 +173,11 @@
                                         TextColor="White" />
                             </StackLayout>
                         </controls:DXPopup>
+
+
                     </Grid>
+
+
                 </dxc:DXStackLayout>
             </controls:ShimmerView.Content>
             <controls:ShimmerView.LoadingView>
@@ -173,3 +188,4 @@
         </controls:ShimmerView>
     </ContentPage.Content>
 </ContentPage>
+
