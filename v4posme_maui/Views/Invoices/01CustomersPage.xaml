@@ -24,123 +24,124 @@
             Style="{StaticResource ShimmerEffect}"
             IsLoading="{Binding IsBusy}">
             <controls:ShimmerView.Content>
-                <dxc:DXStackLayout Orientation="Vertical">
-                    <Grid
-                        RowDefinitions="Auto,*"
-                        HorizontalOptions="Center">
-                        <Grid ColumnDefinitions="0.2*">
-                            <dxe:TextEdit x:Name="SearchBar"
-                                          Grid.Column="1"
-                                          Margin="5"
-                                          StartIcon="search"
-                                          Text="{Binding Search}"
-                                          StartIconCommand="{Binding SearchCommand}"
-                                          ReturnCommand="{Binding SearchCommand}"
-                                          PlaceholderText="Buscar por código, identificacion y nombres" />
-                        </Grid>
-                        <dxcv:DXCollectionView x:Name="ClientesCollectionView"
-                                               Grid.Row="1"
-                                               ItemsSource="{Binding Customers}"
-                                               SelectedItem="{Binding SelectedCustomer}"
-                                               SelectionMode="Single"
-                                               AllowDragDropItems="True"
-                                               IsLoadMoreEnabled="True"
-                                               LoadMoreCommand="{Binding LoadMoreCommand}"
-                                               DropItem="ClientesCollectionView_OnDropItem"
-                                               IsRefreshing="{Binding  IsBusy, Mode=TwoWay}">
-                            <dxcv:DXCollectionView.ItemTemplate>
-                                <DataTemplate>
-                                    <dxc:DXStackLayout
-                                        CornerRadius="15"
-                                        Margin="10">
-                                        <Grid x:DataType="models:Api_AppMobileApi_GetDataDownloadCustomerResponse"
-                                              HorizontalOptions="Fill"
-                                              Padding="10"
-                                              VerticalOptions="Fill">
-                                            <Grid.BackgroundColor>
-                                                <MultiBinding Converter="{StaticResource EstadoToColorConverter}">
-                                                    <Binding Path="Asignado" />
-                                                    <Binding Path="Facturado" />
-                                                </MultiBinding>
-                                            </Grid.BackgroundColor>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="Auto" />
-                                            </Grid.RowDefinitions>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition Width="1.5*" />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
+                <Grid
+                    RowDefinitions="Auto,*"
+                    HorizontalOptions="Center">
+                    <dxe:TextEdit x:Name="SearchBar"
+                                  Margin="5"
+                                  StartIcon="search"
+                                  Text="{Binding Search}"
+                                  StartIconCommand="{Binding SearchCommand}"
+                                  ReturnCommand="{Binding SearchCommand}"
+                                  PlaceholderText="Buscar por código, identificacion y nombres" />
 
-                                            <Frame
-                                                WidthRequest="60"
-                                                HeightRequest="60"
-                                                BackgroundColor="Transparent"
-                                                Grid.Column="0"
-                                                Grid.RowSpan="3">
-                                                <dxc:DXImage WidthRequest="55"
-                                                             HeightRequest="55"
-                                                             Source="person_charge"
-                                                             Aspect="Fill" />
-                                            </Frame>
-                                            <Label Grid.Column="1" Grid.Row="0" FontAttributes="Bold"
-                                                   Grid.ColumnSpan="2"
-                                                   TextColor="White"
-                                                   Text="{Binding Identification}" />
-                                            <HorizontalStackLayout Grid.Column="1" Grid.Row="1">
-                                                <Label Text="{Binding CustomerNumber}"
+
+                    <ScrollView Grid.Row="1">
+                        <VerticalStackLayout>
+                            <dxcv:DXCollectionView x:Name="ClientesCollectionView"
+                                                   Grid.Row="1"
+                                                   ItemsSource="{Binding Customers}"
+                                                   SelectedItem="{Binding SelectedCustomer}"
+                                                   SelectionMode="Single"
+                                                   AllowDragDropItems="True"
+                                                   IsLoadMoreEnabled="True"
+                                                   LoadMoreCommand="{Binding LoadMoreCommand}"
+                                                   DropItem="ClientesCollectionView_OnDropItem"
+                                                   IsRefreshing="{Binding  IsBusy, Mode=TwoWay}">
+                                <dxcv:DXCollectionView.ItemTemplate>
+                                    <DataTemplate>
+                                        <dxc:DXStackLayout
+                                            CornerRadius="15"
+                                            Margin="10">
+                                            <Grid x:DataType="models:Api_AppMobileApi_GetDataDownloadCustomerResponse"
+                                                  HorizontalOptions="Fill"
+                                                  Padding="10"
+                                                  VerticalOptions="Fill">
+                                                <Grid.BackgroundColor>
+                                                    <MultiBinding Converter="{StaticResource EstadoToColorConverter}">
+                                                        <Binding Path="Asignado" />
+                                                        <Binding Path="Facturado" />
+                                                    </MultiBinding>
+                                                </Grid.BackgroundColor>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="1.5*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <Frame
+                                                    WidthRequest="60"
+                                                    HeightRequest="60"
+                                                    BackgroundColor="Transparent"
+                                                    Grid.Column="0"
+                                                    Grid.RowSpan="3">
+                                                    <dxc:DXImage WidthRequest="55"
+                                                                 HeightRequest="55"
+                                                                 Source="person_charge"
+                                                                 Aspect="Fill" />
+                                                </Frame>
+                                                <Label Grid.Column="1" Grid.Row="0" FontAttributes="Bold"
+                                                       Grid.ColumnSpan="2"
                                                        TextColor="White"
-                                                       HorizontalOptions="Start" />
-                                            </HorizontalStackLayout>
-                                            <HorizontalStackLayout Grid.Row="1" Grid.Column="2">
-                                                <Label
-                                                    HorizontalOptions="End">
-                                                    <Label.FormattedText>
-                                                        <FormattedString>
-                                                            <Span Text="Balance "
-                                                                  TextColor="White" />
-                                                            <Span Text="{Binding CurrencyName}"
-                                                                  TextColor="White" />
-                                                            <Span Text="{Binding Balance,StringFormat='{0:N2}'}"
-                                                                  TextColor="White" />
-                                                        </FormattedString>
-                                                    </Label.FormattedText>
-                                                </Label>
-                                            </HorizontalStackLayout>
-                                            <HorizontalStackLayout Grid.Row="2"
-                                                                   Grid.Column="1"
-                                                                   Grid.ColumnSpan="2">
-                                                <Label Text="{Binding FirstName}" TextColor="White" />
-                                                <Label Text=" " />
-                                                <Label Text="{Binding LastName}" TextColor="White" />
-                                            </HorizontalStackLayout>
-                                            <HorizontalStackLayout
-                                                Grid.Row="3"
-                                                Grid.Column="1"
-                                                Grid.ColumnSpan="2">
-                                                <Label
-                                                    Text="Linea de crédito: "
-                                                    TextColor="White" />
-                                                <Label
-                                                    TextColor="White"
-                                                    Text="{Binding CustomerCreditLineId}" />
-                                            </HorizontalStackLayout>
-                                            <Grid.GestureRecognizers>
-                                                <TapGestureRecognizer
-                                                    NumberOfTapsRequired="1"
-                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type invoices:InvoicesViewModel}}, Path=ItemTapped}"
-                                                    CommandParameter="{Binding .}" />
-                                            </Grid.GestureRecognizers>
-                                        </Grid>
-                                    </dxc:DXStackLayout>
-                                </DataTemplate>
-                            </dxcv:DXCollectionView.ItemTemplate>
-                        </dxcv:DXCollectionView>
-                    </Grid>
-                </dxc:DXStackLayout>
+                                                       Text="{Binding Identification}" />
+                                                <HorizontalStackLayout Grid.Column="1" Grid.Row="1">
+                                                    <Label Text="{Binding CustomerNumber}"
+                                                           TextColor="White"
+                                                           HorizontalOptions="Start" />
+                                                </HorizontalStackLayout>
+                                                <HorizontalStackLayout Grid.Row="1" Grid.Column="2">
+                                                    <Label
+                                                        HorizontalOptions="End">
+                                                        <Label.FormattedText>
+                                                            <FormattedString>
+                                                                <Span Text="Balance "
+                                                                      TextColor="White" />
+                                                                <Span Text="{Binding CurrencyName}"
+                                                                      TextColor="White" />
+                                                                <Span Text="{Binding Balance,StringFormat='{0:N2}'}"
+                                                                      TextColor="White" />
+                                                            </FormattedString>
+                                                        </Label.FormattedText>
+                                                    </Label>
+                                                </HorizontalStackLayout>
+                                                <HorizontalStackLayout Grid.Row="2"
+                                                                       Grid.Column="1"
+                                                                       Grid.ColumnSpan="2">
+                                                    <Label Text="{Binding FirstName}" TextColor="White" />
+                                                    <Label Text=" " />
+                                                    <Label Text="{Binding LastName}" TextColor="White" />
+                                                </HorizontalStackLayout>
+                                                <HorizontalStackLayout
+                                                    Grid.Row="3"
+                                                    Grid.Column="1"
+                                                    Grid.ColumnSpan="2">
+                                                    <Label
+                                                        Text="Linea de crédito: "
+                                                        TextColor="White" />
+                                                    <Label
+                                                        TextColor="White"
+                                                        Text="{Binding CustomerCreditLineId}" />
+                                                </HorizontalStackLayout>
+                                                <Grid.GestureRecognizers>
+                                                    <TapGestureRecognizer
+                                                        NumberOfTapsRequired="1"
+                                                        Command="{Binding Source={RelativeSource AncestorType={x:Type invoices:InvoicesViewModel}}, Path=ItemTapped}"
+                                                        CommandParameter="{Binding .}" />
+                                                </Grid.GestureRecognizers>
+                                            </Grid>
+                                        </dxc:DXStackLayout>
+                                    </DataTemplate>
+                                </dxcv:DXCollectionView.ItemTemplate>
+                            </dxcv:DXCollectionView>
+                        </VerticalStackLayout>
+                    </ScrollView>
+                </Grid>
             </controls:ShimmerView.Content>
             <controls:ShimmerView.LoadingView>
                 <ActivityIndicator IsRunning="{Binding IsBusy}"
