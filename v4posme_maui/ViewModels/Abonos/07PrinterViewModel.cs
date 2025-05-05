@@ -153,7 +153,7 @@ public class ValidarAbonoFinancieraViewModel : BaseViewModel
         printer.Append($"Cuota Pactada    : {viewTempDtoAbono.CurrencyName}  {DocumentCreditResponse.CuotaPactada:N2}");
         printer.Append($"Cant. Cuotas     : {DocumentCreditResponse.CantidadCuotas:N2}");
         printer.Append($"Cuotas Pend.     : {CuotasPendientes:N2}");
-        printer.Append($"Días Mora        : {viewTempDtoAbono.DiasMora}");
+        printer.Append($"Días Mora        : {viewTempDtoAbono.DiasMora}"); 
         printer.Append($"Monto Mora       : {viewTempDtoAbono.CurrencyName} {viewTempDtoAbono.MontoMora}");
         printer.Append($"Fecha            : {viewTempDtoAbono.Fecha:yyyy-MM-dd}");
         printer.Append($"Recibo           : {viewTempDtoAbono!.CodigoAbono}");
@@ -165,7 +165,7 @@ public class ValidarAbonoFinancieraViewModel : BaseViewModel
         if (ListaCuotasAplicadas.Count > 0)
         {
             printer.Append("Cuotas Aplicadas");
-            foreach (var dc in ListaCuotasAplicadas)
+            foreach (var dc in ListaCuotasAplicadas) 
             {
                 printer.Append($"NO Cuota {dc.Sequence}: {dc.CurrencyName} {dc.MontoCuota}");
             }

@@ -11,10 +11,10 @@ public class RepositoryDocumentCreditAmortization(DataBase dataBase) : Repositor
         return _dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadDocumentCreditAmortizationResponse>()
             .CountAsync(response => response.DocumentNumber!.Contains(document));
     }
-    public Task<int> PosMeCountByDocumentNumberRemainingZero(string document)
+    public Task<int> PosMeCountByDocumentNumberRemainingMayorAZero(string document)
     {
         return _dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadDocumentCreditAmortizationResponse>()
-            .Where(dc=> dc.Remaining <= 0m)
+            .Where(dc=> dc.Remaining > 0m)
             .CountAsync(response => response.DocumentNumber!.Contains(document));
     }
 

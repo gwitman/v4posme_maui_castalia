@@ -90,10 +90,9 @@ public class AplicarAbonoViewModel : BaseViewModel, IQueryAttributable
 				SaldoFinal,
 				Description!
 			);
-			
-			//Aplicar Abono
-			string reference = await HelperCustomerCreditDocumentAmortization.ApplyShare(_customerResponse.EntityId, DocumentCreditResponse.DocumentNumber!, Monto);
-			
+
+            //Aplicar Abono
+            string reference						= await HelperCustomerCreditDocumentAmortization.ApplyShare(_customerResponse.EntityId, DocumentCreditResponse.DocumentNumber!, Monto);			
 			var documentosConRemanentes				= await _repositoryDocumentCreditAmortization.PosMeFilterByDocumentNumber(DocumentCreditAmortizationResponse.DocumentNumber!);
 			var documentCrediAmortizationHastaHoy	= documentosConRemanentes.Where(dc => dc.DateApply.Date <= DateTime.Now.Date).ToList();
 			var montoMora							= documentCrediAmortizationHastaHoy.Where(dc => dc.Remaining > 0).Sum(dc => dc.Remaining);
@@ -107,14 +106,17 @@ public class AplicarAbonoViewModel : BaseViewModel, IQueryAttributable
 					diasMora = 0;
 				}
 			}
-			
-			VariablesGlobales.DtoAplicarAbono.DiasMora			= diasMora;
-			VariablesGlobales.DtoAplicarAbono.MontoMora			= montoMora;
-			VariablesGlobales.DtoAplicarAbono.MoraPagada		= moraPagada;
+
+            //Cuotas pendiente
+            var cuotasPendientes								= await _repositoryDocumentCreditAmortization.PosMeCountByDocumentNumberRemainingMayorAZero(DocumentCreditResponse.DocumentNumber ?? "");
+            VariablesGlobales.DtoAplicarAbono.DiasMora			= 0;
+			VariablesGlobales.DtoAplicarAbono.MontoMora			= 0;
+			VariablesGlobales.DtoAplicarAbono.MoraPagada		= 0;
 			VariablesGlobales.DtoAplicarAbono.Documentos		= reference;
-			VariablesGlobales.DtoAplicarAbono.CuotasPendientes	= await GetCuotasPendientes();
-			//Ingrear Abono 
-			var tmpMonto = Monto;
+			VariablesGlobales.DtoAplicarAbono.CuotasPendientes  = cuotasPendientes;
+
+            //Ingrear Abono 
+            var tmpMonto = Monto;
 			var transactionMaster = new TbTransactionMaster
 			{
 				TransactionId          = TypeTransaction.TransactionShare,
@@ -161,11 +163,7 @@ public class AplicarAbonoViewModel : BaseViewModel, IQueryAttributable
 		}
 	}
 
-	private async Task<int> GetCuotasPendientes()
-	{
-		var cantidadDocumentos = await _repositoryDocumentCreditAmortization.PosMeCountByDocumentNumberRemainingZero(DocumentCreditResponse.DocumentNumber ?? "");
-		return DocumentCreditResponse.CantidadCuotas - cantidadDocumentos;
-	}
+	
 	private bool Validate()
 	{
 		if (string.IsNullOrWhiteSpace(Description))
