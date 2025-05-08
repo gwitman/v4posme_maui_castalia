@@ -1,7 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.v4posme.app">
 	<!--<uses-sdk android:minSdkVersion="21" android:targetSdkVersion="34" />-->
-	<application android:allowBackup="true"
+	<application
+				 android:allowBackup="false"
+				 android:fullBackupContent="false" 
 				 android:label="posMe"
 				 android:icon="@mipmap/appicon"
 				 android:usesCleartextTraffic="true" 
