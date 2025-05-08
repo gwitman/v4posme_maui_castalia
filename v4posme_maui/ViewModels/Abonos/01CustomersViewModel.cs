@@ -124,12 +124,6 @@ public class AbonosViewModel : BaseViewModel
                 //2. Ordenar
                 allCustomers = await _helperCore.ReordenarListaAbono(allCustomers);
 
-                //Lenar el elemento vacio
-                if (string.IsNullOrWhiteSpace(Search))
-                {
-                    var empty = new Api_AppMobileApi_GetDataDownloadCustomerResponse();
-                    allCustomers.Add(empty);
-                }else{}
 
             }
             else
@@ -138,10 +132,7 @@ public class AbonosViewModel : BaseViewModel
                 if (string.IsNullOrWhiteSpace(Search))
                 {
                     allCustomers    = await _customerRepositoryTbCustomer.PosMeFilterByShare();
-
-                    //Lenar el elemento vacio
-                    var empty       = new Api_AppMobileApi_GetDataDownloadCustomerResponse();
-                    allCustomers.Add(empty);
+                    
                 }
                 else
                 {

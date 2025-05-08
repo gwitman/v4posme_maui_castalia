@@ -467,12 +467,12 @@ public class HelperCore(
 
 
         //dejar de ultimo los que no les toca pago
-        var secuenciaAbono = listaBase.Count + 1;
-        foreach (var customerResponse in listaBase.Where(customerResponse => customerResponse.FirstBalanceDate.Date > DateTime.Today))
-        {
-            customerResponse.SecuenciaAbono = secuenciaAbono;
-            secuenciaAbono++;
-        }
+        //var secuenciaAbono = listaBase.Count + 1;
+        //foreach (var customerResponse in listaBase.Where(customerResponse => customerResponse.FirstBalanceDate.Date > DateTime.Today))
+        //{
+        //    customerResponse.SecuenciaAbono = secuenciaAbono;
+        //    secuenciaAbono++;
+        //}
 
 
         //rellenar las pocicones en 0, o nullas, con su secuenca correcta
