@@ -43,5 +43,7 @@ public static class Constantes
     public const string DescripcionRealizarPago     = "LICENCIA MOBIL";
     public const string fileError                   = "v4posme_error_log.txt";
     public const string fileBackupJson              = "v4posme_backup_log.txt";
-    
+    public const string ErrorUrl					= "Error";
+    public const string UrlInvalida					= "URL inválida";
+    public const string ParametrUrlShareViewError	= "No se pudo encontrar el parametro de la url";
 }

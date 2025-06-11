@@ -10,7 +10,6 @@ using v4posme_maui.Views;
 using Unity;
 using v4posme_maui.Services.Helpers;
 using v4posme_maui.Services.SystemNames;
-using AndroidX.Lifecycle;
 
 namespace v4posme_maui.ViewModels.Abonos;
 
@@ -63,7 +62,7 @@ public class AbonosViewModel : BaseViewModel
         IsBusy = false;
     }
 
-    private async void OnSearchCommand()
+    private void OnSearchCommand()
     {
         try
         {
@@ -108,23 +107,20 @@ public class AbonosViewModel : BaseViewModel
         try
         {
             List<Api_AppMobileApi_GetDataDownloadCustomerResponse> allCustomers;
-            IsBusy                  = true;
-            if(VariablesGlobales.OrdenarAbonos )
+            IsBusy  = true;
+            // 1. Obtener todos los clientes
+            if (string.IsNullOrWhiteSpace(Search))
             {
-                // 1. Obtener todos los clientes                
-                if (string.IsNullOrWhiteSpace(Search))
-                {
-                    allCustomers = await _customerRepositoryTbCustomer.PosMeFilterByShare();
-                }
-                else
-                {
-                    allCustomers = await _customerRepositoryTbCustomer.PosMeFilterByCustomerShare(Search);
-                }
-
+                allCustomers = await _customerRepositoryTbCustomer.PosMeFilterByShare();
+            }
+            else
+            {
+                allCustomers = await _customerRepositoryTbCustomer.PosMeFilterByCustomerShare(Search);
+            }
+            /*if(VariablesGlobales.OrdenarAbonos )
+            {
                 //2. Ordenar
                 allCustomers = await _helperCore.ReordenarListaAbono(allCustomers);
-
-
             }
             else
             {
@@ -138,13 +134,11 @@ public class AbonosViewModel : BaseViewModel
                 {
                     allCustomers = await _customerRepositoryTbCustomer.PosMeFilterByCustomerShare(Search);
                 }
-            }
+            }*/
 
             
             //8. Agregar a la lista principal
             Customers = new DXObservableCollection<Api_AppMobileApi_GetDataDownloadCustomerResponse>(allCustomers);
-            
-
 
         }
         catch (Exception ex)

@@ -1,5 +1,4 @@
 ﻿using DevExpress.Maui.CollectionView;
-using v4posme_maui.Models;
 using v4posme_maui.ViewModels.Abonos;
 
 namespace v4posme_maui.Views.Abonos;
@@ -28,6 +27,6 @@ public partial class AbonosPage : ContentPage
 
     private void ClientesCollectionView_OnDropItem(object? sender, DropItemEventArgs e)
     {
-        _viewModel.SavePositionCustomer(e);
+        //_viewModel.SavePositionCustomer(e);
     }
 }

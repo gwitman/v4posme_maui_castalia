@@ -297,6 +297,8 @@ public class RepositoryTbCustomer(DataBase dataBase, IRepositoryTbParameterSyste
                         tbc.Modificado,
                         tbc.Secuencia,
                         tbc.SecuenciaAbono,
+                        tbc.ordenAbono as OrdenAbono,
+                        tbc.isHaveShareNow as IsHaveShareNow,
                         SUM(tdc.Balance) as Remaining,
                         (
                             SELECT MIN(tdc.DateApply)
@@ -305,13 +307,17 @@ public class RepositoryTbCustomer(DataBase dataBase, IRepositoryTbParameterSyste
                               AND tdc.Remaining > 0
                         ) AS FirstBalanceDate,
                         CASE
-                            WHEN EXISTS (
-                                SELECT 1
-                                FROM tb_transaction_master ttm
-                                WHERE ttm.EntityId = tbc.EntityId
-                                AND ttm.TransactionId = {typeShare}
-                            ) THEN 1
-                            ELSE 0
+                            when tbc.isHaveShareNow = 1 THEN 1
+                            else
+                                CASE
+                                    WHEN EXISTS (
+                                        SELECT 1
+                                        FROM tb_transaction_master ttm
+                                        WHERE ttm.EntityId = tbc.EntityId
+                                        AND ttm.TransactionId = {typeShare}
+                                    ) THEN 1
+                                    ELSE 0
+                                END 
                         END AS HasAbono
                     from 
                         tb_customers 
@@ -334,8 +340,10 @@ public class RepositoryTbCustomer(DataBase dataBase, IRepositoryTbParameterSyste
                         tbc.Me,
                         tbc.Modificado,
                         tbc.Secuencia,
-                        tbc.SecuenciaAbono
-                    order by SecuenciaAbono,FirstBalanceDate 
+                        tbc.SecuenciaAbono,
+                        tbc.ordenAbono,
+                        tbc.isHaveShareNow
+                    order by ordenAbono,FirstBalanceDate 
                     """;
         return await _dataBase.Database.QueryAsync<Api_AppMobileApi_GetDataDownloadCustomerResponse>(query);
     }
@@ -363,6 +371,8 @@ public class RepositoryTbCustomer(DataBase dataBase, IRepositoryTbParameterSyste
                          tbc.Modificado,
                          tbc.Secuencia,
                          tbc.SecuenciaAbono,
+                         tbc.ordenAbono as OrdenAbono,
+                         tbc.isHaveShareNow as IsHaveShareNow,
                          SUM(tdc.Balance) as Remaining,
                          (
                              SELECT MIN(tdc.DateApply)
@@ -370,14 +380,18 @@ public class RepositoryTbCustomer(DataBase dataBase, IRepositoryTbParameterSyste
                              WHERE tdc.CustomerNumber = tbc.CustomerNumber
                                AND tdc.Remaining > 0
                          ) AS FirstBalanceDate,
-                         CASE
-                             WHEN EXISTS (
-                                 SELECT 1
-                                 FROM tb_transaction_master ttm
-                                 WHERE ttm.EntityId = tbc.EntityId
-                                 AND ttm.TransactionId = "+typeShare+ @"
-                             ) THEN 1
-                             ELSE 0
+                          CASE
+                            when tbc.isHaveShareNow = 1 THEN 1
+                            else
+                                CASE
+                                     WHEN EXISTS (
+                                         SELECT 1
+                                         FROM tb_transaction_master ttm
+                                         WHERE ttm.EntityId = tbc.EntityId
+                                         AND ttm.TransactionId = "+typeShare+ @"
+                                     ) THEN 1
+                                     ELSE 0
+                                 END
                          END AS HasAbono
                      FROM 
                          tb_customers tbc join tb_document_credit tdc on tbc.EntityId = tdc.EntityId
@@ -401,9 +415,11 @@ public class RepositoryTbCustomer(DataBase dataBase, IRepositoryTbParameterSyste
                          tbc.Me,
                          tbc.Modificado,
                          tbc.Secuencia,
-                         tbc.SecuenciaAbono                     
+                         tbc.SecuenciaAbono,
+                         tbc.ordenAbono,
+                         tbc.isHaveShareNow
                      ORDER BY 
-                         SecuenciaAbono,FirstBalanceDate 
+                         ordenAbono,FirstBalanceDate 
                      ";
         return _dataBase.Database.QueryAsync<Api_AppMobileApi_GetDataDownloadCustomerResponse>(query);
     }
