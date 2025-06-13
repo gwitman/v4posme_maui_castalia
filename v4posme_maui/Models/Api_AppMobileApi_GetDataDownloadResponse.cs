@@ -60,9 +60,11 @@ public class Api_AppMobileApi_GetDataDownloadCustomerResponse : BindableBase
     public int SecuenciaAbono { get=>GetValue<int>(); set=>SetValue(value); }
     
     public int? Secuencia { get=>GetValue<int>(); set=>SetValue(value); }
-    
+
+    [DataMember(Name = "ordenAbono")]
     public int OrdenAbono { get=>GetValue<int>(); set=>SetValue(value); }
 
+    [DataMember(Name = "isHaveShareNow")]
     public int IsHaveShareNow { get => GetValue<int>(); set => SetValue(value); }
 
     [NotMapped] public string? NombreCompleto => $"{FirstName} {LastName}";

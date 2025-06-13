@@ -297,8 +297,8 @@ public class RepositoryTbCustomer(DataBase dataBase, IRepositoryTbParameterSyste
                         tbc.Modificado,
                         tbc.Secuencia,
                         tbc.SecuenciaAbono,
-                        tbc.ordenAbono as OrdenAbono,
-                        tbc.isHaveShareNow as IsHaveShareNow,
+                        tbc.OrdenAbono as OrdenAbono,
+                        tbc.IsHaveShareNow as IsHaveShareNow,
                         SUM(tdc.Balance) as Remaining,
                         (
                             SELECT MIN(tdc.DateApply)
@@ -307,7 +307,7 @@ public class RepositoryTbCustomer(DataBase dataBase, IRepositoryTbParameterSyste
                               AND tdc.Remaining > 0
                         ) AS FirstBalanceDate,
                         CASE
-                            when tbc.isHaveShareNow = 1 THEN 1
+                            when tbc.IsHaveShareNow = 1 THEN 1
                             else
                                 CASE
                                     WHEN EXISTS (
@@ -341,9 +341,9 @@ public class RepositoryTbCustomer(DataBase dataBase, IRepositoryTbParameterSyste
                         tbc.Modificado,
                         tbc.Secuencia,
                         tbc.SecuenciaAbono,
-                        tbc.ordenAbono,
-                        tbc.isHaveShareNow
-                    order by ordenAbono,FirstBalanceDate 
+                        tbc.OrdenAbono,
+                        tbc.IsHaveShareNow
+                    order by tbc.OrdenAbono,FirstBalanceDate 
                     """;
         return await _dataBase.Database.QueryAsync<Api_AppMobileApi_GetDataDownloadCustomerResponse>(query);
     }
@@ -371,8 +371,8 @@ public class RepositoryTbCustomer(DataBase dataBase, IRepositoryTbParameterSyste
                          tbc.Modificado,
                          tbc.Secuencia,
                          tbc.SecuenciaAbono,
-                         tbc.ordenAbono as OrdenAbono,
-                         tbc.isHaveShareNow as IsHaveShareNow,
+                         tbc.OrdenAbono as OrdenAbono,
+                         tbc.IsHaveShareNow as IsHaveShareNow,
                          SUM(tdc.Balance) as Remaining,
                          (
                              SELECT MIN(tdc.DateApply)
@@ -381,7 +381,7 @@ public class RepositoryTbCustomer(DataBase dataBase, IRepositoryTbParameterSyste
                                AND tdc.Remaining > 0
                          ) AS FirstBalanceDate,
                           CASE
-                            when tbc.isHaveShareNow = 1 THEN 1
+                            when tbc.IsHaveShareNow = 1 THEN 1
                             else
                                 CASE
                                      WHEN EXISTS (
@@ -416,10 +416,10 @@ public class RepositoryTbCustomer(DataBase dataBase, IRepositoryTbParameterSyste
                          tbc.Modificado,
                          tbc.Secuencia,
                          tbc.SecuenciaAbono,
-                         tbc.ordenAbono,
-                         tbc.isHaveShareNow
+                         tbc.OrdenAbono,
+                         tbc.IsHaveShareNow
                      ORDER BY 
-                         ordenAbono,FirstBalanceDate 
+                         tbc.OrdenAbono,FirstBalanceDate 
                      ";
         return _dataBase.Database.QueryAsync<Api_AppMobileApi_GetDataDownloadCustomerResponse>(query);
     }
