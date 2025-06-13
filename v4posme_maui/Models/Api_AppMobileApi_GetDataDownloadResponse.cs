@@ -67,6 +67,12 @@ public class Api_AppMobileApi_GetDataDownloadCustomerResponse : BindableBase
     [DataMember(Name = "isHaveShareNow")]
     public int IsHaveShareNow { get => GetValue<int>(); set => SetValue(value); }
 
+    [DataMember(Name = "frecuencyNameIntoShare")]
+    public string FrecuencyNameIntoShare { get => GetValue<string>(); set => SetValue(value); }
+
+    [DataMember(Name = "showFrecuenciInCustomerIntoShare")]
+    public int ShowFrecuenciInCustomerIntoShare { get => GetValue<int>(); set => SetValue(value); }
+
     [NotMapped] public string? NombreCompleto => $"{FirstName} {LastName}";
     
     [NotMapped] public decimal? Remaining { get; set; }
@@ -74,6 +80,8 @@ public class Api_AppMobileApi_GetDataDownloadCustomerResponse : BindableBase
     [NotMapped] public bool Asignado => Me == 1;
     [NotMapped] public bool Facturado { get; set; }
     [NotMapped] public DateTime FirstBalanceDate { get=>GetValue<DateTime>(); set=>SetValue(value); }
+
+  
 }
 
 [SQLite.Table("tb_company")]

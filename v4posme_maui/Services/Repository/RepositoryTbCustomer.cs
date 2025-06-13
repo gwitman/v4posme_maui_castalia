@@ -299,6 +299,8 @@ public class RepositoryTbCustomer(DataBase dataBase, IRepositoryTbParameterSyste
                         tbc.SecuenciaAbono,
                         tbc.OrdenAbono as OrdenAbono,
                         tbc.IsHaveShareNow as IsHaveShareNow,
+                        tbc.FrecuencyNameIntoShare,
+                        tbc.ShowFrecuenciInCustomerIntoShare,
                         SUM(tdc.Balance) as Remaining,
                         (
                             SELECT MIN(tdc.DateApply)
@@ -342,8 +344,13 @@ public class RepositoryTbCustomer(DataBase dataBase, IRepositoryTbParameterSyste
                         tbc.Secuencia,
                         tbc.SecuenciaAbono,
                         tbc.OrdenAbono,
-                        tbc.IsHaveShareNow
-                    order by tbc.OrdenAbono,FirstBalanceDate 
+                        tbc.IsHaveShareNow,
+                        tbc.FrecuencyNameIntoShare,
+                        tbc.ShowFrecuenciInCustomerIntoShare 
+                    order by 
+                        tbc.OrdenAbono,
+                        FirstBalanceDate 
+
                     """;
         return await _dataBase.Database.QueryAsync<Api_AppMobileApi_GetDataDownloadCustomerResponse>(query);
     }
@@ -373,6 +380,8 @@ public class RepositoryTbCustomer(DataBase dataBase, IRepositoryTbParameterSyste
                          tbc.SecuenciaAbono,
                          tbc.OrdenAbono as OrdenAbono,
                          tbc.IsHaveShareNow as IsHaveShareNow,
+                         tbc.FrecuencyNameIntoShare,
+                         tbc.ShowFrecuenciInCustomerIntoShare,
                          SUM(tdc.Balance) as Remaining,
                          (
                              SELECT MIN(tdc.DateApply)
@@ -388,7 +397,7 @@ public class RepositoryTbCustomer(DataBase dataBase, IRepositoryTbParameterSyste
                                          SELECT 1
                                          FROM tb_transaction_master ttm
                                          WHERE ttm.EntityId = tbc.EntityId
-                                         AND ttm.TransactionId = "+typeShare+ @"
+                                         AND ttm.TransactionId = " + typeShare+ @"
                                      ) THEN 1
                                      ELSE 0
                                  END
@@ -417,9 +426,12 @@ public class RepositoryTbCustomer(DataBase dataBase, IRepositoryTbParameterSyste
                          tbc.Secuencia,
                          tbc.SecuenciaAbono,
                          tbc.OrdenAbono,
-                         tbc.IsHaveShareNow
+                         tbc.IsHaveShareNow,
+                         tbc.FrecuencyNameIntoShare,
+                         tbc.ShowFrecuenciInCustomerIntoShare
                      ORDER BY 
-                         tbc.OrdenAbono,FirstBalanceDate 
+                         tbc.OrdenAbono,
+                         FirstBalanceDate 
                      ";
         return _dataBase.Database.QueryAsync<Api_AppMobileApi_GetDataDownloadCustomerResponse>(query);
     }

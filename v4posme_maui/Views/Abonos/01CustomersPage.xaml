@@ -70,6 +70,7 @@
                                                     <RowDefinition Height="Auto" />
                                                     <RowDefinition Height="Auto" />
                                                     <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
                                                 </Grid.RowDefinitions>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="Auto" />
@@ -133,6 +134,11 @@
                                                     <Label FontAttributes="Bold"
                                                            TextColor="White"
                                                            Text="{Binding FirstBalanceDate, StringFormat='{0:yyyy-MM-dd}'}" />
+                                                </HorizontalStackLayout>
+                                                <HorizontalStackLayout Grid.Row="5" Grid.ColumnSpan="2" Grid.Column="1" IsVisible="{Binding ShowFrecuenciInCustomerIntoShare}">
+                                                    <Label FontAttributes="Bold"
+                                                           TextColor="White"
+                                                           Text="{Binding FrecuencyNameIntoShare}" />
                                                 </HorizontalStackLayout>
                                                 <Grid.GestureRecognizers>
                                                     <TapGestureRecognizer
