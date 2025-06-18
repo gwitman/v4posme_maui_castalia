@@ -10,6 +10,7 @@ namespace v4posme_maui.ViewModels
     {
         private readonly IRepositoryTbTransactionMaster _repositoryTbTransactionMaster;
         private readonly IRepositoryDocumentCreditAmortization _repositoryDocumentCreditAmortization;
+        private readonly IRepositoryServerTransactionMaster _repositoryServerTransactionMaster;
 
         public const string ViewName = "AboutPage";
 
@@ -18,6 +19,7 @@ namespace v4posme_maui.ViewModels
             Title = "Inicio";
             _repositoryTbTransactionMaster = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMaster>();
             _repositoryDocumentCreditAmortization = VariablesGlobales.UnityContainer.Resolve<IRepositoryDocumentCreditAmortization>();
+            _repositoryServerTransactionMaster = VariablesGlobales.UnityContainer.Resolve<IRepositoryServerTransactionMaster>();
         }
 
         private decimal _totalCorodbas;
@@ -142,17 +144,21 @@ namespace v4posme_maui.ViewModels
         {
             try
             {
-                IsBusy = true;
-                Navigation = navigation;
-                var findAllDocumentCreditAmortization = await _repositoryDocumentCreditAmortization.PosMeFindByMaxDate(DateTime.Now);
-                var findAll = await _repositoryTbTransactionMaster.PosMeFindAll();
-                var listaAbonosDolares = new List<TbTransactionMaster>();
-                var listaAbonosCordobas = new List<TbTransactionMaster>();
-                var listaFacturasCreditoCordobas = new List<TbTransactionMaster>();
-                var listaFacturasCreditoDolares = new List<TbTransactionMaster>();
-                var listaFacturasContadoCordobas = new List<TbTransactionMaster>();
-                var listaFacturasContadoDolares = new List<TbTransactionMaster>();
+                IsBusy                                          = true;
+                Navigation                                      = navigation;
+                var findAllDocumentCreditAmortization           = await _repositoryDocumentCreditAmortization.PosMeFindByMaxDate(DateTime.Now);
+                var findAll                                     = await _repositoryTbTransactionMaster.PosMeFindAll();
+                var findServerTransactionMasterAbonosCordoba    = await _repositoryServerTransactionMaster.PosMeFilterByCurrencyIDAndTransactionID((int)TypeCurrency.Cordoba, (int)TypeTransaction.TransactionShare);
+                var listaAbonosDolares                  = new List<TbTransactionMaster>();
+                var listaAbonosCordobas                 = new List<TbTransactionMaster>();
+                var listaFacturasCreditoCordobas        = new List<TbTransactionMaster>();
+                var listaFacturasCreditoDolares         = new List<TbTransactionMaster>();
+                var listaFacturasContadoCordobas        = new List<TbTransactionMaster>();
+                var listaFacturasContadoDolares         = new List<TbTransactionMaster>();
                 
+                
+
+                //Obtener las tansacciones locales
                 foreach (var master in findAll)
                 {
                     if (master.TransactionId == TypeTransaction.TransactionShare)
@@ -192,37 +198,46 @@ namespace v4posme_maui.ViewModels
                         }
                     }
                 }
-                
+
+
+                //Obtener las transacciones del server
+                foreach (var master in findServerTransactionMasterAbonosCordoba)
+                {
+                    TbTransactionMaster t   = new TbTransactionMaster();
+                    t.SubAmount             = master.Amount;
+                    listaAbonosCordobas.Add(t);
+                }
+
                 //Abonos
-                CantidadAbonos = listaAbonosCordobas.Count + listaAbonosDolares.Count;
+                CantidadAbonos      = listaAbonosCordobas.Count + listaAbonosDolares.Count;
                 MontoAbonosCordobas = listaAbonosCordobas.Sum(master => master.SubAmount);
-                MontoAbonosDolares = listaAbonosDolares.Sum(master => master.SubAmount);
+                MontoAbonosDolares  = listaAbonosDolares.Sum(master => master.SubAmount);
                 foreach (var documentCredit in findAllDocumentCreditAmortization)
                 {
                     if (documentCredit.CurrencyId ==TypeCurrency.Cordoba)
                     {
-                        MontoTotalAbonosCordobas = findAllDocumentCreditAmortization.Sum(response => response.Balance);
+                        MontoTotalAbonosCordobas        = findAllDocumentCreditAmortization.Sum(response => response.Balance);
                         PorcentajeAbonosTotalesCordobas = Math.Round(MontoAbonosCordobas / MontoTotalAbonosCordobas * 100, 2);
                     }
                     else
                     {
-                        MontoTotalAbonosDolares = findAllDocumentCreditAmortization.Sum(response => response.Balance);
-                        PorcentajeAbonosTotalesDolares = Math.Round(MontoAbonosDolares / MontoTotalAbonosCordobas * 100, 2);
+                        MontoTotalAbonosDolares         = findAllDocumentCreditAmortization.Sum(response => response.Balance);
+                        PorcentajeAbonosTotalesDolares  = Math.Round(MontoAbonosDolares / MontoTotalAbonosCordobas * 100, 2);
                     }
                 }
                 
                 //Facutras Contado
-                CantidadFacutrasContado = listaFacturasContadoCordobas.Count + listaFacturasContadoDolares.Count;
-                MontoFacturasContadoCordobas = listaFacturasContadoCordobas.Sum(master => master.SubAmount);
-                MontoFacturasContadoDolares = listaFacturasContadoDolares.Sum(master => master.SubAmount);
+                CantidadFacutrasContado         = listaFacturasContadoCordobas.Count + listaFacturasContadoDolares.Count;
+                MontoFacturasContadoCordobas    = listaFacturasContadoCordobas.Sum(master => master.SubAmount);
+                MontoFacturasContadoDolares     = listaFacturasContadoDolares.Sum(master => master.SubAmount);
                 //Facturas Credito
-                CantidadFacutrasCredito = listaFacturasCreditoCordobas.Count + listaFacturasCreditoDolares.Count;
-                MontoFacturasCreditoCordobas = listaFacturasCreditoCordobas.Sum(master => master.SubAmount);
-                MontoFacturasCreditoDolares = listaFacturasCreditoDolares.Sum(master => master.SubAmount);
+                CantidadFacutrasCredito         = listaFacturasCreditoCordobas.Count + listaFacturasCreditoDolares.Count;
+                MontoFacturasCreditoCordobas    = listaFacturasCreditoCordobas.Sum(master => master.SubAmount);
+                MontoFacturasCreditoDolares     = listaFacturasCreditoDolares.Sum(master => master.SubAmount);
                 //Totales
-                TotalCordobas = MontoAbonosCordobas + MontoFacturasContadoCordobas;
-                TotalDolares = MontoAbonosDolares + MontoFacturasContadoDolares;
-                IsBusy = false;
+                TotalCordobas   = MontoAbonosCordobas + MontoFacturasContadoCordobas;
+                TotalDolares    = MontoAbonosDolares + MontoFacturasContadoDolares;
+                IsBusy          = false;
             }
             catch (Exception e)
             {

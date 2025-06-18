@@ -30,6 +30,8 @@ public class RestApiAppMobileApi
     
     private readonly IRepositoryTbTransactionMasterDetail _repositoryTbTransactionMasterDetail      = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMasterDetail>();
 
+    private readonly IRepositoryServerTransactionMaster _repositoryServerTransactionMasterDetail    = VariablesGlobales.UnityContainer.Resolve<IRepositoryServerTransactionMaster>();
+
     private readonly IRepositoryTbParameterSystem _parameterSystem                                  = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbParameterSystem>();
     
     public async Task<bool> GetDataDownload()
@@ -69,11 +71,13 @@ public class RestApiAppMobileApi
             var parametersDeleteAll         = _repositoryParameters!.PosMeDeleteAll();
             var documentCreditDeleteAll     = _repositoryDocumentCredit!.PosMeDeleteAll();
             var companyDeleteAll            = _repositoryTbCompany.PosMeDeleteAll();
-            var transactionMasterAll        =  _repositoryTbTransactionMaster.PosMeDeleteAll();
-            var transactionMasterDetailAll  =  _repositoryTbTransactionMasterDetail.PosMeDeleteAll();
+            var transactionMasterAll        = _repositoryTbTransactionMaster.PosMeDeleteAll();
+            var transactionMasterDetailAll  = _repositoryTbTransactionMasterDetail.PosMeDeleteAll();
+            var serverTransactionMasterAll  = _repositoryServerTransactionMasterDetail.PosMeDeleteAll();
             await Task.WhenAll([
                 customerDeleteAll, itemsDeleteAll, documentCreditAmortizationDeleteAll, parametersDeleteAll,
-                documentCreditDeleteAll, companyDeleteAll, transactionMasterAll,transactionMasterDetailAll
+                documentCreditDeleteAll, companyDeleteAll, transactionMasterAll,transactionMasterDetailAll,
+                serverTransactionMasterAll
             ]);
 
             //insertar nuevos movimientos
@@ -83,9 +87,11 @@ public class RestApiAppMobileApi
             var taskDocumentCreditAmortization  = _repositoryDocumentCreditAmortization!.PosMeInsertAll(apiResponse.ListDocumentCreditAmortization);
             var taskParameters                  = _repositoryParameters!.PosMeInsertAll(apiResponse.ListParameter);
             var taskDocumentCredit              = _repositoryDocumentCredit!.PosMeInsertAll(apiResponse.ListDocumentCredit);
+            var taskServerTransactionMaster     = _repositoryServerTransactionMasterDetail!.PosMeInsertAll(apiResponse.ListServerTransactionMaster);
+
             await Task.WhenAll([
                 taskCustomer, taskItem, taskDocumentCreditAmortization, taskParameters,
-                taskDocumentCredit, taskCompany
+                taskDocumentCredit, taskCompany, taskServerTransactionMaster
             ]);
 
             //inicializar contador 

@@ -39,6 +39,7 @@ namespace v4posme_maui.ViewModels
         private readonly IRepositoryTbCompany _repositoryTbCompany										= VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCompany>();
         private readonly IRepositoryTbTransactionMaster _repositoryTbTransactionMaster					= VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMaster>();
         private readonly IRepositoryTbTransactionMasterDetail _repositoryTbTransactionMasterDetail		= VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMasterDetail>();
+		private readonly IRepositoryServerTransactionMaster _repositoryServerTransactionMaster			= VariablesGlobales.UnityContainer.Resolve<IRepositoryServerTransactionMaster>();
         private readonly IRepositoryTbParameterSystem _parameterSystem									= VariablesGlobales.UnityContainer.Resolve<IRepositoryTbParameterSystem>();
         private readonly HelperCore helperCore															= VariablesGlobales.UnityContainer.Resolve<HelperCore>();
 
@@ -269,7 +270,8 @@ namespace v4posme_maui.ViewModels
                             var companyDeleteAll					= _repositoryTbCompany.PosMeDeleteAll();
                             var transactionMasterAll				= _repositoryTbTransactionMaster.PosMeDeleteAll();
                             var transactionMasterDetailAll			= _repositoryTbTransactionMasterDetail.PosMeDeleteAll();
-                            await Task.WhenAll([customerDeleteAll, itemsDeleteAll, documentCreditAmortizationDeleteAll, parametersDeleteAll,documentCreditDeleteAll, companyDeleteAll, transactionMasterAll,transactionMasterDetailAll]);
+							var serverTransactionMasterAll			= _repositoryServerTransactionMaster.PosMeDeleteAll();
+                            await Task.WhenAll([customerDeleteAll, itemsDeleteAll, documentCreditAmortizationDeleteAll, parametersDeleteAll,documentCreditDeleteAll, companyDeleteAll, transactionMasterAll,transactionMasterDetailAll, serverTransactionMasterAll]);
 
                             //inicializar contador 
                             var objParameterSystem		= await _parameterSystem.PosMeFindByName(Constantes.ParemeterEntityIDAutoIncrement);

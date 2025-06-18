@@ -16,9 +16,22 @@ public class Api_AppMobileApi_GetDataDownloadResponse
     public List<Api_AppMobileApi_GetDataDownloadCustomerResponse> ListCustomer { get; set; } = [];
     public List<Api_AppMobileApi_GetDataDownloadParametersResponse> ListParameter { get; set; } = [];
     public List<Api_AppMobileApi_GetDataDownloadDocumentCreditResponse> ListDocumentCredit { get; set; } = [];
-
     public List<Api_AppMobileApi_GetDataDownloadDocumentCreditAmortizationResponse> ListDocumentCreditAmortization { get; set; } = [];
+    public List<Api_AppMobileApi_GetDataDownload_ServerTransactionMaster_Response> ListServerTransactionMaster { get; set; } = [];
 }
+
+[SQLite.Table("tb_server_transaction_master")]
+public class Api_AppMobileApi_GetDataDownload_ServerTransactionMaster_Response : BindableBase
+{
+    [PrimaryKey, AutoIncrement]
+    [DataMember(Name = "transactionMasterID")]
+    public int TransactionMasterID { get; set; }
+    [DataMember(Name = "transactionID")] public int TransactionID { get => GetValue<int>(); set => SetValue(value); }
+    [DataMember(Name = "currencyID")] public int CurrencyID { get => GetValue<int>(); set => SetValue(value); }
+    [DataMember(Name = "amount")] public decimal Amount { get => GetValue<decimal>(); set => SetValue(value); }
+
+}
+
 
 [SQLite.Table("tb_customers")]
 public class Api_AppMobileApi_GetDataDownloadCustomerResponse : BindableBase
