@@ -65,38 +65,38 @@ public class PaymentInvoiceViewModel : BaseViewModel
             return;
         }
 
-        IsBusy = true;
-        var dtoInvoice = VariablesGlobales.DtoInvoice;
-        var codigo = await _helper.GetCodigoFactura();
-        VariablesGlobales.DtoInvoice.Codigo = codigo;
-        VariablesGlobales.DtoInvoice.Monto = Monto;
-        VariablesGlobales.DtoInvoice.Cambio = Cambio;
-        VariablesGlobales.DtoInvoice.TransactionOn = DateTime.Now;
+        IsBusy          = true;
+        var dtoInvoice  = VariablesGlobales.DtoInvoice;
+        var codigo      = await _helper.GetCodigoFactura();
+        VariablesGlobales.DtoInvoice.Codigo         = codigo;
+        VariablesGlobales.DtoInvoice.Monto          = Monto;
+        VariablesGlobales.DtoInvoice.Cambio         = Cambio;
+        VariablesGlobales.DtoInvoice.TransactionOn  = DateTime.Now;
         var transactionMaster = new TbTransactionMaster
         {
-            TransactionId = TypeTransaction.TransactionInvoiceBilling,
-            Amount = Monto,
-            TransactionOn = DateTime.Now,
+            TransactionId       = TypeTransaction.TransactionInvoiceBilling,
+            Amount              = Monto,
+            TransactionOn       = DateTime.Now,
             TransactionCausalId = (TypeTransactionCausal)dtoInvoice.TipoDocumento!.Key,
-            TypePaymentId = TypePayment,
-            Comment = dtoInvoice.Comentarios,
-            Discount = decimal.Zero,
-            Taxi1 = decimal.Zero,
-            ExchangeRate = decimal.Zero, //definir
-            EntityId = dtoInvoice.CustomerResponse!.EntityId,
-            EntitySecondaryId = VariablesGlobales.User!.UserId.ToString(),
-            TransactionNumber = codigo,
-            CurrencyId = (TypeCurrency)dtoInvoice.Currency!.Key,
+            TypePaymentId       = TypePayment,
+            Comment             = dtoInvoice.Comentarios,
+            Discount            = decimal.Zero,
+            Taxi1               = decimal.Zero,
+            ExchangeRate        = decimal.Zero, //definir
+            EntityId            = dtoInvoice.CustomerResponse!.EntityId,
+            EntitySecondaryId   = VariablesGlobales.User!.UserId.ToString(),
+            TransactionNumber   = codigo,
+            CurrencyId          = (TypeCurrency)dtoInvoice.Currency!.Key,
             CustomerCreditLineId = dtoInvoice.CustomerResponse.CustomerCreditLineId,
             CustomerIdentification = dtoInvoice.CustomerResponse.Identification!,
-            Plazo = dtoInvoice.Plazo,
-            NextVisit = dtoInvoice.NextVisit,
-            FixedExpenses = dtoInvoice.FixedExpenses,
-            PeriodPay = (TypePeriodPay)dtoInvoice.PeriodPay!.Key
+            Plazo               = dtoInvoice.Plazo,
+            NextVisit           = dtoInvoice.NextVisit,
+            FixedExpenses       = dtoInvoice.FixedExpenses,
+            PeriodPay           = (TypePeriodPay)dtoInvoice.PeriodPay!.Key
         };
         transactionMaster.SubAmount = dtoInvoice.Balance - transactionMaster.Discount + transactionMaster.Taxi1;
 
-        var listMasterDetail = new List<TbTransactionMasterDetail>();
+        var listMasterDetail    = new List<TbTransactionMasterDetail>();
         await _repositoryTbTransactionMaster.PosMeInsert(transactionMaster);
         var transactionMasterId = transactionMaster.TransactionMasterId;
 
@@ -105,16 +105,16 @@ public class PaymentInvoiceViewModel : BaseViewModel
             var findPrecioOriginal = await _repositoryItems.PosMeFindByItemNumber(item.ItemNumber!);
             var detail = new TbTransactionMasterDetail
             {
-                Quantity = item.Quantity,
-                UnitaryCost = findPrecioOriginal.PrecioPublico,
-                UnitaryPrice = item.PrecioPublico,
+                Quantity            = item.Quantity,
+                UnitaryCost         = findPrecioOriginal.PrecioPublico,
+                UnitaryPrice        = item.PrecioPublico,
                 TransactionMasterId = transactionMasterId, /**/
-                SubAmount = item.Importe,
-                Discount = decimal.Zero,
-                Tax1 = decimal.Zero,
-                Componentid = (int)TypeComponent.Itme,
-                ComponentItemId = item.ItemId,
-                ItemBarCode = item.BarCode
+                SubAmount           = item.Importe,
+                Discount            = decimal.Zero,
+                Tax1                = decimal.Zero,
+                Componentid         = (int)TypeComponent.Itme,
+                ComponentItemId     = item.ItemId,
+                ItemBarCode         = item.BarCode
             };
             detail.Amount = detail.SubAmount - detail.Discount + detail.Tax1;
             listMasterDetail.Add(detail);
@@ -122,9 +122,9 @@ public class PaymentInvoiceViewModel : BaseViewModel
 
         await _repositoryTbTransactionMasterDetail.PosMeInsertAll(listMasterDetail);
         await _helper.PlusCounter();
-        VariablesGlobales.EnableBackButton = false;
-        VariablesGlobales.DtoInvoice.TipoPayment = TypePayment;
-        VariablesGlobales.DtoInvoice.TransactionMaster = transactionMaster;
+        VariablesGlobales.EnableBackButton              = false;
+        VariablesGlobales.DtoInvoice.TipoPayment        = TypePayment;
+        VariablesGlobales.DtoInvoice.TransactionMaster  = transactionMaster;
         await Navigation!.PushAsync(new PrinterInvoicePage());
         IsBusy = false;
     }
@@ -309,28 +309,35 @@ public class PaymentInvoiceViewModel : BaseViewModel
             ShowToast(Mensajes.MensajeMontoMenorIgualCero,ToastDuration.Long,12);
             return;
         }
-        IsBusy = true;
-        var uid = await _repositoryParameters.PosMeFindByKey("CORE_PAYMENT_PRODUCCION_USUARIO_COMMERCECLIENT");
-        var awk = await _repositoryParameters.PosMeFindByKey("CORE_PAYMENT_PRODUCCION_CLAVE_COMMERCECLIENTE");        
-        var urlCommerce = "http://posme.net";
-        var operationRequest = await _repositoryParameters.PosMeFindByKey("CORE_PAYMENT_PRODUCCION_OPERTATIONID_CONNECT");
-        var operationExec = await _repositoryParameters.PosMeFindByKey("CORE_PAYMENT_PRODUCCION_OPERTATIONID_EXEC");
-        var realizarPago = new RestApiPagadito();
-        var tm = new TbTransactionMaster()
+        IsBusy                  = true;
+        var uid                 = await _repositoryParameters.PosMeFindByKey("CORE_PAYMENT_PRODUCCION_USUARIO_COMMERCECLIENT");
+        var awk                 = await _repositoryParameters.PosMeFindByKey("CORE_PAYMENT_PRODUCCION_CLAVE_COMMERCECLIENTE");        
+        var urlCommerce         = "http://posme.net";
+        var operationRequest    = await _repositoryParameters.PosMeFindByKey("CORE_PAYMENT_PRODUCCION_OPERTATIONID_CONNECT");
+        var operationExec       = await _repositoryParameters.PosMeFindByKey("CORE_PAYMENT_PRODUCCION_OPERTATIONID_EXEC");
+        var realizarPago        = new RestApiPagadito();
+        var tm                  = new TbTransactionMaster()
         {
-            Amount = Monto,
-            CurrencyId = (TypeCurrency)VariablesGlobales.DtoInvoice.Currency!.Key
+            Amount      = Monto,
+            CurrencyId  = (TypeCurrency)VariablesGlobales.DtoInvoice.Currency!.Key
         };
-        var response = await realizarPago.GenerarUrl(uid!.Value!, awk!.Value!,urlCommerce,
+        var response    = await realizarPago.GenerarUrl(uid!.Value!, awk!.Value!,urlCommerce,
             operationRequest!.Value!,operationExec!.Value!,VariablesGlobales.DtoInvoice.Items.ToList(), tm);
-        IsBusy = false;
+        IsBusy          = false;
         if (response is not null)
         {
-            await Share.RequestAsync(new ShareTextRequest
+            if (response.Value != "")
+            { 
+                await Share.RequestAsync(new ShareTextRequest
+                {
+                    Uri     = response.Value,
+                    Title   = "Realizar pago de compras"
+                });
+            }
+            else
             {
-                Uri = response.Value,
-                Title = "Realizar pago de compras"
-            });
+                ShowToast(realizarPago.Mensaje, ToastDuration.Long, 12);
+            }
         }
         else
         {

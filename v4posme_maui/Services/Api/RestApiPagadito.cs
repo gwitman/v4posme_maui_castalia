@@ -8,7 +8,8 @@ namespace v4posme_maui.Services.Api
 {
     public class RestApiPagadito
     {
-        private readonly IRepositoryParameters _repositoryParameters = VariablesGlobales.UnityContainer.Resolve<IRepositoryParameters>();
+        private readonly IRepositoryParameters _repositoryParameters    = VariablesGlobales.UnityContainer.Resolve<IRepositoryParameters>();
+        private readonly IRepositoryTbCompany _repositoryCompany        = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCompany>();
         public string Mensaje { get; private set; } = string.Empty;
 
         public async Task<Api_Pagadito_Response_Exec?> GenerarUrl(string uidcommece, string awkcomerce, string urlcommerce,
@@ -28,7 +29,7 @@ namespace v4posme_maui.Services.Api
                     new("operation", operationRequest)
                 };
                 var urlPagadito = await _repositoryParameters.PosMeFindByKey("CORE_PAYMENT_PRODUCCION_URL_PAGADITO");
-                var req = new HttpRequestMessage(HttpMethod.Post, urlPagadito!.Value)
+                var req         = new HttpRequestMessage(HttpMethod.Post, urlPagadito!.Value)
                 {
                     Content = new FormUrlEncodedContent(nvc)
                 };
@@ -77,10 +78,12 @@ namespace v4posme_maui.Services.Api
                     TypeCurrency.Dolar => Mensajes.MonedaDolar,
                     _ => ""
                 };
-                var ern = $"{VariablesGlobales.CompanyKey}_{DateTime.Now:yyyyMMddHHmmss}";
-                var detallesJson = JsonConvert.SerializeObject(listaDetails);
-                var parametrosJson = JsonConvert.SerializeObject(customParam);
-                var amount = decimal.Zero;
+
+                var objCompany      = await _repositoryCompany.PosMeFindFirst();
+                var ern             = $"FCCLI__{objCompany.FlavorId.ToString()}__{DateTime.Now:yyyyMMddHHmmss}";
+                var detallesJson    = JsonConvert.SerializeObject(listaDetails);
+                var parametrosJson  = JsonConvert.SerializeObject(customParam);
+                var amount          = decimal.Zero;
                 if (transactionMaster.CurrencyId == TypeCurrency.Dolar)
                 {
                     amount = transactionMaster.Amount * VariablesGlobales.TipoCambio;
@@ -103,9 +106,9 @@ namespace v4posme_maui.Services.Api
                 };
                 var request = new HttpRequestMessage
                 {
-                    Method = HttpMethod.Post,
-                    RequestUri = new Uri(urlPagadito.Value!),
-                    Content = new FormUrlEncodedContent(data)
+                    Method      = HttpMethod.Post,
+                    RequestUri  = new Uri(urlPagadito.Value!),
+                    Content     = new FormUrlEncodedContent(data)
                 };
                 var response = await client.SendAsync(request);
                 response.EnsureSuccessStatusCode();

@@ -109,18 +109,20 @@
                             Grid.Row="0"
                             Grid.Column="0" />
                         
-                        <!--
+                        
                         <dx:DXToggleButton
                             Style="{StaticResource SinFondoColorSinRedondeado}"
                             IconWidth="40"
                             IconHeight="40"
-                            Content="Tar. Débito"
+                            Content="Pagadito"
                             IsChecked="{Binding ChkDebito}"
                             Command="{Binding SelectionDebitoCommand}"
                             IconPlacement="Top"
                             Icon="credit_card_1"
                             Grid.Row="0"
                             Grid.Column="1" />
+                        
+                        <!--
                         <dx:DXToggleButton
                             Style="{StaticResource SinFondoColorSinRedondeado}"
                             IconWidth="40"
