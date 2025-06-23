@@ -19,20 +19,20 @@ public class PaymentInvoiceViewModel : BaseViewModel
 
     public PaymentInvoiceViewModel()
     {
-        _helper = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
-        _repositoryTbTransactionMasterDetail = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMasterDetail>();
-        _repositoryTbTransactionMaster = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMaster>();
-        _repositoryItems = VariablesGlobales.UnityContainer.Resolve<IRepositoryItems>();
-        Title = "Pago 6/6";
-        SelectionEfectivoCommand = new Command(OnSelectionEfectivoCommand);
-        SelectionDebitoCommand = new Command(OnSelectionDebitoCommand);
-        SelectionCreditoCommand = new Command(OnSelectionCreditoCommand);
-        SelectionMonederoCommand = new Command(OnSelectionMonederoCommand);
-        SelectionChequeCommand = new Command(OnSelectionChequeCommand);
-        SelectionOtrosCommand = new Command(OnSelectionOtrosCommand);
-        AplicarPagoCommand = new Command(OnAplicarPagoCommand, OnValidatePago);
-        ClearMontoCommand = new Command(OnClearMontoCommand);
-        PagarSeleccion = "Pagar con Selección";
+        _helper                                 = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
+        _repositoryTbTransactionMasterDetail    = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMasterDetail>();
+        _repositoryTbTransactionMaster          = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMaster>();
+        _repositoryItems                        = VariablesGlobales.UnityContainer.Resolve<IRepositoryItems>();
+        Title                                   = "Pago 6/6";
+        SelectionEfectivoCommand                = new Command(OnSelectionEfectivoCommand);
+        SelectionDebitoCommand                  = new Command(OnSelectionDebitoCommand);
+        SelectionCreditoCommand                 = new Command(OnSelectionCreditoCommand);
+        SelectionMonederoCommand                = new Command(OnSelectionMonederoCommand);
+        SelectionChequeCommand                  = new Command(OnSelectionChequeCommand);
+        SelectionOtrosCommand                   = new Command(OnSelectionOtrosCommand);
+        AplicarPagoCommand                      = new Command(OnAplicarPagoCommand, OnValidatePago);
+        ClearMontoCommand                       = new Command(OnClearMontoCommand);
+        PagarSeleccion                          = "Pagar con Selección";
         PropertyChanged += (_, _) => AplicarPagoCommand.ChangeCanExecute();
     }
 
@@ -257,12 +257,12 @@ public class PaymentInvoiceViewModel : BaseViewModel
 
     private void ChangedChecked(bool efectivo, bool debito, bool credito, bool monedero, bool cheque, bool otros)
     {
-        ChkEfectivo = efectivo;
-        ChkCredito = credito;
-        ChkDebito = debito;
-        ChkCheque = cheque;
-        ChkMonedero = monedero;
-        ChkOtros = otros;
+        ChkEfectivo     = efectivo;
+        ChkCredito      = credito;
+        ChkDebito       = debito;
+        ChkCheque       = cheque;
+        ChkMonedero     = monedero;
+        ChkOtros        = otros;
         if (efectivo)
         {
             TypePayment = TypePayment.Efectivo;

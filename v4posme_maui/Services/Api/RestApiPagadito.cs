@@ -34,10 +34,10 @@ namespace v4posme_maui.Services.Api
                     Content = new FormUrlEncodedContent(nvc)
                 };
 
-                var responseTokenMessage = await client.SendAsync(req);
+                var responseTokenMessage    = await client.SendAsync(req);
                 if (!responseTokenMessage.IsSuccessStatusCode) return null;
-                var responseBodyToken = await responseTokenMessage.Content.ReadAsStringAsync();
-                var authToken = JsonConvert.DeserializeObject<Api_Pagadito_Response_TokenPagadito>(responseBodyToken);
+                var responseBodyToken       = await responseTokenMessage.Content.ReadAsStringAsync();
+                var authToken               = JsonConvert.DeserializeObject<Api_Pagadito_Response_TokenPagadito>(responseBodyToken);
                 if (authToken is null)
                 {
                     Mensaje = Mensajes.AuthTokenError;
@@ -59,10 +59,10 @@ namespace v4posme_maui.Services.Api
 
                     var detail = new Detalle
                     {
-                        Quantity = item.Quantity,
+                        Quantity    = item.Quantity,
                         Description = item.Name,
-                        Price = precio,
-                        UrlProduct = urlcommerce
+                        Price       = precio,
+                        UrlProduct  = urlcommerce
                     };
                     listaDetails.Add(detail);
                 }
