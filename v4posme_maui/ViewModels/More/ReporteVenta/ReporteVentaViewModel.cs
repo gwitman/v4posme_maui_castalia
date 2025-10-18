@@ -47,9 +47,10 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 			get => _fechaInical;
 			set
 			{
-				_fechaInical = value;
-				SetProperty(ref _fechaInical, value);
-			}
+				/*_fechaInical = value;*/
+				if(SetProperty(ref _fechaInical, value))
+                    OnPropertyChanged(nameof(ReporteFecha));
+            }
 		}
 
 		public DateTime FechaFinal
@@ -57,12 +58,15 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 			get => _fechaFinal;
 			set
 			{
-				_fechaFinal = value;
-				SetProperty(ref _fechaFinal, value);
+				/*_fechaFinal = value;*/
+				if(SetProperty(ref _fechaFinal, value))
+                    OnPropertyChanged(nameof(ReporteFecha)); 
 			}
 		}
 
-		private bool _isFormVisible = false;
+        public string ReporteFecha  => $"DEL {FechaInical:dd/MM/yyyy} - {FechaFinal:dd/MM/yyyy hh:mm:ss tt}";
+
+        private bool _isFormVisible = false;
 		private bool _isVisibleDate = true;
 
 		public bool IsFormVisible
@@ -265,11 +269,12 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 				var totalNIO = 0m;
 				var totalUSD = 0m;
 
-				var transactions = (await _repositoryTbTransactionMaster.PosmeGetAll());
+				var transactions	= (await _repositoryTbTransactionMaster.PosmeGetAll());
+                FechaFinal			= FechaFinal.AddHours(23).AddMinutes(59).AddSeconds(59);
 
-				var invoicesUS = transactions
+                var invoicesUS = transactions
 					.Where(_invoices => _invoices.TransactionId == TypeTransaction.TransactionInvoiceBilling)
-					.Where(_invoices => _invoices.TransactionOn >= FechaInical && _invoices.TransactionOn <= FechaFinal.AddHours(12))
+					.Where(_invoices => _invoices.TransactionOn >= FechaInical && _invoices.TransactionOn <= FechaFinal)
 					.Where(_invoices => _invoices.CurrencyId == TypeCurrency.Dolar)
 					.Select(x => new ViewTempDtoReporteCierre()
 					{
@@ -282,7 +287,7 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 
 				var creditsUS = transactions
 					.Where(_credits => _credits.TransactionId == TypeTransaction.TransactionShare)
-					.Where(_credits => _credits.TransactionOn >= FechaInical && _credits.TransactionOn <= FechaFinal.AddHours(12))
+					.Where(_credits => _credits.TransactionOn >= FechaInical && _credits.TransactionOn <= FechaFinal)
 					.Where(_credits => _credits.CurrencyId == TypeCurrency.Dolar)
 					.Select(x => new ViewTempDtoReporteCierre()
 					{
@@ -295,7 +300,7 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 
 				var invoicesNIO = transactions
 					.Where(_invoices => _invoices.TransactionId == TypeTransaction.TransactionInvoiceBilling)
-					.Where(_invoices => _invoices.TransactionOn >= FechaInical && _invoices.TransactionOn <= FechaFinal.AddHours(12))
+					.Where(_invoices => _invoices.TransactionOn >= FechaInical && _invoices.TransactionOn <= FechaFinal)
 					.Where(_invoices => _invoices.CurrencyId == TypeCurrency.Cordoba)
 					.Select(x => new ViewTempDtoReporteCierre()
 					{
@@ -308,7 +313,7 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 
 				var creditsNIO = transactions
 					.Where(_credits => _credits.TransactionId == TypeTransaction.TransactionShare)
-					.Where(_credits => _credits.TransactionOn >= FechaInical && _credits.TransactionOn <= FechaFinal.AddHours(12))
+					.Where(_credits => _credits.TransactionOn >= FechaInical && _credits.TransactionOn <= FechaFinal)
 					.Where(_credits => _credits.CurrencyId == TypeCurrency.Cordoba)
 					.Select(x => new ViewTempDtoReporteCierre()
 					{
@@ -321,7 +326,7 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 
 				var visits = transactions
 					.Where(_visits => _visits.TransactionId == TypeTransaction.TransactionQueryMedical)
-					.Where(_visits => _visits.TransactionOn >= FechaInical && _visits.TransactionOn <= FechaFinal.AddHours(12))
+					.Where(_visits => _visits.TransactionOn >= FechaInical && _visits.TransactionOn <= FechaFinal)
 					.Select(x => new ViewTempDtoReporteCierre()
 					{
 						DocumentNumber = x.TransactionNumber!,
@@ -429,7 +434,7 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 			printer.BoldMode($"CIERRE");
 			printer.NewLine();
 			printer.AlignCenter();
-			printer.BoldMode($"DEL {FechaInical:yyyy-MM-dd} AL {FechaFinal:yyyy-MM-dd}");
+			printer.BoldMode($"DEL {FechaInical:yyyy-MM-dd} AL {FechaFinal:yyyy-MM-dd hh:mm:ss tt}");
 			printer.NewLine();
 			printer.AlignLeft();
 

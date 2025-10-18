@@ -86,6 +86,7 @@
 
                             <Label x:Name="reporteFecha"
                                 FontSize="17"
+                                Text="{Binding ReporteFecha}"
                                 HorizontalTextAlignment="Center"
                                 FontAttributes="Bold" />
 

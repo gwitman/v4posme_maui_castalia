@@ -19,8 +19,7 @@ public partial class ReporteVentaPage : ContentPage
 	protected override async void OnAppearing()
 	{
 		base.OnAppearing();
-		await viewModel.OnAppearing(Navigation);
-		reporteFecha.Text = $"DEL {viewModel.FechaInical:dd/MM/yyyy} - {viewModel.FechaFinal:dd/MM/yyyy}";
+		await viewModel.OnAppearing(Navigation);		
 	}
 
 	protected override bool OnBackButtonPressed()
