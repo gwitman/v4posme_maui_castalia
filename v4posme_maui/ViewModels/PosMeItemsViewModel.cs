@@ -18,6 +18,7 @@ namespace v4posme_maui.ViewModels
 		private readonly HelperCore _helper;
         private int _loadBatchSize = 15;
         private int _lastLoadedIndex;
+        
 
 
 		public PosMeItemsViewModel()
@@ -29,6 +30,7 @@ namespace v4posme_maui.ViewModels
             _items = new DXObservableCollection<Api_AppMobileApi_GetDataDownloadItemsResponse>();
             CreateDetailFormViewModelCommand = new Command<CreateDetailFormViewModelEventArgs>(CreateDetailFormViewModel);
             SearchCommand = new Command(OnSearchItems);
+            ChangeValueCommand = new Command(OnChangeValueCommand);
             OnBarCode = new Command(OnSearchBarCode);
             LoadMoreCommand = new Command(OnLoadMoreCommand);
         }
@@ -36,6 +38,7 @@ namespace v4posme_maui.ViewModels
 
         public ICommand OnBarCode { get; }
         public ICommand SearchCommand { get; }
+        public ICommand ChangeValueCommand { get;  }
         public ICommand LoadMoreCommand { get; }
         public ICommand CreateDetailFormViewModelCommand { get; }
         
@@ -65,6 +68,10 @@ namespace v4posme_maui.ViewModels
             OnSearchItems(Search);
         }
 
+        private void OnChangeValueCommand(object? obj)
+        {
+            _lastLoadedIndex = 0;            
+        }
         private void OnSearchItems(object? obj)
         {
             IsBusy = true;
@@ -76,12 +83,20 @@ namespace v4posme_maui.ViewModels
             _lastLoadedIndex = 0;
             Items.Clear();
             LoadItems();
-            IsBusy = false;
+            
+        }
+        private void OnLoadMoreCommand()
+        {
+            if (IsBusy)
+                return;
+
+            LoadItems();
+            _lastLoadedIndex += _loadBatchSize;
         }
 
         private async void LoadItems()
         {
-            IsBusy = true;
+            IsBusy  = true;
             await Task.Run(async () =>
             {
                 Thread.Sleep(1000);
@@ -92,19 +107,17 @@ namespace v4posme_maui.ViewModels
                 }
                 else
                 {
+                    
                     newItems = await _repositoryItems.PosMeFilterdByItemNumberAndBarCodeAndNameByTop(Search, _lastLoadedIndex, _loadBatchSize);
                 }
 				
                 Items.AddRange(newItems);
+                IsBusy = false;
             });
-            IsBusy = false;
+            
         }
         
-        private void OnLoadMoreCommand()
-        {
-            LoadItems();
-            _lastLoadedIndex += _loadBatchSize;
-        }
+        
         private void CreateDetailFormViewModel(CreateDetailFormViewModelEventArgs e)
         {
             if (e.DetailFormType != DetailFormType.Edit) return;

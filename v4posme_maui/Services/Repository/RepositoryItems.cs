@@ -52,7 +52,7 @@ public class RepositoryItems(DataBase dataBase)
                                || response.Name.ToLower().Contains(textSearch))
             .ToListAsync();
     }
-    public async Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeFilterdByItemNumberAndBarCodeAndNameByTop(string? textSearch,int size,int top)
+    public async Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeFilterdByItemNumberAndBarCodeAndNameByTop(string? textSearch,int size /*numero o elemento inicial */,int top /*elementos por paginas*/)
     {
         textSearch = textSearch!.ToLower();
         return await _dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadItemsResponse>()

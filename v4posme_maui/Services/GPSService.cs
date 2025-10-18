@@ -115,8 +115,8 @@ namespace v4posme_maui.Services
                     return;
                 }
 
-                var nickname = VariablesGlobales.User!.Nickname!;
-                var password = VariablesGlobales.User!.Password!;
+                var nickname = VariablesGlobales.User is null ? "" : VariablesGlobales.User!.Nickname!;
+                var password = VariablesGlobales.User is null ? "" : VariablesGlobales.User!.Password!;
 
                 var nvc = new List<KeyValuePair<string, string>>
                 {
@@ -125,7 +125,7 @@ namespace v4posme_maui.Services
                     new("txtLatituded", latitude.ToString()),
                     new("txtLongituded", longitude.ToString()),
                     new("txtReference1", " "),
-                    new("txtCompanyName", VariablesGlobales.CompanyKey!.ToString())
+                    new("txtCompanyName", VariablesGlobales.CompanyKey is null ? "" : VariablesGlobales.CompanyKey!.ToString())
                 };
                 var req = new HttpRequestMessage(HttpMethod.Post, tempUrl)
                 {
@@ -158,8 +158,8 @@ namespace v4posme_maui.Services
                     return;
                 }
 
-                nickname = VariablesGlobales.User!.Nickname!;
-                password = VariablesGlobales.User!.Password!;
+                nickname = VariablesGlobales.User is null ? "" : VariablesGlobales.User!.Nickname!;
+                password = VariablesGlobales.User is null ? "" : VariablesGlobales.User!.Password!;
 
                 var nvcPosme = new List<KeyValuePair<string, string>>
                 {
@@ -168,7 +168,7 @@ namespace v4posme_maui.Services
                     new("txtLatituded", latitude.ToString()),
                     new("txtLongituded", longitude.ToString()),
                     new("txtReference1", " "),
-                    new("txtCompanyName", VariablesGlobales.CompanyKey!.ToString())
+                    new("txtCompanyName",VariablesGlobales.CompanyKey is null ? "" :  VariablesGlobales.CompanyKey!.ToString())
                 };
                 var reqPosme = new HttpRequestMessage(HttpMethod.Post, tempUrl)
                 {

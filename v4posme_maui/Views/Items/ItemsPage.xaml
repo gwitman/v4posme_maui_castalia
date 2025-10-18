@@ -34,6 +34,7 @@
                                   Text="{Binding Search}"
                                   StartIconCommand="{Binding SearchCommand}"
                                   ReturnCommand="{Binding SearchCommand}"
+                                  TextChangedCommand="{Binding ChangeValueCommand}"
                                   PlaceholderText="Buscar por código, código de barra y descripción" />
 
 
