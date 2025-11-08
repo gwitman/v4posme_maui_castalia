@@ -5,4 +5,5 @@ namespace v4posme_maui.Services.Repository;
 public interface IRepositoryTbTransactionMasterDetail : IRepositoryFacade<TbTransactionMasterDetail>
 {
     Task<List<TbTransactionMasterDetail>> PosMeItemByTransactionId(int transactionId);
+    Task<List<TbTransactionMasterDetail>> PosMeByTransactionIDAndItemID(int transactionId, int itemID);
 }

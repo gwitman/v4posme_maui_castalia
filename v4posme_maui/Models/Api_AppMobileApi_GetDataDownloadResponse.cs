@@ -322,6 +322,13 @@ public class Api_AppMobileApi_GetDataDownloadItemsResponse : BindableBase
         get => GetValue<decimal>();
         set => SetValue(value);
     }
+
+    [NotMapped]
+    public decimal CantidadFacturadas
+    {
+        get => GetValue<decimal>();
+        set => SetValue(value);
+    }
 }
 
 [SQLite.Table("tb_parameters")]

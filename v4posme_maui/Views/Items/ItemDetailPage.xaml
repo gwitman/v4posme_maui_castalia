@@ -62,6 +62,12 @@
             </dx:DXBorder>
             <dx:DXBorder Style="{StaticResource PropertyBorder}">
                 <dx:DXStackLayout Orientation="Vertical">
+                    <Label Text="Cantidad facturadas: " FontAttributes="Bold" FontSize="18" />
+                    <Label Text="{Binding Item.CantidadFacturadas}" FontSize="18" />
+                </dx:DXStackLayout>
+            </dx:DXBorder>
+            <dx:DXBorder Style="{StaticResource PropertyBorder}">
+                <dx:DXStackLayout Orientation="Vertical">
                     <Label Text="Cantidad ingresadas: " FontAttributes="Bold" FontSize="18" />
                     <Label Text="{Binding Item.CantidadEntradas}" FontSize="18" />
                 </dx:DXStackLayout>

@@ -17,15 +17,16 @@ public class ProductosRetornosViewModel : BaseViewModel
     private readonly IRepositoryItems _repositoryItems;
     private readonly IRepositoryTbParameterSystem _parameterSystem;
     private readonly IRepositoryParameters _repositoryParameters;
-
+    private readonly IRepositoryTbTransactionMasterDetail _transactionMasterDetail;
 
     public ProductosRetornosViewModel()
     {
         _repositoryItems        = VariablesGlobales.UnityContainer.Resolve<IRepositoryItems>();
         _parameterSystem        = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbParameterSystem>();
         _repositoryParameters   = VariablesGlobales.UnityContainer.Resolve<IRepositoryParameters>();
-        _items                  = new();
-        PrintCommand            = new Command(OnPrintCommand);
+        _transactionMasterDetail    = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMasterDetail>();
+        _items                      = new();
+        PrintCommand                = new Command(OnPrintCommand);
     }
     
     public ICommand PrintCommand { get; private set; }
@@ -100,11 +101,27 @@ public class ProductosRetornosViewModel : BaseViewModel
             printer.NewLine();
             if (Items.Count > 0)
             {
+
+               
+
                 printer.Append("Detalle de productos");
                 printer.Append("Descripción     Barra      Qt");
                 printer.NewLine();                
                 foreach (var item in Items)
                 {
+                    //Obtener la cantidad facturadas por prodcuto
+                    decimal quantityInvoice         = 0;
+                    var objListTransactionDetail    = await _transactionMasterDetail.PosMeByTransactionIDAndItemID((int)TypeTransaction.TransactionInvoiceBilling, item.ItemId);
+                    if (objListTransactionDetail is null)
+                        quantityInvoice = 0;
+                    else
+                        quantityInvoice = Convert.ToDecimal(objListTransactionDetail.Sum(p => p.Quantity));
+
+
+                    //Obtener las cantidades por productos
+                    decimal quantityByItem          = 0;
+                    quantityByItem                  = (item.Quantity + item.CantidadEntradas) - (item.CantidadSalidas + quantityInvoice);
+
                     var barCode = item.BarCode;
                     barCode     = barCode.Split(",")[0];
                     
@@ -114,7 +131,7 @@ public class ProductosRetornosViewModel : BaseViewModel
                         barCode = barCode.Substring(0, 12); // Corta a 12 caracteres
 
                     printer.Append($"{item.Name}");
-                    printer.Append($"{barCode}               {item.Quantity:N2}");
+                    printer.Append($"{barCode}               {quantityByItem:N2}");
                     printer.Append("..............................");
                     
                 }
@@ -147,6 +164,24 @@ public class ProductosRetornosViewModel : BaseViewModel
         {
             var data        = await _repositoryItems.PosMeQuantityDistintoZero();
             Items           = new DXObservableCollection<Api_AppMobileApi_GetDataDownloadItemsResponse>(data);
+
+            //Calcular los prodcutos cantidade finales
+            if (Items is not null)
+            {
+                foreach (var item in Items)
+                {
+                    decimal quantityInvoice         = 0;
+                    var objListTransactionDetail    = await _transactionMasterDetail.PosMeByTransactionIDAndItemID((int)TypeTransaction.TransactionInvoiceBilling, item.ItemId);
+                    if (objListTransactionDetail is null)
+                        quantityInvoice = 0;
+                    else
+                        quantityInvoice = Convert.ToDecimal(objListTransactionDetail.Sum(p => p.Quantity));
+
+                    item.Quantity = (item.Quantity + item.CantidadEntradas) - (item.CantidadSalidas + quantityInvoice);
+
+                }
+            }
+
             CompanyTelefono = await _repositoryParameters.PosMeFindByKey("CORE_PHONE");
             CompanyRuc      = await _repositoryParameters.PosMeFindByKey("CORE_COMPANY_IDENTIFIER");
             Company         = VariablesGlobales.TbCompany;
