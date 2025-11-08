@@ -21,7 +21,7 @@ public class HelperCore(
         var findMenuElement = await _reporitoryTbMenuElement.PosMeFindById((int)menuElementID);
         if(typePermission == TypePermission.Updated)
         {
-            if (findMenuElement.Selected == (int)impact)
+            if (findMenuElement.Edited == (int)impact)
                 return true;
         }
         return false;
