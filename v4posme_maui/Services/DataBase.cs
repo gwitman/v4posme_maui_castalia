@@ -51,6 +51,7 @@ public class DataBase
         try
         {
             await Database.CreateTableAsync<Api_AppMobileApi_GetDataDownloadCustomerResponse>();
+            await Database.CreateTableAsync<Api_AppMobileApi_GetDataDownloadMenuElementResponse>();
             await Database.CreateTableAsync<Api_AppMobileApi_GetDataDownloadItemsResponse>();
             await Database.CreateTableAsync<Api_AppMobileApi_GetDataDownloadParametersResponse>();
             await Database.CreateTableAsync<Api_AppMobileApi_GetDataDownloadDocumentCreditResponse>();

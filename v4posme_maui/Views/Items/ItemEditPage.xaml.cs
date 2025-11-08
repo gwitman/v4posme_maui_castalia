@@ -40,6 +40,15 @@ public partial class ItemEditPage : ContentPage
                 return;
             }
 
+            //Validar Permiso
+            bool permission = await _helperContador.GetPermission(TypeMenuElementID.app_inventory_item_index_aspx, TypePermission.Updated, TypeImpact.All);
+            if ( !permission )
+            {
+                TxtMensaje.Text = Mensajes.MensajeNoTienePermisoDeEdicion;
+                Popup.IsOpen    = true;
+                return;
+            }
+
             _saveItem            = (Api_AppMobileApi_GetDataDownloadItemsResponse)DataForm.DataObject;
             _saveItem.Modificado = true;
             var count            = await _repositoryItems.PosMeExistBarCode(_saveItem.BarCode, _saveItem.ItemId);

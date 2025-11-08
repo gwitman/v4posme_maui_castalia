@@ -55,4 +55,27 @@ namespace v4posme_maui.Services.SystemNames
         Monedero,
         Otros
     }
+
+    public enum TypePermission
+    {
+        Selected = 0,
+        Inserted = 1,
+        Deleted  = 2,
+        Updated  = 3
+    }
+    public enum TypeImpact
+    {
+        None = -1, /*no puede ver ningun registro*/
+        All = 0, /*puede ver todos los registros*/
+        Branch = 1, /*puede ver solo los registros de la sucursal*/
+        Me=2, /*puede ver solo los que yo cree*/
+    }
+    public enum TypeMenuElement
+    {
+        Left = 5
+    }
+    public enum TypeMenuElementID
+    {
+        app_inventory_item_index_aspx = 55 
+    }
 }

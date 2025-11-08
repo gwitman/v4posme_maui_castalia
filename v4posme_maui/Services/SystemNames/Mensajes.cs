@@ -29,6 +29,7 @@ public static class Mensajes
     public const string MensajeCompartirError = "No fue posible realizar la captura de los datos para compartir";
     public const string MensajeDispositivoNoConectado = "No está conectado el dispositivo al celular o nombre es incorrecto";
     public const string MensajeCampoRequerido = "Todos los campos son requeridos, intente nuevamente.";
+    public const string MensajeNoTienePermisoDeEdicion = "No tiene permiso para editar el producto";
     public const string MensajeCompartirComprobante = "Compartir Comprobante de Factura";
     public const string MensajeSeleccionarMoneda = "Seleccione una moneda para continuar";
     public const string MensajeSeleccionarFrecuenciaPago = "Seleccione una frecuencia de pago";

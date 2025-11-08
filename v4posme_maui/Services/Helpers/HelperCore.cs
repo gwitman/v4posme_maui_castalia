@@ -11,9 +11,21 @@ namespace v4posme_maui.Services.Helpers;
 public class HelperCore(
     IRepositoryTbParameterSystem repositoryParameters,
     IRepositoryParameters _repositoryParametersWeb,
-    IRepositoryTbCustomer _repositoryTbCustomer
+    IRepositoryTbCustomer _repositoryTbCustomer,
+    IRepositoryTbMenuElement _reporitoryTbMenuElement 
 )
 {
+
+    public async Task<bool> GetPermission(TypeMenuElementID menuElementID, TypePermission typePermission,TypeImpact impact )
+    {
+        var findMenuElement = await _reporitoryTbMenuElement.PosMeFindById((int)menuElementID);
+        if(typePermission == TypePermission.Updated)
+        {
+            if (findMenuElement.Selected == (int)impact)
+                return true;
+        }
+        return false;
+    } 
     public string ExtractCompanyKey(string companyUrl)
     {
         if (Uri.TryCreate(companyUrl, UriKind.Absolute, out var uri))

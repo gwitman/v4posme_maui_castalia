@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
 using DevExpress.Maui.Core;
+using DevExpress.Xpo.DB.Helpers;
 using SQLite;
 using v4posme_maui.Services.SystemNames;
 
@@ -12,6 +13,7 @@ public class Api_AppMobileApi_GetDataDownloadResponse
     public string? Message { get; set; }
 
     public TbCompany ObjCompany { get; set; } = new();
+    public List<Api_AppMobileApi_GetDataDownloadMenuElementResponse> ListMenuElement { get; set; } = [];
     public List<Api_AppMobileApi_GetDataDownloadItemsResponse> ListItem { get; set; } = [];
     public List<Api_AppMobileApi_GetDataDownloadCustomerResponse> ListCustomer { get; set; } = [];
     public List<Api_AppMobileApi_GetDataDownloadParametersResponse> ListParameter { get; set; } = [];
@@ -159,6 +161,67 @@ public class Api_AppMobileApi_GetDataDownloadDocumentCreditAmortizationResponse
     
     [NotMapped] public string? CurrencyName { get; set; }
     [NotMapped] public decimal MontoCuota { get; set; }
+}
+
+[SQLite.Table("tb_menu_element")]
+public class Api_AppMobileApi_GetDataDownloadMenuElementResponse : BindableBase
+{
+    [PrimaryKey]
+    [DataMember(Name = "menuElementID")]
+    public int MenuElementId
+    {
+        get => GetValue<int>();
+        set => SetValue(value);
+
+    }
+    [DataMember(Name = "display")]
+    public string Display
+    {
+        get => GetValue<string>();
+        set => SetValue(value);
+    }
+    [DataMember(Name = "address")]
+    public string Address
+    {
+        get => GetValue<string>();
+        set => SetValue(value);
+    }
+    [DataMember(Name = "icon")]
+    public string Icon
+    {
+        get => GetValue<string>();
+        set => SetValue(value);
+    }
+    [DataMember(Name = "typeMenuElementID")]
+    public int TypeMenuElementID
+    {
+        get => GetValue<int>();
+        set => SetValue(value);
+    }
+    [DataMember(Name = "selected")]
+    public int Selected
+    {
+        get => GetValue<int>();
+        set => SetValue(value);
+    }
+    [DataMember(Name = "inserted")]
+    public int Inserted
+    {
+        get => GetValue<int>();
+        set => SetValue(value);
+    }
+    [DataMember(Name = "deleted")]
+    public int Deleted
+    {
+        get => GetValue<int>();
+        set => SetValue(value);
+    }
+    [DataMember(Name = "edited")]
+    public int Edited
+    {
+        get => GetValue<int>();
+        set => SetValue(value);
+    }
 }
 
 [SQLite.Table("tb_items")]

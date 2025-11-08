@@ -15,6 +15,7 @@ public class RestApiAppMobileApi
 {
     private readonly HttpClient _httpClient = new();
     private readonly IRepositoryTbCustomer _repositoryTbCustomer                                    = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCustomer>();
+    private readonly IRepositoryTbMenuElement _repositoryTbMenuElement                              = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbMenuElement>();
 
     private readonly IRepositoryItems _repositoryItems                                              = VariablesGlobales.UnityContainer.Resolve<IRepositoryItems>();
 
@@ -74,10 +75,13 @@ public class RestApiAppMobileApi
             var transactionMasterAll        = _repositoryTbTransactionMaster.PosMeDeleteAll();
             var transactionMasterDetailAll  = _repositoryTbTransactionMasterDetail.PosMeDeleteAll();
             var serverTransactionMasterAll  = _repositoryServerTransactionMasterDetail.PosMeDeleteAll();
+            var menuElementDeleteAll        = _repositoryTbMenuElement.PosMeDeleteAll();
+
             await Task.WhenAll([
                 customerDeleteAll, itemsDeleteAll, documentCreditAmortizationDeleteAll, parametersDeleteAll,
                 documentCreditDeleteAll, companyDeleteAll, transactionMasterAll,transactionMasterDetailAll,
-                serverTransactionMasterAll
+                serverTransactionMasterAll,
+                menuElementDeleteAll
             ]);
 
             //insertar nuevos movimientos
@@ -88,10 +92,12 @@ public class RestApiAppMobileApi
             var taskParameters                  = _repositoryParameters!.PosMeInsertAll(apiResponse.ListParameter);
             var taskDocumentCredit              = _repositoryDocumentCredit!.PosMeInsertAll(apiResponse.ListDocumentCredit);
             var taskServerTransactionMaster     = _repositoryServerTransactionMasterDetail!.PosMeInsertAll(apiResponse.ListServerTransactionMaster);
+            var taskMenuElement                 = _repositoryTbMenuElement!.PosMeInsertAll(apiResponse.ListMenuElement);
 
             await Task.WhenAll([
                 taskCustomer, taskItem, taskDocumentCreditAmortization, taskParameters,
-                taskDocumentCredit, taskCompany, taskServerTransactionMaster
+                taskDocumentCredit, taskCompany, taskServerTransactionMaster,
+                taskMenuElement
             ]);
 
             //inicializar contador 

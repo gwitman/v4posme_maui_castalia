@@ -33,6 +33,7 @@ namespace v4posme_maui.ViewModels
         private readonly RestApiCoreAcount _restServiceUser												= new();
         private readonly IRepositoryParameters _repositoryParameters									= VariablesGlobales.UnityContainer.Resolve<IRepositoryParameters>();
         private readonly IRepositoryTbCustomer _repositoryTbCustomer									= VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCustomer>();
+		private readonly IRepositoryTbMenuElement _repositoryTbMenuElement								= VariablesGlobales.UnityContainer.Resolve<IRepositoryTbMenuElement>();
         private readonly IRepositoryItems _repositoryItems												= VariablesGlobales.UnityContainer.Resolve<IRepositoryItems>();        
         private readonly IRepositoryDocumentCreditAmortization _repositoryDocumentCreditAmortization	= VariablesGlobales.UnityContainer.Resolve<IRepositoryDocumentCreditAmortization>();
         private readonly IRepositoryDocumentCredit _repositoryDocumentCredit							= VariablesGlobales.UnityContainer.Resolve<IRepositoryDocumentCredit>();
@@ -271,7 +272,8 @@ namespace v4posme_maui.ViewModels
                             var transactionMasterAll				= _repositoryTbTransactionMaster.PosMeDeleteAll();
                             var transactionMasterDetailAll			= _repositoryTbTransactionMasterDetail.PosMeDeleteAll();
 							var serverTransactionMasterAll			= _repositoryServerTransactionMaster.PosMeDeleteAll();
-                            await Task.WhenAll([customerDeleteAll, itemsDeleteAll, documentCreditAmortizationDeleteAll, parametersDeleteAll,documentCreditDeleteAll, companyDeleteAll, transactionMasterAll,transactionMasterDetailAll, serverTransactionMasterAll]);
+							var menuElementDeleteAll				= _repositoryTbMenuElement.PosMeDeleteAll();
+                            await Task.WhenAll([customerDeleteAll, itemsDeleteAll, documentCreditAmortizationDeleteAll, parametersDeleteAll,documentCreditDeleteAll, companyDeleteAll, transactionMasterAll,transactionMasterDetailAll, serverTransactionMasterAll, menuElementDeleteAll]);
 
                             //inicializar contador 
                             var objParameterSystem		= await _parameterSystem.PosMeFindByName(Constantes.ParemeterEntityIDAutoIncrement);
