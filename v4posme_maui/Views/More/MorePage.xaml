@@ -44,7 +44,7 @@
 
         <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
             <!-- Botón a la izquierda -->
-            <Button Text="Productos"
+            <Button Text="Inventario"
             BackgroundColor="{StaticResource PrimaryDark}"
             TextColor="White"
             Padding="10,10"

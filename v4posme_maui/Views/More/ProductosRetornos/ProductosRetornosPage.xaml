@@ -11,8 +11,8 @@
     </ContentPage.BindingContext>
     <ContentPage.ToolbarItems>
 
-        <ToolbarItem Text="Imprimir" IconImageSource="printer"  Command="{Binding PrintCommand}" />
-        <ToolbarItem Text="Compartir" IconImageSource="shared" Clicked="MenuItem_OnClicked" />
+        <ToolbarItem Text="Imprimir" Order="Secondary"  Command="{Binding PrintCommand}" />
+        <ToolbarItem Text="Compartir" Order="Secondary" Clicked="MenuItem_OnClicked" />
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
         <StackLayout>

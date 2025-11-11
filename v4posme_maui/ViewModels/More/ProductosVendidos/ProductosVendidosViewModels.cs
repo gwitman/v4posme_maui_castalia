@@ -27,9 +27,14 @@ public class ProductosVendidosViewModel : BaseViewModel
         _transactionMasterDetail = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMasterDetail>();
         _items = new();
         PrintCommand = new Command(OnPrintCommand);
+        LoadDataCommand = new Command(OnLoadDataCommand);
+
+
     }
 
     public ICommand PrintCommand { get; private set; }
+    public ICommand LoadDataCommand { get; }
+
     private DXObservableCollection<Api_AppMobileApi_GetDataDownloadItemsResponse> _items;
     public DXObservableCollection<Api_AppMobileApi_GetDataDownloadItemsResponse> Items
     {
@@ -53,6 +58,33 @@ public class ProductosVendidosViewModel : BaseViewModel
         private set => SetProperty(ref _companyRuc, value);
     }
 
+    private DateTime _fechaInical;
+    private DateTime _fechaFinal;
+
+    public DateTime FechaInical
+    {
+        get => _fechaInical;
+        set
+        {
+            SetProperty(ref _fechaInical, value);
+        }
+    }
+
+    public DateTime FechaFinal
+    {
+        get => _fechaFinal;
+        set
+        {
+            /*_fechaFinal = value;*/
+            SetProperty(ref _fechaFinal, value);
+        }
+    }
+
+
+    private async void OnLoadDataCommand()
+    {
+        LoadData();
+    }
     private async void OnPrintCommand()
     {
         try
@@ -90,6 +122,22 @@ public class ProductosVendidosViewModel : BaseViewModel
                 ShowMensajePopUp(Mensajes.CompanyNoExiste);
                 return;
             }
+
+
+            if (FechaInical == DateTime.MinValue)
+            {
+                var hoy = DateTime.Now;
+                FechaInical = new DateTime(hoy.Year, hoy.Month, hoy.Day);
+            }
+
+            if (FechaFinal == DateTime.MinValue)
+            {
+                FechaFinal = DateTime.Now;
+            }
+
+            DateTime startOn    = FechaInical;
+            DateTime endOn      = new DateTime(FechaFinal.Year, FechaFinal.Month, FechaFinal.Day).AddDays(1).AddSeconds(-1);
+
             printer.AlignCenter();
             printer.BoldMode(Company.Name!);
             printer.BoldMode($"RUC: {CompanyRuc!.Value}");
@@ -114,7 +162,7 @@ public class ProductosVendidosViewModel : BaseViewModel
                     //Obtener la cantidad facturadas por prodcuto
                     decimal quantityInvoice      = 0;
                     decimal amountInvoice        = 0;
-                    var objListTransactionDetail = await _transactionMasterDetail.PosMeByTransactionIDAndItemID((int)TypeTransaction.TransactionInvoiceBilling, item.ItemId);
+                    var objListTransactionDetail = await _transactionMasterDetail.PosMeByTransactionIDAndItemID_BetweenDate((int)TypeTransaction.TransactionInvoiceBilling, item.ItemId, startOn, endOn);
                     if (objListTransactionDetail is null)
                     {
                         quantityInvoice = 0;
@@ -175,8 +223,25 @@ public class ProductosVendidosViewModel : BaseViewModel
     {
         try
         {
-            var data = await _repositoryItems.PosMeFindAll();
-            Items = new DXObservableCollection<Api_AppMobileApi_GetDataDownloadItemsResponse>(data);
+            var data            = await _repositoryItems.PosMeFindAll();
+            Items               = new DXObservableCollection<Api_AppMobileApi_GetDataDownloadItemsResponse>(data);
+
+            if (FechaInical == DateTime.MinValue)
+            {
+                var hoy         = DateTime.Now;
+                FechaInical     = new DateTime(hoy.Year, hoy.Month, hoy.Day);
+            }
+
+            if (FechaFinal == DateTime.MinValue)
+            {
+                FechaFinal = DateTime.Now;
+            }
+
+
+            DateTime startOn    = FechaInical;
+            DateTime endOn      = new DateTime(FechaFinal.Year, FechaFinal.Month, FechaFinal.Day).AddDays(1).AddSeconds(-1);
+
+
 
             //Calcular los prodcutos cantidade finales
             if (Items is not null)
@@ -184,7 +249,7 @@ public class ProductosVendidosViewModel : BaseViewModel
                 foreach (var item in Items)
                 {
                     decimal quantityInvoice = 0;
-                    var objListTransactionDetail = await _transactionMasterDetail.PosMeByTransactionIDAndItemID((int)TypeTransaction.TransactionInvoiceBilling, item.ItemId);
+                    var objListTransactionDetail = await _transactionMasterDetail.PosMeByTransactionIDAndItemID_BetweenDate((int)TypeTransaction.TransactionInvoiceBilling, item.ItemId,startOn,endOn);
                     if (objListTransactionDetail is null)
                         quantityInvoice = 0;
                     else

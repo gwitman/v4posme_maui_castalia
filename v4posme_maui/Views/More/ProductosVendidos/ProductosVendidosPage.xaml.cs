@@ -58,6 +58,12 @@ public partial class ProductosVendidosPage : ContentPage
         }
     }
 
+    private async void BackToHome_OnClicked(object? sender, EventArgs e)
+    {
+        Application.Current!.MainPage = new MainPage();
+        await Navigation.PopToRootAsync();
+    }
+
     private async void MenuItem_OnClicked(object? sender, EventArgs e)
     {
         try

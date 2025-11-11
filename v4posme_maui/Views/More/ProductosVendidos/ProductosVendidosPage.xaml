@@ -11,8 +11,12 @@
     </ContentPage.BindingContext>
     <ContentPage.ToolbarItems>
 
-        <ToolbarItem Text="Imprimir" IconImageSource="printer"  Command="{Binding PrintCommand}" />
-        <ToolbarItem Text="Compartir" IconImageSource="shared" Clicked="MenuItem_OnClicked" />
+        <ToolbarItem IconImageSource="basic_home_white" Clicked="BackToHome_OnClicked" />
+        <ToolbarItem IconImageSource="shared_white" Command="{Binding LoadDataCommand}" />
+
+        <ToolbarItem Text="Imprimir" Order="Secondary"  Command="{Binding PrintCommand}" />
+        <ToolbarItem Text="Compartir" Order="Secondary" Clicked="MenuItem_OnClicked" />
+        
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
         <StackLayout>
@@ -35,6 +39,32 @@
                             TextColor="White" />
                 </StackLayout>
             </dx:DXPopup>
+
+            <Grid Margin="0,0,0,10" HorizontalOptions="Center" >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <dx:DateEdit
+                x:Name="fechaInicio"
+                DisplayFormat="d"
+                StartIcon="editorscalendar"
+                IconColor="{StaticResource Primary}"
+                LabelText="Fecha Inicio"
+                Grid.Column="0" 
+                Date="{Binding FechaInical}"/>
+
+                <dx:DateEdit
+                x:Name="fechaFinal"
+                DisplayFormat="d"
+                StartIcon="editorscalendar"
+                IconColor="{StaticResource Primary}"
+                LabelText="Fecha Final"
+                Grid.Column="1"
+                Date="{Binding FechaFinal}" />
+            </Grid>
+
             <dx:DataGridView ItemsSource="{Binding Items}" x:Name="ItemsGridView">
                 <dx:DataGridView.Columns>
                     <dx:TemplateColumn FieldName="Quantity" Caption="Cantidad" Width="100">
