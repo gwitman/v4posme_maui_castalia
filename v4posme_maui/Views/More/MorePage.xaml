@@ -41,8 +41,47 @@
                 </Button.ImageSource>
             </Button>
         </StackLayout>
+
+        <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+            <!-- Botón a la izquierda -->
+            <Button Text="Productos"
+            BackgroundColor="{StaticResource PrimaryDark}"
+            TextColor="White"
+            Padding="10,10"
+            Margin="0, 20,10, 0"
+            WidthRequest="150"
+            HeightRequest="50"
+            HorizontalOptions="EndAndExpand"
+            Clicked="OnButtonClicked"
+            CommandParameter="3">
+                <Button.ImageSource>
+                    <FileImageSource File="productos_retorno.svg"/>
+                </Button.ImageSource>
+            </Button>
+
+            <!-- Botón a la derecha -->
+            <Button Text="Vendidos"
+            BackgroundColor="#e74c3c"
+            TextColor="White"
+            Padding="10,10"
+            Margin="0,20,10,0"
+            WidthRequest="150"
+            HeightRequest="50"
+            HorizontalOptions="StartAndExpand"
+            Clicked="OnButtonClicked"
+            CommandParameter="4">
+                <Button.ImageSource>
+                    <FileImageSource File="productos_retorno.svg" />
+                </Button.ImageSource>
+            </Button>
+        </StackLayout>
+
+
+
+        <!--
         <StackLayout Orientation="Vertical" HorizontalOptions="FillAndExpand" VerticalOptions="StartAndExpand">
             <Button Text="Productos"
+                    
                     BackgroundColor="{StaticResource PrimaryDark}"
                     TextColor="White"
                     Padding="10,10"
@@ -58,5 +97,7 @@
                 </Button.ImageSource>
             </Button>
         </StackLayout>
+        -->
+        
     </StackLayout>
 </ContentPage>

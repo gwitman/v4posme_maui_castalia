@@ -39,6 +39,9 @@ public partial class MorePage : ContentPage
 			case "3":
 				await Navigation.PushAsync(new ProductosRetornosPage());
 				break;
+            case "4":
+                await Navigation.PushAsync(new ProductosVendidosPage());
+                break;
 		}
 	}
 }
