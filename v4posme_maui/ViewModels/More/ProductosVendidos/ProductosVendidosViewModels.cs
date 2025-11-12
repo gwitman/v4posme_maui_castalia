@@ -189,10 +189,13 @@ public class ProductosVendidosViewModel : BaseViewModel
                     else
                         barCode = barCode.Substring(0, 12); // Corta a 12 caracteres
 
-                    printer.Append($"{item.Name}");
-                    printer.Append($"{barCode}               {quantityInvoice:N2}");
-                    printer.Append($"{barCode}               {amountInvoice:N2}");
-                    printer.Append("..............................");
+                    if (quantityInvoice != 0)
+                    {
+                        printer.Append($"{item.Name}");
+                        printer.Append($"{barCode}               {quantityInvoice:N2}");
+                        printer.Append($"{barCode}               {amountInvoice:N2}");
+                        printer.Append("..............................");
+                    }
 
                 }
             }

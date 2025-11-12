@@ -130,9 +130,12 @@ public class ProductosRetornosViewModel : BaseViewModel
                     else
                         barCode = barCode.Substring(0, 12); // Corta a 12 caracteres
 
-                    printer.Append($"{item.Name}");
-                    printer.Append($"{barCode}               {quantityByItem:N2}");
-                    printer.Append("..............................");
+                    if (quantityByItem != 0)
+                    {
+                        printer.Append($"{item.Name}");
+                        printer.Append($"{barCode}               {quantityByItem:N2}");
+                        printer.Append("..............................");
+                    }
                     
                 }
             }

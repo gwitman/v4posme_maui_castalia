@@ -72,10 +72,12 @@ namespace v4posme_maui.Services.SystemNames
     }
     public enum TypeMenuElement
     {
-        Left = 5
+        Left = 5,
+        Poup = 8
     }
     public enum TypeMenuElementID
     {
-        app_inventory_item_index_aspx = 55 
+        app_inventory_item_index_aspx               = 55,
+        core_inventory_clear_item_on_upload_data    = 285
     }
 }
