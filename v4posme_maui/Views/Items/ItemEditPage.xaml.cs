@@ -42,7 +42,7 @@ public partial class ItemEditPage : ContentPage
 
             //Validar Permiso
             bool permission = await _helperContador.GetPermission(TypeMenuElementID.app_inventory_item_index_aspx, TypePermission.Updated, TypeImpact.All);
-            if ( !permission )
+            if ( !permission)
             {
                 TxtMensaje.Text = Mensajes.MensajeNoTienePermisoDeEdicion;
                 Popup.IsOpen    = true;

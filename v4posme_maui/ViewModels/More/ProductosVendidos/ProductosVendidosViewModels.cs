@@ -159,6 +159,12 @@ public class ProductosVendidosViewModel : BaseViewModel
                 printer.NewLine();
                 foreach (var item in Items)
                 {
+                    //if (item.BarCode == "22")
+                    //{
+                    //    string debug = "debug point";
+                    //}
+
+
                     //Obtener la cantidad facturadas por prodcuto
                     decimal quantityInvoice      = 0;
                     decimal amountInvoice        = 0;
@@ -200,8 +206,8 @@ public class ProductosVendidosViewModel : BaseViewModel
                 }
             }
             printer.NewLine();
-            printer.Append($"TOTAL ARTICULOS: {Items.Count}");
-            printer.Append($"TOTAL ARTICULOS: {amountTotal:N2}");
+            printer.Append($"TOTAL #  ARTICULOS: {Items.Count}");
+            printer.Append($"TOTAL C$ ARTICULOS: {amountTotal:N2}");
             printer.NewLine();
             printer.AlignCenter();
             printer.Append(CompanyTelefono!.Value!);
@@ -227,7 +233,8 @@ public class ProductosVendidosViewModel : BaseViewModel
         try
         {
             var data            = await _repositoryItems.PosMeFindAll();
-            Items               = new DXObservableCollection<Api_AppMobileApi_GetDataDownloadItemsResponse>(data);
+            var itemsTemporal   = new DXObservableCollection<Api_AppMobileApi_GetDataDownloadItemsResponse>(data);
+            Items               = new DXObservableCollection<Api_AppMobileApi_GetDataDownloadItemsResponse>();
 
             if (FechaInical == DateTime.MinValue)
             {
@@ -247,9 +254,9 @@ public class ProductosVendidosViewModel : BaseViewModel
 
 
             //Calcular los prodcutos cantidade finales
-            if (Items is not null)
+            if (itemsTemporal is not null)
             {
-                foreach (var item in Items)
+                foreach (var item in itemsTemporal)
                 {
                     decimal quantityInvoice = 0;
                     var objListTransactionDetail = await _transactionMasterDetail.PosMeByTransactionIDAndItemID_BetweenDate((int)TypeTransaction.TransactionInvoiceBilling, item.ItemId,startOn,endOn);
@@ -261,12 +268,17 @@ public class ProductosVendidosViewModel : BaseViewModel
                     item.Quantity = (item.Quantity + item.CantidadEntradas) - (item.CantidadSalidas + quantityInvoice);
                     item.Quantity = quantityInvoice;
 
+                    if (item.Quantity > 0)
+                    {
+                        Items.Add(item);
+                    }
+
                 }
             }
 
             CompanyTelefono = await _repositoryParameters.PosMeFindByKey("CORE_PHONE");
-            CompanyRuc = await _repositoryParameters.PosMeFindByKey("CORE_COMPANY_IDENTIFIER");
-            Company = VariablesGlobales.TbCompany;
+            CompanyRuc      = await _repositoryParameters.PosMeFindByKey("CORE_COMPANY_IDENTIFIER");
+            Company         = VariablesGlobales.TbCompany;
         }
         catch (Exception e)
         {

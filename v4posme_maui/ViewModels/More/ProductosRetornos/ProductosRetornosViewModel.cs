@@ -109,6 +109,11 @@ public class ProductosRetornosViewModel : BaseViewModel
                 printer.NewLine();                
                 foreach (var item in Items)
                 {
+                    //if (item.BarCode == "22")
+                    //{
+                    //    string debug = "debug point";
+                    //}
+
                     //Obtener la cantidad facturadas por prodcuto
                     decimal quantityInvoice         = 0;
                     var objListTransactionDetail    = await _transactionMasterDetail.PosMeByTransactionIDAndItemID((int)TypeTransaction.TransactionInvoiceBilling, item.ItemId);
@@ -120,7 +125,8 @@ public class ProductosRetornosViewModel : BaseViewModel
 
                     //Obtener las cantidades por productos
                     decimal quantityByItem          = 0;
-                    quantityByItem                  = (item.Quantity + item.CantidadEntradas) - (item.CantidadSalidas + quantityInvoice);
+                    //quantityByItem                = (item.Quantity + item.CantidadEntradas) - (item.CantidadSalidas + quantityInvoice);
+                    quantityByItem                  = (item.Quantity);
 
                     var barCode = item.BarCode;
                     barCode     = barCode.Split(",")[0];
