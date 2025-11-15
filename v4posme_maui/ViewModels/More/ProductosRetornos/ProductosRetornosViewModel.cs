@@ -109,10 +109,10 @@ public class ProductosRetornosViewModel : BaseViewModel
                 printer.NewLine();                
                 foreach (var item in Items)
                 {
-                    //if (item.BarCode == "22")
-                    //{
-                    //    string debug = "debug point";
-                    //}
+                    if (item.BarCode == "22")
+                    {
+                        string debug = "debug point";
+                    }
 
                     //Obtener la cantidad facturadas por prodcuto
                     decimal quantityInvoice         = 0;

@@ -75,11 +75,11 @@ public class SeleccionarProductoViewModel : BaseViewModel
 
     private async void OnSearchBarCode()
     {
-        var barCodePage = new BarCodePage();
+        var barCodePage     = new BarCodePage();
         await Navigation!.PushModalAsync(barCodePage);
-        var bar = await barCodePage.WaitForResultAsync();
-        Search = bar!;
-        IsPanelVisible = !IsPanelVisible;
+        var bar             = await barCodePage.WaitForResultAsync();
+        Search              = bar!;
+        IsPanelVisible      = !IsPanelVisible;
     }
 
     private void OnAnadirProducto(Api_AppMobileApi_GetDataDownloadItemsResponse? obj)
@@ -89,24 +89,24 @@ public class SeleccionarProductoViewModel : BaseViewModel
             return;
         }
 
-        var cestaArticulos = VariablesGlobales.DtoInvoice.Items;
-        var find = cestaArticulos.FirstOrDefault(response => response.ItemNumber == obj.ItemNumber);
+        var cestaArticulos  = VariablesGlobales.DtoInvoice.Items;
+        var find            = cestaArticulos.FirstOrDefault(response => response.ItemNumber == obj.ItemNumber);
         if (find is not null)
         {
-            find.Quantity = decimal.Add(decimal.One, find.Quantity);
-            find.Importe = decimal.Multiply(find.Quantity, find.PrecioPublico);
+            find.Quantity   = decimal.Add(decimal.One, find.Quantity);
+            find.Importe    = decimal.Multiply(find.Quantity, find.PrecioPublico);
         }
         else
         {
-            obj.Quantity = decimal.One;
-            obj.Importe = decimal.Multiply(obj.Quantity, obj.PrecioPublico);
+            obj.Quantity    = decimal.One;
+            obj.Importe     = decimal.Multiply(obj.Quantity, obj.PrecioPublico);
             VariablesGlobales.DtoInvoice.Items.Add(obj);
         }
 
-        VariablesGlobales.DtoInvoice.Balance = VariablesGlobales.DtoInvoice.Items.Sum(response => response.Importe);
+        VariablesGlobales.DtoInvoice.Balance    = VariablesGlobales.DtoInvoice.Items.Sum(response => response.Importe);
         VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada++;
-        ProductosSeleccionadosCantidad = $"Enviar {VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada} Items";
-        ProductosSeleccionadosCantidadTotal = $"{VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada} Items = {VariablesGlobales.DtoInvoice.Balance}";
+        ProductosSeleccionadosCantidad          = $"Enviar {VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada} Items";
+        ProductosSeleccionadosCantidadTotal     = $"{VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada} Items = {VariablesGlobales.DtoInvoice.Balance}";
     }
 
     private async void LoadProductos()
@@ -114,7 +114,7 @@ public class SeleccionarProductoViewModel : BaseViewModel
         var valueTop        = await _helper.GetValueParameter("MOBILE_SHOW_TOP_ITEMS", "10");
         var findProductos   = await _repositoryItems.PosMeDescending10(int.Parse(valueTop));
         Productos.Clear();
-        foreach (var itemsResponse in findProductos)
+        foreach (var itemsResponse in findProductos.OrderBy(p => p.Name ))
         {
             itemsResponse.MonedaSimbolo = VariablesGlobales.DtoInvoice.Currency!.Simbolo;
             Productos.Add(itemsResponse);

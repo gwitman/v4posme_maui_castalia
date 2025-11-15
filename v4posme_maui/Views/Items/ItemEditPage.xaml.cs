@@ -9,6 +9,7 @@ using v4posme_maui.Services.Repository;
 using v4posme_maui.Services.SystemNames;
 using Unity;
 using v4posme_maui.ViewModels;
+using Android.Icu.Text;
 
 namespace v4posme_maui.Views.Items;
 
@@ -44,7 +45,7 @@ public partial class ItemEditPage : ContentPage
 
             //Validar Permiso
             bool permission = await _helperContador.GetPermission(TypeMenuElementID.app_inventory_item_index_aspx, TypePermission.Updated, TypeImpact.All);
-            if ( !permission)
+            if (!permission)
             {
                 TxtMensaje.Text = Mensajes.MensajeNoTienePermisoDeEdicion;
                 Popup.IsOpen    = true;
@@ -147,6 +148,22 @@ public partial class ItemEditPage : ContentPage
         {
             _saveItem = (Api_AppMobileApi_GetDataDownloadItemsResponse)DataForm.DataObject;
             _defaultItem = await _repositoryItems.PosMeFindByItemNumber(_saveItem.ItemNumber!);
+
+
+            //Total de productos facturados
+            var objListTransactionDetail    = _transactionMasterDetail.PosMeByTransactionIDAndItemID((int)TypeTransaction.TransactionInvoiceBilling, _defaultItem.ItemId).Result;
+            decimal quatityInvoice          = 0;
+            if (objListTransactionDetail is null)
+                quatityInvoice = 0;
+            else
+                quatityInvoice = Convert.ToDecimal(objListTransactionDetail.Sum(p => p.Quantity));
+
+
+            TextCantidadFacturadas.Text = quatityInvoice.ToString("N2");
+            TextCantidadFinal.Text      = (_defaultItem.CantidadFinal - quatityInvoice).ToString("N2");
+
+
+
         }
 
         DataForm.CommitMode = CommitMode.LostFocus;
