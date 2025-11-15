@@ -16,6 +16,7 @@ public partial class ItemEditPage : ContentPage
 {
     private DetailEditFormViewModel ViewModel => (DetailEditFormViewModel)BindingContext;
     private readonly IRepositoryItems _repositoryItems = VariablesGlobales.UnityContainer.Resolve<IRepositoryItems>();
+    private readonly IRepositoryTbTransactionMasterDetail _transactionMasterDetail;
     private Api_AppMobileApi_GetDataDownloadItemsResponse _saveItem;
     private Api_AppMobileApi_GetDataDownloadItemsResponse _defaultItem;
     private readonly HelperCore _helperContador;
@@ -25,6 +26,7 @@ public partial class ItemEditPage : ContentPage
         _saveItem = new Api_AppMobileApi_GetDataDownloadItemsResponse();
         _defaultItem = new Api_AppMobileApi_GetDataDownloadItemsResponse();
         _helperContador = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
+        _transactionMasterDetail = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMasterDetail>();
         DataForm.CommitMode = CommitMode.Manually;
         Title = "Editar Producto";
     }
@@ -135,7 +137,8 @@ public partial class ItemEditPage : ContentPage
     private void TextCantidadEntrada_OnTextChanged(object? sender, EventArgs e)
     {
         _saveItem.CantidadFinal = decimal.Add(_saveItem.CantidadEntradas, _saveItem.Quantity) - _saveItem.CantidadSalidas;
-        TextCantidadFinal.Text = _saveItem.CantidadFinal.ToString("N2");
+        decimal quantityFinal   = _saveItem.CantidadFinal - Convert.ToDecimal(TextCantidadFacturadas.Text);
+        TextCantidadFinal.Text  = quantityFinal.ToString("N2");
     }
 
     protected override async void OnAppearing()
@@ -152,14 +155,25 @@ public partial class ItemEditPage : ContentPage
     protected override void OnDisappearing()
     {
         if (ViewModel.IsSaved) return;
-        TxtBarCode.Text = _defaultItem.BarCode;
-        TextCantidadFinal.Text = _defaultItem.CantidadFinal.ToString("N2");
-        TextCantidadEntrada.Text = _defaultItem.CantidadEntradas.ToString("N2");
-        TextCantidadSalida.Text = _defaultItem.CantidadSalidas.ToString("N2");
-        TextName.Text = _defaultItem.Name;
-        TextItemNumber.Text = _defaultItem.ItemNumber;
-        TextPrecioPublico.Text = _defaultItem.PrecioPublico.ToString("N2");
-        DataForm.DataObject = _defaultItem;
+
+        
+        var objListTransactionDetail          = _transactionMasterDetail.PosMeByTransactionIDAndItemID((int)TypeTransaction.TransactionInvoiceBilling, _defaultItem.ItemId).Result;
+        decimal quatityInvoice                = 0;
+        if (objListTransactionDetail is null)
+            quatityInvoice = 0;
+        else
+            quatityInvoice = Convert.ToDecimal(objListTransactionDetail.Sum(p => p.Quantity));
+
+
+        TxtBarCode.Text             = _defaultItem.BarCode;
+        TextCantidadFinal.Text      = _defaultItem.CantidadFinal.ToString("N2");
+        TextCantidadEntrada.Text    = _defaultItem.CantidadEntradas.ToString("N2");
+        TextCantidadSalida.Text     = _defaultItem.CantidadSalidas.ToString("N2");
+        TextName.Text               = _defaultItem.Name;
+        TextItemNumber.Text         = _defaultItem.ItemNumber;
+        TextCantidadFacturadas.Text = quatityInvoice.ToString("N2");
+        TextPrecioPublico.Text      = _defaultItem.PrecioPublico.ToString("N2");
+        DataForm.DataObject         = _defaultItem;
     }
 
     private void ClosePopup_Clicked(object? sender, EventArgs e)

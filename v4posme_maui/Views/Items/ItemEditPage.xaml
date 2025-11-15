@@ -116,6 +116,16 @@
                                 LabelText="Existencia total" />
                         </dxdf:DataFormCustomItem>
                         <dxdf:DataFormCustomItem>
+                            <dxe:TextEdit                                
+                                x:Name="TextCantidadFacturadas"
+                                Keyboard="Numeric"
+                                IconColor="#006E98"
+                                StartIcon="quantity"
+                                Text="{Binding CantidadFacturadas}"
+                                IsReadOnly="True"
+                                LabelText="Cantidad facturadas" />
+                        </dxdf:DataFormCustomItem>
+                        <dxdf:DataFormCustomItem>
                             <dxe:TextEdit
                                 TextChanged="TextCantidadEntrada_OnTextChanged"
                                 x:Name="TextCantidadEntrada"
