@@ -117,7 +117,7 @@ public class RestApiAppMobileApi
                 if (changeInItems == false)
                 {
                     mensaje.Error       = true;
-                    mensaje.Description = Mensajes.MensajeDownloadError;
+                    mensaje.Description = Mensajes.MensajeDownloadCantidadTransacciones;
                     return mensaje;
                 }
                 else
