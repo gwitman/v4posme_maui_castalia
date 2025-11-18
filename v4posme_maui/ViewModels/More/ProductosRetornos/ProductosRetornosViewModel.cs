@@ -171,7 +171,7 @@ public class ProductosRetornosViewModel : BaseViewModel
     {
         try
         {
-            var data        = await _repositoryItems.PosMeQuantityDistintoZero();
+            var data        = await _repositoryItems.PosMeFindAll();
             Items           = new DXObservableCollection<Api_AppMobileApi_GetDataDownloadItemsResponse>(data);
 
             //Calcular los prodcutos cantidade finales
@@ -189,6 +189,14 @@ public class ProductosRetornosViewModel : BaseViewModel
                     item.Quantity = (item.Quantity + item.CantidadEntradas) - (item.CantidadSalidas + quantityInvoice);
 
                 }
+
+                //Eliminar de la lista aquellos productos con cantidades igual a 0
+                var itemsFiltrados = Items.Where(x => x.Quantity != 0).ToList();
+                Items.Clear();
+                foreach (var item in itemsFiltrados)
+                    Items.Add(item);
+
+
             }
 
             CompanyTelefono = await _repositoryParameters.PosMeFindByKey("CORE_PHONE");
