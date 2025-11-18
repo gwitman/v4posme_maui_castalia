@@ -30,24 +30,41 @@ public class PosMeDownloadViewModel : BaseViewModel
         var counter = await _helperContador.GetCounter();
         if (counter != 0)
         {
-            Mensaje                 = Mensajes.MensajeDownloadCantidadTransacciones;
-            PopupBackgroundColor    = Colors.Red;
-            PopUpShow               = true;
-            IsBusy                  = !IsBusy;
-            return;
-        }
+            //w-g-Mensaje               = Mensajes.MensajeDownloadCantidadTransacciones;
+            //w-g-PopupBackgroundColor  = Colors.Red;
+            //w-g-PopUpShow             = true;
+            //w-g-IsBusy                = !IsBusy;
+            //w-g-return;
 
-        var result = await _restApiDownload.GetDataDownload();
-        if (result)
-        {
-            PopupBackgroundColor    = Colors.Green;
-            Mensaje                 = Mensajes.MensajeDownloadSuccess;
-            
+            var result = await _restApiDownload.GetDataDownload(true);
+            if (result.Error == false)
+            {
+                PopupBackgroundColor    = Colors.Green;
+                Mensaje                 = result.Description;
+
+            }
+            else
+            {
+                Mensaje                 = result.Description;
+                PopupBackgroundColor    = Colors.Red;
+            }
+
         }
         else
         {
-            Mensaje                 = Mensajes.MensajeDownloadError;
-            PopupBackgroundColor    = Colors.Red;
+
+            var result = await _restApiDownload.GetDataDownload(false);
+            if (result.Error == false)
+            {
+                PopupBackgroundColor    = Colors.Green;
+                Mensaje                 = result.Description;
+
+            }
+            else
+            {
+                Mensaje                 = result.Description;
+                PopupBackgroundColor    = Colors.Red;
+            }
         }
 
         PopUpShow   = true;
