@@ -137,32 +137,30 @@ public partial class ItemEditPage : ContentPage
 
     private void TextCantidadEntrada_OnTextChanged(object? sender, EventArgs e)
     {
-        _saveItem.CantidadFinal = decimal.Add(_saveItem.CantidadEntradas, _saveItem.Quantity) - _saveItem.CantidadSalidas;
-        decimal quantityFinal   = _saveItem.CantidadFinal - Convert.ToDecimal(TextCantidadFacturadas.Text);
-        TextCantidadFinal.Text  = quantityFinal.ToString("N2");
+        _saveItem.CantidadFinal = decimal.Add(_saveItem.CantidadEntradas, _saveItem.Quantity) - (_saveItem.CantidadSalidas + _saveItem.CantidadFacturadas);        
     }
 
     protected override async void OnAppearing()
     {
         if (!ViewModel.IsNew)
         {
-            _saveItem = (Api_AppMobileApi_GetDataDownloadItemsResponse)DataForm.DataObject;
-            _defaultItem = await _repositoryItems.PosMeFindByItemNumber(_saveItem.ItemNumber!);
+            _saveItem       = (Api_AppMobileApi_GetDataDownloadItemsResponse)DataForm.DataObject;
+            _defaultItem    = await _repositoryItems.PosMeFindByItemNumber(_saveItem.ItemNumber!);
+            
 
 
             //Total de productos facturados
-            var objListTransactionDetail    = _transactionMasterDetail.PosMeByTransactionIDAndItemID((int)TypeTransaction.TransactionInvoiceBilling, _defaultItem.ItemId).Result;
+            var objListTransactionDetail    = await _transactionMasterDetail.PosMeByTransactionIDAndItemID((int)TypeTransaction.TransactionInvoiceBilling, _defaultItem.ItemId);
             decimal quatityInvoice          = 0;
             if (objListTransactionDetail is null)
                 quatityInvoice = 0;
             else
                 quatityInvoice = Convert.ToDecimal(objListTransactionDetail.Sum(p => p.Quantity));
 
-
-            TextCantidadFacturadas.Text = quatityInvoice.ToString("N2");
-            TextCantidadFinal.Text      = (_defaultItem.CantidadFinal - quatityInvoice).ToString("N2");
-
-
+            _defaultItem.CantidadFacturadas = quatityInvoice;
+            _saveItem.CantidadFacturadas    = quatityInvoice;
+            _defaultItem.CantidadFinal      = (_defaultItem.Quantity + _defaultItem.CantidadEntradas) - (_defaultItem.CantidadSalidas + quatityInvoice);
+            _saveItem.CantidadFinal         = (_defaultItem.Quantity + _defaultItem.CantidadEntradas) - (_defaultItem.CantidadSalidas + quatityInvoice);
 
         }
 
@@ -173,14 +171,6 @@ public partial class ItemEditPage : ContentPage
     {
         if (ViewModel.IsSaved) return;
 
-        
-        var objListTransactionDetail          = _transactionMasterDetail.PosMeByTransactionIDAndItemID((int)TypeTransaction.TransactionInvoiceBilling, _defaultItem.ItemId).Result;
-        decimal quatityInvoice                = 0;
-        if (objListTransactionDetail is null)
-            quatityInvoice = 0;
-        else
-            quatityInvoice = Convert.ToDecimal(objListTransactionDetail.Sum(p => p.Quantity));
-
 
         TxtBarCode.Text             = _defaultItem.BarCode;
         TextCantidadFinal.Text      = _defaultItem.CantidadFinal.ToString("N2");
@@ -188,7 +178,7 @@ public partial class ItemEditPage : ContentPage
         TextCantidadSalida.Text     = _defaultItem.CantidadSalidas.ToString("N2");
         TextName.Text               = _defaultItem.Name;
         TextItemNumber.Text         = _defaultItem.ItemNumber;
-        TextCantidadFacturadas.Text = quatityInvoice.ToString("N2");
+        TextCantidadFacturadas.Text = _defaultItem.CantidadFacturadas.ToString("N2");
         TextPrecioPublico.Text      = _defaultItem.PrecioPublico.ToString("N2");
         DataForm.DataObject         = _defaultItem;
     }
