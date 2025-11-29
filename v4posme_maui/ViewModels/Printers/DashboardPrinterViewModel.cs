@@ -27,23 +27,23 @@ public class DashboardPrinterViewModel : BaseViewModel
     private readonly HelperCore _helper;
     public DashboardPrinterViewModel()
     {
-        _repositoryTbTransactionMaster = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMaster>();
-        _repositoryTbTransactionMasterDetail = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMasterDetail>();
-        _repositoryDocumentCredit = VariablesGlobales.UnityContainer.Resolve<IRepositoryDocumentCredit>();
-        _repositoryItems = VariablesGlobales.UnityContainer.Resolve<IRepositoryItems>();
-        _repositoryTbCustomer = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCustomer>();
-        _helper = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
-        Facturas = new();
-        Abonos = new();
-        Productos = new();
-        OnBarCode = new Command(OnSearchBarCode);
-        SearchFacturaCommand = new Command(OnSearchFacturaCommand);
-        SelectedFacturaCommand = new Command<ViewTempDtoInvoice>(OnSelectedFacturaCommand);
-        SelectedAbonoCommand = new Command<ViewTempDtoAbono>(OnSelectedAbonoCommand);
-        SelectedProductoCommand = new Command<Api_AppMobileApi_GetDataDownloadItemsResponse>(OnSelectedProductoCommand);
-        SearchAbonoCommand = new Command(OnSearchAbonoCommand);
-        SearchProductCommand = new Command(OnSearchProductCommand);
-        IsBusy = true;
+        _repositoryTbTransactionMaster          = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMaster>();
+        _repositoryTbTransactionMasterDetail    = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMasterDetail>();
+        _repositoryDocumentCredit               = VariablesGlobales.UnityContainer.Resolve<IRepositoryDocumentCredit>();
+        _repositoryItems                        = VariablesGlobales.UnityContainer.Resolve<IRepositoryItems>();
+        _repositoryTbCustomer                   = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCustomer>();
+        _helper                                 = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
+        Facturas                                = new();
+        Abonos                                  = new();
+        Productos                               = new();
+        OnBarCode                               = new Command(OnSearchBarCode);
+        SearchFacturaCommand                    = new Command(OnSearchFacturaCommand);
+        SelectedFacturaCommand                  = new Command<ViewTempDtoInvoice>(OnSelectedFacturaCommand);
+        SelectedAbonoCommand                    = new Command<ViewTempDtoAbono>(OnSelectedAbonoCommand);
+        SelectedProductoCommand                 = new Command<Api_AppMobileApi_GetDataDownloadItemsResponse>(OnSelectedProductoCommand);
+        SearchAbonoCommand                      = new Command(OnSearchAbonoCommand);
+        SearchProductCommand                    = new Command(OnSearchProductCommand);
+        IsBusy                                  = true;
     }
 
     private async void OnSearchProductCommand()
@@ -77,9 +77,9 @@ public class DashboardPrinterViewModel : BaseViewModel
     {
         try
         {
-            VariablesGlobales.DtoAplicarAbono = obj;
-            var mostrarPrintSinSaldos = await _helper.GetValueParameter("CXC_SHOW_BALANCE_IN_SHARE_MOBILE","false");
-            var typePrinterShare = await _helper.GetValueParameter("CXC_TYPE_PRINTER_SHARE_MOBILE","DEFAULT");
+            VariablesGlobales.DtoAplicarAbono   = obj;
+            var mostrarPrintSinSaldos           = await _helper.GetValueParameter("CXC_SHOW_BALANCE_IN_SHARE_MOBILE","false");
+            var typePrinterShare                = await _helper.GetValueParameter("CXC_TYPE_PRINTER_SHARE_MOBILE","DEFAULT");
         
             if (typePrinterShare=="FINANCIAL")
             {
@@ -392,9 +392,9 @@ public class DashboardPrinterViewModel : BaseViewModel
                 {
                     tmpAbono.MoraPagada = Convert.ToDecimal(abono.Reference3);
                 }
-                tmpAbono.Documentos = abono.Reference1;
-                tmpAbono.DiasMora = abono.Plazo;
-                tmpAbono.CuotasPendientes = abono.CuotasPendientes;
+                tmpAbono.Documentos         = abono.Reference1;
+                tmpAbono.DiasMora           = abono.Plazo;
+                tmpAbono.CuotasPendientes   = abono.CuotasPendientes;
                 Abonos.Add(tmpAbono);
             }
 

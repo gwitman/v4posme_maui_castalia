@@ -44,7 +44,7 @@ public class PrinterInvoiceViewModel : BaseViewModel
             IsBusy                      = true;
             var objTransactionMaster    = await _repositoryTbTransactionMaster.PosMeFindByTransactionId(VariablesGlobales.DtoInvoice.TransactionMasterId);
             if (
-                objTransactionMaster.StatusID == (int)TypeStatusBilling.Register || 
+                objTransactionMaster.StatusID == (int)TypeStatusBilling.Anulada || 
                 objTransactionMaster.StatusID == (int)TypeStatusBilling.Apply
             )
             {
