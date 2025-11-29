@@ -17,13 +17,15 @@ public class Api_AppMobileApi_GetDataDownloadResponse
     public List<Api_AppMobileApi_GetDataDownloadItemsResponse> ListItem { get; set; } = [];
     public List<Api_AppMobileApi_GetDataDownloadCustomerResponse> ListCustomer { get; set; } = [];
     public List<Api_AppMobileApi_GetDataDownloadParametersResponse> ListParameter { get; set; } = [];
+    public List<Api_AppMobileApi_GetDataDownloadCatalogItemResponse> ListCatalogItem { get; set; } = [];
     public List<Api_AppMobileApi_GetDataDownloadDocumentCreditResponse> ListDocumentCredit { get; set; } = [];
     public List<Api_AppMobileApi_GetDataDownloadDocumentCreditAmortizationResponse> ListDocumentCreditAmortization { get; set; } = [];
-    public List<Api_AppMobileApi_GetDataDownload_ServerTransactionMaster_Response> ListServerTransactionMaster { get; set; } = [];
+    public List<Api_AppMobileApi_GetDataDownloadServerTransactionMasterResponse> ListServerTransactionMaster { get; set; } = [];
+    public List<Api_AppMobileApi_GetDataDownloadTransactionMasterRegisterResponse> ListTransactionMasterRegister { get; set; } = [];
 }
 
 [SQLite.Table("tb_server_transaction_master")]
-public class Api_AppMobileApi_GetDataDownload_ServerTransactionMaster_Response : BindableBase
+public class Api_AppMobileApi_GetDataDownloadServerTransactionMasterResponse : BindableBase
 {
     [PrimaryKey, AutoIncrement]
     [DataMember(Name = "transactionMasterID")]
@@ -349,4 +351,95 @@ public class Api_AppMobileApi_GetDataDownloadParametersResponse
     public string? CustomValue { get; set; }
 
     public string? Name { get; set; }
+}
+
+
+
+[SQLite.Table("tb_catalog_item")]
+public class Api_AppMobileApi_GetDataDownloadCatalogItemResponse
+{
+    public int catalogID { get; set; }
+
+    public string catalogName { get; set; }
+
+    public string catalogDescription { get; set; }
+
+    public int catalogItemID { get; set; }
+
+    public string catalogItemName { get; set; }
+
+    public string catalogItemDescriptionName { get; set; }
+
+    public string catalogItemDisplay { get; set; }
+    public decimal ratio { get; set; }
+    public string? reference1 { get; set; }
+    public string? reference2 { get; set; }
+}
+
+
+public class Api_AppMobileApi_GetDataDownloadTransactionMasterRegisterResponse
+{
+
+    // ------------------------------
+    // CAMPOS DE transaction_master (c.)
+    // ------------------------------
+    public string? tm_transactionMasterMobileID { get; set; }
+    public string? tm_transactionMasterMobileNumber { get; set; }
+
+    public int tm_transactionMasterID { get; set; }
+    public int tm_transactionID { get; set; }
+    public string? tm_transactionNumber { get; set; }
+    public int tm_entityID { get; set; }
+    public int tm_entityIDSecondary { get; set; }
+    public DateTime tm_transactionOn { get; set; }
+    public DateTime tm_transactionOn2 { get; set; }
+    public DateTime? tm_nextVisit { get; set; }
+    public int tm_statusID { get; set; }
+
+    public int tm_mesaID { get; set; }
+    public string? tm_mesaName { get; set; }
+    public string? tm_referenceClientIdentifier { get; set; }
+    public string? tm_referenceClientName { get; set; }
+
+    public int tm_plazo { get; set; }
+    public string? tm_reference1 { get; set; }
+    public string? tm_reference3 { get; set; }
+    public string? tm_note { get; set; }
+
+    public int tm_currencyID { get; set; }
+    public decimal tm_exchangeRate { get; set; }
+    public int tm_transactionCausalID { get; set; }
+
+    public decimal tm_Amount { get; set; }
+    public decimal tm_subAmount { get; set; }
+    public decimal tm_tax1 { get; set; }
+    public decimal tm_discount { get; set; }
+
+    public int tm_customerCreditLineID { get; set; }
+    public int tm_periodPay { get; set; }
+    public decimal tm_fixedExpenses { get; set; }
+
+    // ------------------------------
+    // CAMPOS DE transaction_master_detail (tmd.)
+    // ------------------------------
+    public int tmd_transactionMasterDetailID { get; set; }
+    public int tmd_componentID { get; set; }
+    public int tmd_componentItemID { get; set; }
+    public decimal tmd_quantity { get; set; }
+    public decimal tmd_unitaryCost { get; set; }
+    public decimal tmd_unitaryPrice { get; set; }
+    public decimal tmd_SubAmount { get; set; }
+    public decimal tmd_Amount { get; set; }
+    public decimal tmd_Discount { get; set; }
+    public decimal tmd_tax1 { get; set; }
+
+    // ------------------------------
+    // CAMPOS DE items (i.)
+    // ------------------------------
+    public string? tmd_itemNumber { get; set; }
+    public string? tmd_itemName { get; set; }
+    public string? tmd_barCode { get; set; }
+
+    public string? tmd_reference1 { get; set; }
+    public string? tmd_reference2 { get; set; }
 }

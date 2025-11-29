@@ -12,6 +12,7 @@ using v4posme_maui.Views.Invoices;
 using v4posme_maui.Views.Printers;
 using Unity;
 using v4posme_maui.Services.Helpers;
+using Android.Test.Suitebuilder.Annotation;
 
 namespace v4posme_maui.ViewModels.Printers;
 
@@ -121,15 +122,48 @@ public class DashboardPrinterViewModel : BaseViewModel
     {
         try
         {
-            VariablesGlobales.DtoInvoice = obj;
-            var transactionMasterId = VariablesGlobales.DtoInvoice.TransactionMasterId;
-            VariablesGlobales.DtoInvoice.TransactionMaster = await _repositoryTbTransactionMaster.PosMeFindByTransactionId(transactionMasterId);
+            VariablesGlobales.DtoInvoice                    = obj;
+            var transactionMasterId                         = VariablesGlobales.DtoInvoice.TransactionMasterId;
+            var transactionMasterDetailItems                = await _repositoryTbTransactionMasterDetail.PosMeItemByTransactionId(transactionMasterId);
+            VariablesGlobales.DtoInvoice.TransactionMaster  = await _repositoryTbTransactionMaster.PosMeFindByTransactionId(transactionMasterId);
+
             VariablesGlobales.DtoInvoice.TransactionMasterId= transactionMasterId;
-            VariablesGlobales.DtoInvoice.TipoDocumento = new DtoCatalogItem(
-                (int)VariablesGlobales.DtoInvoice.TransactionMaster.TransactionCausalId, 
-                VariablesGlobales.DtoInvoice.TransactionMaster.TransactionCausalId.ToString(), 
-                VariablesGlobales.DtoInvoice.TransactionMaster.TransactionCausalId.ToString());
-            VariablesGlobales.EnableBackButton = true;
+            VariablesGlobales.DtoInvoice.Monto              = VariablesGlobales.DtoInvoice.TransactionMaster.Amount;
+            VariablesGlobales.DtoInvoice.TipoPayment        = VariablesGlobales.DtoInvoice.TransactionMaster.TypePaymentId;
+            VariablesGlobales.DtoInvoice.Comentarios        = VariablesGlobales.DtoInvoice.TransactionMaster.Comment;
+            VariablesGlobales.DtoInvoice.CustomerResponse                       = await _repositoryTbCustomer.PosMeFindEntityId(VariablesGlobales.DtoInvoice.TransactionMaster.EntityId);
+            VariablesGlobales.DtoInvoice.CustomerResponse.CustomerCreditLineId  = VariablesGlobales.DtoInvoice.TransactionMaster.CustomerCreditLineId;
+            VariablesGlobales.DtoInvoice.CustomerResponse.Identification        = VariablesGlobales.DtoInvoice.TransactionMaster.CustomerIdentification;
+            
+            VariablesGlobales.DtoInvoice.Codigo                 = VariablesGlobales.DtoInvoice.TransactionMaster.TransactionNumber!;
+            VariablesGlobales.DtoInvoice.Plazo                  = VariablesGlobales.DtoInvoice.TransactionMaster.Plazo;
+            VariablesGlobales.DtoInvoice.NextVisit              = VariablesGlobales.DtoInvoice.TransactionMaster.NextVisit;
+            VariablesGlobales.DtoInvoice.FixedExpenses          = VariablesGlobales.DtoInvoice.TransactionMaster.FixedExpenses;
+            VariablesGlobales.DtoInvoice.ReferenceClientName    = VariablesGlobales.DtoInvoice.TransactionMaster.ReferenceClientName;
+            VariablesGlobales.DtoInvoice.Cambio                 = 0;
+            VariablesGlobales.DtoInvoice.TransactionOn          = DateTime.Now;
+
+
+            VariablesGlobales.DtoInvoice.Currency           = new DtoCatalogItem((int)VariablesGlobales.DtoInvoice.TransactionMaster.CurrencyId, VariablesGlobales.DtoInvoice.TransactionMaster.CurrencyId.ToString(), VariablesGlobales.DtoInvoice.TransactionMaster.CurrencyId.ToString());
+            VariablesGlobales.DtoInvoice.TipoDocumento      = new DtoCatalogItem((int)VariablesGlobales.DtoInvoice.TransactionMaster.TransactionCausalId, VariablesGlobales.DtoInvoice.TransactionMaster.TransactionCausalId.ToString(), VariablesGlobales.DtoInvoice.TransactionMaster.TransactionCausalId.ToString());
+            VariablesGlobales.DtoInvoice.PeriodPay          = new DtoCatalogItem((int)VariablesGlobales.DtoInvoice.TransactionMaster.PeriodPay, VariablesGlobales.DtoInvoice.TransactionMaster.PeriodPay.ToString(), VariablesGlobales.DtoInvoice.TransactionMaster.PeriodPay.ToString());
+            VariablesGlobales.DtoInvoice.Mesa               = new DtoCatalogItem((int)VariablesGlobales.DtoInvoice.TransactionMaster.MesaID, VariablesGlobales.DtoInvoice.TransactionMaster.MesaID.ToString(), VariablesGlobales.DtoInvoice.TransactionMaster.MesaID.ToString());
+            VariablesGlobales.DtoInvoice.Balance            = VariablesGlobales.DtoInvoice.TransactionMaster.SubAmount;
+            VariablesGlobales.DtoInvoice.ClearItems();
+
+            foreach(var items in transactionMasterDetailItems)
+            {
+                Api_AppMobileApi_GetDataDownloadItemsResponse item  = await _repositoryItems.PosMeFindByItemId(items.ComponentItemId);
+                item.Quantity                                       = items.Quantity;
+                item.Importe                                        = items.SubAmount;
+                item.PrecioPublico                                  = items.UnitaryPrice;                
+                VariablesGlobales.DtoInvoice.Items.Add(item);
+            }
+
+            VariablesGlobales.DtoInvoice.Balance                    = VariablesGlobales.DtoInvoice.Items.Sum(response => response.Importe);
+            VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada  = VariablesGlobales.DtoInvoice.Items.Count();
+
+            VariablesGlobales.EnableBackButton              = true;
             await Navigation!.PushAsync(new VoucherInvoicePage());
         }
         catch (Exception e)
@@ -375,19 +409,20 @@ public class DashboardPrinterViewModel : BaseViewModel
 
     private async void FillFacturas(List<TbTransactionMaster> findAllFactura)
     {
-        var totalCordobas = decimal.Zero;
-        var totalDolares = decimal.Zero;
+        var totalCordobas   = decimal.Zero;
+        var totalDolares    = decimal.Zero;
         Facturas.Clear();
         foreach (var master in findAllFactura)
         {
             var dto = new ViewTempDtoInvoice
             {
-                Balance = master.SubAmount,
-                TransactionOn = master.TransactionOn,
-                Codigo = master.TransactionNumber!,
-                Monto = master.SubAmount,
-                Cambio = decimal.Subtract(master.Amount, master.SubAmount),
-                Comentarios = master.Comment,
+                Balance             = master.SubAmount,
+                TransactionOn       = master.TransactionOn,
+                Codigo              = master.TransactionNumber!,
+                Monto               = master.SubAmount,
+                Cambio              = decimal.Subtract(master.Amount, master.SubAmount),
+                Comentarios         = master.Comment,
+                ReferenceClientName = master.ReferenceClientName,                
                 TransactionMasterId = master.TransactionMasterId
             };
             if (master.CurrencyId == TypeCurrency.Cordoba)
@@ -401,23 +436,24 @@ public class DashboardPrinterViewModel : BaseViewModel
                 totalDolares += master.SubAmount;
             }
 
-            dto.CustomerResponse = await _repositoryTbCustomer.PosMeFindEntityId(master.EntityId);
-            dto.FirstName = dto.CustomerResponse.FirstName;
-            dto.LastName = dto.CustomerResponse.LastName;
+            dto.Mesa                         = new DtoCatalogItem(master.MesaID, master.MesaName, master.MesaName);
+            dto.CustomerResponse             = await _repositoryTbCustomer.PosMeFindEntityId(master.EntityId);
+            dto.FirstName                    = dto.CustomerResponse.FirstName;
+            dto.LastName                     = dto.CustomerResponse.LastName;
             var findTransactionMasterDetails = await _repositoryTbTransactionMasterDetail.PosMeItemByTransactionId(master.TransactionMasterId);
             foreach (var detail in findTransactionMasterDetails)
             {
-                var findItem = await _repositoryItems.PosMeFindByItemId(detail.ComponentItemId);
-                findItem.Importe = detail.SubAmount;
-                findItem.Quantity = detail.Quantity;
-                findItem.PrecioPublico = detail.UnitaryPrice;
+                var findItem            = await _repositoryItems.PosMeFindByItemId(detail.ComponentItemId);
+                findItem.Importe        = detail.SubAmount;
+                findItem.Quantity       = detail.Quantity;
+                findItem.PrecioPublico  = detail.UnitaryPrice;
                 dto.Items.Add(findItem);
             }
 
             Facturas.Add(dto);
         }
 
-        TotalCordobasFacturado = $"C$ {totalCordobas:N2}";
-        TotalDolaresFacturado = $"$ {totalDolares:N2}";
+        TotalCordobasFacturado  = $"C$ {totalCordobas:N2}";
+        TotalDolaresFacturado   = $"$ {totalDolares:N2}";
     }
 }

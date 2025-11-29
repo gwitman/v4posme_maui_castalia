@@ -62,6 +62,9 @@ public static class Mensajes
 	public const string CompanyNoExiste = "No existe la compañía o no se ha inicializado";
 	public const string ArchivoNoExiste = "El archivo no existe o no fue posible crearlo";
 	public const string AnularFacturaCorrectamente = "Factura anulada correctamente";
+    public const string AnularFacturaNoPermitido = "El usuario no tiene permitido anular facturas";
+    public const string EditarFacturaNoPermitido = "El usuario no tiene permitido editar facturas";
+    public const string FacturaEditarNotPermitido = "La factura no puede ser editada por su estado actual";
 	public const string AnularAbonoCorrectamente = "Abono anulado correctamente";
 	public const string UsuarioNoPermitido = "No se permite el usuario en la aplicación ya que hay datos por subir. Envie los datos antes de cambiar de usuario";
 }

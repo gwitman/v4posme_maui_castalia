@@ -8,6 +8,8 @@ using v4posme_maui.Services.SystemNames;
 using Unity;
 using Android.Content;
 using static Java.Util.Jar.Attributes;
+using Android.Accounts;
+using System.ComponentModel;
 
 namespace v4posme_maui.Services.Api;
 
@@ -16,24 +18,16 @@ public class RestApiAppMobileApi
     private readonly HttpClient _httpClient = new();
     private readonly IRepositoryTbCustomer _repositoryTbCustomer                                    = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCustomer>();
     private readonly IRepositoryTbMenuElement _repositoryTbMenuElement                              = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbMenuElement>();
-
     private readonly IRepositoryItems _repositoryItems                                              = VariablesGlobales.UnityContainer.Resolve<IRepositoryItems>();
-
     private readonly IRepositoryParameters _repositoryParameters                                    = VariablesGlobales.UnityContainer.Resolve<IRepositoryParameters>();
-
     private readonly IRepositoryDocumentCreditAmortization _repositoryDocumentCreditAmortization    = VariablesGlobales.UnityContainer.Resolve<IRepositoryDocumentCreditAmortization>();
-
     private readonly IRepositoryDocumentCredit _repositoryDocumentCredit                            = VariablesGlobales.UnityContainer.Resolve<IRepositoryDocumentCredit>();
-
     private readonly IRepositoryTbCompany _repositoryTbCompany                                      = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCompany>();
-
-    private readonly IRepositoryTbTransactionMaster _repositoryTbTransactionMaster                  = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMaster>();
-    
+    private readonly IRepositoryTbTransactionMaster _repositoryTbTransactionMaster                  = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMaster>();    
     private readonly IRepositoryTbTransactionMasterDetail _repositoryTbTransactionMasterDetail      = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMasterDetail>();
-
     private readonly IRepositoryServerTransactionMaster _repositoryServerTransactionMasterDetail    = VariablesGlobales.UnityContainer.Resolve<IRepositoryServerTransactionMaster>();
-
     private readonly IRepositoryTbParameterSystem _parameterSystem                                  = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbParameterSystem>();
+    private readonly IRepositoryTbCatalogItem _repositoryCatalogItem                                = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCatalogItem>();
     
     public async Task<DtoMenssage> GetDataDownload(bool onlyQuantityNew)
     {
@@ -140,7 +134,8 @@ public class RestApiAppMobileApi
                 var transactionMasterDetailAll          = _repositoryTbTransactionMasterDetail.PosMeDeleteAll();
                 var serverTransactionMasterAll          = _repositoryServerTransactionMasterDetail.PosMeDeleteAll();
                 var menuElementDeleteAll                = _repositoryTbMenuElement.PosMeDeleteAll();
-
+                var catalogItemAll                      = _repositoryCatalogItem.PosMeDeleteAll();
+                
                 await Task.WhenAll([
                     customerDeleteAll, 
                     itemsDeleteAll, 
@@ -151,8 +146,70 @@ public class RestApiAppMobileApi
                     transactionMasterAll,
                     transactionMasterDetailAll,
                     serverTransactionMasterAll,
-                    menuElementDeleteAll
+                    menuElementDeleteAll,
+                    catalogItemAll
                 ]);
+
+
+                //Ingresar las transacionces registradas del servidor                
+                List<TbTransactionMasterDetail> objListTransactionMasterDetailNew   = new List<TbTransactionMasterDetail>();
+                if (apiResponse.ListTransactionMasterRegister != null)
+                {
+                    if (apiResponse.ListTransactionMasterRegister.Count > 0)
+                    {
+                        var objTransactionMasterRegister = apiResponse.ListTransactionMasterRegister.AsEnumerable().DistinctBy(lu => lu.tm_transactionMasterID).ToList();
+                        
+                        foreach (var objI in objTransactionMasterRegister)
+                        {
+                            var objListTransactionMasterFirst               = apiResponse.ListTransactionMasterRegister.Where(k => k.tm_transactionMasterID == objI.tm_transactionMasterID).First();
+                            var objListTransactionMasterAll                 = apiResponse.ListTransactionMasterRegister.Where(k => k.tm_transactionMasterID == objI.tm_transactionMasterID);
+                            TbTransactionMaster objTransactionMasterTemp    = new TbTransactionMaster();
+                            objTransactionMasterTemp.TransactionId          = (TypeTransaction)objI.tm_transactionID;
+                            objTransactionMasterTemp.TransactionMasterId    = Convert.ToInt32(objI.tm_transactionMasterMobileID);
+                            objTransactionMasterTemp.Amount                 = objI.tm_Amount;
+                            objTransactionMasterTemp.TransactionOn          = objI.tm_transactionOn;
+                            objTransactionMasterTemp.TransactionCausalId    = (TypeTransactionCausal)objI.tm_transactionCausalID;
+                            objTransactionMasterTemp.TypePaymentId          = TypePayment.Registrar;
+                            objTransactionMasterTemp.Comment                = objI.tm_note;
+                            objTransactionMasterTemp.Discount               = decimal.Zero;
+                            objTransactionMasterTemp.Taxi1                  = decimal.Zero;
+                            objTransactionMasterTemp.ExchangeRate           = decimal.Zero; //definir
+                            objTransactionMasterTemp.EntityId               = objI.tm_entityID;
+                            objTransactionMasterTemp.EntitySecondaryId      = VariablesGlobales.User!.UserId.ToString();
+                            objTransactionMasterTemp.TransactionNumber      = objI.tm_transactionMasterMobileNumber;
+                            objTransactionMasterTemp.CurrencyId             = (TypeCurrency)objI.tm_currencyID;
+                            objTransactionMasterTemp.CustomerCreditLineId   = objI.tm_customerCreditLineID;
+                            objTransactionMasterTemp.CustomerIdentification = objI.tm_referenceClientIdentifier!;
+                            objTransactionMasterTemp.Plazo                  = objI.tm_plazo;
+                            objTransactionMasterTemp.NextVisit              = objI.tm_nextVisit ?? DateTime.MinValue;
+                            objTransactionMasterTemp.FixedExpenses          = objI.tm_fixedExpenses;
+                            objTransactionMasterTemp.PeriodPay              = (TypePeriodPay)objI.tm_periodPay;
+                            objTransactionMasterTemp.StatusID               = objI.tm_statusID;
+                            objTransactionMasterTemp.MesaID                 = objI.tm_mesaID;
+                            objTransactionMasterTemp.ReferenceClientName    = objI.tm_referenceClientName!;    
+                            objTransactionMasterTemp.SubAmount              = objI.tm_Amount;
+                            objTransactionMasterTemp.MesaName               = objI.tm_mesaName!;
+                            await _repositoryTbTransactionMaster.PosMeInsert(objTransactionMasterTemp);
+                            var transactionMasterId                         = objTransactionMasterTemp.TransactionMasterId;
+                            foreach (var objII in objListTransactionMasterAll)
+                            {
+                                TbTransactionMasterDetail objTransactionMasterDetailTemp    = new TbTransactionMasterDetail();
+                                objTransactionMasterDetailTemp.Quantity                     = objII.tmd_quantity;
+                                objTransactionMasterDetailTemp.UnitaryCost                  = objII.tmd_unitaryCost;
+                                objTransactionMasterDetailTemp.UnitaryPrice                 = objII.tmd_unitaryPrice;
+                                objTransactionMasterDetailTemp.TransactionMasterId          = transactionMasterId;
+                                objTransactionMasterDetailTemp.SubAmount                    = objII.tmd_Amount;
+                                objTransactionMasterDetailTemp.Discount                     = decimal.Zero;
+                                objTransactionMasterDetailTemp.Tax1                         = decimal.Zero;
+                                objTransactionMasterDetailTemp.Componentid                  = objII.tmd_componentID;
+                                objTransactionMasterDetailTemp.ComponentItemId              = objII.tmd_componentItemID;
+                                objTransactionMasterDetailTemp.ItemBarCode                  = objII.tmd_barCode!;
+                                objListTransactionMasterDetailNew.Add(objTransactionMasterDetailTemp);
+                            }
+                            
+                        }
+                    }
+                }
 
                 //insertar nuevos movimientos
                 var taskCompany                     = _repositoryTbCompany.PosMeInsert(apiResponse.ObjCompany);
@@ -163,6 +220,8 @@ public class RestApiAppMobileApi
                 var taskDocumentCredit              = _repositoryDocumentCredit!.PosMeInsertAll(apiResponse.ListDocumentCredit);
                 var taskServerTransactionMaster     = _repositoryServerTransactionMasterDetail!.PosMeInsertAll(apiResponse.ListServerTransactionMaster);
                 var taskMenuElement                 = _repositoryTbMenuElement!.PosMeInsertAll(apiResponse.ListMenuElement);
+                var taskCatalogItem                 = _repositoryCatalogItem!.PosMeInsertAll(apiResponse.ListCatalogItem);                
+                var taskTransactionMasterDetail     = _repositoryTbTransactionMasterDetail.PosMeInsertAll(objListTransactionMasterDetailNew);
 
                 await Task.WhenAll([
                     taskCustomer, 
@@ -172,8 +231,12 @@ public class RestApiAppMobileApi
                     taskDocumentCredit, 
                     taskCompany, 
                     taskServerTransactionMaster,
-                    taskMenuElement
+                    taskMenuElement,
+                    taskCatalogItem,
+                    taskTransactionMasterDetail
                 ]);
+
+
 
                 //inicializar contador 
                 var objParameterSystem      = await _parameterSystem.PosMeFindByName(Constantes.ParemeterEntityIDAutoIncrement);

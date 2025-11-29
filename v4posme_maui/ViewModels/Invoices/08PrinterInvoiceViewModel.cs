@@ -10,6 +10,8 @@ using v4posme_maui.Services.Repository;
 using v4posme_maui.Services.SystemNames;
 using SkiaSharp;
 using Unity;
+using v4posme_maui.Views.Printers;
+using v4posme_maui.Services.Helpers;
 
 namespace v4posme_maui.ViewModels.Invoices;
 
@@ -19,10 +21,12 @@ public class PrinterInvoiceViewModel : BaseViewModel
     private readonly IRepositoryParameters _repositoryParameters;
     private readonly IRepositoryTbTransactionMaster _repositoryTbTransactionMaster;
     private readonly IRepositoryTbTransactionMasterDetail _repositoryTbTransactionMasterDetail;
+    private readonly HelperCore _helperCore;
 
     public PrinterInvoiceViewModel()
     {
         Title = "Comprobante Pago Factura";
+        _helperCore                         = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
         _repositoryTbTransactionMaster       = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMaster>();
         _repositoryTbTransactionMasterDetail = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMasterDetail>();
         _parameterSystem                     = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbParameterSystem>();
@@ -30,13 +34,50 @@ public class PrinterInvoiceViewModel : BaseViewModel
         AplicarOtroCommand   = new Command(OnAplicarOtroCommand);
         PrintCommand         = new Command(OnPrintCommand);
         AnularFacturaCommand = new Command(OnAnularFacturaCommand);
+        EditFacturaCommand   = new Command(OnEditarFacturaCommand);
     }
 
+    private async void OnEditarFacturaCommand()
+    {
+        try
+        {
+            IsBusy                      = true;
+            var objTransactionMaster    = await _repositoryTbTransactionMaster.PosMeFindByTransactionId(VariablesGlobales.DtoInvoice.TransactionMasterId);
+            //wg-activar--if (
+            //wg-activar--    objTransactionMaster.StatusID == (int)TypeStatusBilling.Register || 
+            //wg-activar--    objTransactionMaster.StatusID == (int)TypeStatusBilling.Apply
+            //wg-activar--)
+            //wg-activar--{
+            //wg-activar--    throw new Exception(Mensajes.FacturaEditarNotPermitido);
+            //wg-activar--}
+
+            bool permission = await _helperCore.GetPermission(TypeMenuElementID.app_invoice_billing_index, TypePermission.Updated, TypeImpact.All);
+            if (!permission && VariablesGlobales.User!.UserId! != Constantes.UserIdAdmin)
+            {
+                throw new Exception(Mensajes.EditarFacturaNoPermitido);
+            }
+
+            await NavigationService.NavigateToAsync<DataInvoicesViewModel>(VariablesGlobales.DtoInvoice.CustomerResponse!.CustomerNumber!);            
+            IsBusy = false;
+
+        }
+        catch (Exception e)
+        {   
+            ShowMensajePopUp(e.Message);
+            IsBusy = false;
+        }
+    }
     private async void OnAnularFacturaCommand()
     {
         try
         {
-            IsBusy = true;
+            IsBusy          = true;
+            bool permission = await _helperCore.GetPermission(TypeMenuElementID.app_invoice_billing_index, TypePermission.Deleted, TypeImpact.All);
+            if (!permission && VariablesGlobales.User!.UserId! != Constantes.UserIdAdmin)
+            {
+                throw new Exception(Mensajes.AnularFacturaNoPermitido);
+            }
+
             var details = await _repositoryTbTransactionMasterDetail.PosMeItemByTransactionId(TransactionMaster.TransactionMasterId);
             await _repositoryTbTransactionMaster.PosMeDelete(TransactionMaster);
             foreach (var masterDetail in details)
@@ -49,7 +90,7 @@ public class PrinterInvoiceViewModel : BaseViewModel
         }
         catch (Exception e)
         {
-            ShowToast(e.Message, ToastDuration.Long, 13);
+            ShowToast(e.Message, ToastDuration.Long, 13);            
         }
     }
 
@@ -202,6 +243,7 @@ public class PrinterInvoiceViewModel : BaseViewModel
     }
 
     public Command AnularFacturaCommand { get; }
+    public Command EditFacturaCommand { get; }
 
     public async void OnAppearing(INavigation navigation)
     {

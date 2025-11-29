@@ -105,6 +105,12 @@
                                                             Grid.Column="0"
                                                             Grid.ColumnSpan="2"
                                                             Text="{Binding TransactionOn, StringFormat='{0:yyyy-MM-dd hh:mm tt}'}" />
+
+                                                        <Label
+                                                            Text="{Binding MesaName}"
+                                                            FontAttributes="Bold"
+                                                            TextColor="Green" />
+
                                                         <core:DXButton
                                                             Command="{Binding BindingContext.SelectedFacturaCommand,Source={x:Reference FacturaCollectionView}}"
                                                             CommandParameter="{Binding .}"

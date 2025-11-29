@@ -21,6 +21,7 @@ public static class Constantes
 	public const string CustomerOrderInvoice						= "CUSTOMER_ORDER_INVOICE";
 	public static int CompanyId                                     = 2;
     public static int BranchId                                      = 2;
+    public static int UserIdAdmin                                   = 2;
     public const string UrlBase                                     = "{UrlBase}";
     public const string UrlBasePosme                                = "https://posme.net/v4posme/posme/public/";
     public const string TimeGpsInMilleseconds                       = "2629824000"; //1 mes
@@ -46,4 +47,5 @@ public static class Constantes
     public const string ErrorUrl					= "Error";
     public const string UrlInvalida					= "URL inválida";
     public const string ParametrUrlShareViewError	= "No se pudo encontrar el parametro de la url";
+    public const string CatalogName_MESAS           = "CATALOGO DE MESAS";
 }

@@ -5,10 +5,10 @@ using v4posme_maui.Services.SystemNames;
 namespace v4posme_maui.Services.Repository
 {
     
-    public class RepositoryServerTransactionMaster(DataBase dataBase, IRepositoryTbParameterSystem repositoryParameters) : RepositoryFacade<Api_AppMobileApi_GetDataDownload_ServerTransactionMaster_Response>(dataBase), IRepositoryServerTransactionMaster
+    public class RepositoryServerTransactionMaster(DataBase dataBase, IRepositoryTbParameterSystem repositoryParameters) : RepositoryFacade<Api_AppMobileApi_GetDataDownloadServerTransactionMasterResponse>(dataBase), IRepositoryServerTransactionMaster
     {
         private readonly DataBase _dataBase = dataBase;
-        public Task<List<Api_AppMobileApi_GetDataDownload_ServerTransactionMaster_Response>> PosMeFilterByCurrencyIDAndTransactionID(int currencyID, int transactionID)
+        public Task<List<Api_AppMobileApi_GetDataDownloadServerTransactionMasterResponse>> PosMeFilterByCurrencyIDAndTransactionID(int currencyID, int transactionID)
         {
             
             
@@ -24,7 +24,7 @@ namespace v4posme_maui.Services.Repository
                             t.TransactionID =  {transactionID} AND 
                             t.CurrencyID = {currencyID}
                       """;
-            return _dataBase.Database.QueryAsync<Api_AppMobileApi_GetDataDownload_ServerTransactionMaster_Response>(query);
+            return _dataBase.Database.QueryAsync<Api_AppMobileApi_GetDataDownloadServerTransactionMasterResponse>(query);
 
 
         }

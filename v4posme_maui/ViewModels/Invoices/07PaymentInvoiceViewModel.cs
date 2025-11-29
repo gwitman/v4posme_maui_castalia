@@ -6,6 +6,7 @@ using v4posme_maui.Services.Repository;
 using v4posme_maui.Services.SystemNames;
 using v4posme_maui.Views.Invoices;
 using Unity;
+using CommunityToolkit.Maui.Views;
 
 namespace v4posme_maui.ViewModels.Invoices;
 
@@ -25,6 +26,7 @@ public class PaymentInvoiceViewModel : BaseViewModel
         _repositoryItems                        = VariablesGlobales.UnityContainer.Resolve<IRepositoryItems>();
         Title                                   = "Pago 6/6";
         SelectionEfectivoCommand                = new Command(OnSelectionEfectivoCommand);
+        SelectionRegistrarCommand               = new Command(OnSelectionRegistrarCommand);
         SelectionDebitoCommand                  = new Command(OnSelectionDebitoCommand);
         SelectionCreditoCommand                 = new Command(OnSelectionCreditoCommand);
         SelectionMonederoCommand                = new Command(OnSelectionMonederoCommand);
@@ -54,7 +56,7 @@ public class PaymentInvoiceViewModel : BaseViewModel
 
     private bool ValidarSeleccionPago()
     {
-        return ChkCheque || ChkCredito || ChkDebito || ChkEfectivo || ChkMonedero || ChkOtros;
+        return ChkCheque || ChkCredito || ChkDebito || ChkEfectivo || ChkMonedero || ChkOtros || ChkRegistrar;
     }
 
     private async void OnAplicarPagoCommand()
@@ -67,12 +69,42 @@ public class PaymentInvoiceViewModel : BaseViewModel
 
         IsBusy          = true;
         var dtoInvoice  = VariablesGlobales.DtoInvoice;
-        var codigo      = await _helper.GetCodigoFactura();
+        var codigo      = "";
+
+        if (dtoInvoice.TransactionMasterId <= 0 )
+            codigo = await _helper.GetCodigoFactura();
+        else
+            codigo = dtoInvoice.Codigo;
+
+        //Eliminar el registro en caso de ser edicion
+        if(dtoInvoice.TransactionMasterId > 0)
+        {
+            var invoiceOld          = await _repositoryTbTransactionMaster.PosMeFindByTransactionId(dtoInvoice.TransactionMasterId);
+            var invoiceDetailOld    = await _repositoryTbTransactionMasterDetail.PosMeItemByTransactionId(dtoInvoice.TransactionMasterId);
+            foreach (var invoiceDetailOld_i in invoiceDetailOld)
+            {
+                await _repositoryTbTransactionMasterDetail.PosMeDelete(invoiceDetailOld_i);
+            }
+            await _repositoryTbTransactionMaster.PosMeDelete(invoiceOld);
+        }
+        
         VariablesGlobales.DtoInvoice.Codigo         = codigo;
         VariablesGlobales.DtoInvoice.Monto          = Monto;
         VariablesGlobales.DtoInvoice.Cambio         = Cambio;
         VariablesGlobales.DtoInvoice.TransactionOn  = DateTime.Now;
-        var transactionMaster = new TbTransactionMaster
+
+        //Obtener el estado de la factura
+        int statusID            = 0;
+        bool permission = await _helper.GetPermission(TypeMenuElementID.core_billing_invoice_type_restaurant, TypePermission.Updated, TypeImpact.All);
+        if (!permission)
+        {
+            statusID = (int)TypeStatusBilling.Apply;
+        }
+        else {
+            statusID = (int)TypeStatusBilling.Register;
+        }
+
+        var transactionMaster   = new TbTransactionMaster
         {
             TransactionId       = TypeTransaction.TransactionInvoiceBilling,
             Amount              = Monto,
@@ -92,13 +124,17 @@ public class PaymentInvoiceViewModel : BaseViewModel
             Plazo               = dtoInvoice.Plazo,
             NextVisit           = dtoInvoice.NextVisit,
             FixedExpenses       = dtoInvoice.FixedExpenses,
-            PeriodPay           = (TypePeriodPay)dtoInvoice.PeriodPay!.Key
+            PeriodPay           = (TypePeriodPay)dtoInvoice.PeriodPay!.Key,
+            StatusID            = statusID,
+            MesaID              = dtoInvoice.Mesa!.Key,
+            ReferenceClientName = dtoInvoice.ReferenceClientName,
+            MesaName            = dtoInvoice.Mesa!.Name
         };
-        transactionMaster.SubAmount = dtoInvoice.Balance - transactionMaster.Discount + transactionMaster.Taxi1;
 
-        var listMasterDetail    = new List<TbTransactionMasterDetail>();
+        transactionMaster.SubAmount = dtoInvoice.Balance - transactionMaster.Discount + transactionMaster.Taxi1;
+        var listMasterDetail        = new List<TbTransactionMasterDetail>();
         await _repositoryTbTransactionMaster.PosMeInsert(transactionMaster);
-        var transactionMasterId = transactionMaster.TransactionMasterId;
+        var transactionMasterId     = transactionMaster.TransactionMasterId;
 
         foreach (var item in dtoInvoice.Items)
         {
@@ -131,37 +167,42 @@ public class PaymentInvoiceViewModel : BaseViewModel
 
     private void OnSelectionOtrosCommand()
     {
-        ChangedChecked(false, false, false, false, false, true);
+        ChangedChecked(false, false, false, false, false, true,false);
         PagarSeleccion = "Pagar con Otros";
     }
 
     private void OnSelectionChequeCommand()
     {
-        ChangedChecked(false, false, false, false, true, false);
+        ChangedChecked(false, false, false, false, true, false,false);
         PagarSeleccion = "Pagar con Cheque";
     }
 
     private void OnSelectionMonederoCommand()
     {
-        ChangedChecked(false, false, false, true, false, false);
+        ChangedChecked(false, false, false, true, false, false,false);
         PagarSeleccion = "Pagar con Monedero";
     }
 
     private void OnSelectionCreditoCommand()
     {
-        ChangedChecked(false, false, true, false, false, false);
+        ChangedChecked(false, false, true, false, false, false,false);
         PagarSeleccion = "Pagar con Credito";
     }
 
     private void OnSelectionDebitoCommand()
     {
-        ChangedChecked(false, true, false, false, false, false);
+        ChangedChecked(false, true, false, false, false, false  ,false);
         PagarSeleccion = "Pagar con Debito";
     }
 
+    private void OnSelectionRegistrarCommand()
+    {
+        ChangedChecked(false, false, false, false, false, false, true);
+        PagarSeleccion = "Registrar";
+    }
     private void OnSelectionEfectivoCommand()
     {
-        ChangedChecked(true, false, false, false, false, false);
+        ChangedChecked(true, false, false, false, false, false,false);
         PagarSeleccion = "Pagar con Efectivo";
     }
 
@@ -169,11 +210,19 @@ public class PaymentInvoiceViewModel : BaseViewModel
     public decimal Balance => VariablesGlobales.DtoInvoice.Balance;
 
     private bool _chkEfectivo;
+    
 
     public bool ChkEfectivo
     {
         get => _chkEfectivo;
         set => SetProperty(ref _chkEfectivo, value);
+    }
+
+    private bool _chkRegistrar;
+    public bool ChkRegistrar
+    {
+        get => _chkRegistrar;
+        set => SetProperty(ref _chkRegistrar, value);
     }
 
     private bool _chkCredito;
@@ -238,6 +287,7 @@ public class PaymentInvoiceViewModel : BaseViewModel
     }
 
     public Command SelectionEfectivoCommand { get; }
+    public Command SelectionRegistrarCommand { get; }
     public Command SelectionDebitoCommand { get; }
     public Command SelectionCreditoCommand { get; }
     public Command SelectionMonederoCommand { get; }
@@ -255,7 +305,7 @@ public class PaymentInvoiceViewModel : BaseViewModel
     public Command AplicarPagoCommand { get; }
     public Command ClearMontoCommand { get; }
 
-    private void ChangedChecked(bool efectivo, bool debito, bool credito, bool monedero, bool cheque, bool otros)
+    private void ChangedChecked(bool efectivo, bool debito, bool credito, bool monedero, bool cheque, bool otros,bool registrar)
     {
         ChkEfectivo     = efectivo;
         ChkCredito      = credito;
@@ -263,6 +313,13 @@ public class PaymentInvoiceViewModel : BaseViewModel
         ChkCheque       = cheque;
         ChkMonedero     = monedero;
         ChkOtros        = otros;
+        ChkRegistrar    = registrar;
+
+        if(registrar)
+        {
+            TypePayment = TypePayment.Registrar;
+        }
+
         if (efectivo)
         {
             TypePayment = TypePayment.Efectivo;

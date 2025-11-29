@@ -36,6 +36,8 @@
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
                                 <dxe:TextEdit
                                     Grid.Row="0"
@@ -63,24 +65,46 @@
                                     StartIcon="identificacion"
                                     Text="{Binding Referencias}"
                                     LabelText="Referencia" />
-                                <dxe:ComboBoxEdit
+
+                                <dxe:TextEdit
                                     Grid.Row="3"
+                                    IconColor="{StaticResource Primary}"
+                                    HasError="{Binding ErrorReferenceClientName}"
+                                    x:Name="TxtReferenceClientName"
+                                    IsErrorIconVisible="{Binding ErrorReferenceClientName}"
+                                    StartIcon="identificacion"
+                                    Text="{Binding ReferenceClientName}"
+                                    LabelText="Cliente Referente" />
+                                
+                                <dxe:ComboBoxEdit
+                                    Grid.Row="4"
                                     SelectedItem="{Binding SelectedCurrency}"
                                     HasError="{Binding ErrorCurrency}"
                                     IsLabelFloating="True"
                                     StartIcon="price"
                                     LabelText="Moneda"
                                     ItemsSource="{Binding Currencies}" />
+
                                 <dxe:ComboBoxEdit
-                                    Grid.Row="4"
+                                    Grid.Row="5"
                                     SelectedItem="{Binding SelectedTipoDocumento}"
                                     HasError="{Binding ErrorTipoDocumento}"
                                     StartIcon="identificacion"
                                     IsLabelFloating="True"
                                     LabelText="Tipo de documento"
                                     ItemsSource="{Binding TipoDocumentos}" />
+
+                                <dxe:ComboBoxEdit
+                                    Grid.Row="6"
+                                    SelectedItem="{Binding SelectedMesa}"
+                                    HasError="{Binding ErrorMesa}"
+                                    IsLabelFloating="True"
+                                    StartIcon="price"
+                                    LabelText="Zona"
+                                    ItemsSource="{Binding Mesas}" />
+                                
                                 <dx:DXButton
-                                    Grid.Row="5"
+                                    Grid.Row="7"
                                     Content="Más opciones"
                                     Command="{Binding SeleccionarInvoiceCreditCommand}" />
                             </Grid>

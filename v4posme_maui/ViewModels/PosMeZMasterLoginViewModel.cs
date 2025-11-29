@@ -42,6 +42,7 @@ namespace v4posme_maui.ViewModels
         private readonly IRepositoryTbTransactionMasterDetail _repositoryTbTransactionMasterDetail		= VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMasterDetail>();
 		private readonly IRepositoryServerTransactionMaster _repositoryServerTransactionMaster			= VariablesGlobales.UnityContainer.Resolve<IRepositoryServerTransactionMaster>();
         private readonly IRepositoryTbParameterSystem _parameterSystem									= VariablesGlobales.UnityContainer.Resolve<IRepositoryTbParameterSystem>();
+        private readonly IRepositoryTbCatalogItem _repositoryCatalogItem								= VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCatalogItem>();
         private readonly HelperCore helperCore															= VariablesGlobales.UnityContainer.Resolve<HelperCore>();
 
 
@@ -273,7 +274,8 @@ namespace v4posme_maui.ViewModels
                             var transactionMasterDetailAll			= _repositoryTbTransactionMasterDetail.PosMeDeleteAll();
 							var serverTransactionMasterAll			= _repositoryServerTransactionMaster.PosMeDeleteAll();
 							var menuElementDeleteAll				= _repositoryTbMenuElement.PosMeDeleteAll();
-                            await Task.WhenAll([customerDeleteAll, itemsDeleteAll, documentCreditAmortizationDeleteAll, parametersDeleteAll,documentCreditDeleteAll, companyDeleteAll, transactionMasterAll,transactionMasterDetailAll, serverTransactionMasterAll, menuElementDeleteAll]);
+                            var catalogItemAll						= _repositoryCatalogItem.PosMeDeleteAll();
+                            await Task.WhenAll([customerDeleteAll, itemsDeleteAll, documentCreditAmortizationDeleteAll, parametersDeleteAll,documentCreditDeleteAll, companyDeleteAll, transactionMasterAll,transactionMasterDetailAll, serverTransactionMasterAll, menuElementDeleteAll, catalogItemAll]);
 
                             //inicializar contador 
                             var objParameterSystem		= await _parameterSystem.PosMeFindByName(Constantes.ParemeterEntityIDAutoIncrement);

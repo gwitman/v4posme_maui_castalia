@@ -10,20 +10,23 @@ using v4posme_maui.Services.Repository;
 using v4posme_maui.Services.SystemNames;
 using v4posme_maui.Services.Api;
 using Unity;
+using Microsoft.Maui.Controls.Compatibility.Platform.Android;
 
 namespace v4posme_maui.ViewModels.Invoices;
 
 public class DataInvoicesViewModel : BaseViewModel, IQueryAttributable
 {
     private IRepositoryTbCustomer _repositoryTbCustomer;
+    private IRepositoryTbCatalogItem _repositoryTbCatalogItem;
 
     public DataInvoicesViewModel()
     {
-        _repositoryTbCustomer = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCustomer>();
-        Title = "Datos de facturacion 2/6";
-        Item = VariablesGlobales.DtoInvoice;
+        _repositoryTbCustomer   = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCustomer>();
+        _repositoryTbCatalogItem = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCatalogItem>();
+        Title                   = "Datos de facturacion 2/6";
+        Item                    = VariablesGlobales.DtoInvoice;
         SeleccionarInvoiceCreditCommand = new Command(OnSeleccionarDataCredit, ValidateFields);
-        PropertyChanged += (_, _) => SeleccionarInvoiceCreditCommand.ChangeCanExecute();
+        PropertyChanged         += (_, _) => SeleccionarInvoiceCreditCommand.ChangeCanExecute();
         LoadComboBox();
     }
 
@@ -58,10 +61,12 @@ public class DataInvoicesViewModel : BaseViewModel, IQueryAttributable
             return;
         }
 
-        Item.Comentarios    = Comentarios;
-        Item.Referencia     = Referencias;
-        Item.Currency       = SelectedCurrency;
-        Item.TipoDocumento      = SelectedTipoDocumento;        
+        Item.Comentarios            = Comentarios;
+        Item.Referencia             = Referencias;
+        Item.Currency               = SelectedCurrency;
+        Item.TipoDocumento          = SelectedTipoDocumento;
+        Item.ReferenceClientName    = ReferenceClientName;
+        Item.Mesa                   = SelectedMesa;
         await NavigationService.NavigateToAsync<DataInvoiceCreditViewModel>(Item.CustomerResponse!.CustomerNumber!);
         IsBusy = false;
     }
@@ -70,6 +75,8 @@ public class DataInvoicesViewModel : BaseViewModel, IQueryAttributable
     public bool ErrorTipoDocumento { get; set; }
     public bool ErrorComentarios { get; set; }
     public bool ErrorReferencia { get; set; }
+    public bool ErrorReferenceClientName { get; set; }
+    public bool ErrorMesa { get; set; }
     public ViewTempDtoInvoice Item { get; private set; }
     private string _comentarios="Sin Comentarios";
 
@@ -81,10 +88,18 @@ public class DataInvoicesViewModel : BaseViewModel, IQueryAttributable
 
     private string _referencias=string.Empty;
 
+
     public string Referencias
     {
         get => _referencias;
         set => SetProperty(ref _referencias, value);
+    }
+
+    private string _ReferenceClientName = string.Empty;
+    public string ReferenceClientName
+    {
+        get => _ReferenceClientName;
+        set => SetProperty(ref _ReferenceClientName, value);
     }
 
     private ObservableCollection<DtoCatalogItem>? _currencies;
@@ -93,6 +108,13 @@ public class DataInvoicesViewModel : BaseViewModel, IQueryAttributable
     {
         get => _currencies;
         set => SetProperty(ref _currencies, value);
+    }
+
+    private ObservableCollection<DtoCatalogItem>? _mesas;
+    public ObservableCollection<DtoCatalogItem>? Mesas
+    {
+        get => _mesas;
+        set => SetProperty(ref _mesas, value);
     }
 
     private ObservableCollection<DtoCatalogItem>? _tipoDocumentos;
@@ -104,8 +126,29 @@ public class DataInvoicesViewModel : BaseViewModel, IQueryAttributable
     }
 
     public Command SeleccionarInvoiceCreditCommand { get; }
-    public DtoCatalogItem? SelectedCurrency { get; set; }
-    public DtoCatalogItem? SelectedTipoDocumento { get; set; }
+   
+
+    private DtoCatalogItem? _selectedCurrency;
+    public DtoCatalogItem? SelectedCurrency
+    {
+        get => _selectedCurrency;
+        set => SetProperty(ref _selectedCurrency, value);
+    }
+
+    private DtoCatalogItem? _selectedTipoDocumento;
+    public DtoCatalogItem? SelectedTipoDocumento
+    {
+        get => _selectedTipoDocumento;
+        set => SetProperty(ref _selectedTipoDocumento, value);
+    }
+
+    private DtoCatalogItem? _selectedMesa;
+    public DtoCatalogItem? SelectedMesa
+    {
+        get => _selectedMesa;
+        set => SetProperty(ref _selectedMesa, value);
+    }
+
 
     public void OnAppearing(INavigation? navigation)
     {
@@ -120,8 +163,8 @@ public class DataInvoicesViewModel : BaseViewModel, IQueryAttributable
 
     private async Task LoadData(string? id)
     {
-        var customer = await _repositoryTbCustomer.PosMeFindCustomer(id!);
-        Item = VariablesGlobales.DtoInvoice;
+        var customer    = await _repositoryTbCustomer.PosMeFindCustomer(id!);
+        Item            = VariablesGlobales.DtoInvoice;
         VariablesGlobales.DtoInvoice.CustomerResponse = customer;
         LoadComboBox();
         IsBusy = false;
@@ -139,14 +182,48 @@ public class DataInvoicesViewModel : BaseViewModel, IQueryAttributable
             new DtoCatalogItem((int)TypeTransactionCausal.Contado, "Contado", "D"),
             new DtoCatalogItem((int)TypeTransactionCausal.Credito, "Crédito", "C")
         ];
+
+        //Llenar el catalogo de mesas
+        Mesas                                                                       =  [ new DtoCatalogItem(0, "Seleccione", "Seleccione")];
+        List<Api_AppMobileApi_GetDataDownloadCatalogItemResponse> catalogoDeMesas   = _repositoryTbCatalogItem.PosMeFindByName( Constantes.CatalogName_MESAS).Result;
+        if (catalogoDeMesas != null)
+        {
+            if(catalogoDeMesas.Count > 0)
+            {
+                foreach(var catalogoDeMesasI in catalogoDeMesas)
+                {
+                    Mesas.Add(new DtoCatalogItem(catalogoDeMesasI.catalogItemID, catalogoDeMesasI.catalogItemName, catalogoDeMesasI.catalogItemDisplay));
+                }
+            }
+        }
+
+
+        if(Mesas.Any())
+        {
+            SelectedMesa = Mesas.First();
+        }
+        if(VariablesGlobales.DtoInvoice.Mesa != null)
+        {
+            SelectedMesa = Mesas.Where(k => k.Key == VariablesGlobales.DtoInvoice.Mesa.Key).FirstOrDefault();
+        }
+
         if (Currencies.Any())
         {
             SelectedCurrency = Currencies.First();
+        }
+        if (VariablesGlobales.DtoInvoice.Currency != null)
+        {
+            SelectedCurrency = Currencies.Where(k => k.Key == VariablesGlobales.DtoInvoice.Currency.Key).FirstOrDefault();
         }
 
         if (TipoDocumentos.Any())
         {
             SelectedTipoDocumento = TipoDocumentos.First();
         }
+        if (VariablesGlobales.DtoInvoice.TipoDocumento != null)
+        {
+            SelectedTipoDocumento = TipoDocumentos.Where(k => k.Key == VariablesGlobales.DtoInvoice.TipoDocumento.Key).FirstOrDefault();
+        }
+
     }
 }

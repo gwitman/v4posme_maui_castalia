@@ -47,6 +47,8 @@ public class ViewTempDtoInvoice
     public decimal FixedExpenses { get; set; } = decimal.Zero;
     public int Plazo { get; set; } = 1;
     public DateTime NextVisit { get; set; } = DateTime.Now;
+    public string ReferenceClientName { get; set; } = string.Empty ;
+    public DtoCatalogItem? Mesa { get; set; }
     public DtoCatalogItem PeriodPay { get; set; } 
     public TbTransactionMaster TransactionMaster { get; set; }
 

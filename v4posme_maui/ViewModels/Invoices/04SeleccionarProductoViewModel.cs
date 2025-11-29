@@ -120,6 +120,12 @@ public class SeleccionarProductoViewModel : BaseViewModel
             Productos.Add(itemsResponse);
         }
 
+        if (VariablesGlobales.DtoInvoice.Items.Count > 0)
+        {
+            ProductosSeleccionadosCantidad      = $"Enviar {VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada} Items";
+            ProductosSeleccionadosCantidadTotal = $"{VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada} Items = {VariablesGlobales.DtoInvoice.Balance}";
+        }
+
         IsBusy = false;
     }
 

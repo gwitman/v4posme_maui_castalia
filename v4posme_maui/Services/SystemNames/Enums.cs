@@ -53,9 +53,16 @@ namespace v4posme_maui.Services.SystemNames
         Efectivo,
         Cheque,
         Monedero,
-        Otros
+        Otros,
+        Registrar
     }
 
+    public enum TypeStatusBilling
+    {
+        Register = 66,
+        Apply = 67,
+        Anulada = 68 
+    }
     public enum TypePermission
     {
         Selected = 0,
@@ -78,6 +85,9 @@ namespace v4posme_maui.Services.SystemNames
     public enum TypeMenuElementID
     {
         app_inventory_item_index_aspx               = 55,
-        core_inventory_clear_item_on_upload_data    = 285
+        app_invoice_billing_index                   = 125,
+        core_inventory_clear_item_on_upload_data    = 285,
+        core_billing_invoice_type_restaurant        = 286
+        
     }
 }

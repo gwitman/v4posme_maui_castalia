@@ -139,6 +139,11 @@ public class DataInvoiceCreditViewModel : BaseViewModel, IQueryAttributable
             SelectedPeriodPay = PeriodPay.First();
         }
 
+        if (VariablesGlobales.DtoInvoice.PeriodPay != null)
+        {
+            SelectedPeriodPay = PeriodPay.Where(k => k.Key == VariablesGlobales.DtoInvoice.PeriodPay.Key).FirstOrDefault();
+        }
+
     }
 
 }

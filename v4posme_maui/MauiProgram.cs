@@ -59,6 +59,7 @@ namespace v4posme_maui
             VariablesGlobales.UnityContainer.RegisterType<IRepositoryTbTransactionMaster, RepositoryTbTransactionMaster>();
             VariablesGlobales.UnityContainer.RegisterType<IRepositoryTbTransactionMasterDetail, RepositoryTbTransactionMasterDetail>();
             VariablesGlobales.UnityContainer.RegisterType<IRepositoryServerTransactionMaster, RepositoryServerTransactionMaster>();
+            VariablesGlobales.UnityContainer.RegisterType<IRepositoryTbCatalogItem, RepositoryTbCatalogItem>();
             VariablesGlobales.UnityContainer.RegisterSingleton<DataBase>();
             VariablesGlobales.UnityContainer.RegisterSingleton<HelperCore>();
             VariablesGlobales.UnityContainer.RegisterSingleton<DownloadPage>();

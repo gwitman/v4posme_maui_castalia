@@ -27,7 +27,11 @@ public class RepositoryTbTransactionMaster(DataBase dataBase) : RepositoryFacade
                              tm.Comment,
                              tm.Reference1,
                              tm.Reference2,
-                             tm.Reference3
+                             tm.Reference3,
+                             tm.ReferenceClientName,
+                             tm.MesaID,
+                             tm.MesaName,
+                             tm.StatusID
                      from tb_transaction_master tm
                               join tb_customers c on tm.CustomerCreditLineId = c.CustomerCreditLineId and tm.EntityId=c.EntityId
                      where tm.TransactionId={(int)TypeTransaction.TransactionInvoiceBilling} and 

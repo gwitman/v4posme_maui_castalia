@@ -49,7 +49,11 @@ public class TbTransactionMaster
     [DataMember(Name = "referencie2")] public string? Reference2 { get; set; } = string.Empty;
     [DataMember(Name = "referencie3")] public string? Reference3 { get; set; } = string.Empty;
     [DataMember(Name = "CustomerIdentification")] public string CustomerIdentification { get; set; } = string.Empty;
-    
+    [DataMember(Name = "ReferenceClientName")] public string ReferenceClientName { get; set; } = string.Empty;
+    [DataMember(Name = "MesaID")] public int MesaID { get; set; } = 1;
+    [DataMember(Name = "MesaName")] public string MesaName { get; set; } = string.Empty;
+    [DataMember(Name = "StatusID")] public int StatusID { get; set; } = 1;
+
     public string? Reference4 { get; set; }
     public int CuotasPendientes { get; set; }
 }

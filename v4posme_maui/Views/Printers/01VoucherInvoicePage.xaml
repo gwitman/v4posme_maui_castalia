@@ -28,6 +28,10 @@
         <ToolbarItem Text="Regresar"
                      Order="Secondary"
                      Command="{Binding AplicarOtroCommand}" />
+        <ToolbarItem Text="Editar"
+             Order="Secondary" 
+             Command="{Binding EditFacturaCommand}" />
+        
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
         <controls:ShimmerView

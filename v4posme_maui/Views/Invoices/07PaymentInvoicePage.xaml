@@ -122,18 +122,20 @@
                             Grid.Row="0"
                             Grid.Column="1" />
                         
-                        <!--
+                        
                         <dx:DXToggleButton
                             Style="{StaticResource SinFondoColorSinRedondeado}"
                             IconWidth="40"
                             IconHeight="40"
-                            Content="Tar. Crédito"
-                            IsChecked="{Binding ChkCredito}"
-                            Command="{Binding SelectionCreditoCommand}"
+                            Content="Registrar"
+                            IsChecked="{Binding ChkRegistrar}"
+                            Command="{Binding SelectionRegistrarCommand}"
                             IconPlacement="Top"
                             Icon="debit_card_1"
                             Grid.Row="0"
                             Grid.Column="2" />
+                        
+                        <!--
                         <dx:DXToggleButton
                             Style="{StaticResource SinFondoColorSinRedondeado}"
                             IconWidth="40"

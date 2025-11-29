@@ -12,19 +12,34 @@ public class HelperCore(
     IRepositoryTbParameterSystem repositoryParameters,
     IRepositoryParameters _repositoryParametersWeb,
     IRepositoryTbCustomer _repositoryTbCustomer,
-    IRepositoryTbMenuElement _reporitoryTbMenuElement 
+    IRepositoryTbMenuElement _reporitoryTbMenuElement
 )
 {
 
-    public async Task<bool> GetPermission(TypeMenuElementID menuElementID, TypePermission typePermission,TypeImpact impact )
+    public async Task<bool> GetPermission(TypeMenuElementID menuElementID, TypePermission typePermission, TypeImpact impact)
     {
         var findMenuElement = await _reporitoryTbMenuElement.PosMeFindById((int)menuElementID);
-        if(findMenuElement is null )
+        if (findMenuElement is null)
             return false;
 
-        if(typePermission == TypePermission.Updated)
+        if (typePermission == TypePermission.Updated)
         {
             if (findMenuElement.Edited == (int)impact)
+                return true;
+        }
+        if (typePermission == TypePermission.Deleted)
+        {
+            if (findMenuElement.Deleted == (int)impact)
+                return true;
+        }
+        if (typePermission == TypePermission.Inserted)
+        {
+            if (findMenuElement.Inserted == (int)impact)
+                return true;
+        }
+        if (typePermission == TypePermission.Selected)
+        {
+            if (findMenuElement.Selected == (int)impact)
                 return true;
         }
         return false;
