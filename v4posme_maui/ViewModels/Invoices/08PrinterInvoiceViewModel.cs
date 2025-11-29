@@ -43,13 +43,13 @@ public class PrinterInvoiceViewModel : BaseViewModel
         {
             IsBusy                      = true;
             var objTransactionMaster    = await _repositoryTbTransactionMaster.PosMeFindByTransactionId(VariablesGlobales.DtoInvoice.TransactionMasterId);
-            //wg-activar--if (
-            //wg-activar--    objTransactionMaster.StatusID == (int)TypeStatusBilling.Register || 
-            //wg-activar--    objTransactionMaster.StatusID == (int)TypeStatusBilling.Apply
-            //wg-activar--)
-            //wg-activar--{
-            //wg-activar--    throw new Exception(Mensajes.FacturaEditarNotPermitido);
-            //wg-activar--}
+            if (
+                objTransactionMaster.StatusID == (int)TypeStatusBilling.Register || 
+                objTransactionMaster.StatusID == (int)TypeStatusBilling.Apply
+            )
+            {
+                throw new Exception(Mensajes.FacturaEditarNotPermitido);
+            }
 
             bool permission = await _helperCore.GetPermission(TypeMenuElementID.app_invoice_billing_index, TypePermission.Updated, TypeImpact.All);
             if (!permission && VariablesGlobales.User!.UserId! != Constantes.UserIdAdmin)

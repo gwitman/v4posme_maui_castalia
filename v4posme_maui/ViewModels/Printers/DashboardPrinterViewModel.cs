@@ -424,6 +424,7 @@ public class DashboardPrinterViewModel : BaseViewModel
                 Comentarios         = master.Comment,
                 ReferenceClientName = master.ReferenceClientName,                
                 TransactionMasterId = master.TransactionMasterId
+                
             };
             if (master.CurrencyId == TypeCurrency.Cordoba)
             {
@@ -440,6 +441,7 @@ public class DashboardPrinterViewModel : BaseViewModel
             dto.CustomerResponse             = await _repositoryTbCustomer.PosMeFindEntityId(master.EntityId);
             dto.FirstName                    = dto.CustomerResponse.FirstName;
             dto.LastName                     = dto.CustomerResponse.LastName;
+            
             var findTransactionMasterDetails = await _repositoryTbTransactionMasterDetail.PosMeItemByTransactionId(master.TransactionMasterId);
             foreach (var detail in findTransactionMasterDetails)
             {
