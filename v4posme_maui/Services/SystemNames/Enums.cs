@@ -85,7 +85,7 @@ namespace v4posme_maui.Services.SystemNames
     public enum TypeMenuElementID
     {
         app_inventory_item_index_aspx               = 55,
-        app_invoice_billing_index                   = 125,
+        app_invoice_billing_index                   = 77,
         core_inventory_clear_item_on_upload_data    = 285,
         core_billing_invoice_type_restaurant        = 286
         
