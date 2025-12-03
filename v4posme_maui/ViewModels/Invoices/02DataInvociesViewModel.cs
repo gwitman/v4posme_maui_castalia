@@ -25,6 +25,7 @@ public class DataInvoicesViewModel : BaseViewModel, IQueryAttributable
         _repositoryTbCatalogItem = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCatalogItem>();
         Title                   = "Datos de facturacion 2/6";
         Item                    = VariablesGlobales.DtoInvoice;
+        Comentarios             = Item.Comentarios is null ? Comentarios :  Item.Comentarios!;
         SeleccionarInvoiceCreditCommand = new Command(OnSeleccionarDataCredit, ValidateFields);
         PropertyChanged         += (_, _) => SeleccionarInvoiceCreditCommand.ChangeCanExecute();
         LoadComboBox();
