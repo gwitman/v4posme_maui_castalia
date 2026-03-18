@@ -6,6 +6,7 @@
              xmlns:dx="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
              xmlns:models="clr-namespace:v4posme_maui.Models"
              xmlns:controls="clr-namespace:DevExpress.Maui.Controls;assembly=DevExpress.Maui.Controls"
+             xmlns:zxing="clr-namespace:ZXing.Net.Maui.Controls;assembly=ZXing.Net.MAUI.Controls"
              Title="{Binding Title}"
              x:Class="v4posme_maui.Views.Invoices.PrinterInvoicePage"
              Style="{StaticResource DetailPageStyle}">
@@ -28,17 +29,27 @@
         <controls:ShimmerView Style="{StaticResource ShimmerEffect}" IsLoading="{Binding IsBusy}">
             <controls:ShimmerView.Content>
                 <ScrollView>
+                    <VerticalStackLayout>
                     <dx:DXStackLayout
                         x:Name="DxStackLayout"
                         BackgroundColor="White"
                         Margin="10">
                         <dx:DXStackLayout
                             Orientation="Vertical">
+                            
                             <dx:DXImage x:Name="Logo"
                                         HorizontalOptions="Center"
                                         HeightRequest="150"
                                         WidthRequest="150"
                                         Source="{Binding LogoSource}" />
+
+                            <dx:DXImage x:Name="LogoQr"
+                               HorizontalOptions="Center"
+                               HeightRequest="150"
+                               WidthRequest="150" 
+                               IsVisible="{Binding ShowQr}" 
+                               Source="{Binding QrImageSource}" />
+                            
                             <Label
                                 HorizontalTextAlignment="Center"
                                 Text="{Binding Company.Name}"
@@ -107,8 +118,12 @@
                                            Text="{Binding DtoInvoice.Comentarios}" />
                                 </Grid>
                             </dx:DXBorder>
+                            
                         </dx:DXStackLayout>
-
+                        
+                        
+                        
+                        
                         <dx:DXStackLayout>
                             <dx:DXSeparator />
                             <Grid>
@@ -212,13 +227,19 @@
                                 </Label.FormattedText>
                             </Label>
                         </dx:DXStackLayout>
+                        
+                        
                         <Label
                             HorizontalTextAlignment="Center"
                             Text="{Binding Company.Address}" />
                         <Label
                             HorizontalOptions="Center"
                             Text="{Binding CompanyTelefono.Value}" />
+
+
+                        
                     </dx:DXStackLayout>
+                    </VerticalStackLayout>
                 </ScrollView>
             </controls:ShimmerView.Content>
             <controls:ShimmerView.LoadingView>

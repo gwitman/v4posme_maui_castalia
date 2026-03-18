@@ -259,6 +259,22 @@ public class PrinterInvoiceViewModel : BaseViewModel
         set => SetProperty(ref _enableBackButton, value);
     }
 
+    private bool _showQr;
+
+    public bool ShowQr
+    {
+        get => _showQr;
+        set => SetProperty(ref _showQr, value);
+    }
+
+    private ImageSource? _qrImageSource;
+
+    public ImageSource? QrImageSource
+    {
+        get => _qrImageSource;
+        set => SetProperty(ref _qrImageSource, value);
+    }
+
     public Command AnularFacturaCommand { get; }
     public Command EditFacturaCommand { get; }
 
@@ -266,24 +282,90 @@ public class PrinterInvoiceViewModel : BaseViewModel
     {
         try
         {
-            Navigation = navigation;
-            var paramter = await _parameterSystem.PosMeFindLogo();
+            Navigation          = navigation;
+            var paramter        = await _parameterSystem.PosMeFindLogo();
+            byte[]? logoBytes   = null;
             if (!string.IsNullOrWhiteSpace(paramter.Value))
             {
-                var imageBytes = Convert.FromBase64String(paramter.Value!);
-                LogoSource = ImageSource.FromStream(() => new MemoryStream(imageBytes));
+                logoBytes       = Convert.FromBase64String(paramter.Value!);
+                LogoSource      = ImageSource.FromStream(() => new MemoryStream(logoBytes));
+                
+                Debug.WriteLine($"[LOGO] LogoSource assigned, bytes: {logoBytes.Length}");
+                Debug.WriteLine($"[QR] QrImageSource assigned, bytes: {logoBytes.Length}");
             }
-            CompanyTelefono = await _repositoryParameters.PosMeFindByKey("CORE_PHONE");
-            CompanyRuc = await _repositoryParameters.PosMeFindByKey("CORE_COMPANY_IDENTIFIER");
-            Company = VariablesGlobales.TbCompany;
-            EnableBackButton = VariablesGlobales.EnableBackButton;
-            TransactionMaster = DtoInvoice.TransactionMaster;
+            CompanyTelefono     = await _repositoryParameters.PosMeFindByKey("CORE_PHONE");
+            CompanyRuc          = await _repositoryParameters.PosMeFindByKey("CORE_COMPANY_IDENTIFIER");
+            Company             = VariablesGlobales.TbCompany;
+            EnableBackButton    = VariablesGlobales.EnableBackButton;
+            TransactionMaster   = DtoInvoice.TransactionMaster;
+
+            string printerQR    = await _helperCore.GetValueParameter("MOBILE_PRINTER_QR_IN_INVOICE", "false");
+            string printerQRUrl = await _helperCore.GetValueParameter("MOBILE_PRINTER_QR_IN_INVOICE_URL", "www.google.com");
+            Debug.WriteLine($"[QR] MOBILE_PRINTER_QR_IN_INVOICE = '{printerQR}'");
+            ShowQr              = printerQR.Trim().Equals("true", StringComparison.OrdinalIgnoreCase);
+            Debug.WriteLine($"[QR] ShowQr = {ShowQr}");
+            if(ShowQr == true)
+            {
+                string qrContent = printerQRUrl + "/inm/" + DtoInvoice.Codigo + "/unm/" + VariablesGlobales.User!.Nickname;
+                QrImageSource    = GenerateQrImageSource(qrContent);
+            }
+            
             IsBusy = false;
         }
         catch (Exception e)
         {
             ShowMensajePopUp(e.Message);
         }
+    }
+
+    private static ImageSource GenerateTestImageSource()
+    {
+        // Crear una imagen de prueba simple: cuadrado rojo de 200x200
+        var bitmap = new SKBitmap(200, 200);
+        using (var canvas = new SKCanvas(bitmap))
+        {
+            canvas.Clear(SKColors.White);
+            var paint = new SKPaint
+            {
+                Color = SKColors.Red,
+                Style = SKPaintStyle.Fill
+            };
+            canvas.DrawRect(50, 50, 100, 100, paint);
+        }
+
+        byte[] bytes;
+        using (var image = SKImage.FromBitmap(bitmap))
+        using (var data = image.Encode(SKEncodedImageFormat.Png, 100))
+        {
+            bytes = data.ToArray();
+        }
+        bitmap.Dispose();
+
+        Debug.WriteLine($"[TEST] PNG bytes generated: {bytes.Length}");
+        return ImageSource.FromStream(() => new MemoryStream(bytes));
+    }
+
+    private static ImageSource GenerateQrImageSource(string content, int size = 300)
+    {
+        var writer = new ZXing.BarcodeWriterPixelData
+        {
+            Format  = ZXing.BarcodeFormat.QR_CODE,
+            Options = new ZXing.Common.EncodingOptions { Width = size, Height = size, Margin = 1 }
+        };
+        var pixelData = writer.Write(content);
+        var bitmap    = new SKBitmap(pixelData.Width, pixelData.Height, SKColorType.Rgba8888, SKAlphaType.Premul);
+        System.Runtime.InteropServices.Marshal.Copy(pixelData.Pixels, 0, bitmap.GetPixels(), pixelData.Pixels.Length);
+
+        byte[] bytes;
+        using (var image = SKImage.FromBitmap(bitmap))
+        using (var data  = image.Encode(SKEncodedImageFormat.Png, 100))
+        {
+            bytes = data.ToArray();
+        }
+        bitmap.Dispose();
+
+        Debug.WriteLine($"[QR] PNG bytes generated: {bytes.Length}");
+        return ImageSource.FromStream(() => new MemoryStream(bytes));
     }
     
 }
