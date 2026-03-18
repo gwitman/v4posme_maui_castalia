@@ -25,7 +25,8 @@ namespace v4posme_maui.Services.HelpersPrinters.Epson_Commands
 
         private static IEnumerable<byte> StoreQr(string qrData)
         {
-            var length = qrData.Length + 3;
+            var dataBytes = Encoding.UTF8.GetByteCount(qrData);
+            var length = dataBytes + 3;
             var b = (byte)(length % 256);
             var b2 = (byte)(length / 256);
 

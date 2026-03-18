@@ -12,6 +12,8 @@ using SkiaSharp;
 using Unity;
 using v4posme_maui.Views.Printers;
 using v4posme_maui.Services.Helpers;
+using v4posme_maui.Services.HelpersPrinters.Helper;
+using QrCodeSize = v4posme_maui.Services.HelpersPrinters.Enums.QrCodeSize;
 
 namespace v4posme_maui.ViewModels.Invoices;
 
@@ -26,7 +28,7 @@ public class PrinterInvoiceViewModel : BaseViewModel
     public PrinterInvoiceViewModel()
     {
         Title = "Comprobante Pago Factura";
-        _helperCore                         = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
+        _helperCore                          = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
         _repositoryTbTransactionMaster       = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMaster>();
         _repositoryTbTransactionMasterDetail = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMasterDetail>();
         _parameterSystem                     = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbParameterSystem>();
@@ -98,6 +100,8 @@ public class PrinterInvoiceViewModel : BaseViewModel
     {
         try
         {
+            string printerQR = await _helperCore.GetValueParameter("MOBILE_PRINTER_QR_IN_INVOICE", "false");
+            string printerQRUrl = await _helperCore.GetValueParameter("MOBILE_PRINTER_QR_IN_INVOICE_URL", "www.google.com");
             var parametroPrinter = await _parameterSystem.PosMeFindPrinter();
             var logo = await _parameterSystem.PosMeFindLogo();
             if (string.IsNullOrWhiteSpace(parametroPrinter.Value))
@@ -154,10 +158,23 @@ public class PrinterInvoiceViewModel : BaseViewModel
             printer.Append($"CAMBIO:              {dtoInvoice.Cambio:N2}");
             printer.NewLine();
             printer.AlignCenter();
+
+            if (printerQR == "true")
+            {
+                var qrContent   = QrGenerator.BuildContent(dtoInvoice);
+                qrContent       = printerQRUrl + "/inm/" + dtoInvoice.Codigo + "/unm/" + VariablesGlobales.User!.Nickname;
+                
+                printer.QrCode(qrContent, QrCodeSize.Size1);
+                printer.NewLine();
+                printer.NewLine();
+            }
+
+
             printer.Append($"{Company.Address}");
             printer.Append($"{CompanyTelefono!.Value}");
             printer.NewLine();
             printer.NewLine();
+
             printer.FullPaperCut();
             printer.Print();
             if (printer.Device is null)
