@@ -101,18 +101,12 @@ public partial class ReporteVentaPage : ContentPage
 			return "";
 		}
 
-		await using var stream = await screenshotResult.OpenReadAsync();
-		
-		using var memoryStream = new MemoryStream();
-		
-		await stream.CopyToAsync(memoryStream);
-		
-		var dateTime = DateTime.Now;
-		
-		var result = $"{dateTime.Year}{dateTime.Month}{dateTime.Day}{dateTime.Hour}{dateTime.Minute}{dateTime.Second}";
-		
-		var filePath = GetFilePath($"{result}.png");
-
+		await using var stream = await screenshotResult.OpenReadAsync();		
+		using var memoryStream = new MemoryStream();		
+		await stream.CopyToAsync(memoryStream);		
+		var dateTime	= DateTime.Now;		
+		var result		= $"{dateTime.Year}{dateTime.Month}{dateTime.Day}{dateTime.Hour}{dateTime.Minute}{dateTime.Second}";		
+		var filePath	= GetFilePath($"{result}.png");
 		await File.WriteAllBytesAsync(filePath, memoryStream.ToArray());
 		
 		return filePath;

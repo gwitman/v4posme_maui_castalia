@@ -188,21 +188,21 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 			Title = "Cierre";
 			var today = DateTime.Today;
 
-			_parameterSystem = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbParameterSystem>();
-			_repositoryTbCustomer = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCustomer>();
-			_repositoryTbTransactionMaster = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMaster>();
+			_parameterSystem				= VariablesGlobales.UnityContainer.Resolve<IRepositoryTbParameterSystem>();
+			_repositoryTbCustomer			= VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCustomer>();
+			_repositoryTbTransactionMaster	= VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMaster>();
 
-			PrintCommand = new Command(OnPrintCommand);
-			HideFormCommand = new Command(OnHideFormCommand);
+			PrintCommand		= new Command(OnPrintCommand);
+			HideFormCommand		= new Command(OnHideFormCommand);
 			
 			FechaInical = new DateTime(today.Year, today.Month, 1);
-			FechaFinal = new DateTime(today.Year, today.Month, DateTime.DaysInMonth(today.Year, today.Month));
+			FechaFinal	= new DateTime(today.Year, today.Month, DateTime.DaysInMonth(today.Year, today.Month));
 
-			InvoicesUS = [];
-			CreditsUS = [];
-			Visits = [];
+			InvoicesUS	= [];
+			CreditsUS	= [];
+			Visits		= [];
 			InvoicesNIO = [];
-			CreditsNIO = [];
+			CreditsNIO	= [];
 		}
 
 		public override async Task InitializeAsync(object parameter) => await OnAppearing(Navigation!);
@@ -238,11 +238,11 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 			IsVisibleDate = true;
 			IsFormVisible = false;
 
-			InvoicesHeight = 0;
-			InvoicesHeight_2 = 0;
-			CreditHeight = 0;
-			CreditHeight_2 = 0;
-			VisitHeight = 0;
+			InvoicesHeight		= 0;
+			InvoicesHeight_2	= 0;
+			CreditHeight		= 0;
+			CreditHeight_2		= 0;
+			VisitHeight			= 0;
 
 			InvoicesUS.Clear();
 			CreditsUS.Clear();
@@ -261,10 +261,10 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 				InvoicesNIO.Clear();
 				CreditsNIO.Clear();
 
-				var _TotalFactura = 0m;
-				var _TotalFacturaNIO = 0m;
-				var _TotalCredito = 0m;
-				var _TotalCreditoNIO = 0m;
+				var _TotalFactura		= 0m;
+				var _TotalFacturaNIO	= 0m;
+				var _TotalCredito		= 0m;
+				var _TotalCreditoNIO	= 0m;
 
 				var totalNIO = 0m;
 				var totalUSD = 0m;
@@ -281,7 +281,7 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 						DocumentNumber = x.TransactionNumber!,
 						CurrencyId = (int)x.CurrencyId,
 						CurrencyName = "$",
-						Remaining = x.Amount,
+						Remaining = x.Amount - x.Discount,
 					})
 					.ToList();
 
@@ -294,7 +294,7 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 						DocumentNumber = x.TransactionNumber!,
 						CurrencyId = (int)x.CurrencyId,
 						CurrencyName = "$",
-						Remaining = x.SubAmount,
+						Remaining = x.SubAmount - x.Discount,
 					})
 					.ToList();
 
@@ -307,7 +307,7 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 						DocumentNumber = x.TransactionNumber!,
 						CurrencyId = (int)x.CurrencyId,
 						CurrencyName = "C$",
-						Remaining = x.Amount,
+						Remaining = x.Amount - x.Discount,
 					})
 					.ToList();
 
@@ -320,7 +320,7 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 						DocumentNumber = x.TransactionNumber!,
 						CurrencyId = (int)x.CurrencyId,
 						CurrencyName = "C$",
-						Remaining = x.SubAmount,
+						Remaining = x.SubAmount - x.Discount,
 					})
 					.ToList();
 
@@ -379,26 +379,26 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 					Visits.Add(item);
 				}
 
-				IsBusy = false;
-				InvoicesHeight = 24 * InvoicesUS.Count;
-				InvoicesHeight_2 = 24 * InvoicesNIO.Count;
-				CreditHeight = 24 * CreditsUS.Count;
-				CreditHeight_2 = 24 * CreditsNIO.Count;
-				VisitHeight = 24 * Visits.Count;
-				TotalNIO = $"C$ {totalNIO:N2}";
-				TotalUSD = $"$ {totalUSD:N2}";
+				IsBusy				= false;
+				InvoicesHeight		= 24 * InvoicesUS.Count;
+				InvoicesHeight_2	= 24 * InvoicesNIO.Count;
+				CreditHeight		= 24 * CreditsUS.Count;
+				CreditHeight_2		= 24 * CreditsNIO.Count;
+				VisitHeight			= 24 * Visits.Count;
+				TotalNIO			= $"C$ {totalNIO:N2}";
+				TotalUSD			= $"$ {totalUSD:N2}";
 
-				TotalFactura = $"$ {_TotalFactura:N2}";
-				TotalFacturaNIO = $"C$ {_TotalFacturaNIO:N2}";
-				TotalCredito = $"$ {_TotalCredito:N2}";
-				TotalCreditoNIO = $"C$ {_TotalCreditoNIO:N2}";
+				TotalFactura		= $"$ {_TotalFactura:N2}";
+				TotalFacturaNIO		= $"C$ {_TotalFacturaNIO:N2}";
+				TotalCredito		= $"$ {_TotalCredito:N2}";
+				TotalCreditoNIO		= $"C$ {_TotalCreditoNIO:N2}";
 			}
 			catch (Exception ex)
 			{
 				Debug.WriteLine(ex.Message);
-				IsBusy = false;
-				IsVisibleDate = !IsVisibleDate;
-				IsFormVisible = !IsFormVisible;
+				IsBusy			= false;
+				IsVisibleDate	= !IsVisibleDate;
+				IsFormVisible	= !IsFormVisible;
 			}
 		}
 

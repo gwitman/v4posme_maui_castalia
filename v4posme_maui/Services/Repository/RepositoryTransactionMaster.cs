@@ -126,7 +126,8 @@ public class RepositoryTbTransactionMaster(DataBase dataBase) : RepositoryFacade
                              tm.Reference1,
                              tm.Reference2,
                              c.firstName || ' ' || c.lastName referencie3,
-                             tm.SubAmount 
+                             tm.SubAmount,
+                             tm.Discount 
                      from tb_transaction_master tm
                               left join tb_customers c on tm.EntityId=c.EntityId
                      order by tm.TransactionOn DESC 
