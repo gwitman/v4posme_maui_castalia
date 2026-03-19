@@ -307,7 +307,7 @@
                                     <FormattedString>
                                         <Span Text="TOTAL: " />
                                         <Span Text="{Binding MonedaSimbolo}" />
-                                        <Span Text="{Binding SubTotal,StringFormat='{0:N2}'}" />
+                                        <Span Text="{Binding Balance,StringFormat='{0:N2}'}" />
                                     </FormattedString>
                                 </Label.FormattedText>
                             </Label>
@@ -331,7 +331,7 @@
                                     <Label
                                         TextColor="White"
                                         FontAttributes="Bold"
-                                        Text="{Binding SubTotal,StringFormat='{0:N2}'}" />
+                                        Text="{Binding Balance,StringFormat='{0:N2}'}" />
                                 </StackLayout>
                             </dx:DXButton>
                         </dx:DXStackLayout>

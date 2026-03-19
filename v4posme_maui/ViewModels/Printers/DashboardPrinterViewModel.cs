@@ -148,7 +148,7 @@ public class DashboardPrinterViewModel : BaseViewModel
             VariablesGlobales.DtoInvoice.TipoDocumento      = new DtoCatalogItem((int)VariablesGlobales.DtoInvoice.TransactionMaster.TransactionCausalId, VariablesGlobales.DtoInvoice.TransactionMaster.TransactionCausalId.ToString(), VariablesGlobales.DtoInvoice.TransactionMaster.TransactionCausalId.ToString());
             VariablesGlobales.DtoInvoice.PeriodPay          = new DtoCatalogItem((int)VariablesGlobales.DtoInvoice.TransactionMaster.PeriodPay, VariablesGlobales.DtoInvoice.TransactionMaster.PeriodPay.ToString(), VariablesGlobales.DtoInvoice.TransactionMaster.PeriodPay.ToString());
             VariablesGlobales.DtoInvoice.Mesa               = new DtoCatalogItem((int)VariablesGlobales.DtoInvoice.TransactionMaster.MesaID, VariablesGlobales.DtoInvoice.TransactionMaster.MesaID.ToString(), VariablesGlobales.DtoInvoice.TransactionMaster.MesaID.ToString());
-            VariablesGlobales.DtoInvoice.Balance            = VariablesGlobales.DtoInvoice.TransactionMaster.SubAmount;
+            VariablesGlobales.DtoInvoice.Balance            = VariablesGlobales.DtoInvoice.TransactionMaster.SubAmount - VariablesGlobales.DtoInvoice.TransactionMaster.Discount;
             VariablesGlobales.DtoInvoice.ClearItems();
 
             foreach(var items in transactionMasterDetailItems)
@@ -156,11 +156,12 @@ public class DashboardPrinterViewModel : BaseViewModel
                 Api_AppMobileApi_GetDataDownloadItemsResponse item  = await _repositoryItems.PosMeFindByItemId(items.ComponentItemId);
                 item.Quantity                                       = items.Quantity;
                 item.Importe                                        = items.SubAmount;
+                item.MontoDescuento                                 = items.Discount;                
                 item.PrecioPublico                                  = items.UnitaryPrice;                
                 VariablesGlobales.DtoInvoice.Items.Add(item);
             }
-
-            VariablesGlobales.DtoInvoice.Balance                    = VariablesGlobales.DtoInvoice.Items.Sum(response => response.Importe);
+            
+            VariablesGlobales.DtoInvoice.Balance                    = VariablesGlobales.DtoInvoice.Items.Sum(response => response.Importe) - VariablesGlobales.DtoInvoice.Items.Sum(response => response.MontoDescuento);
             VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada  = VariablesGlobales.DtoInvoice.Items.Count();
 
             VariablesGlobales.EnableBackButton              = true;
@@ -419,7 +420,7 @@ public class DashboardPrinterViewModel : BaseViewModel
                 Balance             = master.SubAmount,
                 TransactionOn       = master.TransactionOn,
                 Codigo              = master.TransactionNumber!,
-                Monto               = master.SubAmount,
+                Monto               = master.SubAmount - master.Discount,
                 Cambio              = decimal.Subtract(master.Amount, master.SubAmount),
                 Comentarios         = master.Comment,
                 ReferenceClientName = master.ReferenceClientName,                
@@ -429,12 +430,12 @@ public class DashboardPrinterViewModel : BaseViewModel
             if (master.CurrencyId == TypeCurrency.Cordoba)
             {
                 dto.Currency = new DtoCatalogItem((int)master.CurrencyId, "Cordoba", "C$");
-                totalCordobas += master.SubAmount;
+                totalCordobas += master.SubAmount - master.Discount;
             }
             else
             {
                 dto.Currency = new DtoCatalogItem((int)master.CurrencyId, "Dolar", "$");
-                totalDolares += master.SubAmount;
+                totalDolares += master.SubAmount - master.Discount;
             }
 
             dto.Mesa                         = new DtoCatalogItem(master.MesaID, master.MesaName, master.MesaName);
@@ -449,6 +450,7 @@ public class DashboardPrinterViewModel : BaseViewModel
                 findItem.Importe        = detail.SubAmount;
                 findItem.Quantity       = detail.Quantity;
                 findItem.PrecioPublico  = detail.UnitaryPrice;
+                findItem.MontoDescuento = detail.Discount;
                 dto.Items.Add(findItem);
             }
 

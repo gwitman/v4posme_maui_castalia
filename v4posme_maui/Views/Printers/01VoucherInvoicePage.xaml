@@ -215,6 +215,31 @@
                         <dx:DXStackLayout
                             ItemSpacing="5"
                             Margin="20">
+
+
+                            <Label
+                                HorizontalOptions="End">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="Sub Total: " />
+                                        <Span Text="{Binding Moneda}" />
+                                        <Span Text="{Binding Amount}" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                            <Label
+                                HorizontalOptions="End">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="Descuento: " />
+                                        <Span Text="{Binding Moneda}" />
+                                        <Span Text="{Binding Descuento}" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                            
+                            
+
                             <Label
                                 HorizontalOptions="End">
                                 <Label.FormattedText>
@@ -225,6 +250,7 @@
                                     </FormattedString>
                                 </Label.FormattedText>
                             </Label>
+                            
                             <Label
                                 HorizontalOptions="End">
                                 <Label.FormattedText>

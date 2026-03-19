@@ -222,7 +222,7 @@
                                         <FormattedString>
                                             <Span Text="Total: " />
                                             <Span Text="{Binding Moneda}" />
-                                            <Span Text="{Binding SubAmount}" />
+                                            <Span Text="{Binding Balance}" />
                                         </FormattedString>
                                     </Label.FormattedText>
                                 </Label>

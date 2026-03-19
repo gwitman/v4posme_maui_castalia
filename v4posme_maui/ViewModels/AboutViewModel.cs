@@ -228,12 +228,12 @@ namespace v4posme_maui.ViewModels
                 
                 //Facutras Contado
                 CantidadFacutrasContado         = listaFacturasContadoCordobas.Count + listaFacturasContadoDolares.Count;
-                MontoFacturasContadoCordobas    = listaFacturasContadoCordobas.Sum(master => master.SubAmount);
-                MontoFacturasContadoDolares     = listaFacturasContadoDolares.Sum(master => master.SubAmount);
+                MontoFacturasContadoCordobas    = listaFacturasContadoCordobas.Sum(master => master.SubAmount) - listaFacturasContadoCordobas.Sum(master => master.Discount);
+                MontoFacturasContadoDolares     = listaFacturasContadoDolares.Sum(master => master.SubAmount) - listaFacturasContadoDolares.Sum(master => master.Discount) ;
                 //Facturas Credito
                 CantidadFacutrasCredito         = listaFacturasCreditoCordobas.Count + listaFacturasCreditoDolares.Count;
-                MontoFacturasCreditoCordobas    = listaFacturasCreditoCordobas.Sum(master => master.SubAmount);
-                MontoFacturasCreditoDolares     = listaFacturasCreditoDolares.Sum(master => master.SubAmount);
+                MontoFacturasCreditoCordobas    = listaFacturasCreditoCordobas.Sum(master => master.SubAmount) - listaFacturasCreditoCordobas.Sum(master => master.Discount);
+                MontoFacturasCreditoDolares     = listaFacturasCreditoDolares.Sum(master => master.SubAmount) - listaFacturasCreditoDolares.Sum(master => master.Discount);
                 //Totales
                 TotalCordobas   = MontoAbonosCordobas + MontoFacturasContadoCordobas;
                 TotalDolares    = MontoAbonosDolares + MontoFacturasContadoDolares;

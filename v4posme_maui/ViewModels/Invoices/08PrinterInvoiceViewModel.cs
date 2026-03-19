@@ -155,7 +155,7 @@ public class PrinterInvoiceViewModel : BaseViewModel
             printer.NewLine();
             printer.Append($"SUB TOTAL:           {dtoInvoice.TransactionMaster.Amount:N2}");
             printer.Append($"DESCUENTO:           {dtoInvoice.TransactionMaster.Discount:N2}");
-            printer.Append($"TOTAL:               {dtoInvoice.TransactionMaster.SubAmount:N2}");
+            printer.Append($"TOTAL:               {dtoInvoice.TransactionMaster.SubAmount - dtoInvoice.TransactionMaster.Discount:N2}");
             printer.Append($"RECIBIDO:            {dtoInvoice.Monto:N2}");
             printer.Append($"CAMBIO:              {dtoInvoice.Cambio:N2}");
             printer.NewLine();

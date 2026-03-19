@@ -127,11 +127,20 @@ public class RevisarProductosSeleccionadosViewModel : BaseViewModel
     public Command ReferenciaCommand { get; }
     public Command PagoCommand { get; }
 
+
+    private decimal _balance;
+
+    public decimal Balance
+    {
+        get => ProductosSeleccionados.Sum(response => response.Importe) - ProductosSeleccionados.Sum(response => response.MontoDescuento);
+        set => SetProperty(ref _balance, value);
+    }
+
     private decimal _subTotal;
 
     public decimal SubTotal
     {
-        get => ProductosSeleccionados.Sum(response => response.Importe) - ProductosSeleccionados.Sum(response => response.MontoDescuento);
+        get => ProductosSeleccionados.Sum(response => response.Importe);
         set => SetProperty(ref _subTotal, value);
     }
 
@@ -153,12 +162,14 @@ public class RevisarProductosSeleccionadosViewModel : BaseViewModel
         if (item.MontoDescuento < 0) item.MontoDescuento = 0;
 
         OnPropertyChanged(nameof(SubTotal));
+        OnPropertyChanged(nameof(Balance));
     }
 
     public void OnAppearing(INavigation navigation)
     {
-        Navigation = navigation;
-        SubTotal = ProductosSeleccionados.Sum(response => response.Importe)  - ProductosSeleccionados.Sum(response => response.MontoDescuento);
-        IsBusy = false;
+        Navigation  = navigation;
+        SubTotal    = ProductosSeleccionados.Sum(response => response.Importe);
+        Balance     = ProductosSeleccionados.Sum(response => response.Importe) - ProductosSeleccionados.Sum(response => response.MontoDescuento);
+        IsBusy      = false;
     }
 }
