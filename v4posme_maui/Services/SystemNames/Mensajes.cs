@@ -67,4 +67,8 @@ public static class Mensajes
     public const string FacturaEditarNotPermitido = "La factura no puede ser editada por su estado actual";
 	public const string AnularAbonoCorrectamente = "Abono anulado correctamente";
 	public const string UsuarioNoPermitido = "No se permite el usuario en la aplicación ya que hay datos por subir. Envie los datos antes de cambiar de usuario";
+    public const string MensajeProductoYaAgregado = "Este producto ya fue agregado a la factura.";
+    public const string MensajeDescuentoFueraDeRango = "El porcentaje de descuento debe estar entre 0 y 100.";
+    public const string MensajeDescuentoSuperaPrecio = "El descuento no puede superar el precio total del producto. Se ajustó al máximo permitido.";
+    public const string MensajeReferenciaTruncada = "La referencia fue truncada a 255 caracteres.";
 }

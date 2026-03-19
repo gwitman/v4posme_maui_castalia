@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using CommunityToolkit.Maui.Core;
 using v4posme_maui.Models;
 using v4posme_maui.Services.SystemNames;
 using v4posme_maui.Views.Invoices;
@@ -9,11 +10,13 @@ public class RevisarProductosSeleccionadosViewModel : BaseViewModel
 {
     public RevisarProductosSeleccionadosViewModel()
     {
-        Title = "Productos Seleccionados 5/6";
-        ProductosSeleccionados = VariablesGlobales.DtoInvoice.Items;
-        TapCommandProducto = new Command(OnTapCommand);
-        PrecioCommand = new Command<Api_AppMobileApi_GetDataDownloadItemsResponse>(OnPrecioCommand);
-        QuantityCommand = new Command<Api_AppMobileApi_GetDataDownloadItemsResponse>(OnQuantityCommand);
+        Title                   = "Productos Seleccionados 5/6";
+        ProductosSeleccionados  = VariablesGlobales.DtoInvoice.Items;
+        TapCommandProducto      = new Command(OnTapCommand);
+        PrecioCommand           = new Command<Api_AppMobileApi_GetDataDownloadItemsResponse>(OnPrecioCommand);
+        QuantityCommand         = new Command<Api_AppMobileApi_GetDataDownloadItemsResponse>(OnQuantityCommand);
+        DescuentoCommand        = new Command<Api_AppMobileApi_GetDataDownloadItemsResponse>(OnDescuentoCommand);
+        ReferenciaCommand       = new Command<Api_AppMobileApi_GetDataDownloadItemsResponse>(OnReferenciaCommand);
         PagoCommand = new Command(OnPagoCommand);
     }
 
@@ -27,7 +30,12 @@ public class RevisarProductosSeleccionadosViewModel : BaseViewModel
     private void OnQuantityCommand(Api_AppMobileApi_GetDataDownloadItemsResponse obj)
     {
         var modificarValorPage = new ModificarValorPage();
-        modificarValorPage.SetQuantity(obj.Quantity);
+        modificarValorPage.SetQuantity(obj.Quantity, valorIngresado => { 
+            RecalcularItem(obj);
+            VariablesGlobales.DtoInvoice.Balance =
+            VariablesGlobales.DtoInvoice.Items.Sum(response => response.Importe) -
+            VariablesGlobales.DtoInvoice.Items.Sum(response => response.MontoDescuento);
+        });
         modificarValorPage.SetCampo("cantidad");
         modificarValorPage.SetItemSelected(obj);
         Navigation!.PushAsync(modificarValorPage, true);
@@ -36,9 +44,53 @@ public class RevisarProductosSeleccionadosViewModel : BaseViewModel
     private void OnPrecioCommand(Api_AppMobileApi_GetDataDownloadItemsResponse obj)
     {
         var modificarValorPage = new ModificarValorPage();
-        modificarValorPage.SetPrecio(obj.PrecioPublico);
+        modificarValorPage.SetPrecio(obj.PrecioPublico, valorIngresado => { 
+                RecalcularItem(obj);
+                VariablesGlobales.DtoInvoice.Balance =
+                VariablesGlobales.DtoInvoice.Items.Sum(response => response.Importe) -
+                VariablesGlobales.DtoInvoice.Items.Sum(response => response.MontoDescuento);
+        });
         modificarValorPage.SetCampo("precio");
         modificarValorPage.SetItemSelected(obj);
+        Navigation!.PushAsync(modificarValorPage, true);
+    }
+
+    private void OnDescuentoCommand(Api_AppMobileApi_GetDataDownloadItemsResponse obj)
+    {
+        var modificarValorPage = new ModificarValorPage();
+        modificarValorPage.SetCampo("descuento");
+        modificarValorPage.SetItemSelected(obj);
+        modificarValorPage.SetDescuento(obj.PorcentajeDescuento, valorIngresado =>
+        {
+            if (valorIngresado < 0 || valorIngresado > 100)
+            {
+                ShowToast(Mensajes.MensajeDescuentoFueraDeRango, ToastDuration.Short, 12);
+            }
+            RecalcularItem(obj);
+            VariablesGlobales.DtoInvoice.Balance = 
+                VariablesGlobales.DtoInvoice.Items.Sum(response => response.Importe) - 
+                VariablesGlobales.DtoInvoice.Items.Sum(response => response.MontoDescuento);
+        });
+        Navigation!.PushAsync(modificarValorPage, true);
+    }
+
+    private void OnReferenciaCommand(Api_AppMobileApi_GetDataDownloadItemsResponse obj)
+    {
+        var modificarValorPage = new ModificarValorPage();
+        modificarValorPage.SetCampo("referencia");
+        modificarValorPage.SetItemSelected(obj);
+        modificarValorPage.SetReferencia(obj.Referencia, valorIngresado =>
+        {
+            if (valorIngresado.Length > 255)
+            {
+                obj.Referencia = valorIngresado[..255];
+                ShowToast(Mensajes.MensajeReferenciaTruncada, ToastDuration.Short, 12);
+            }
+            else
+            {
+                obj.Referencia = valorIngresado;
+            }
+        });
         Navigation!.PushAsync(modificarValorPage, true);
     }
 
@@ -71,13 +123,15 @@ public class RevisarProductosSeleccionadosViewModel : BaseViewModel
     public Command TapCommandProducto { get; }
     public Command PrecioCommand { get; }
     public Command QuantityCommand { get; }
+    public Command DescuentoCommand { get; }
+    public Command ReferenciaCommand { get; }
     public Command PagoCommand { get; }
 
     private decimal _subTotal;
 
     public decimal SubTotal
     {
-        get => ProductosSeleccionados.Sum(response => response.Importe);
+        get => ProductosSeleccionados.Sum(response => response.Importe) - ProductosSeleccionados.Sum(response => response.MontoDescuento);
         set => SetProperty(ref _subTotal, value);
     }
 
@@ -85,10 +139,26 @@ public class RevisarProductosSeleccionadosViewModel : BaseViewModel
 
     public int CantidadTotalItems => (int)VariablesGlobales.DtoInvoice.Items.Sum(response => response.Quantity);
 
+    private void RecalcularItem(Api_AppMobileApi_GetDataDownloadItemsResponse item)
+    {
+        // Clamp porcentaje a [0, 100]
+        if (item.PorcentajeDescuento < 0) item.PorcentajeDescuento = 0;
+        if (item.PorcentajeDescuento > 100) item.PorcentajeDescuento = 100;
+
+        var precioTotal     = item.PrecioPublico * item.Quantity;
+        item.MontoDescuento = precioTotal * item.PorcentajeDescuento / 100m;
+
+        // Clamp monto a [0, precioTotal]
+        if (item.MontoDescuento > precioTotal) item.MontoDescuento = precioTotal;
+        if (item.MontoDescuento < 0) item.MontoDescuento = 0;
+
+        OnPropertyChanged(nameof(SubTotal));
+    }
+
     public void OnAppearing(INavigation navigation)
     {
         Navigation = navigation;
-        SubTotal = ProductosSeleccionados.Sum(response => response.Importe);
+        SubTotal = ProductosSeleccionados.Sum(response => response.Importe)  - ProductosSeleccionados.Sum(response => response.MontoDescuento);
         IsBusy = false;
     }
 }

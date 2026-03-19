@@ -131,7 +131,9 @@ public class PaymentInvoiceViewModel : BaseViewModel
             MesaName            = dtoInvoice.Mesa!.Name
         };
 
-        transactionMaster.SubAmount = dtoInvoice.Balance - transactionMaster.Discount + transactionMaster.Taxi1;
+        transactionMaster.SubAmount = dtoInvoice.Balance;
+        transactionMaster.Amount    = dtoInvoice.Balance + dtoInvoice.Items.Sum(P => P.MontoDescuento);
+        transactionMaster.Discount  = dtoInvoice.Items.Sum(P => P.MontoDescuento);
         var listMasterDetail        = new List<TbTransactionMasterDetail>();
         await _repositoryTbTransactionMaster.PosMeInsert(transactionMaster);
         var transactionMasterId     = transactionMaster.TransactionMasterId;
@@ -145,14 +147,14 @@ public class PaymentInvoiceViewModel : BaseViewModel
                 UnitaryCost         = findPrecioOriginal.PrecioPublico,
                 UnitaryPrice        = item.PrecioPublico,
                 TransactionMasterId = transactionMasterId, /**/
-                SubAmount           = item.Importe,
-                Discount            = decimal.Zero,
+                SubAmount           = item.Importe - item.MontoDescuento,
+                Discount            = item.MontoDescuento,
                 Tax1                = decimal.Zero,
                 Componentid         = (int)TypeComponent.Itme,
                 ComponentItemId     = item.ItemId,
                 ItemBarCode         = item.BarCode
             };
-            detail.Amount = detail.SubAmount - detail.Discount + detail.Tax1;
+            detail.Amount = detail.SubAmount + detail.Discount;
             listMasterDetail.Add(detail);
         }
 

@@ -204,6 +204,9 @@ public class RestApiAppMobileApi
                                 objTransactionMasterDetailTemp.Componentid                  = objII.tmd_componentID;
                                 objTransactionMasterDetailTemp.ComponentItemId              = objII.tmd_componentItemID;
                                 objTransactionMasterDetailTemp.ItemBarCode                  = objII.tmd_barCode!;
+                                objTransactionMasterDetailTemp.PorcentajeDescuento          = objII.tmd_porcentaje_descuento;
+                                objTransactionMasterDetailTemp.MontoDescuento               = objII.tmd_monto_descuento;
+                                objTransactionMasterDetailTemp.ReferenciaProducto           = objII.tmd_referencia_producto ?? string.Empty;
                                 objListTransactionMasterDetailNew.Add(objTransactionMasterDetailTemp);
                             }
                             

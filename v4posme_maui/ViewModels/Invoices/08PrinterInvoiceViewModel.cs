@@ -153,7 +153,9 @@ public class PrinterInvoiceViewModel : BaseViewModel
             }
 
             printer.NewLine();
-            printer.Append($"TOTAL:               {dtoInvoice.Balance:N2}");
+            printer.Append($"SUB TOTAL:           {dtoInvoice.TransactionMaster.Amount:N2}");
+            printer.Append($"DESCUENTO:           {dtoInvoice.TransactionMaster.Discount:N2}");
+            printer.Append($"TOTAL:               {dtoInvoice.TransactionMaster.SubAmount:N2}");
             printer.Append($"RECIBIDO:            {dtoInvoice.Monto:N2}");
             printer.Append($"CAMBIO:              {dtoInvoice.Cambio:N2}");
             printer.NewLine();
@@ -225,8 +227,12 @@ public class PrinterInvoiceViewModel : BaseViewModel
 
     public ViewTempDtoInvoice DtoInvoice => VariablesGlobales.DtoInvoice;
     public ObservableCollection<Api_AppMobileApi_GetDataDownloadItemsResponse> ItemsResponses => VariablesGlobales.DtoInvoice.Items;
-    public string Moneda => VariablesGlobales.DtoInvoice.Currency!.Simbolo;
+    public string Moneda => VariablesGlobales.DtoInvoice.Currency!.Simbolo + " ";
     public string Balance => VariablesGlobales.DtoInvoice.Balance.ToString("N2");
+    public string Descuento => VariablesGlobales.DtoInvoice.TransactionMaster.Discount.ToString("N2");
+    public string Amount => VariablesGlobales.DtoInvoice.TransactionMaster.Amount.ToString("N2");
+    public string SubAmount => VariablesGlobales.DtoInvoice.TransactionMaster.SubAmount.ToString("N2");
+
     public string Monto => VariablesGlobales.DtoInvoice.Monto.ToString("N2");
     public string Cambio => VariablesGlobales.DtoInvoice.Cambio.ToString("N2");
     public Command PrintCommand { get; }

@@ -319,6 +319,27 @@ public class Api_AppMobileApi_GetDataDownloadItemsResponse : BindableBase
     }
 
     [NotMapped]
+    public decimal PorcentajeDescuento
+    {
+        get => GetValue<decimal>();
+        set => SetValue(value);
+    }
+
+    [NotMapped]
+    public decimal MontoDescuento
+    {
+        get => GetValue<decimal>();
+        set => SetValue(value);
+    }
+
+    [NotMapped]
+    public string Referencia
+    {
+        get => GetValue<string>() ?? string.Empty;
+        set => SetValue(value);
+    }
+
+    [NotMapped]
     public decimal Importe
     {
         get => GetValue<decimal>();
@@ -442,4 +463,8 @@ public class Api_AppMobileApi_GetDataDownloadTransactionMasterRegisterResponse
 
     public string? tmd_reference1 { get; set; }
     public string? tmd_reference2 { get; set; }
+
+    public decimal tmd_porcentaje_descuento { get; set; }
+    public decimal tmd_monto_descuento { get; set; }
+    public string? tmd_referencia_producto { get; set; }
 }

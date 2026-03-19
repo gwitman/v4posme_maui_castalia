@@ -82,28 +82,52 @@ public class SeleccionarProductoViewModel : BaseViewModel
         IsPanelVisible      = !IsPanelVisible;
     }
 
-    private void OnAnadirProducto(Api_AppMobileApi_GetDataDownloadItemsResponse? obj)
+    private async void OnAnadirProducto(Api_AppMobileApi_GetDataDownloadItemsResponse? obj)
     {
         if (obj is null)
         {
             return;
         }
 
-        var cestaArticulos  = VariablesGlobales.DtoInvoice.Items;
-        var find            = cestaArticulos.FirstOrDefault(response => response.ItemNumber == obj.ItemNumber);
-        if (find is not null)
+        var permitirRepetidos = await _helper.GetValueParameter("MOBILE_ALLOW_REPEATED_PRODUCTS", "false");
+        var cestaArticulos    = VariablesGlobales.DtoInvoice.Items;
+
+        if (permitirRepetidos == "true")
         {
-            find.Quantity   = decimal.Add(decimal.One, find.Quantity);
-            find.Importe    = decimal.Multiply(find.Quantity, find.PrecioPublico);
+            // Agregar siempre como nueva línea independiente (clonar el ítem)
+            var nuevo = new Api_AppMobileApi_GetDataDownloadItemsResponse
+            {
+                ItemPk              = obj.ItemPk,
+                ItemId              = obj.ItemId,
+                BarCode             = obj.BarCode,
+                ItemNumber          = obj.ItemNumber,
+                Name                = obj.Name,
+                PrecioPublico       = obj.PrecioPublico,
+                CantidadEntradas    = obj.CantidadEntradas,
+                CantidadSalidas     = obj.CantidadSalidas,
+                CantidadFinal       = obj.CantidadFinal,
+                MonedaSimbolo       = obj.MonedaSimbolo,
+                Quantity            = decimal.One,
+                MontoDescuento      = 0m,
+                PorcentajeDescuento = 0m
+            };
+            cestaArticulos.Add(nuevo);
         }
         else
         {
-            obj.Quantity    = decimal.One;
-            obj.Importe     = decimal.Multiply(obj.Quantity, obj.PrecioPublico);
-            VariablesGlobales.DtoInvoice.Items.Add(obj);
+            var find = cestaArticulos.FirstOrDefault(response => response.ItemNumber == obj.ItemNumber);
+            if (find is not null)
+            {
+                ShowToast(Mensajes.MensajeProductoYaAgregado, ToastDuration.Short, 12);
+                return;
+            }
+
+            obj.Quantity        = decimal.One;
+            obj.MontoDescuento  = 0m;
+            cestaArticulos.Add(obj);
         }
 
-        VariablesGlobales.DtoInvoice.Balance    = VariablesGlobales.DtoInvoice.Items.Sum(response => response.Importe);
+        VariablesGlobales.DtoInvoice.Balance    = VariablesGlobales.DtoInvoice.Items.Sum(response => response.Importe) - VariablesGlobales.DtoInvoice.Items.Sum(response => response.MontoDescuento);
         VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada++;
         ProductosSeleccionadosCantidad          = $"Enviar {VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada} Items";
         ProductosSeleccionadosCantidadTotal     = $"{VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada} Items = {VariablesGlobales.DtoInvoice.Balance}";

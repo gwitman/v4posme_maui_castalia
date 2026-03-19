@@ -36,6 +36,7 @@ public class DataBase
                     new() { Name = Constantes.CustomerOrderShare, Description = "Orden de clientes abonos", Value = "" },
                     new() { Name = Constantes.CustomerOrderCustomer, Description = "Orden de clientes en pantalla cliente", Value = "" },
                     new() { Name = Constantes.CustomerOrderInvoice, Description = "Orden de clientes en pantalla invoice", Value = "" },
+                    
                 };
                 await Database.InsertAllAsync(parametrosDefault);
             }
@@ -60,7 +61,7 @@ public class DataBase
             await Database.CreateTableAsync<Api_AppMobileApi_GetDataDownloadServerTransactionMasterResponse>();            
             await Database.CreateTableAsync<TbTransactionMaster>();
             await Database.CreateTableAsync<TbTransactionMasterDetail>();
-            await Database.CreateTableAsync<TbCompany>();
+            await Database.CreateTableAsync<TbCompany>();            
         }
         catch (Exception e)
         {

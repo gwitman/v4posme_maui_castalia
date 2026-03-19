@@ -46,6 +46,7 @@
                                                     <ColumnDefinition Width="35" />
                                                     <ColumnDefinition Width="*" />
                                                     <ColumnDefinition Width="80" />
+                                                    <ColumnDefinition Width="80" />
                                                 </Grid.ColumnDefinitions>
                                                 <dx:DXStackLayout
                                                     Grid.Row="0"
@@ -123,6 +124,26 @@
                                                         </DataTrigger>
                                                     </Label.Triggers>
                                                 </Label>
+                                                <Label
+                                                    Grid.Row="0"
+                                                    Grid.Column="3"
+                                                    FontSize="12"
+                                                    TextColor="Red">
+                                                    <Label.FormattedText>
+                                                        <FormattedString>
+                                                            <Span Text="-" />
+                                                            <Span Text="{Binding MonedaSimbolo}" />
+                                                            <Span Text=" " />
+                                                            <Span Text="{Binding MontoDescuento}" />
+                                                        </FormattedString>
+                                                    </Label.FormattedText>
+                                                    <Label.Triggers>
+                                                        <DataTrigger TargetType="Label" Binding="{Binding IsSelected}"
+                                                                     Value="True">
+                                                            <Setter Property="TextColor" Value="White" />
+                                                        </DataTrigger>
+                                                    </Label.Triggers>
+                                                </Label>
                                                 <Grid.Triggers>
                                                     <DataTrigger TargetType="Grid"
                                                                  Binding="{Binding IsSelected}"
@@ -143,6 +164,7 @@
                                                         <RowDefinition Height="Auto" />
                                                     </Grid.RowDefinitions>
                                                     <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
                                                         <ColumnDefinition Width="*" />
                                                         <ColumnDefinition Width="*" />
                                                         <ColumnDefinition Width="*" />
@@ -208,13 +230,11 @@
                                                             </Grid>
                                                         </dx:DXButton>
                                                     </Grid>
-                                                    
-                                                    <!--
                                                     <Grid
-                                                        RowSpacing="2"
-                                                        ColumnSpacing="3"
                                                         Grid.Column="2">
                                                         <dx:DXButton
+                                                            Command="{Binding BindingContext.DescuentoCommand, Source={x:Reference CollectionView}}"
+                                                            CommandParameter="{Binding .}"
                                                             BorderThickness="1"
                                                             BorderColor="{StaticResource Gray300}"
                                                             CornerRadius="0"
@@ -231,15 +251,43 @@
                                                                     Source="discount" />
                                                                 <Label
                                                                     HorizontalOptions="Center"
-                                                                    Text="Descuento"
+                                                                    Text="{Binding PorcentajeDescuento, StringFormat='{0}%'}"
+                                                                    FontSize="12"
                                                                     FontAttributes="Bold"
                                                                     TextColor="Red"
                                                                     Grid.Row="1" />
                                                             </Grid>
                                                         </dx:DXButton>
                                                     </Grid>
-                                                    -->
-                                                    
+                                                    <Grid
+                                                        Grid.Column="3">
+                                                        <dx:DXButton
+                                                            Command="{Binding BindingContext.ReferenciaCommand, Source={x:Reference CollectionView}}"
+                                                            CommandParameter="{Binding .}"
+                                                            BorderThickness="1"
+                                                            BorderColor="{StaticResource Gray300}"
+                                                            CornerRadius="0"
+                                                            BackgroundColor="Transparent">
+                                                            <Grid RowSpacing="10">
+                                                                <Grid.RowDefinitions>
+                                                                    <RowDefinition Height="Auto" />
+                                                                    <RowDefinition Height="Auto" />
+                                                                </Grid.RowDefinitions>
+                                                                <dx:DXImage
+                                                                    HeightRequest="35"
+                                                                    WidthRequest="35"
+                                                                    Source="note" />
+                                                                <Label
+                                                                    HorizontalOptions="Center"
+                                                                    Text="{Binding Referencia}"
+                                                                    FontSize="12"
+                                                                    FontAttributes="Bold"
+                                                                    TextColor="{DynamicResource GridCellFontColor}"
+                                                                    LineBreakMode="TailTruncation"
+                                                                    Grid.Row="1" />
+                                                            </Grid>
+                                                        </dx:DXButton>
+                                                    </Grid>
                                                 </Grid>
                                             </ContentView>
                                         </StackLayout>

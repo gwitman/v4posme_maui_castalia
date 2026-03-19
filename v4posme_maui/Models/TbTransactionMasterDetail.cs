@@ -6,7 +6,9 @@ namespace v4posme_maui.Models;
 [Table("tb_transaction_master_detail")]
 public class TbTransactionMasterDetail
 {
-    [PrimaryKey, AutoIncrement] public int TransactionMasterDetailId { get; set; }
+    [PrimaryKey, AutoIncrement]
+    [DataMember(Name = "TransactionMasterDetailId")]
+    public int TransactionMasterDetailId { get; set; }
 
     [DataMember(Name = "transactionMasterID")]
     public int TransactionMasterId { get; set; }
@@ -34,4 +36,13 @@ public class TbTransactionMasterDetail
     [DataMember(Name = "referencie1")] public string Reference1 { get; set; } = string.Empty;
 
     [DataMember(Name = "referencie2")] public string Reference2 { get; set; } = string.Empty;
+
+    [DataMember(Name = "porcentajeDescuento")]
+    public decimal PorcentajeDescuento { get; set; } = 0m;
+
+    [DataMember(Name = "montoDescuento")]
+    public decimal MontoDescuento { get; set; } = 0m;
+
+    [DataMember(Name = "referenciaProducto")]
+    public string ReferenciaProducto { get; set; } = string.Empty;
 }

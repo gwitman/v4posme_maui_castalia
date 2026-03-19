@@ -399,3 +399,4 @@ FodyWeavers.xsd
 /v4posme_maui_output/com.v4posme.app.apk
 /v4posme_maui/.kiro/specs/
 /v4posme_maui.Tests/
+.kiro/specs/
