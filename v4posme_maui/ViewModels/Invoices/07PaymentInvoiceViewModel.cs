@@ -152,7 +152,8 @@ public class PaymentInvoiceViewModel : BaseViewModel
                 Tax1                = decimal.Zero,
                 Componentid         = (int)TypeComponent.Itme,
                 ComponentItemId     = item.ItemId,
-                ItemBarCode         = item.BarCode
+                ItemBarCode         = item.BarCode,
+                ReferenciaProducto  = item.Referencia
             };
             detail.Amount = detail.SubAmount;
             listMasterDetail.Add(detail);
