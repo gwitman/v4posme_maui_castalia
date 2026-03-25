@@ -157,7 +157,8 @@ public class DashboardPrinterViewModel : BaseViewModel
                 item.Quantity                                       = items.Quantity;
                 item.Importe                                        = items.SubAmount;
                 item.MontoDescuento                                 = items.Discount;                
-                item.PrecioPublico                                  = items.UnitaryPrice;                
+                item.PrecioPublico                                  = items.UnitaryPrice;
+                item.Referencia                                     = items.ReferenciaProducto;
                 VariablesGlobales.DtoInvoice.Items.Add(item);
             }
             

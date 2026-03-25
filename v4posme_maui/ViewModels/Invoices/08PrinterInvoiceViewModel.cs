@@ -145,12 +145,21 @@ public class PrinterInvoiceViewModel : BaseViewModel
             printer.NewLine();
             printer.Append(detalleHeader);
             printer.NewLine();
+            string printerReferencia = await _helperCore.GetValueParameter("PRINTER_REFERENCE_INVOICE_MOBILE", "false");
+            bool showReferencia      = printerReferencia.Trim().Equals("true", StringComparison.OrdinalIgnoreCase);
+
             printer.Append("CANT.       PREC         TOTAL");
             foreach (var item in dtoInvoice.Items)
             {
+                printer.Separator();
                 printer.Append(item.Name);
                 printer.Append($"{item.Quantity}        {item.PrecioPublico:N2}         {item.Importe:N2}");
+                if (showReferencia && !string.IsNullOrWhiteSpace(item.Referencia))
+                {
+                    printer.Append($"REF: {item.Referencia}");
+                }
             }
+            printer.Separator();
 
             printer.NewLine();
             printer.Append($"SUB TOTAL:           {dtoInvoice.TransactionMaster.Amount:N2}");
@@ -273,6 +282,14 @@ public class PrinterInvoiceViewModel : BaseViewModel
         set => SetProperty(ref _showQr, value);
     }
 
+    private bool _showReferencia;
+
+    public bool ShowReferencia
+    {
+        get => _showReferencia;
+        set => SetProperty(ref _showReferencia, value);
+    }
+
     private ImageSource? _qrImageSource;
 
     public ImageSource? QrImageSource
@@ -315,8 +332,10 @@ public class PrinterInvoiceViewModel : BaseViewModel
                 string qrContent = printerQRUrl + "/inm/" + DtoInvoice.Codigo + "/unm/" + VariablesGlobales.User!.Nickname;
                 QrImageSource    = GenerateQrImageSource(qrContent);
             }
-            
-            IsBusy = false;
+
+            string printerRef   = await _helperCore.GetValueParameter("PRINTER_REFERENCE_INVOICE_MOBILE", "false");
+            ShowReferencia      = printerRef.Trim().Equals("true", StringComparison.OrdinalIgnoreCase);            
+            IsBusy              = false;
         }
         catch (Exception e)
         {
