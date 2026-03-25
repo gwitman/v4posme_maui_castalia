@@ -44,12 +44,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-android|AnyCPU'">
-	  <AndroidPackageFormat>apk</AndroidPackageFormat>
-	  <!-- Evita colgarse en AOT/linking durante publicación -->
-	  <RunAOTCompilation>false</RunAOTCompilation>
-	  <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
-	  <PublishTrimmed>false</PublishTrimmed>
-	  <AndroidLinkTool>r8</AndroidLinkTool>
+	  <AndroidPackageFormat>apk</AndroidPackageFormat>	 
 	</PropertyGroup>
 
 	<ItemGroup>
