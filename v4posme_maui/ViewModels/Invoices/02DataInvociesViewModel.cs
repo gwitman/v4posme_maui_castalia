@@ -31,15 +31,9 @@ public class DataInvoicesViewModel : BaseViewModel, IQueryAttributable
         LoadComboBox();
     }
 
-    private bool Validate()
-    {
-        return string.IsNullOrWhiteSpace(Comentarios);
-    }
-
-
     private bool ValidateFields()
     {
-        return !Validate();
+        return true;
     }
 
     private async void OnSeleccionarDataCredit()
