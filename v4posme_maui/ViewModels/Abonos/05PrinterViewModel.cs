@@ -19,14 +19,14 @@ public class ValidarAbonoViewModel : BaseViewModel
 
     public ValidarAbonoViewModel()
     {
-        Title = "Comprobanto de Abono 5/5";
-        _parameterSystem = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbParameterSystem>();
-        _repositoryParameters = VariablesGlobales.UnityContainer.Resolve<IRepositoryParameters>();
-        _repositoryTbTransactionMaster = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMaster>();
-        Item = VariablesGlobales.DtoAplicarAbono!;
-        AplicarOtroCommand = new Command(OnAplicarOtroCommand);
-        PrintCommand = new Command(OnPrintCommand);
-        AnularCommand = new Command(OnAnularCommand);
+        Title                           = "Comprobanto de Abono 5/5";
+        _parameterSystem                = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbParameterSystem>();
+        _repositoryParameters           = VariablesGlobales.UnityContainer.Resolve<IRepositoryParameters>();
+        _repositoryTbTransactionMaster  = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMaster>();
+        Item                            = VariablesGlobales.DtoAplicarAbono!;
+        AplicarOtroCommand              = new Command(OnAplicarOtroCommand);
+        PrintCommand                    = new Command(OnPrintCommand);
+        AnularCommand                   = new Command(OnAnularCommand);
     }
 
     private async void OnAnularCommand()

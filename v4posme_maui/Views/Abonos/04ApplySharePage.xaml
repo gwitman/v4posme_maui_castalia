@@ -83,7 +83,7 @@
                                               Keyboard="Numeric"
                                               ClearIconCommand="{Binding ClearMontoCommand}"
                                               TextChanged="TxtMonto_OnTextChanged"
-                                              Text="{Binding Monto}" />
+                                              Text="{Binding MontoText}" />
                                 <dxe:TextEdit Grid.Row="4"
                                               LabelText="Saldo Final"
                                               IconColor="{StaticResource Primary}"

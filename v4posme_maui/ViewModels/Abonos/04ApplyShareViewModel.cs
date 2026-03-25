@@ -45,6 +45,7 @@ public class AplicarAbonoViewModel : BaseViewModel, IQueryAttributable
 	private void OnClearMontoCommand(object obj)
 	{
 		Monto = decimal.Zero;
+		MontoText = string.Empty;
 	}
 
 	private bool OnValidateMonto(object arg)
@@ -225,6 +226,41 @@ public class AplicarAbonoViewModel : BaseViewModel, IQueryAttributable
 		set => SetProperty(ref _saldoInicial, value);
 	}
 
+	private string? _montoText;
+
+	// Texto que se bindea al TextEdit en la vista
+	public string? MontoText
+	{
+		get => _montoText;
+		set
+		{
+			SetProperty(ref _montoText, value);
+			// Parsear con InvariantCulture para que tanto "0.5" como "0,5" funcionen
+			if (decimal.TryParse(value,
+				    System.Globalization.NumberStyles.Any,
+				    System.Globalization.CultureInfo.InvariantCulture,
+				    out var parsed))
+			{
+				_monto = parsed;
+			}
+			else if (decimal.TryParse(value,
+				         System.Globalization.NumberStyles.Any,
+				         System.Globalization.CultureInfo.CurrentCulture,
+				         out var parsedLocal))
+			{
+				_monto = parsedLocal;
+			}
+			else
+			{
+				_monto = decimal.Zero;
+			}
+
+			_saldoFinal = decimal.Subtract(SaldoInicial, _monto);
+			OnPropertyChanged(nameof(SaldoFinal));
+			OnPropertyChanged(nameof(Monto));
+		}
+	}
+
 	private decimal _monto;
 
 	public decimal Monto
@@ -232,9 +268,12 @@ public class AplicarAbonoViewModel : BaseViewModel, IQueryAttributable
 		get => _monto;
 		set
 		{
-			SetProperty(ref _monto, value);
+			_monto = value;
+			_montoText = value == decimal.Zero ? string.Empty : value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+			OnPropertyChanged(nameof(MontoText));
 			_saldoFinal = decimal.Subtract(SaldoInicial, value);
 			OnPropertyChanged(nameof(SaldoFinal));
+			OnPropertyChanged(nameof(Monto));
 		}
 	}
 

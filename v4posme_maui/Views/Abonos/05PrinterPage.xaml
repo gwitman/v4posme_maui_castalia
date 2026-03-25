@@ -133,7 +133,7 @@
                                     Orientation="Horizontal">
                                     <Label Text="{Binding Item.CurrencyName}" FontSize="14" />
                                     <Label Text=" " />
-                                    <Label Text="{Binding Item.MontoAplicar, StringFormat='{0:N0}'}"
+                                    <Label Text="{Binding Item.MontoAplicar, StringFormat='{0:N2}'}"
                                            FontSize="14" />
                                 </dx:DXStackLayout>
                                 <Label
