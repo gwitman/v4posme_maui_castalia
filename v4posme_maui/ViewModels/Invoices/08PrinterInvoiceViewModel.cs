@@ -148,12 +148,15 @@ public class PrinterInvoiceViewModel : BaseViewModel
             string printerReferencia = await _helperCore.GetValueParameter("PRINTER_REFERENCE_INVOICE_MOBILE", "false");
             bool showReferencia      = printerReferencia.Trim().Equals("true", StringComparison.OrdinalIgnoreCase);
 
-            printer.Append("CANT.       PREC         TOTAL");
+            printer.Append("CANT.    PRECIO       TOTAL");
             foreach (var item in dtoInvoice.Items)
             {
                 printer.Separator();
                 printer.Append(item.Name);
-                printer.Append($"{item.Quantity}        {item.PrecioPublico:N2}         {item.Importe:N2}");
+                var cant   = item.Quantity.ToString("N2").PadLeft(6);
+                var precio = item.PrecioPublico.ToString("N2").PadLeft(10);
+                var total  = item.Importe.ToString("N2").PadLeft(10);
+                printer.Append($"{cant}  {precio}  {total}");
                 if (showReferencia && !string.IsNullOrWhiteSpace(item.Referencia))
                 {
                     printer.Append($"REF: {item.Referencia}");
