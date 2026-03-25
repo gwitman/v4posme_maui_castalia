@@ -47,5 +47,6 @@ public static class Constantes
     public const string ErrorUrl					= "Error";
     public const string UrlInvalida					= "URL inválida";
     public const string ParametrUrlShareViewError	= "No se pudo encontrar el parametro de la url";
-    public const string CatalogName_MESAS           = "CATALOGO DE MESAS";
+    public const string CatalogName_MESAS                          = "CATALOGO DE MESAS";
+    public const string InvoiceInMobileFieldCommentRequired        = "INVOICE_IN_MOBILE_FIELD_COMMENT_REQUERIED";
 }

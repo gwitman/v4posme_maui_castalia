@@ -18,21 +18,36 @@ public class DataInvoicesViewModel : BaseViewModel, IQueryAttributable
 {
     private IRepositoryTbCustomer _repositoryTbCustomer;
     private IRepositoryTbCatalogItem _repositoryTbCatalogItem;
+    private HelperCore _helperCore;
+    private bool _commentRequired   = false;
 
     public DataInvoicesViewModel()
     {
         _repositoryTbCustomer   = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCustomer>();
         _repositoryTbCatalogItem = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCatalogItem>();
+        _helperCore             = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
         Title                   = "Datos de facturacion 2/6";
         Item                    = VariablesGlobales.DtoInvoice;
-        Comentarios             = Item.Comentarios is null ? Comentarios :  Item.Comentarios!;
+        Comentarios             = Item.Comentarios is null ? Comentarios : Item.Comentarios!;
+
+       
         SeleccionarInvoiceCreditCommand = new Command(OnSeleccionarDataCredit, ValidateFields);
         PropertyChanged         += (_, _) => SeleccionarInvoiceCreditCommand.ChangeCanExecute();
         LoadComboBox();
+        _ = LoadParametersAsync();
+    }
+
+    private async Task LoadParametersAsync()
+    {
+        var value        = await _helperCore.GetValueParameter(Constantes.InvoiceInMobileFieldCommentRequired, "false");
+        _commentRequired = value.Trim().ToLower() == "true";
+        SeleccionarInvoiceCreditCommand.ChangeCanExecute();
     }
 
     private bool ValidateFields()
     {
+        if (_commentRequired)
+            return !string.IsNullOrWhiteSpace(Comentarios);
         return true;
     }
 
