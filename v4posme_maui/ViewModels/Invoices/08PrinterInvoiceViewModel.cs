@@ -165,11 +165,13 @@ public class PrinterInvoiceViewModel : BaseViewModel
             printer.Separator();
 
             printer.NewLine();
-            printer.Append($"SUB TOTAL:           {dtoInvoice.TransactionMaster.Amount:N2}");
-            printer.Append($"DESCUENTO:           {dtoInvoice.TransactionMaster.Discount:N2}");
-            printer.Append($"TOTAL:               {dtoInvoice.TransactionMaster.SubAmount - dtoInvoice.TransactionMaster.Discount:N2}");
-            printer.Append($"RECIBIDO:            {dtoInvoice.Monto:N2}");
-            printer.Append($"CAMBIO:              {dtoInvoice.Cambio:N2}");
+            const int labelWidth = 12;
+            const int valueWidth = 12;
+            printer.Append($"{"SUB TOTAL:".PadRight(labelWidth)}{dtoInvoice.TransactionMaster.Amount.ToString("N2").PadLeft(valueWidth)}");
+            printer.Append($"{"DESCUENTO:".PadRight(labelWidth)}{dtoInvoice.TransactionMaster.Discount.ToString("N2").PadLeft(valueWidth)}");
+            printer.Append($"{"TOTAL:".PadRight(labelWidth)}{(dtoInvoice.TransactionMaster.SubAmount - dtoInvoice.TransactionMaster.Discount).ToString("N2").PadLeft(valueWidth)}");
+            printer.Append($"{"RECIBIDO:".PadRight(labelWidth)}{dtoInvoice.Monto.ToString("N2").PadLeft(valueWidth)}");
+            printer.Append($"{"CAMBIO:".PadRight(labelWidth)}{dtoInvoice.Cambio.ToString("N2").PadLeft(valueWidth)}");
             printer.NewLine();
             printer.AlignCenter();
 
