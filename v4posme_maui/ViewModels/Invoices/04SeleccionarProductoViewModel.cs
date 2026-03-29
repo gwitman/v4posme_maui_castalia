@@ -92,7 +92,7 @@ public class SeleccionarProductoViewModel : BaseViewModel
         var permitirRepetidos = await _helper.GetValueParameter("MOBILE_ALLOW_REPEATED_PRODUCTS", "false");
         var cestaArticulos    = VariablesGlobales.DtoInvoice.Items;
 
-        if ( !(permitirRepetidos == "true")  )
+        if ( (permitirRepetidos == "true")  )
         {
             // Agregar siempre como nueva línea independiente (clonar el ítem)
             var nuevo = new Api_AppMobileApi_GetDataDownloadItemsResponse
