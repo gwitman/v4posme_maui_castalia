@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Maui.Core;
+using Newtonsoft.Json;
 using v4posme_maui.Models;
 using v4posme_maui.Services.Api;
 using v4posme_maui.Services.Helpers;
@@ -17,6 +18,8 @@ public class PaymentInvoiceViewModel : BaseViewModel
     private readonly IRepositoryTbTransactionMaster _repositoryTbTransactionMaster;
     private readonly IRepositoryItems _repositoryItems;
     private readonly IRepositoryParameters _repositoryParameters = VariablesGlobales.UnityContainer.Resolve<IRepositoryParameters>();
+    private readonly IRepositoryTbCustomer _repositoryTbCustomer = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCustomer>();
+    private readonly RestApiAppMobileApi _restApiDownload = new RestApiAppMobileApi();
 
     public PaymentInvoiceViewModel()
     {
@@ -164,6 +167,56 @@ public class PaymentInvoiceViewModel : BaseViewModel
         VariablesGlobales.EnableBackButton              = false;
         VariablesGlobales.DtoInvoice.TipoPayment        = TypePayment;
         VariablesGlobales.DtoInvoice.TransactionMaster  = transactionMaster;
+
+        //Subir / Bajar a otra ventana
+        var uploadAfterInvoiceValue = await _helper.GetValueParameter("MOBILE_UPLOAD_AFTER_INVOICE", "false");
+        var uploadAfterInvoice      = bool.TryParse(uploadAfterInvoiceValue, out var parsedValue) && parsedValue;
+        if (uploadAfterInvoice)
+        {
+            //Subir datos
+            var response    = await _restApiDownload.SendDataAsync();
+            var apiResponse = JsonConvert.DeserializeObject<Api_AppMobileApi_SetDataUploadResponse>(response);
+            if (apiResponse is not null)
+            {
+                if (apiResponse.Error)
+                {
+                    Mensaje                 = $"{Mensajes.MensajeUploadError} {apiResponse.Message} ";
+                    PopupBackgroundColor    = Colors.Red;
+                }
+                else
+                {
+                    Mensaje = Mensajes.MensajeUploadSuccess;
+                    PopupBackgroundColor = Colors.Green;
+                    await _repositoryItems.PosMeDeleteAll();
+                    await _repositoryTbCustomer.PosMeDeleteAll();
+                    await _repositoryTbTransactionMaster.PosMeDeleteAll();
+                    await _repositoryTbTransactionMasterDetail.PosMeDeleteAll();
+                    await _helper.ZeroCounter();
+                }
+                PopUpShow   = true;
+            }
+            else
+            {
+                Mensaje              = Mensajes.MensajeUploadError;
+                PopupBackgroundColor = Colors.Red;
+                PopUpShow            = true;
+            }
+
+
+            //Descargar Datos
+            var counter = await _helper.GetCounter();
+            if (counter != 0)
+            {
+                await _restApiDownload.GetDataDownload(true);
+            }
+            else
+            {
+                await _restApiDownload.GetDataDownload(false);
+            }
+
+        }
+
+        //Pasar a otra ventana
         await Navigation!.PushAsync(new PrinterInvoicePage());
         IsBusy = false;
     }
