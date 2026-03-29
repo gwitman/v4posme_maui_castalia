@@ -35,10 +35,18 @@ namespace v4posme_maui.Services.HelpersPrinters.Epson_Commands
             InitializePrint = new InitializePrint();
         }
 
-        public byte[] Separator(char speratorChar= '-')
+        public byte[] Separator(char speratorChar = '-')
         {
             return FontMode.Condensed(PrinterModeState.On)
                 .AddBytes(new string(speratorChar, ColsCondensed))
+                .AddBytes(FontMode.Condensed(PrinterModeState.Off))
+                .AddCrLF();
+        }
+
+        public byte[] Separator(char separatorChar, int chars)
+        {
+            return FontMode.Condensed(PrinterModeState.On)
+                .AddBytes(new string(separatorChar, chars))
                 .AddBytes(FontMode.Condensed(PrinterModeState.Off))
                 .AddCrLF();
         }

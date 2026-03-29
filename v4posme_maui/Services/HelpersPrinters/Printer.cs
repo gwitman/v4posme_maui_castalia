@@ -122,6 +122,11 @@ namespace v4posme_maui.Services.HelpersPrinters
             Append(_command.Separator(speratorChar));
         }
 
+        public void Separator(char separatorChar, int chars)
+        {
+            Append(_command.Separator(separatorChar, chars));
+        }
+
         public void AutoTest()
         {
             Append(_command.AutoTest());

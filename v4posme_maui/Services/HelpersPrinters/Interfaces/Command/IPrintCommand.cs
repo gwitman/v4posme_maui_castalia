@@ -19,6 +19,7 @@ namespace v4posme_maui.Services.HelpersPrinters.Interfaces.Command
         ILineHeight LineHeight { get; set; }
         IInitializePrint InitializePrint { get; set; }
         byte[] Separator(char speratorChar = '-');
+        byte[] Separator(char separatorChar, int chars);
         byte[] AutoTest();
     }
 }

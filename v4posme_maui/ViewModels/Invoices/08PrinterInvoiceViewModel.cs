@@ -13,7 +13,6 @@ using Unity;
 using v4posme_maui.Views.Printers;
 using v4posme_maui.Services.Helpers;
 using v4posme_maui.Services.HelpersPrinters.Helper;
-using QrCodeSize = v4posme_maui.Services.HelpersPrinters.Enums.QrCodeSize;
 
 namespace v4posme_maui.ViewModels.Invoices;
 
@@ -100,17 +99,18 @@ public class PrinterInvoiceViewModel : BaseViewModel
     {
         try
         {
-            string printerQR = await _helperCore.GetValueParameter("MOBILE_PRINTER_QR_IN_INVOICE", "false");
-            string printerQRUrl = await _helperCore.GetValueParameter("MOBILE_PRINTER_QR_IN_INVOICE_URL", "www.google.com");
-            var parametroPrinter = await _parameterSystem.PosMeFindPrinter();
-            var logo = await _parameterSystem.PosMeFindLogo();
+            string printerQR        = await _helperCore.GetValueParameter("MOBILE_PRINTER_QR_IN_INVOICE", "false");
+            string printerQRUrl     = await _helperCore.GetValueParameter("MOBILE_PRINTER_QR_IN_INVOICE_URL", "www.google.com");
+            string printerFormat    = await _helperCore.GetValueParameter("MOBILE_PRINTER_INVOICE_FISICAL_FORMAT", "default");
+            var parametroPrinter    = await _parameterSystem.PosMeFindPrinter();
+            var logo                = await _parameterSystem.PosMeFindLogo();
             if (string.IsNullOrWhiteSpace(parametroPrinter.Value))
             {
                 return;
             }
 
             var dtoInvoice = DtoInvoice;
-            var printer = new Printer(parametroPrinter.Value);
+            var printer    = new Printer(parametroPrinter.Value);
             if (!CrossBluetoothLE.Current.IsOn)
             {
                 ShowMensajePopUp(Mensajes.MensajeBluetoothState);
@@ -118,86 +118,48 @@ public class PrinterInvoiceViewModel : BaseViewModel
             }
 
             IsBusy = true;
-            if (!string.IsNullOrWhiteSpace(logo.Value))
+
+            if (printerFormat.Trim().Equals("default", StringComparison.OrdinalIgnoreCase))
             {
-                var readImage = Convert.FromBase64String(logo.Value!);
-                printer.AlignRight();
-                printer.Image(SKBitmap.Decode(readImage));
+                string printerReferencia = await _helperCore.GetValueParameter("PRINTER_REFERENCE_INVOICE_MOBILE", "false");
+                await PrinterInvoiceFormatHelper.PrintDefaultFormat(
+                    printer,
+                    dtoInvoice,
+                    logo,
+                    Company!.Name!,
+                    CompanyRuc!.Value!,
+                    Company.Address!,
+                    CompanyTelefono!.Value!,
+                    printerQR,
+                    printerQRUrl,
+                    printerReferencia,
+                    VariablesGlobales.User!.Nickname!,
+                    _helperCore
+                );
+            }
+            if (printerFormat.Trim().Equals("loto", StringComparison.OrdinalIgnoreCase))
+            {
+                string printerReferencia = await _helperCore.GetValueParameter("PRINTER_REFERENCE_INVOICE_MOBILE", "false");
+                await PrinterInvoiceFormatHelper.PrintLotoFormat(
+                    printer,
+                    dtoInvoice,
+                    logo,
+                    Company!.Name!,
+                    CompanyRuc!.Value!,
+                    Company.Address!,
+                    CompanyTelefono!.Value!,
+                    printerQR,
+                    printerQRUrl,
+                    printerReferencia,
+                    VariablesGlobales.User!.Nickname!,
+                    _helperCore
+                );
             }
 
-            printer.AlignCenter();
-            printer.BoldMode(Company!.Name!);
-            printer.BoldMode($"RUC: {CompanyRuc!.Value}");
-            printer.BoldMode("FACTURA");
-            printer.BoldMode(dtoInvoice.Codigo);
-            printer.BoldMode($"FECHA: {dtoInvoice.TransactionOn:yyyy-MM-dd hh:mm tt}");
-            printer.NewLine();
-            printer.AlignLeft();
-            var detalleHeader = $"""
-                                 VENDEDOR     :{VariablesGlobales.User!.Nickname}
-                                 CODIGO       :{dtoInvoice.CustomerResponse.CustomerNumber}
-                                 MONEDA       :{dtoInvoice.Currency!.Simbolo}
-                                 TIPO         :{dtoInvoice.TipoDocumento!.Name}
-                                 CLIENTE       
-                                 {dtoInvoice.NombreCompleto}
-                                 {dtoInvoice.Comentarios}
-                                 """;
-            printer.NewLine();
-            printer.Append(detalleHeader);
-            printer.NewLine();
-            string printerReferencia = await _helperCore.GetValueParameter("PRINTER_REFERENCE_INVOICE_MOBILE", "false");
-            bool showReferencia      = printerReferencia.Trim().Equals("true", StringComparison.OrdinalIgnoreCase);
-
-            printer.Append("CANT.    PRECIO       TOTAL");
-            foreach (var item in dtoInvoice.Items)
-            {
-                printer.Separator();
-                printer.Append(item.Name);
-                var cant   = item.Quantity.ToString("N2").PadLeft(6);
-                var precio = item.PrecioPublico.ToString("N2").PadLeft(10);
-                var total  = item.Importe.ToString("N2").PadLeft(10);
-                printer.Append($"{cant}  {precio}  {total}");
-                if (showReferencia && !string.IsNullOrWhiteSpace(item.Referencia))
-                {
-                    printer.Append($"REF: {item.Referencia}");
-                }
-            }
-            printer.Separator();
-
-            printer.NewLine();
-            const int labelWidth = 12;
-            const int valueWidth = 12;
-            printer.Append($"{"SUB TOTAL:".PadRight(labelWidth)}{dtoInvoice.TransactionMaster.Amount.ToString("N2").PadLeft(valueWidth)}");
-            printer.Append($"{"DESCUENTO:".PadRight(labelWidth)}{dtoInvoice.TransactionMaster.Discount.ToString("N2").PadLeft(valueWidth)}");
-            printer.Append($"{"TOTAL:".PadRight(labelWidth)}{(dtoInvoice.TransactionMaster.SubAmount - dtoInvoice.TransactionMaster.Discount).ToString("N2").PadLeft(valueWidth)}");
-            printer.Append($"{"RECIBIDO:".PadRight(labelWidth)}{dtoInvoice.Monto.ToString("N2").PadLeft(valueWidth)}");
-            printer.Append($"{"CAMBIO:".PadRight(labelWidth)}{dtoInvoice.Cambio.ToString("N2").PadLeft(valueWidth)}");
-            printer.NewLine();
-            printer.AlignCenter();
-
-            if (printerQR == "true")
-            {
-                var qrContent   = QrGenerator.BuildContent(dtoInvoice);
-                qrContent       = printerQRUrl + "/inm/" + dtoInvoice.Codigo + "/unm/" + VariablesGlobales.User!.Nickname;
-                
-                printer.QrCode(qrContent, QrCodeSize.Size1);
-                printer.NewLine();
-                printer.NewLine();
-            }
-
-
-            printer.Append($"{Company.Address}");
-            printer.Append($"{CompanyTelefono!.Value}");
-            printer.NewLine();
-            printer.NewLine();
-
-            printer.FullPaperCut();
-            printer.Print();
             if (printer.Device is null)
             {
                 ShowMensajePopUp(Mensajes.MensajeDispositivoNoConectado);
             }
-
             IsBusy = false;
         }
         catch (Exception e)

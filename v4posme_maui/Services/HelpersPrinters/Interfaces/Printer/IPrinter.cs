@@ -16,6 +16,7 @@ namespace v4posme_maui.Services.HelpersPrinters.Interfaces.Printer
         void NewLines(int lines);
         void Clear();
         void Separator(char speratorChar = '-');
+        void Separator(char separatorChar, int chars);
         void AutoTest();
         void TestPrinter();
         void Font(string value, Fonts state);
