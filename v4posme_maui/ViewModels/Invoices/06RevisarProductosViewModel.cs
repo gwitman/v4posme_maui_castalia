@@ -181,8 +181,8 @@ public class RevisarProductosSeleccionadosViewModel : BaseViewModel
 
     private async Task CargarParametros()
     {
-        var value       = await _helper.GetValueParameter("MOBILE_IN_INVOICE_MOSTRAR_DESCUENTO", "false");
-        MostrarDescuento = bool.TryParse(value, out var parsed) && parsed;
+        var value        = await _helper.GetValueParameter("MOBILE_IN_INVOICE_MOSTRAR_DESCUENTO", "false");
+        MostrarDescuento = !(bool.TryParse(value, out var parsed) && parsed);
     }
 
     private bool _mostrarDescuento;

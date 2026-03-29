@@ -188,7 +188,7 @@ public class PrinterInvoiceViewModel : BaseViewModel
     {
         var uploadAfterInvoiceValue = await _helperCore.GetValueParameter("MOBILE_UPLOAD_AFTER_INVOICE", "false");
         var uploadAfterInvoice      = bool.TryParse(uploadAfterInvoiceValue, out var parsedValue) && parsedValue;
-        if (uploadAfterInvoice)
+        if (uploadAfterInvoice )
         {
             IsBusy = true;
 

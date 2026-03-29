@@ -14,8 +14,13 @@ public partial class ModificarValorPage : ContentPage
     protected override void OnAppearing()
     {
         base.OnAppearing();
-        TxtValor.Focus();
-        TxtValor.SelectAll();
+        // Delay needed so the control is fully rendered before focusing/selecting
+        Dispatcher.DispatchAsync(async () =>
+        {
+            await Task.Delay(300);
+            TxtValor.Focus();
+            TxtValor.SelectAll();
+        });
     }
 
     private decimal Quantity { get; set; }
