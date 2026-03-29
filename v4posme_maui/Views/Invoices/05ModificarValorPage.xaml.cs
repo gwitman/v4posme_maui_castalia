@@ -15,6 +15,7 @@ public partial class ModificarValorPage : ContentPage
     {
         base.OnAppearing();
         TxtValor.Focus();
+        TxtValor.SelectAll();
     }
 
     private decimal Quantity { get; set; }

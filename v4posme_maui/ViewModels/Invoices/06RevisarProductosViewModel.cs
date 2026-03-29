@@ -3,11 +3,15 @@ using CommunityToolkit.Maui.Core;
 using v4posme_maui.Models;
 using v4posme_maui.Services.SystemNames;
 using v4posme_maui.Views.Invoices;
+using Unity;
+using v4posme_maui.Services.Helpers;
 
 namespace v4posme_maui.ViewModels.Invoices;
 
 public class RevisarProductosSeleccionadosViewModel : BaseViewModel
 {
+    private readonly HelperCore _helper;
+
     public RevisarProductosSeleccionadosViewModel()
     {
         Title                   = "Productos Seleccionados 5/6";
@@ -17,7 +21,8 @@ public class RevisarProductosSeleccionadosViewModel : BaseViewModel
         QuantityCommand         = new Command<Api_AppMobileApi_GetDataDownloadItemsResponse>(OnQuantityCommand);
         DescuentoCommand        = new Command<Api_AppMobileApi_GetDataDownloadItemsResponse>(OnDescuentoCommand);
         ReferenciaCommand       = new Command<Api_AppMobileApi_GetDataDownloadItemsResponse>(OnReferenciaCommand);
-        PagoCommand = new Command(OnPagoCommand);
+        PagoCommand             = new Command(OnPagoCommand);
+        _helper                 = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
     }
 
     private async void OnPagoCommand()
@@ -171,5 +176,19 @@ public class RevisarProductosSeleccionadosViewModel : BaseViewModel
         SubTotal    = ProductosSeleccionados.Sum(response => response.Importe);
         Balance     = ProductosSeleccionados.Sum(response => response.Importe) - ProductosSeleccionados.Sum(response => response.MontoDescuento);
         IsBusy      = false;
+        _ = CargarParametros();
+    }
+
+    private async Task CargarParametros()
+    {
+        var value       = await _helper.GetValueParameter("MOBILE_IN_INVOICE_MOSTRAR_DESCUENTO", "false");
+        MostrarDescuento = bool.TryParse(value, out var parsed) && parsed;
+    }
+
+    private bool _mostrarDescuento;
+    public bool MostrarDescuento
+    {
+        get => _mostrarDescuento;
+        set => SetProperty(ref _mostrarDescuento, value);
     }
 }

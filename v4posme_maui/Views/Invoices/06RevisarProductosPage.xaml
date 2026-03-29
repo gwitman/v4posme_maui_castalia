@@ -238,7 +238,8 @@
                                                             BorderThickness="1"
                                                             BorderColor="{StaticResource Gray300}"
                                                             CornerRadius="0"
-                                                            BackgroundColor="Transparent">
+                                                            BackgroundColor="Transparent"
+                                                            IsVisible="{Binding BindingContext.MostrarDescuento, Source={x:Reference CollectionView}}">
                                                             <Grid RowSpacing="10">
                                                                 <Grid.RowDefinitions>
                                                                     <RowDefinition Height="Auto" />
