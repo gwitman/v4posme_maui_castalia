@@ -236,6 +236,12 @@ public class Api_AppMobileApi_GetDataDownloadItemsResponse : BindableBase
         set => SetValue(value);
     }
 
+    public long TransactionMasterDetailID
+    {
+        get => GetValue<long>();
+        set => SetValue(value);
+    }
+
     [DataMember(Name = "itemID")]
     public int ItemId
     {

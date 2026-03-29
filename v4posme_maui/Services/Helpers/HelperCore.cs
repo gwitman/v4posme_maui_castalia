@@ -466,6 +466,15 @@ public class HelperCore(
     }
 
 
+    /// <summary>
+    /// Genera un ID único basado en el timestamp actual (yyyyMMddHHmmssfff).
+    /// Cada llamada retorna un valor mayor que el anterior.
+    /// </summary>
+    public long GetTimestampId()
+    {
+        return long.Parse(DateTime.Now.ToString("yyyyMMddHHmmssfff"));
+    }
+
     public async Task<List<Api_AppMobileApi_GetDataDownloadCustomerResponse>> ReordenarListaAbono(List<Api_AppMobileApi_GetDataDownloadCustomerResponse> listaBase)
     {
         List<Api_AppMobileApi_GetDataDownloadCustomerResponse> listaOrdenada;

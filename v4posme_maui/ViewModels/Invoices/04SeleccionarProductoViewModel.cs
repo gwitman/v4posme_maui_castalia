@@ -89,14 +89,18 @@ public class SeleccionarProductoViewModel : BaseViewModel
             return;
         }
 
-        var permitirRepetidos = await _helper.GetValueParameter("MOBILE_ALLOW_REPEATED_PRODUCTS", "false");
-        var cestaArticulos    = VariablesGlobales.DtoInvoice.Items;
+        var permitirRepetidos           = await _helper.GetValueParameter("MOBILE_ALLOW_REPEATED_PRODUCTS", "false");
+        var cestaArticulos              = VariablesGlobales.DtoInvoice.Items;
+        var transactionMasterDetailID   = _helper.GetTimestampId();
+
 
         if ( (permitirRepetidos == "true")  )
         {
             // Agregar siempre como nueva línea independiente (clonar el ítem)
             var nuevo = new Api_AppMobileApi_GetDataDownloadItemsResponse
             {
+                TransactionMasterDetailID 
+                                    = transactionMasterDetailID,
                 ItemPk              = obj.ItemPk,
                 ItemId              = obj.ItemId,
                 BarCode             = obj.BarCode,

@@ -85,7 +85,7 @@ public partial class ModificarValorPage : ContentPage
 
         if (Campo == "descuento")
         {
-            if (!decimal.TryParse(valueText, out var descuento))
+            if (!decimal.TryParse(valueText, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var descuento))
             {
                 TxtValor.HasError = true;
                 return;
@@ -104,8 +104,7 @@ public partial class ModificarValorPage : ContentPage
             return;
         }
 
-        var value = decimal.Parse(valueText);
-
+        var value = decimal.Parse(valueText, System.Globalization.CultureInfo.InvariantCulture);
         if (decimal.Compare(Quantity, decimal.Zero) >= 0 && Campo == "cantidad")
         {
             SelectedItem.Quantity = value;
@@ -119,7 +118,7 @@ public partial class ModificarValorPage : ContentPage
         SelectedItem.Importe                    = decimal.Multiply(SelectedItem.Quantity, SelectedItem.PrecioPublico);
         VariablesGlobales.DtoInvoice.Balance    = VariablesGlobales.DtoInvoice.Items.Sum(response => response.Importe) - VariablesGlobales.DtoInvoice.Items.Sum(response => response.MontoDescuento);
 
-        var findIndex = VariablesGlobales.DtoInvoice.Items.FindIndex(response => response.ItemNumber == SelectedItem.ItemNumber);
+        var findIndex = VariablesGlobales.DtoInvoice.Items.FindIndex(response => response.TransactionMasterDetailID == SelectedItem.TransactionMasterDetailID);
         VariablesGlobales.DtoInvoice.Items.RemoveAt(findIndex);
 
         //Si la cantidad es mayor que 0 volver a insertar
