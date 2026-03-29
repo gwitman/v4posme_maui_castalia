@@ -23,6 +23,9 @@ public class PrinterInvoiceViewModel : BaseViewModel
     private readonly IRepositoryTbTransactionMaster _repositoryTbTransactionMaster;
     private readonly IRepositoryTbTransactionMasterDetail _repositoryTbTransactionMasterDetail;
     private readonly HelperCore _helperCore;
+    private readonly IRepositoryItems _repositoryItems;
+    private readonly IRepositoryTbCustomer _repositoryTbCustomer;
+    private readonly RestApiAppMobileApi _restApiDownload = new RestApiAppMobileApi();
 
     public PrinterInvoiceViewModel()
     {
@@ -32,10 +35,13 @@ public class PrinterInvoiceViewModel : BaseViewModel
         _repositoryTbTransactionMasterDetail = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMasterDetail>();
         _parameterSystem                     = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbParameterSystem>();
         _repositoryParameters                = VariablesGlobales.UnityContainer.Resolve<IRepositoryParameters>();
+        _repositoryItems                     = VariablesGlobales.UnityContainer.Resolve<IRepositoryItems>();
+        _repositoryTbCustomer                = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCustomer>();
         AplicarOtroCommand   = new Command(OnAplicarOtroCommand);
         PrintCommand         = new Command(OnPrintCommand);
         AnularFacturaCommand = new Command(OnAnularFacturaCommand);
         EditFacturaCommand   = new Command(OnEditarFacturaCommand);
+        SubirCommand         = new Command(OnSubirCommand);
     }
 
     private async void OnEditarFacturaCommand()
@@ -177,6 +183,54 @@ public class PrinterInvoiceViewModel : BaseViewModel
             Shell.Current.Navigation.RemovePage(stack[i]);
         }
     }
+
+    private async void OnSubirCommand()
+    {
+        var uploadAfterInvoiceValue = await _helperCore.GetValueParameter("MOBILE_UPLOAD_AFTER_INVOICE", "false");
+        var uploadAfterInvoice      = bool.TryParse(uploadAfterInvoiceValue, out var parsedValue) && parsedValue;
+        if (uploadAfterInvoice)
+        {
+            IsBusy = true;
+
+            // Subir datos
+            var response    = await _restApiDownload.SendDataAsync();
+            var apiResponse = Newtonsoft.Json.JsonConvert.DeserializeObject<Api_AppMobileApi_SetDataUploadResponse>(response);
+            if (apiResponse is not null)
+            {
+                if (apiResponse.Error)
+                {
+                    ShowMensajePopUp($"{Mensajes.MensajeUploadError} {apiResponse.Message}", Colors.Red);
+                }
+                else
+                {
+                    Mensaje              = Mensajes.MensajeUploadSuccess;
+                    PopupBackgroundColor = Colors.Green;
+                    PopUpShow            = true;
+                    await _repositoryItems.PosMeDeleteAll();
+                    await _repositoryTbCustomer.PosMeDeleteAll();
+                    await _repositoryTbTransactionMaster.PosMeDeleteAll();
+                    await _repositoryTbTransactionMasterDetail.PosMeDeleteAll();
+                    await _helperCore.ZeroCounter();
+                }
+            }
+            else
+            {
+                ShowMensajePopUp(Mensajes.MensajeUploadError, Colors.Red);
+            }
+
+            // Descargar datos
+            var counter = await _helperCore.GetCounter();
+            if (counter != 0)
+                await _restApiDownload.GetDataDownload(true);
+            else
+                await _restApiDownload.GetDataDownload(false);
+
+            IsBusy = false;
+        }
+
+        // Navegar a página 1 (selección de cliente)
+        OnAplicarOtroCommand();
+    }
     
     private TbTransactionMaster _transactionMaster;
 
@@ -213,6 +267,7 @@ public class PrinterInvoiceViewModel : BaseViewModel
     public string Cambio => VariablesGlobales.DtoInvoice.Cambio.ToString("N2");
     public Command PrintCommand { get; }
     public Command AplicarOtroCommand { get; }
+    public Command SubirCommand { get; }
     public string SimboloMoneda => VariablesGlobales.DtoInvoice.Currency!.Simbolo;
     public string NombreCliente => VariablesGlobales.DtoInvoice.NombreCompleto!;
     public string CodigoVendedor => VariablesGlobales.User!.Nickname!;
