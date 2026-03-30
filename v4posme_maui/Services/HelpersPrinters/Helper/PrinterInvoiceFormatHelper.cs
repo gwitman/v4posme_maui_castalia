@@ -136,54 +136,52 @@ public static class PrinterInvoiceFormatHelper
         var txHour = dtoInvoice.TransactionOn.TimeOfDay;
         string tiempo;
         if (txHour < TimeSpan.FromHours(12))
-            tiempo = dtoInvoice.TransactionOn.ToString("yyyy-MM-dd") + " 12:00";
+            tiempo = "MAÑANA";
         else if (txHour < TimeSpan.FromHours(15))
-            tiempo = dtoInvoice.TransactionOn.ToString("yyyy-MM-dd") + " 03:00 p.m";
+            tiempo = "TARDE";
         else if (txHour < TimeSpan.FromHours(18))
-            tiempo = dtoInvoice.TransactionOn.ToString("yyyy-MM-dd") + " 06:00 p.m";
+            tiempo = "06:00 P.M";
         else
-            tiempo = dtoInvoice.TransactionOn.ToString("yyyy-MM-dd") + " 09:00 p.m";
+            tiempo = "NOCHE";
 
-        printer.NewLine();
+        //printer.NewLine();
         printer.AlignLeft();
         var detalleHeader = $"""
-                             FACTURA      :{dtoInvoice.Codigo}
-                             FECHA        :{dtoInvoice.TransactionOn:yyyy-MM-dd hh:mm tt}
-                             VENDEDOR     :{userNickname}
-                             CLIENTE      :{dtoInvoice.Comentarios}
-                             TIEMPO       :{tiempo}
+                             FACTURA  :{dtoInvoice.Codigo}
+                             FECHA    :{dtoInvoice.TransactionOn:yyyy-MM-dd hh:mm tt}
+                             VENDEDOR :{userNickname}
+                             CLIENTE  :{dtoInvoice.Comentarios}
+                             TIEMPO   :{tiempo}
                              """;
         printer.NewLine();
         printer.Append(detalleHeader);
-        printer.NewLine();
+        //printer.NewLine();
 
         bool showReferencia = printerReferencia.Trim().Equals("true", StringComparison.OrdinalIgnoreCase);
 
-        //printer.Append("CANT.    PRECIO       TOTAL");
+        printer.Append("NUM.    MONTO       PREMIO");
         foreach (var item in dtoInvoice.Items)
         {
-            printer.Separator('-', 32);
+            //printer.Separator('-', 40);
             printer.Append(item.Name);
             var cant            = item.Quantity.ToString("N2").PadLeft(6);
-            var precio          = item.PrecioPublico.ToString("N2").PadLeft(10);
-            var total           = item.Importe.ToString("N2").PadLeft(10);
-            var ganancia        = (item.PrecioPublico * 80).ToString("N2").PadLeft(10);
-            //printer.Append($"{cant}  {precio}  {total}");
+            var precio          = ("C$ " + item.PrecioPublico.ToString("N0")).PadLeft(7);
+            var total           = ("C$ " + item.Importe.ToString("N0")).PadLeft(13);
+            var ganancia        = ("C$ " + (item.PrecioPublico * 80).ToString("N0")).PadLeft(13);            
             if (showReferencia && !string.IsNullOrWhiteSpace(item.Referencia))
             {
-                var partes = item.Referencia.Split('y');
+                var partes = item.Referencia.Replace(" ", "y").Split('y');
                 foreach (var parte in partes)
                 {
-                    printer.Append($"# {parte.Trim()}  C$ {precio}  C$ {ganancia}");
+                    printer.Append($"#{parte.Trim().PadLeft(3)} {precio} {ganancia}");
                 }
             }
         }
-        printer.Separator('-', 32);
-
+        //printer.Separator('-', 40);
         printer.NewLine();
         const int labelWidth = 12;
         const int valueWidth = 12;
-        printer.Append($"{"TOTAL:".PadRight(labelWidth)}{(dtoInvoice.TransactionMaster.SubAmount - dtoInvoice.TransactionMaster.Discount).ToString("N2").PadLeft(valueWidth)}");
+        printer.Append($"{"TOTAL: ".PadRight(labelWidth)}{  ("C$ " + ((dtoInvoice.TransactionMaster.SubAmount - dtoInvoice.TransactionMaster.Discount).ToString("N0"))).PadLeft(valueWidth)}");
         printer.NewLine();
         printer.AlignCenter();
 
@@ -191,14 +189,13 @@ public static class PrinterInvoiceFormatHelper
         {
             var qrContent = printerQRUrl + "/inm/" + dtoInvoice.Codigo + "/unm/" + userNickname;
             printer.QrCode(qrContent, QrCodeSize.Size1);
-            printer.NewLine();
-            printer.NewLine();
+            printer.NewLine();            
         }
 
         printer.Append(companyAddress);
         printer.Append(companyTelefono);
-        printer.NewLine();
-        printer.NewLine();
+        //printer.NewLine();
+        //printer.NewLine();
 
         printer.FullPaperCut();
         printer.Print();
