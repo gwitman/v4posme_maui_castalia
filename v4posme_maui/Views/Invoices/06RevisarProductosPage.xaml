@@ -335,6 +335,17 @@
                                         Text="{Binding Balance,StringFormat='{0:N2}'}" />
                                 </StackLayout>
                             </dx:DXButton>
+                            <dx:DXButton
+                                Command="{Binding ClonarCommand}"
+                                Margin="0,0,0,10"
+                                BackgroundColor="Green"
+                                IsVisible="{Binding MostrarClonar}"
+                                VerticalOptions="End">
+                                <Label
+                                    TextColor="White"
+                                    FontAttributes="Bold"
+                                    Text="Clonar Producto" />
+                            </dx:DXButton>
                         </dx:DXStackLayout>
                     </Grid>
                 </AbsoluteLayout>

@@ -22,6 +22,7 @@ public class RevisarProductosSeleccionadosViewModel : BaseViewModel
         DescuentoCommand        = new Command<Api_AppMobileApi_GetDataDownloadItemsResponse>(OnDescuentoCommand);
         ReferenciaCommand       = new Command<Api_AppMobileApi_GetDataDownloadItemsResponse>(OnReferenciaCommand);
         PagoCommand             = new Command(OnPagoCommand);
+        ClonarCommand           = new Command(OnClonarCommand);
         _helper                 = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
     }
 
@@ -30,6 +31,50 @@ public class RevisarProductosSeleccionadosViewModel : BaseViewModel
         IsBusy = true;
         await NavigationService.NavigateToAsync<PaymentInvoiceViewModel>();
         IsBusy = false;
+    }
+
+    private async void OnClonarCommand()
+    {
+        var obj = SelectedItem;
+        if (obj is null)
+        {
+            ShowToast("Selecciona un producto primero", ToastDuration.Short, 12);
+            return;
+        }
+
+        var permitirRepetidos   = await _helper.GetValueParameter("MOBILE_ALLOW_REPEATED_PRODUCTS", "false");
+        var cestaArticulos      = VariablesGlobales.DtoInvoice.Items;
+
+        if (permitirRepetidos == "true")
+        {
+            var nuevo = new Api_AppMobileApi_GetDataDownloadItemsResponse
+            {
+                TransactionMasterDetailID   = _helper.GetTimestampId(),
+                ItemId                      = obj.ItemId,
+                BarCode                     = obj.BarCode,
+                ItemNumber                  = obj.ItemNumber,
+                Name                        = obj.Name,
+                PrecioPublico               = obj.PrecioPublico,
+                CantidadEntradas            = obj.CantidadEntradas,
+                CantidadSalidas             = obj.CantidadSalidas,
+                CantidadFinal               = obj.CantidadFinal,
+                MonedaSimbolo               = obj.MonedaSimbolo,
+                Quantity                    = decimal.One,
+                MontoDescuento              = 0m,
+                PorcentajeDescuento         = 0m
+            };
+            cestaArticulos.Add(nuevo);
+        }
+        else
+        {
+            obj.Quantity += decimal.One;
+            RecalcularItem(obj);
+        }
+
+        VariablesGlobales.DtoInvoice.Balance = cestaArticulos.Sum(r => r.Importe) - cestaArticulos.Sum(r => r.MontoDescuento);
+        OnPropertyChanged(nameof(SubTotal));
+        OnPropertyChanged(nameof(Balance));
+        OnPropertyChanged(nameof(CantidadTotalItems));
     }
 
     private void OnQuantityCommand(Api_AppMobileApi_GetDataDownloadItemsResponse obj)
@@ -131,6 +176,7 @@ public class RevisarProductosSeleccionadosViewModel : BaseViewModel
     public Command DescuentoCommand { get; }
     public Command ReferenciaCommand { get; }
     public Command PagoCommand { get; }
+    public Command ClonarCommand { get; }
 
 
     private decimal _balance;
@@ -183,6 +229,9 @@ public class RevisarProductosSeleccionadosViewModel : BaseViewModel
     {
         var value        = await _helper.GetValueParameter("MOBILE_IN_INVOICE_MOSTRAR_DESCUENTO", "false");
         MostrarDescuento = !(bool.TryParse(value, out var parsed) && parsed);
+
+        var repetidos   = await _helper.GetValueParameter("MOBILE_ALLOW_REPEATED_PRODUCTS", "false");
+        MostrarClonar   = bool.TryParse(repetidos, out var rep) && rep;
     }
 
     private bool _mostrarDescuento;
@@ -190,5 +239,12 @@ public class RevisarProductosSeleccionadosViewModel : BaseViewModel
     {
         get => _mostrarDescuento;
         set => SetProperty(ref _mostrarDescuento, value);
+    }
+
+    private bool _mostrarClonar;
+    public bool MostrarClonar
+    {
+        get => _mostrarClonar;
+        set => SetProperty(ref _mostrarClonar, value);
     }
 }

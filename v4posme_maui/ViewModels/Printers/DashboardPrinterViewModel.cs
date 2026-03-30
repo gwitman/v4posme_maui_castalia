@@ -159,6 +159,7 @@ public class DashboardPrinterViewModel : BaseViewModel
                 item.MontoDescuento                                 = items.Discount;                
                 item.PrecioPublico                                  = items.UnitaryPrice;
                 item.Referencia                                     = items.ReferenciaProducto;
+                item.TransactionMasterDetailID                      = _helper.GetTimestampId();
                 VariablesGlobales.DtoInvoice.Items.Add(item);
             }
             
