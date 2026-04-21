@@ -127,6 +127,7 @@ public class SeleccionarProductoViewModel : BaseViewModel
             }
 
             obj.Quantity        = decimal.One;
+            obj.Importe         = obj.PrecioPublico;
             obj.MontoDescuento  = 0m;
             cestaArticulos.Add(obj);
         }
