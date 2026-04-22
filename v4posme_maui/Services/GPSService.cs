@@ -106,6 +106,14 @@ namespace v4posme_maui.Services
         {
             try
             {
+                // Verificar si el envío de GPS está habilitado
+                HelperCore helperSend = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
+                var sendGpsValue      = await helperSend.GetValueParameter("MOBILE_SEND_GPS", "false");
+                if (!bool.TryParse(sendGpsValue, out var sendGps) || !sendGps)
+                {
+                    return;
+                }
+
                 //Enviar a comercio gps
                 var httpClient = new HttpClient();
                 var tempUrl = Constantes.UrlGPSShare.Replace("{UrlBase}", VariablesGlobales.CompanyKey);

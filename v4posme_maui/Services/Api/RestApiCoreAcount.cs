@@ -29,8 +29,16 @@ public class RestApiCoreAcount
             {
                 Content = new FormUrlEncodedContent(nvc)
             };
+            req.Headers.TryAddWithoutValidation("User-Agent", "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36");
+            req.Headers.TryAddWithoutValidation("Accept", "application/json, text/html, */*");
             var response        = await _httpClient.SendAsync(req);
-            if (!response.IsSuccessStatusCode) return null;
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorBody = await response.Content.ReadAsStringAsync();
+                Debug.WriteLine($"HTTP {(int)response.StatusCode}: {errorBody}");
+                return null;
+            }
+
             var responseBody    = await response.Content.ReadAsStringAsync();
             var apiResponse     = JsonConvert.DeserializeObject<Api_CoreAcount_LoginMobileResponse>(responseBody);
             if (apiResponse is null || apiResponse.Error) return null;
