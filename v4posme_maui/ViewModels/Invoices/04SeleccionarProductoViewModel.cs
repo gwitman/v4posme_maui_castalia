@@ -125,10 +125,10 @@ public class SeleccionarProductoViewModel : BaseViewModel
                 ShowToast(Mensajes.MensajeProductoYaAgregado, ToastDuration.Short, 12);
                 return;
             }
-
-            obj.Quantity        = decimal.One;
-            obj.Importe         = obj.PrecioPublico;
-            obj.MontoDescuento  = 0m;
+            obj.TransactionMasterDetailID   = transactionMasterDetailID;
+            obj.Quantity                    = decimal.One;
+            obj.Importe                     = obj.PrecioPublico;
+            obj.MontoDescuento              = 0m;
             cestaArticulos.Add(obj);
         }
 
