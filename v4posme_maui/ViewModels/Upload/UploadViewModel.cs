@@ -77,7 +77,7 @@ public class UploadViewModel : BaseViewModel
 
     private bool ValidateUpload()
     {
-        return Connectivity.Current.NetworkAccess != NetworkAccess.None && Switch;
+        return !IsBusy && Connectivity.Current.NetworkAccess != NetworkAccess.None && Switch;
     }
 
     private async Task LoadData()
