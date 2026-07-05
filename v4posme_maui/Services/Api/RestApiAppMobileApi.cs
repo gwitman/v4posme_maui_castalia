@@ -305,7 +305,7 @@ public class RestApiAppMobileApi
                 Content = content
             };
             var response        = await _httpClient.SendAsync(req);
-            if (!response.IsSuccessStatusCode) return "{'status': 'false'; 'message': 'error'}";
+            if (!response.IsSuccessStatusCode) return "{'Error': 'false'; 'Message': 'error'}";
             var responseBody    = await response.Content.ReadAsStringAsync();
             return responseBody;
         }
