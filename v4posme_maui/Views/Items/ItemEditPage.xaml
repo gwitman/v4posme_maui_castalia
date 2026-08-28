@@ -130,8 +130,10 @@
                                 TextChanged="TextCantidadEntrada_OnTextChanged"
                                 x:Name="TextCantidadEntrada"
                                 Keyboard="Numeric"
-                                IconColor="#006E98"
+                                IconColor="#2E7D32"
                                 StartIcon="quantity"
+                                TextColor="#2E7D32"
+                                TextFontAttributes="Bold"
                                 Text="{Binding CantidadEntradas}"
                                 LabelText="Cantidad a ingresar" />
                         </dxdf:DataFormCustomItem>
@@ -140,8 +142,10 @@
                                 TextChanged="TextCantidadEntrada_OnTextChanged"
                                 x:Name="TextCantidadSalida"
                                 Keyboard="Numeric"
-                                IconColor="#006E98"
+                                IconColor="#C62828"
                                 StartIcon="quantity"
+                                TextColor="#C62828"
+                                TextFontAttributes="Bold"
                                 Text="{Binding CantidadSalidas}"
                                 LabelText="Cantidad a retirar" />
                         </dxdf:DataFormCustomItem>
