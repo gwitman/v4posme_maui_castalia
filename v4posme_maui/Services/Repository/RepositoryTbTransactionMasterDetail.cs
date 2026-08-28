@@ -33,7 +33,8 @@ public class RepositoryTbTransactionMasterDetail(DataBase dataBase) : Repository
                         tmd.amount as Amount,
                         tmd.itemBarCode as ItemBarCode,
                         tmd.Reference1 as Reference1,
-                        tmd.Reference2 as Reference2
+                        tmd.Reference2 as Reference2,
+                        tmd.RegisterLocal as RegisterLocal
                      from 
                         tb_transaction_master_detail tmd
                         inner join tb_transaction_master tm on 
@@ -66,7 +67,8 @@ public class RepositoryTbTransactionMasterDetail(DataBase dataBase) : Repository
                         tmd.amount as Amount,
                         tmd.itemBarCode as ItemBarCode,
                         tmd.Reference1 as Reference1,
-                        tmd.Reference2 as Reference2
+                        tmd.Reference2 as Reference2,
+                        tmd.RegisterLocal as RegisterLocal
                      from 
                         tb_transaction_master_detail tmd
                         inner join tb_transaction_master tm on 

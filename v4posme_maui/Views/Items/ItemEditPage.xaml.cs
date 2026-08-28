@@ -155,7 +155,7 @@ public partial class ItemEditPage : ContentPage
             if (objListTransactionDetail is null)
                 quatityInvoice = 0;
             else
-                quatityInvoice = Convert.ToDecimal(objListTransactionDetail.Sum(p => p.Quantity));
+                quatityInvoice = Convert.ToDecimal(objListTransactionDetail.Where( p => p.RegisterLocal == 1 ).Sum(p => p.Quantity));
 
             _defaultItem.CantidadFacturadas = quatityInvoice;
             _saveItem.CantidadFacturadas    = quatityInvoice;

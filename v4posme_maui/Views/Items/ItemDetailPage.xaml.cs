@@ -38,7 +38,7 @@ namespace v4posme_maui.Views.Items
             if (objListTransactionDetail is null)
                 SelectedItem.CantidadFacturadas = 0;
             else
-                SelectedItem.CantidadFacturadas = Convert.ToDecimal(objListTransactionDetail.Sum(p => p.Quantity));
+                SelectedItem.CantidadFacturadas = Convert.ToDecimal(objListTransactionDetail.Where(p => p.RegisterLocal == 1 ).Sum(p => p.Quantity));
 
             SelectedItem.CantidadFinal  = (SelectedItem.Quantity +  SelectedItem.CantidadEntradas) - (SelectedItem.CantidadSalidas + SelectedItem.CantidadFacturadas);
             ViewModel.Item              = SelectedItem;

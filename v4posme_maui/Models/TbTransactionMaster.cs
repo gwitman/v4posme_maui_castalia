@@ -56,4 +56,5 @@ public class TbTransactionMaster
 
     public string? Reference4 { get; set; }
     public int CuotasPendientes { get; set; }
+    public int RegisterLocal { get; set; } = 0;
 }

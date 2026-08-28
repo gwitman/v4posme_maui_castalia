@@ -45,4 +45,6 @@ public class TbTransactionMasterDetail
 
     [DataMember(Name = "referenciaProducto")]
     public string ReferenciaProducto { get; set; } = string.Empty;
+
+    public int RegisterLocal { get; set; } = 0;
 }

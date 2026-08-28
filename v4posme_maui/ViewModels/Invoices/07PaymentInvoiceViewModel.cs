@@ -131,7 +131,8 @@ public class PaymentInvoiceViewModel : BaseViewModel
             StatusID            = statusID,
             MesaID              = dtoInvoice.Mesa!.Key,
             ReferenceClientName = dtoInvoice.ReferenceClientName,
-            MesaName            = dtoInvoice.Mesa!.Name
+            MesaName            = dtoInvoice.Mesa!.Name,
+            RegisterLocal       = 1
         };
 
         transactionMaster.SubAmount = dtoInvoice.Balance + dtoInvoice.Items.Sum(P => P.MontoDescuento);
@@ -156,7 +157,8 @@ public class PaymentInvoiceViewModel : BaseViewModel
                 Componentid         = (int)TypeComponent.Itme,
                 ComponentItemId     = item.ItemId,
                 ItemBarCode         = item.BarCode,
-                ReferenciaProducto  = item.Referencia
+                ReferenciaProducto  = item.Referencia,
+                RegisterLocal       = 1
             };
             detail.Amount = detail.SubAmount;
             listMasterDetail.Add(detail);

@@ -31,7 +31,8 @@ public class RepositoryTbTransactionMaster(DataBase dataBase) : RepositoryFacade
                              tm.ReferenceClientName,
                              tm.MesaID,
                              tm.MesaName,
-                             tm.StatusID
+                             tm.StatusID,
+                             tm.RegisterLocal
                      from tb_transaction_master tm
                               join tb_customers c on tm.CustomerCreditLineId = c.CustomerCreditLineId and tm.EntityId=c.EntityId
                      where tm.TransactionId={(int)TypeTransaction.TransactionInvoiceBilling} and 
@@ -61,7 +62,8 @@ public class RepositoryTbTransactionMaster(DataBase dataBase) : RepositoryFacade
                              tm.Comment,
                              tm.Reference1,
                              tm.Reference2,
-                             tm.Reference3
+                             tm.Reference3,
+                             tm.RegisterLocal
                      from tb_transaction_master tm
                               join tb_customers c on tm.CustomerCreditLineId = c.CustomerCreditLineId and tm.EntityId=c.EntityId
                      where tm.TransactionId =? and tm.TransactionId={(int)TypeTransaction.TransactionShare} and
@@ -127,7 +129,8 @@ public class RepositoryTbTransactionMaster(DataBase dataBase) : RepositoryFacade
                              tm.Reference2,
                              c.firstName || ' ' || c.lastName referencie3,
                              tm.SubAmount,
-                             tm.Discount 
+                             tm.Discount,
+                             tm.RegisterLocal
                      from tb_transaction_master tm
                               left join tb_customers c on tm.EntityId=c.EntityId
                      order by tm.TransactionOn DESC 
