@@ -3,8 +3,6 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:dx="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
-             xmlns:dxcn="clr-namespace:DevExpress.Maui.Controls;assembly=DevExpress.Maui.Controls"
-             xmlns:dxdf="clr-namespace:DevExpress.Maui.DataForm;assembly=DevExpress.Maui.Editors"
              xmlns:dxe="clr-namespace:DevExpress.Maui.Editors;assembly=DevExpress.Maui.Editors"
              xmlns:dxcv="clr-namespace:DevExpress.Maui.CollectionView;assembly=DevExpress.Maui.CollectionView"
              xmlns:reporte="clr-namespace:v4posme_maui.ViewModels.More.ReporteVenta"
@@ -13,490 +11,377 @@
              Title="{Binding Title}"
              x:Class="v4posme_maui.Views.More.ReporteVenta.ReporteVentaPage"
              Style="{StaticResource DetailPageStyle}">
-    
+
     <Shell.BackButtonBehavior>
         <BackButtonBehavior IsEnabled="False" IsVisible="False" />
     </Shell.BackButtonBehavior>
-    
     <Shell.PresentationMode>Animated</Shell.PresentationMode>
-    
+
     <ContentPage.BindingContext>
         <reporte:ReporteVentaViewModel />
     </ContentPage.BindingContext>
-    
+
     <ContentPage.ToolbarItems>
         <ToolbarItem IconImageSource="basic_home_white" Clicked="BackToHome_OnClicked" />
         <ToolbarItem IconImageSource="shared_white" Command="{Binding HideFormCommand}" />
-
         <ToolbarItem Text="Imprimir" Order="Secondary" x:Name="ItemPrint_" Command="{Binding PrintCommand}" />
         <ToolbarItem Text="Compartir" Order="Secondary" Clicked="MenuItem_OnClicked" />
     </ContentPage.ToolbarItems>
-    
+
     <ContentPage.Content>
         <controls:ShimmerView Style="{StaticResource ShimmerEffect}" IsLoading="{Binding IsBusy}">
             <controls:ShimmerView.Content>
                 <ScrollView>
-
                     <dx:DXStackLayout
-                        BackgroundColor="White"
                         x:Name="DxStackLayout_"
                         Orientation="Vertical"
-                        Padding="20">
+                        BackgroundColor="{StaticResource PageBackground}"
+                        Padding="16,16,16,24">
 
-                        <Grid Margin="0,0,0,10" HorizontalOptions="Center" IsVisible="{Binding IsVisibleDate}">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-
-                            <dxe:DateEdit
-                            x:Name="fechaInicio"
-                            DisplayFormat="d"
-                            StartIcon="editorscalendar"
-                            IconColor="{StaticResource Primary}"
-                            LabelText="Fecha Inicio"
-                            Grid.Column="0" 
-                            Date="{Binding FechaInical}"/>
-
-                            <dxe:DateEdit
-                            x:Name="fechaFinal"
-                            DisplayFormat="d"
-                            StartIcon="editorscalendar"
-                            IconColor="{StaticResource Primary}"
-                            LabelText="Fecha Final"
-                            Grid.Column="1"
-                            Date="{Binding FechaFinal}" />
-                        </Grid>
-
-                        <dx:DXStackLayout Orientation="Vertical"
-                            Margin="0,0,0,10"
-                            HorizontalOptions="Center"
-                            IsVisible="{Binding IsFormVisible}">
-
-                            <Label Text="{Binding Company.Name}"
-                                    FontSize="17"
-                                    HorizontalTextAlignment="Center"
-                                    FontAttributes="Bold"
-                                    Margin="0,0,0,10"/>
-
-                            <Label Text="CIERRE"
-                                   FontSize="17"
-                                   HorizontalTextAlignment="Center"
-                                   FontAttributes="Bold" />
-
-                            <Label x:Name="reporteFecha"
-                                FontSize="17"
-                                Text="{Binding ReporteFecha}"
-                                HorizontalTextAlignment="Center"
-                                FontAttributes="Bold" />
-
-                            <Label Text=" "
-                                FontSize="24"
-                                HorizontalTextAlignment="Center"
-                                FontAttributes="Bold" />
-
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="*" /> <!-- label factura NIO -->
-                                    <RowDefinition Height="*" /> <!-- Lista de facturas NIO -->
-                                    <RowDefinition Height="*" /> <!-- Total factura NIO -->
-                                    <!--//////////////////////////////////////////////////////-->
-                                    <RowDefinition Height="*" /> <!-- label abono USD -->
-                                    <RowDefinition Height="*" /> <!-- Lista de abonos USD -->
-                                    <RowDefinition Height="*" /> <!-- Total abonos USD -->
-                                    <!--//////////////////////////////////////////////////////-->
-                                    <RowDefinition Height="*" /> <!-- label factura USD -->
-                                    <RowDefinition Height="*" /> <!-- Lista de facturas USD -->
-                                    <RowDefinition Height="*" /> <!-- Total factura USD -->
-                                    <!--//////////////////////////////////////////////////////-->
-                                    <RowDefinition Height="*" /> <!-- label abono NIO -->
-                                    <RowDefinition Height="*" /> <!-- Lista de abono NIO -->
-                                    <RowDefinition Height="*" /> <!-- Total abono USD -->
-                                    <!--//////////////////////////////////////////////////////-->
-                                    <RowDefinition Height="*" /> <!-- totales NIO -->
-                                    <RowDefinition Height="*" /> <!-- Espacio -->
-                                    <RowDefinition Height="*" /> <!-- totales NIO -->
-                                    <RowDefinition Height="*" /> <!-- Raya divisora -->
-                                    <!--//////////////////////////////////////////////////////-->
-                                    <RowDefinition Height="*" /> <!-- Visitas -->
-                                    <RowDefinition Height="*" /> <!-- Lista de visitas -->
-                                </Grid.RowDefinitions>
-
-                                <Label Text="FACTURA DE CONTADO C$"
-                                    FontSize="15"
-                                    HorizontalTextAlignment="Start"
-                                    FontAttributes="Bold"
-                                    Grid.Row="0" Grid.Column="0" 
-                                    Grid.ColumnSpan="2"
-                                    Margin="0, 0, 0, 15"/>
-
-                                <dxcv:DXCollectionView x:Name="InvoicesCollectionView_1"
-                                    Grid.Row="1"
-                                    Grid.Column="0" 
-                                    Grid.ColumnSpan="2"
-                                    ItemsSource="{Binding InvoicesNIO}"
-                                    IsRefreshing="{Binding  IsBusy, Mode=OneWay}" HeightRequest="{Binding InvoicesHeight_2}">
-                                    <dxcv:DXCollectionView.ItemTemplate >
-                                        <DataTemplate>
-                                            <dx:DXStackLayout
-                                                CornerRadius="15">
-                                                <Grid
-                                                    x:DataType="models:ViewTempDtoReporteCierre"
-                                                    Padding="2"
-                                                    BackgroundColor="White">
-
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="auto" />
-                                                    </Grid.RowDefinitions>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="auto" />
-                                                        <ColumnDefinition Width="1.2*" />
-                                                        <ColumnDefinition Width="auto" />
-                                                        <ColumnDefinition Width="auto" />
-                                                    </Grid.ColumnDefinitions>
-
-                                                    <Label Grid.Column="0" Grid.Row="0" FontAttributes="Bold"
-                                                       TextColor="Black"
-                                                       Text="{Binding DocumentNumber}" 
-                                                       HorizontalTextAlignment="Start" />
-
-                                                    <HorizontalStackLayout Grid.Column="3" Grid.Row="0">
-                                                        <Label Text="{Binding Remaining,StringFormat='{0:N0}'}"
-                                                        TextColor="Black"
-                                                        HorizontalOptions="Start" 
-                                                        HorizontalTextAlignment="End" />
-                                                    </HorizontalStackLayout>
-
-                                                    <HorizontalStackLayout Grid.Row="0" Grid.Column="2">
-                                                        <Label Text="{Binding CurrencyName}" TextColor="Black" />
-                                                    </HorizontalStackLayout>
-                                                </Grid>
-                                            </dx:DXStackLayout>
-                                        </DataTemplate>
-                                
-                                    </dxcv:DXCollectionView.ItemTemplate>
-                                </dxcv:DXCollectionView>
-
-                                <Label Text=" "
-                                     FontSize="15"
-                                     HorizontalTextAlignment="End"
-                                     FontAttributes="Bold"
-                                     Grid.Row="2" Grid.Column="0" WidthRequest="450"
-                                     Margin="0, 0, 0, 15"/>
-
-                                <Label Text="{Binding TotalFacturaNIO}"
-                                     FontSize="15"
-                                     HorizontalTextAlignment="End"
-                                     FontAttributes="Bold"
-                                     Grid.Row="2" Grid.Column="1" 
-                                     Margin="0, 0, 0, 15"/>
-                                
-                                <!--///////////////////////////////////////////////-->
-                                
-                                <Label Text="ABONO C$"
-                                     FontSize="15"
-                                     HorizontalTextAlignment="Start"
-                                     FontAttributes="Bold"
-                                     Grid.Row="3" Grid.Column="0" 
-                                     Grid.ColumnSpan="2"
-                                     Margin="0, 0, 0, 15"/>
-
-                                <dxcv:DXCollectionView x:Name="InvoicesCollectionView_2"
-                                    Grid.Row="4"
-                                    Grid.Column="0" 
-                                    Grid.ColumnSpan="2"
-                                    ItemsSource="{Binding CreditsNIO}"
-                                    IsRefreshing="{Binding  IsBusy, Mode=OneWay}" HeightRequest="{Binding CreditHeight_2}">
-                                    <dxcv:DXCollectionView.ItemTemplate>
-                                        <DataTemplate>
-                                            <dx:DXStackLayout CornerRadius="15">
-                                                <Grid
-                                                    x:DataType="models:ViewTempDtoReporteCierre"
-                                                    Padding="2"
-                                                    BackgroundColor="White">
-
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="auto" />
-                                                    </Grid.RowDefinitions>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="auto" />
-                                                        <ColumnDefinition Width="1.2*" />
-                                                        <ColumnDefinition Width="auto" />
-                                                        <ColumnDefinition Width="auto" />
-                                                    </Grid.ColumnDefinitions>
-
-                                                    <Label Grid.Column="0" Grid.Row="0" FontAttributes="Bold"
-                                                           TextColor="Black"
-                                                           Text="{Binding DocumentNumber}" 
-                                                           HorizontalTextAlignment="Start" />
-
-                                                    <HorizontalStackLayout Grid.Column="3" Grid.Row="0">
-                                                        <Label Text="{Binding Remaining,StringFormat='{0:N0}'}"
-                                                               TextColor="Black"
-                                                               HorizontalOptions="Start" 
-                                                               HorizontalTextAlignment="End" />
-                                                    </HorizontalStackLayout>
-
-                                                    <HorizontalStackLayout Grid.Row="0" Grid.Column="2">
-                                                        <Label Text="{Binding CurrencyName}" TextColor="Black" />
-                                                    </HorizontalStackLayout>
-                                                </Grid>
-                                            </dx:DXStackLayout>
-                                        </DataTemplate>
-
-                                    </dxcv:DXCollectionView.ItemTemplate>
-                                </dxcv:DXCollectionView>
-
-                                <Label Text=" "
-                                     FontSize="15"
-                                     HorizontalTextAlignment="End"
-                                     FontAttributes="Bold"
-                                     Grid.Row="5" Grid.Column="0" WidthRequest="450"
-                                     Margin="0, 0, 0, 15"/>
-                                <Label Text="{Binding TotalCreditoNIO}"
-                                     FontSize="15"
-                                     HorizontalTextAlignment="End"
-                                     FontAttributes="Bold"
-                                     Grid.Row="5" Grid.Column="1" 
-                                     Margin="0, 0, 0, 15"/>
-                                <!--///////////////////////////////////////////////-->
-                                <Label Text="FACTURA DE CONTADO $"
-                                     FontSize="15"
-                                     HorizontalTextAlignment="Start"
-                                     FontAttributes="Bold"
-                                     Grid.Row="6" Grid.Column="0" 
-                                     Grid.ColumnSpan="2"
-                                     Margin="0, 0, 0, 15"/>
-
-                                <dxcv:DXCollectionView x:Name="InvoicesCollectionView_3"
-                                    Grid.Row="7"
-                                    Grid.Column="0" 
-                                    Grid.ColumnSpan="2"
-                                    ItemsSource="{Binding Invoices}"
-                                    IsRefreshing="{Binding  IsBusy, Mode=OneWay}" HeightRequest="{Binding InvoicesHeight}">
-                                    <dxcv:DXCollectionView.ItemTemplate >
-                                        <DataTemplate>
-                                            <dx:DXStackLayout
-                                                CornerRadius="15">
-                                                <Grid
-                                                    x:DataType="models:ViewTempDtoReporteCierre"
-                                                    Padding="2"
-                                                    BackgroundColor="White">
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="auto" />
-                                                    </Grid.RowDefinitions>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="auto" />
-                                                        <ColumnDefinition Width="1.2*" />
-                                                        <ColumnDefinition Width="auto" />
-                                                        <ColumnDefinition Width="auto" />
-                                                    </Grid.ColumnDefinitions>
-
-                                                    <Label Grid.Column="0" Grid.Row="0" FontAttributes="Bold"
-                                                        TextColor="Black"
-                                                        Text="{Binding DocumentNumber}" 
-                                                        HorizontalTextAlignment="Start" />
-
-                                                    <HorizontalStackLayout Grid.Column="3" Grid.Row="0">
-                                                        <Label Text="{Binding Remaining,StringFormat='{0:N0}'}"
-                                                               TextColor="Black"
-                                                               HorizontalOptions="Start" 
-                                                               HorizontalTextAlignment="End" />
-                                                    </HorizontalStackLayout>
-
-                                                    <HorizontalStackLayout Grid.Row="0" Grid.Column="2">
-                                                        <Label Text="{Binding CurrencyName}" TextColor="Black" />
-                                                    </HorizontalStackLayout>
-                                                </Grid>
-                                            </dx:DXStackLayout>
-                                        </DataTemplate>
-                                    </dxcv:DXCollectionView.ItemTemplate>
-                                </dxcv:DXCollectionView>
-
-                                <Label Text=" "
-                                    FontSize="15"
-                                    HorizontalTextAlignment="End"
-                                    FontAttributes="Bold"
-                                    Grid.Row="8" Grid.Column="0" WidthRequest="470"
-                                    Margin="0, 0, 0, 15"/>
-
-                                <Label Text="{Binding TotalFactura}"
-                                    FontSize="15"
-                                    HorizontalTextAlignment="End"
-                                    FontAttributes="Bold"
-                                    Grid.Row="8" Grid.Column="1"
-                                    Margin="0, 0, 0, 15"/>
-
-                                <!--///////////////////////////////////////////////-->
-                                <Label Text="ABONO $"
-                                       FontSize="15"
-                                       HorizontalTextAlignment="Start"
-                                       FontAttributes="Bold"
-                                       Grid.Row="9" Grid.Column="0" 
-                                       Grid.ColumnSpan="2"
-                                       Margin="0, 0, 0, 15"/>
-
-                                <dxcv:DXCollectionView x:Name="InvoicesCollectionView_4"
-                                        Grid.Row="10"
-                                        Grid.Column="0" 
-                                        Grid.ColumnSpan="2"
-                                        ItemsSource="{Binding Credits}"
-                                        IsRefreshing="{Binding  IsBusy, Mode=OneWay}" HeightRequest="{Binding CreditHeight}">
-                                    <dxcv:DXCollectionView.ItemTemplate>
-                                        <DataTemplate>
-                                            <dx:DXStackLayout CornerRadius="15">
-                                                <Grid
-                                                    x:DataType="models:ViewTempDtoReporteCierre"
-                                                    Padding="2"
-                                                    BackgroundColor="White">
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="auto" />
-                                                    </Grid.RowDefinitions>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="auto" />
-                                                        <ColumnDefinition Width="1.2*" />
-                                                        <ColumnDefinition Width="auto" />
-                                                        <ColumnDefinition Width="auto" />
-                                                    </Grid.ColumnDefinitions>
-
-                                                    <Label Grid.Column="0" Grid.Row="0" FontAttributes="Bold"
-                                                           TextColor="Black"
-                                                           Text="{Binding DocumentNumber}" 
-                                                           HorizontalTextAlignment="Start" />
-
-                                                    <HorizontalStackLayout Grid.Column="3" Grid.Row="0">
-                                                        <Label Text="{Binding Remaining,StringFormat='{0:N0}'}"
-                                                               TextColor="Black"
-                                                               HorizontalOptions="Start" 
-                                                               HorizontalTextAlignment="End" />
-                                                    </HorizontalStackLayout>
-
-                                                    <HorizontalStackLayout Grid.Row="0" Grid.Column="2">
-                                                        <Label Text="{Binding CurrencyName}" TextColor="Black" />
-                                                    </HorizontalStackLayout>
-                                                </Grid>
-                                            </dx:DXStackLayout>
-                                        </DataTemplate>
-
-                                    </dxcv:DXCollectionView.ItemTemplate>
-                                </dxcv:DXCollectionView>
-
-                                <Label Text=" "
-                                       FontSize="15"
-                                       HorizontalTextAlignment="End"
-                                       FontAttributes="Bold"
-                                       Grid.Row="11" Grid.Column="0" WidthRequest="450"
-                                       Margin="0, 10, 0, 0"/>
-                                <Label Text="{Binding TotalCredito}"
-                                       FontSize="15"
-                                       HorizontalTextAlignment="End"
-                                       FontAttributes="Bold"
-                                       Grid.Row="11" Grid.Column="1" 
-                                       Margin="0, 10, 0, 0"/>
-
-                                <Label Text=""
-                                       FontSize="15"
-                                       HorizontalTextAlignment="Start"
-                                       FontAttributes="Bold"
-                                       Grid.Row="12" Grid.Column="0" Grid.ColumnSpan="2"
-                                       Margin="0"/>
-                                
-                                <Label Text="TOTAL C$"
-                                       FontSize="15"
-                                       HorizontalTextAlignment="Start"
-                                       FontAttributes="Bold"
-                                       Grid.Row="13" Grid.Column="0"
-                                       Margin="0, 10, 0, 0"/>
-                                <Label Text="{Binding TotalNIO}"
-                                       FontSize="15"
-                                       HorizontalTextAlignment="End"
-                                       FontAttributes="Bold"
-                                       Grid.Row="13" Grid.Column="1" 
-                                       Margin="0, 10, 0, 0"/>
-
-                                <Label Text="TOTAL $"
-                                       FontSize="15"
-                                       HorizontalTextAlignment="Start"
-                                       FontAttributes="Bold"
-                                       Grid.Row="14" Grid.Column="0"
-                                       Margin="0, 10, 0, 0"/>
-                                <Label Text="{Binding TotalUSD}"
-                                       FontSize="15"
-                                       HorizontalTextAlignment="End"
-                                       FontAttributes="Bold"
-                                       Grid.Row="14" Grid.Column="1" 
-                                       Margin="0, 10, 0, 0"/>
-
-                                <BoxView Grid.Row="15" 
-                                         Grid.ColumnSpan="2" 
-                                         Margin="0, 10, 0, 20"
-                                         HeightRequest="7" 
-                                         Color="Black" 
-                                         HorizontalOptions="FillAndExpand" />
-                                <!--///////////////////////////////////////////-->
-                                <Label Text="Visitas"
-                                       FontSize="15"
-                                       HorizontalTextAlignment="Start"
-                                       FontAttributes="Bold"
-                                       Grid.Row="16" Grid.Column="0" 
-                                       Grid.ColumnSpan="2"
-                                       Margin="0, 0, 0, 15"/>
-
-                                <dxcv:DXCollectionView x:Name="InvoicesCollectionView_5"
-                                        Grid.Row="17"
-                                        Grid.Column="0" 
-                                        Grid.ColumnSpan="2"
-                                        ItemsSource="{Binding Visits}"
-                                        IsRefreshing="{Binding  IsBusy, Mode=OneWay}" HeightRequest="{Binding VisitHeight}">
-                                    <dxcv:DXCollectionView.ItemTemplate>
-                                        <DataTemplate>
-                                            <dx:DXStackLayout CornerRadius="15">
-                                                <Grid
-                                                    x:DataType="models:ViewTempDtoReporteCierre"
-                                                    Padding="2"
-                                                    BackgroundColor="White">
-
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="auto" />
-                                                    </Grid.RowDefinitions>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="auto" />
-                                                        <ColumnDefinition Width="1.2*" />
-                                                        <ColumnDefinition Width="auto" />
-                                                        <ColumnDefinition Width="auto" />
-                                                    </Grid.ColumnDefinitions>
-
-                                                    <Label Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2"
-                                                           FontAttributes="Bold"
-                                                           TextColor="Black"
-                                                           FontSize="11"
-                                                           Text="{Binding ClientName}" 
-                                                           HorizontalTextAlignment="Start" />
-
-                                                    <HorizontalStackLayout Grid.Column="3" Grid.Row="1">
-                                                        <Label Text="{Binding Date}"
-                                                           TextColor="Black"
-                                                           HorizontalOptions="Start" 
-                                                           HorizontalTextAlignment="End" />
-                                                    </HorizontalStackLayout>
-                                                </Grid>
-                                            </dx:DXStackLayout>
-                                        </DataTemplate>
-
-                                    </dxcv:DXCollectionView.ItemTemplate>
-                                </dxcv:DXCollectionView>
+                        <!-- Date Filter -->
+                        <Border StrokeShape="RoundRectangle 12"
+                                StrokeThickness="0"
+                                BackgroundColor="{StaticResource CardColor}"
+                                Padding="16"
+                                Margin="0,0,0,12"
+                                IsVisible="{Binding IsVisibleDate}">
+                            <Border.Shadow>
+                                <Shadow Brush="{StaticResource Gray300}" Offset="0,2" Radius="8" Opacity="0.3" />
+                            </Border.Shadow>
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                                <dxe:DateEdit x:Name="fechaInicio"
+                                    DisplayFormat="d" StartIcon="editorscalendar"
+                                    IconColor="{StaticResource Primary}"
+                                    LabelText="Fecha Inicio" Grid.Column="0"
+                                    Date="{Binding FechaInical}" />
+                                <dxe:DateEdit x:Name="fechaFinal"
+                                    DisplayFormat="d" StartIcon="editorscalendar"
+                                    IconColor="{StaticResource Primary}"
+                                    LabelText="Fecha Final" Grid.Column="1"
+                                    Date="{Binding FechaFinal}" />
                             </Grid>
-                        </dx:DXStackLayout>
+                        </Border>
+
+                        <!-- Report Content -->
+                        <VerticalStackLayout IsVisible="{Binding IsFormVisible}" Spacing="14">
+
+                            <!-- Header Card -->
+                            <Border StrokeShape="RoundRectangle 14"
+                                    StrokeThickness="0"
+                                    BackgroundColor="{StaticResource PrimaryDark}"
+                                    Padding="20,24">
+                                <Border.Shadow>
+                                    <Shadow Brush="{StaticResource Gray400}" Offset="0,4" Radius="12" Opacity="0.35" />
+                                </Border.Shadow>
+                                <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                                    <Label Text="{Binding Company.Name}"
+                                           FontSize="18" FontFamily="OpenSansSemibold"
+                                           HorizontalTextAlignment="Center" TextColor="White" />
+                                    <Label Text="REPORTE DE CIERRE"
+                                           FontSize="13" HorizontalTextAlignment="Center"
+                                           TextColor="#B0C4DE" Margin="0,6,0,0" />
+                                    <Label x:Name="reporteFecha"
+                                           Text="{Binding ReporteFecha}"
+                                           FontSize="12" HorizontalTextAlignment="Center"
+                                           TextColor="#8FAABE" />
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <!-- Facturas C$ -->
+                            <Border StrokeShape="RoundRectangle 12"
+                                    StrokeThickness="0"
+                                    BackgroundColor="{StaticResource CardColor}"
+                                    Padding="16">
+                                <Border.Shadow>
+                                    <Shadow Brush="{StaticResource Gray300}" Offset="0,2" Radius="8" Opacity="0.25" />
+                                </Border.Shadow>
+                                <VerticalStackLayout Spacing="8">
+                                    <Grid ColumnDefinitions="Auto,*">
+                                        <Border StrokeShape="RoundRectangle 6" StrokeThickness="0"
+                                                BackgroundColor="#E8F4FD" Padding="8,4"
+                                                HorizontalOptions="Start">
+                                            <Label Text="FACTURA DE CONTADO C$"
+                                                   FontSize="13" FontFamily="OpenSansSemibold"
+                                                   TextColor="{StaticResource Primary}" />
+                                        </Border>
+                                    </Grid>
+                                    <dxcv:DXCollectionView x:Name="InvoicesCollectionView_1"
+                                        ItemsSource="{Binding InvoicesNIO}"
+                                        IsRefreshing="{Binding IsBusy, Mode=OneWay}"
+                                        HeightRequest="{Binding InvoicesHeight_2}">
+                                        <dxcv:DXCollectionView.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid x:DataType="models:ViewTempDtoReporteCierre"
+                                                      Padding="4,6" ColumnDefinitions="*,Auto,Auto">
+                                                    <Label Grid.Column="0" Text="{Binding DocumentNumber}"
+                                                           FontSize="13" TextColor="{StaticResource Gray600}" />
+                                                    <Label Grid.Column="1" Text="{Binding CurrencyName}"
+                                                           FontSize="13" TextColor="{StaticResource Tertiary}"
+                                                           Margin="0,0,6,0" />
+                                                    <Label Grid.Column="2"
+                                                           Text="{Binding Remaining, StringFormat='{0:N2}'}"
+                                                           FontSize="13" FontFamily="OpenSansSemibold"
+                                                           TextColor="{StaticResource PrimaryDark}"
+                                                           HorizontalTextAlignment="End" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </dxcv:DXCollectionView.ItemTemplate>
+                                    </dxcv:DXCollectionView>
+                                    <BoxView HeightRequest="1" Color="{StaticResource Gray100}"
+                                             HorizontalOptions="Fill" />
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <Label Grid.Column="0" Text="Total" FontSize="14"
+                                               FontFamily="OpenSansSemibold"
+                                               TextColor="{StaticResource PrimaryDark}" />
+                                        <Label Grid.Column="1" Text="{Binding TotalFacturaNIO}"
+                                               FontSize="14" FontFamily="OpenSansSemibold"
+                                               TextColor="{StaticResource Primary}"
+                                               HorizontalTextAlignment="End" />
+                                    </Grid>
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <!-- Abonos C$ -->
+                            <Border StrokeShape="RoundRectangle 12"
+                                    StrokeThickness="0"
+                                    BackgroundColor="{StaticResource CardColor}"
+                                    Padding="16">
+                                <Border.Shadow>
+                                    <Shadow Brush="{StaticResource Gray300}" Offset="0,2" Radius="8" Opacity="0.25" />
+                                </Border.Shadow>
+                                <VerticalStackLayout Spacing="8">
+                                    <Grid ColumnDefinitions="Auto,*">
+                                        <Border StrokeShape="RoundRectangle 6" StrokeThickness="0"
+                                                BackgroundColor="#E6F5ED" Padding="8,4"
+                                                HorizontalOptions="Start">
+                                            <Label Text="ABONO C$"
+                                                   FontSize="13" FontFamily="OpenSansSemibold"
+                                                   TextColor="{StaticResource Secondary}" />
+                                        </Border>
+                                    </Grid>
+                                    <dxcv:DXCollectionView x:Name="InvoicesCollectionView_2"
+                                        ItemsSource="{Binding CreditsNIO}"
+                                        IsRefreshing="{Binding IsBusy, Mode=OneWay}"
+                                        HeightRequest="{Binding CreditHeight_2}">
+                                        <dxcv:DXCollectionView.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid x:DataType="models:ViewTempDtoReporteCierre"
+                                                      Padding="4,6" ColumnDefinitions="*,Auto,Auto">
+                                                    <Label Grid.Column="0" Text="{Binding DocumentNumber}"
+                                                           FontSize="13" TextColor="{StaticResource Gray600}" />
+                                                    <Label Grid.Column="1" Text="{Binding CurrencyName}"
+                                                           FontSize="13" TextColor="{StaticResource Tertiary}"
+                                                           Margin="0,0,6,0" />
+                                                    <Label Grid.Column="2"
+                                                           Text="{Binding Remaining, StringFormat='{0:N2}'}"
+                                                           FontSize="13" FontFamily="OpenSansSemibold"
+                                                           TextColor="{StaticResource PrimaryDark}"
+                                                           HorizontalTextAlignment="End" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </dxcv:DXCollectionView.ItemTemplate>
+                                    </dxcv:DXCollectionView>
+                                    <BoxView HeightRequest="1" Color="{StaticResource Gray100}"
+                                             HorizontalOptions="Fill" />
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <Label Grid.Column="0" Text="Total" FontSize="14"
+                                               FontFamily="OpenSansSemibold"
+                                               TextColor="{StaticResource PrimaryDark}" />
+                                        <Label Grid.Column="1" Text="{Binding TotalCreditoNIO}"
+                                               FontSize="14" FontFamily="OpenSansSemibold"
+                                               TextColor="{StaticResource Secondary}"
+                                               HorizontalTextAlignment="End" />
+                                    </Grid>
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <!-- Facturas $ -->
+                            <Border StrokeShape="RoundRectangle 12"
+                                    StrokeThickness="0"
+                                    BackgroundColor="{StaticResource CardColor}"
+                                    Padding="16">
+                                <Border.Shadow>
+                                    <Shadow Brush="{StaticResource Gray300}" Offset="0,2" Radius="8" Opacity="0.25" />
+                                </Border.Shadow>
+                                <VerticalStackLayout Spacing="8">
+                                    <Grid ColumnDefinitions="Auto,*">
+                                        <Border StrokeShape="RoundRectangle 6" StrokeThickness="0"
+                                                BackgroundColor="#E8F4FD" Padding="8,4"
+                                                HorizontalOptions="Start">
+                                            <Label Text="FACTURA DE CONTADO $"
+                                                   FontSize="13" FontFamily="OpenSansSemibold"
+                                                   TextColor="{StaticResource Primary}" />
+                                        </Border>
+                                    </Grid>
+                                    <dxcv:DXCollectionView x:Name="InvoicesCollectionView_3"
+                                        ItemsSource="{Binding InvoicesUS}"
+                                        IsRefreshing="{Binding IsBusy, Mode=OneWay}"
+                                        HeightRequest="{Binding InvoicesHeight}">
+                                        <dxcv:DXCollectionView.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid x:DataType="models:ViewTempDtoReporteCierre"
+                                                      Padding="4,6" ColumnDefinitions="*,Auto,Auto">
+                                                    <Label Grid.Column="0" Text="{Binding DocumentNumber}"
+                                                           FontSize="13" TextColor="{StaticResource Gray600}" />
+                                                    <Label Grid.Column="1" Text="{Binding CurrencyName}"
+                                                           FontSize="13" TextColor="{StaticResource Tertiary}"
+                                                           Margin="0,0,6,0" />
+                                                    <Label Grid.Column="2"
+                                                           Text="{Binding Remaining, StringFormat='{0:N2}'}"
+                                                           FontSize="13" FontFamily="OpenSansSemibold"
+                                                           TextColor="{StaticResource PrimaryDark}"
+                                                           HorizontalTextAlignment="End" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </dxcv:DXCollectionView.ItemTemplate>
+                                    </dxcv:DXCollectionView>
+                                    <BoxView HeightRequest="1" Color="{StaticResource Gray100}"
+                                             HorizontalOptions="Fill" />
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <Label Grid.Column="0" Text="Total" FontSize="14"
+                                               FontFamily="OpenSansSemibold"
+                                               TextColor="{StaticResource PrimaryDark}" />
+                                        <Label Grid.Column="1" Text="{Binding TotalFactura}"
+                                               FontSize="14" FontFamily="OpenSansSemibold"
+                                               TextColor="{StaticResource Primary}"
+                                               HorizontalTextAlignment="End" />
+                                    </Grid>
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <!-- Abonos $ -->
+                            <Border StrokeShape="RoundRectangle 12"
+                                    StrokeThickness="0"
+                                    BackgroundColor="{StaticResource CardColor}"
+                                    Padding="16">
+                                <Border.Shadow>
+                                    <Shadow Brush="{StaticResource Gray300}" Offset="0,2" Radius="8" Opacity="0.25" />
+                                </Border.Shadow>
+                                <VerticalStackLayout Spacing="8">
+                                    <Grid ColumnDefinitions="Auto,*">
+                                        <Border StrokeShape="RoundRectangle 6" StrokeThickness="0"
+                                                BackgroundColor="#E6F5ED" Padding="8,4"
+                                                HorizontalOptions="Start">
+                                            <Label Text="ABONO $"
+                                                   FontSize="13" FontFamily="OpenSansSemibold"
+                                                   TextColor="{StaticResource Secondary}" />
+                                        </Border>
+                                    </Grid>
+                                    <dxcv:DXCollectionView x:Name="InvoicesCollectionView_4"
+                                        ItemsSource="{Binding CreditsUS}"
+                                        IsRefreshing="{Binding IsBusy, Mode=OneWay}"
+                                        HeightRequest="{Binding CreditHeight}">
+                                        <dxcv:DXCollectionView.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid x:DataType="models:ViewTempDtoReporteCierre"
+                                                      Padding="4,6" ColumnDefinitions="*,Auto,Auto">
+                                                    <Label Grid.Column="0" Text="{Binding DocumentNumber}"
+                                                           FontSize="13" TextColor="{StaticResource Gray600}" />
+                                                    <Label Grid.Column="1" Text="{Binding CurrencyName}"
+                                                           FontSize="13" TextColor="{StaticResource Tertiary}"
+                                                           Margin="0,0,6,0" />
+                                                    <Label Grid.Column="2"
+                                                           Text="{Binding Remaining, StringFormat='{0:N2}'}"
+                                                           FontSize="13" FontFamily="OpenSansSemibold"
+                                                           TextColor="{StaticResource PrimaryDark}"
+                                                           HorizontalTextAlignment="End" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </dxcv:DXCollectionView.ItemTemplate>
+                                    </dxcv:DXCollectionView>
+                                    <BoxView HeightRequest="1" Color="{StaticResource Gray100}"
+                                             HorizontalOptions="Fill" />
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <Label Grid.Column="0" Text="Total" FontSize="14"
+                                               FontFamily="OpenSansSemibold"
+                                               TextColor="{StaticResource PrimaryDark}" />
+                                        <Label Grid.Column="1" Text="{Binding TotalCredito}"
+                                               FontSize="14" FontFamily="OpenSansSemibold"
+                                               TextColor="{StaticResource Secondary}"
+                                               HorizontalTextAlignment="End" />
+                                    </Grid>
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <!-- Totales Generales -->
+                            <Border StrokeShape="RoundRectangle 12"
+                                    StrokeThickness="0"
+                                    BackgroundColor="{StaticResource CardColor}"
+                                    Padding="16,20">
+                                <Border.Shadow>
+                                    <Shadow Brush="{StaticResource Gray300}" Offset="0,3" Radius="10" Opacity="0.3" />
+                                </Border.Shadow>
+                                <VerticalStackLayout Spacing="10">
+                                    <Label Text="RESUMEN GENERAL"
+                                           FontSize="13" FontFamily="OpenSansSemibold"
+                                           TextColor="{StaticResource Tertiary}"
+                                           HorizontalTextAlignment="Center" />
+                                    <BoxView HeightRequest="1" Color="{StaticResource Gray100}"
+                                             HorizontalOptions="Fill" />
+                                    <Grid ColumnDefinitions="*,Auto" Padding="4,0">
+                                        <Label Grid.Column="0" Text="Total C$"
+                                               FontSize="16" FontFamily="OpenSansSemibold"
+                                               TextColor="{StaticResource PrimaryDark}" />
+                                        <Label Grid.Column="1" Text="{Binding TotalNIO}"
+                                               FontSize="16" FontFamily="OpenSansSemibold"
+                                               TextColor="{StaticResource Primary}"
+                                               HorizontalTextAlignment="End" />
+                                    </Grid>
+                                    <Grid ColumnDefinitions="*,Auto" Padding="4,0">
+                                        <Label Grid.Column="0" Text="Total $"
+                                               FontSize="16" FontFamily="OpenSansSemibold"
+                                               TextColor="{StaticResource PrimaryDark}" />
+                                        <Label Grid.Column="1" Text="{Binding TotalUSD}"
+                                               FontSize="16" FontFamily="OpenSansSemibold"
+                                               TextColor="{StaticResource Primary}"
+                                               HorizontalTextAlignment="End" />
+                                    </Grid>
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <!-- Visitas -->
+                            <Border StrokeShape="RoundRectangle 12"
+                                    StrokeThickness="0"
+                                    BackgroundColor="{StaticResource CardColor}"
+                                    Padding="16">
+                                <Border.Shadow>
+                                    <Shadow Brush="{StaticResource Gray300}" Offset="0,2" Radius="8" Opacity="0.25" />
+                                </Border.Shadow>
+                                <VerticalStackLayout Spacing="8">
+                                    <Grid ColumnDefinitions="Auto,*">
+                                        <Border StrokeShape="RoundRectangle 6" StrokeThickness="0"
+                                                BackgroundColor="#FFF3E0" Padding="8,4"
+                                                HorizontalOptions="Start">
+                                            <Label Text="VISITAS"
+                                                   FontSize="13" FontFamily="OpenSansSemibold"
+                                                   TextColor="#E65100" />
+                                        </Border>
+                                    </Grid>
+                                    <dxcv:DXCollectionView x:Name="InvoicesCollectionView_5"
+                                        ItemsSource="{Binding Visits}"
+                                        IsRefreshing="{Binding IsBusy, Mode=OneWay}"
+                                        HeightRequest="{Binding VisitHeight}">
+                                        <dxcv:DXCollectionView.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid x:DataType="models:ViewTempDtoReporteCierre"
+                                                      Padding="4,6" ColumnDefinitions="*,Auto">
+                                                    <Label Grid.Column="0" Text="{Binding ClientName}"
+                                                           FontSize="13" TextColor="{StaticResource Gray600}"
+                                                           LineBreakMode="TailTruncation" />
+                                                    <Label Grid.Column="1" Text="{Binding Date}"
+                                                           FontSize="12" TextColor="{StaticResource Tertiary}"
+                                                           HorizontalTextAlignment="End" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </dxcv:DXCollectionView.ItemTemplate>
+                                    </dxcv:DXCollectionView>
+                                </VerticalStackLayout>
+                            </Border>
+
+                        </VerticalStackLayout>
                     </dx:DXStackLayout>
                 </ScrollView>
             </controls:ShimmerView.Content>
-            
-           
-            
         </controls:ShimmerView>
     </ContentPage.Content>
 </ContentPage>
