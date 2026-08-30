@@ -55,12 +55,14 @@
                                 <dxcv:DXCollectionView.ItemTemplate>
                                     <DataTemplate>
                                         <dxc:DXStackLayout
-                                            CornerRadius="15"
-                                            Margin="10">
+                                            CornerRadius="12"
+                                            Margin="8,4">
                                             <Grid x:DataType="models:Api_AppMobileApi_GetDataDownloadItemsResponse"
                                                   HorizontalOptions="Fill"
-                                                  Padding="10"
+                                                  Padding="12"
                                                   VerticalOptions="Fill"
+                                                  ColumnSpacing="10"
+                                                  RowSpacing="4"
                                                   BackgroundColor="{StaticResource Primary}">
                                                 <Grid.RowDefinitions>
                                                     <RowDefinition Height="Auto" />
@@ -70,49 +72,82 @@
                                                 </Grid.RowDefinitions>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="Auto" />
-                                                    <ColumnDefinition Width="1.5*" />
+                                                    <ColumnDefinition Width="*" />
                                                     <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
 
-                                                <Frame
-                                                    WidthRequest="60"
-                                                    HeightRequest="60"
-                                                    BackgroundColor="Transparent"
+                                                <!-- Icono del producto -->
+                                                <Border
+                                                    StrokeShape="RoundRectangle 8"
+                                                    Stroke="Transparent"
+                                                    BackgroundColor="#33FFFFFF"
+                                                    WidthRequest="52"
+                                                    HeightRequest="52"
+                                                    Padding="6"
                                                     Grid.Column="0"
-                                                    Grid.RowSpan="3">
-                                                    <dxc:DXImage WidthRequest="55"
-                                                                 HeightRequest="55"
+                                                    Grid.RowSpan="4"
+                                                    VerticalOptions="Center">
+                                                    <dxc:DXImage WidthRequest="40"
+                                                                 HeightRequest="40"
                                                                  Source="package_item.svg"
-                                                                 Aspect="Fill" />
-                                                </Frame>
-                                                <Label Grid.Column="1" Grid.Row="0" FontAttributes="Bold"
+                                                                 Aspect="AspectFit" />
+                                                </Border>
+
+                                                <!-- Nombre del producto -->
+                                                <Label Grid.Column="1" Grid.Row="0"
                                                        Grid.ColumnSpan="2"
+                                                       FontAttributes="Bold"
+                                                       FontSize="15"
                                                        TextColor="White"
+                                                       LineBreakMode="TailTruncation"
+                                                       Text="{Binding Name}" />
+
+                                                <!-- Código de barra -->
+                                                <Label Grid.Column="1" Grid.Row="1"
+                                                       FontSize="13"
+                                                       TextColor="#CCFFFFFF"
                                                        Text="{Binding BarCode}" />
-                                                <HorizontalStackLayout Grid.Column="1" Grid.Row="1">
-                                                    <Label
-                                                        HorizontalOptions="Start">
-                                                        <Label.FormattedText>
-                                                            <FormattedString>
-                                                                <Span Text="{Binding ItemNumber}"
-                                                                      TextColor="White" />
-                                                            </FormattedString>
-                                                        </Label.FormattedText>
-                                                    </Label>
-                                                </HorizontalStackLayout>
-                                                <HorizontalStackLayout Grid.Column="2" Grid.Row="1">
-                                                    <Label Text="Precio: C$ " TextColor="White" />
-                                                    <Label
-                                                        HorizontalOptions="End"
-                                                        Text="{Binding PrecioPublico}" TextColor="White" />
-                                                </HorizontalStackLayout>
-                                                <HorizontalStackLayout Grid.Row="2"
-                                                                       Grid.Column="1"
-                                                                       Grid.ColumnSpan="2">
-                                                    <Label TextColor="White"
+
+                                                <!-- Número de artículo -->
+                                                <Label Grid.Column="2" Grid.Row="1"
+                                                       FontSize="13"
+                                                       TextColor="#CCFFFFFF"
+                                                       HorizontalOptions="End"
+                                                       Text="{Binding ItemNumber}" />
+
+                                                <!-- Precio -->
+                                                <HorizontalStackLayout Grid.Column="1" Grid.Row="2">
+                                                    <Label Text="Precio: "
+                                                           FontSize="13"
+                                                           TextColor="#CCFFFFFF" />
+                                                    <Label Text="{Binding PrecioPublico, StringFormat='C$ {0:N2}'}"
+                                                           FontSize="14"
                                                            FontAttributes="Bold"
-                                                           Text="{Binding Name}" />
+                                                           TextColor="White" />
                                                 </HorizontalStackLayout>
+
+                                                <!-- Existencia -->
+                                                <Border Grid.Column="2" Grid.Row="2"
+                                                        Grid.RowSpan="2"
+                                                        StrokeShape="RoundRectangle 8"
+                                                        Stroke="Transparent"
+                                                        BackgroundColor="#33FFFFFF"
+                                                        Padding="8,4"
+                                                        VerticalOptions="Center"
+                                                        HorizontalOptions="End">
+                                                    <VerticalStackLayout HorizontalOptions="Center">
+                                                        <Label Text="Existencia"
+                                                               FontSize="10"
+                                                               TextColor="#CCFFFFFF"
+                                                               HorizontalTextAlignment="Center" />
+                                                        <Label Text="{Binding CantidadFinal, StringFormat='{0:N2}'}"
+                                                               FontSize="16"
+                                                               FontAttributes="Bold"
+                                                               TextColor="White"
+                                                               HorizontalTextAlignment="Center" />
+                                                    </VerticalStackLayout>
+                                                </Border>
+
                                                 <Grid.GestureRecognizers>
                                                     <TapGestureRecognizer
                                                         NumberOfTapsRequired="1"

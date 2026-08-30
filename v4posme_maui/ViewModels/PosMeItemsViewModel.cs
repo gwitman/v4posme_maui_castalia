@@ -15,6 +15,7 @@ namespace v4posme_maui.ViewModels
     public class PosMeItemsViewModel : BaseViewModel
     {
         private readonly IRepositoryItems _repositoryItems;
+        private readonly IRepositoryTbTransactionMasterDetail _transactionMasterDetail;
 		private readonly HelperCore _helper;
         private int _loadBatchSize = 15;
         private int _lastLoadedIndex;
@@ -25,6 +26,7 @@ namespace v4posme_maui.ViewModels
         {
             IsBusy = true;
             _repositoryItems = VariablesGlobales.UnityContainer.Resolve<IRepositoryItems>();
+            _transactionMasterDetail = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMasterDetail>();
 			_helper = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
 			Title = "Productos";
             _items = new DXObservableCollection<Api_AppMobileApi_GetDataDownloadItemsResponse>();
@@ -110,7 +112,18 @@ namespace v4posme_maui.ViewModels
                     
                     newItems = await _repositoryItems.PosMeFilterdByItemNumberAndBarCodeAndNameByTop(Search, _lastLoadedIndex, _loadBatchSize);
                 }
-				
+
+                foreach (var item in newItems)
+                {
+                    var details = await _transactionMasterDetail.PosMeByTransactionIDAndItemID(
+                        (int)TypeTransaction.TransactionInvoiceBilling, item.ItemId);
+                    decimal cantidadFacturadas = details is null
+                        ? 0
+                        : Convert.ToDecimal(details.Where(p => p.RegisterLocal == 1).Sum(p => p.Quantity));
+                    item.CantidadFacturadas = cantidadFacturadas;
+                    item.CantidadFinal = (item.Quantity + item.CantidadEntradas) - (item.CantidadSalidas + cantidadFacturadas);
+                }
+
                 Items.AddRange(newItems);
                 IsBusy = false;
             });
