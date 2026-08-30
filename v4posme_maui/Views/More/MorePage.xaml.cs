@@ -20,15 +20,12 @@ public partial class MorePage : ContentPage
 		base.OnAppearing();
 	}
 
-	private async void OnButtonClicked(object sender, EventArgs e)
+	private async void OnCardTapped(object sender, TappedEventArgs e)
 	{
-		if (sender is not Button button) return;
-		var parameter = button.CommandParameter;
-		if (parameter is null)
-		{
-			return;
-		}
-		switch (parameter.ToString())
+		var parameter = e.Parameter?.ToString();
+		if (string.IsNullOrEmpty(parameter)) return;
+
+		switch (parameter)
 		{
 			case "1":
 				await Navigation.PushAsync(new ReporteVentaPage());
@@ -39,9 +36,9 @@ public partial class MorePage : ContentPage
 			case "3":
 				await Navigation.PushAsync(new ProductosRetornosPage());
 				break;
-            case "4":
-                await Navigation.PushAsync(new ProductosVendidosPage());
-                break;
+			case "4":
+				await Navigation.PushAsync(new ProductosVendidosPage());
+				break;
 		}
 	}
 }

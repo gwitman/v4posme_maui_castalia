@@ -2,102 +2,193 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="v4posme_maui.Views.More.MorePage"
-             xmlns:dxco="clr-namespace:DevExpress.Maui.Controls;assembly=DevExpress.Maui.Controls"
              xmlns:dx="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
-             Title="Mas">
+             Title="Más opciones"
+             BackgroundColor="{StaticResource PageBackground}">
 
-    <StackLayout Orientation="Vertical">
-        <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
-            <!-- Botón a la izquierda -->
-            <Button Text="Cierre"
-                    BackgroundColor="#3498db"
-                    TextColor="White"
-                    Padding="10,10"
-                    Margin="0, 20,10, 0"
-                    WidthRequest="150"
-                    HeightRequest="50"
-                    HorizontalOptions="EndAndExpand"
-                    Clicked="OnButtonClicked"
-                    CommandParameter="1">
+    <ScrollView Padding="16,20">
+        <Grid ColumnDefinitions="*,*"
+              RowDefinitions="Auto,Auto"
+              ColumnSpacing="14"
+              RowSpacing="14">
 
-                <Button.ImageSource>
-                    <FileImageSource File="invoice_white.svg"/>
-                </Button.ImageSource>
-            </Button>
+            <!-- Movimiento en mobile -->
+            <Border Grid.Row="0" Grid.Column="0"
+                    StrokeShape="RoundRectangle 14"
+                    StrokeThickness="0"
+                    BackgroundColor="{StaticResource CardColor}"
+                    Padding="0"
+                    HeightRequest="170">
+                <Border.Shadow>
+                    <Shadow Brush="{StaticResource Gray300}"
+                            Offset="0,4"
+                            Radius="12"
+                            Opacity="0.4" />
+                </Border.Shadow>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnCardTapped" CommandParameter="1" />
+                </Border.GestureRecognizers>
+                <Grid RowDefinitions="Auto,*,Auto" Padding="16,20,16,16">
+                    <Border Grid.Row="0"
+                            StrokeShape="RoundRectangle 12"
+                            StrokeThickness="0"
+                            BackgroundColor="#E8F4FD"
+                            WidthRequest="48"
+                            HeightRequest="48"
+                            HorizontalOptions="Start">
+                        <Image Source="invoice_white.svg"
+                               WidthRequest="24"
+                               HeightRequest="24"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+                    </Border>
+                    <Label Grid.Row="1"
+                           Text="Venta "
+                           FontFamily="OpenSansSemibold"
+                           FontSize="15"
+                           TextColor="{StaticResource PrimaryDark}"
+                           VerticalOptions="End"
+                           Margin="0,12,0,0" />
+                    <Label Grid.Row="2"
+                           Text="En el mobile"
+                           FontSize="12"
+                           TextColor="{StaticResource Tertiary}" />
+                </Grid>
+            </Border>
 
-            <!-- Botón a la derecha -->
-            <Button Text="Visita"
-                    BackgroundColor="#e74c3c"
-                    TextColor="White"
-                    Padding="10,10"
-                    Margin="0,20,10,0"
-                    WidthRequest="150"
-                    HeightRequest="50"
-                    HorizontalOptions="StartAndExpand"
-                    Clicked="OnButtonClicked"
-                    CommandParameter="2">
-                <Button.ImageSource>
-                    <FileImageSource File="person_white.svg" />
-                </Button.ImageSource>
-            </Button>
-        </StackLayout>
+            <!-- Visita en mobile -->
+            <Border Grid.Row="0" Grid.Column="1"
+                    StrokeShape="RoundRectangle 14"
+                    StrokeThickness="0"
+                    BackgroundColor="{StaticResource CardColor}"
+                    Padding="0"
+                    HeightRequest="170">
+                <Border.Shadow>
+                    <Shadow Brush="{StaticResource Gray300}"
+                            Offset="0,4"
+                            Radius="12"
+                            Opacity="0.4" />
+                </Border.Shadow>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnCardTapped" CommandParameter="2" />
+                </Border.GestureRecognizers>
+                <Grid RowDefinitions="Auto,*,Auto" Padding="16,20,16,16">
+                    <Border Grid.Row="0"
+                            StrokeShape="RoundRectangle 12"
+                            StrokeThickness="0"
+                            BackgroundColor="#FDECEE"
+                            WidthRequest="48"
+                            HeightRequest="48"
+                            HorizontalOptions="Start">
+                        <Image Source="person_white.svg"
+                               WidthRequest="24"
+                               HeightRequest="24"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+                    </Border>
+                    <Label Grid.Row="1"
+                           Text="Visitas"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="15"
+                           TextColor="{StaticResource PrimaryDark}"
+                           VerticalOptions="End"
+                           Margin="0,12,0,0" />
+                    <Label Grid.Row="2"
+                           Text="En el mobile"
+                           FontSize="12"
+                           TextColor="{StaticResource Tertiary}" />
+                </Grid>
+            </Border>
 
-        <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
-            <!-- Botón a la izquierda -->
-            <Button Text="Inventario"
-            BackgroundColor="{StaticResource PrimaryDark}"
-            TextColor="White"
-            Padding="10,10"
-            Margin="0, 20,10, 0"
-            WidthRequest="150"
-            HeightRequest="50"
-            HorizontalOptions="EndAndExpand"
-            Clicked="OnButtonClicked"
-            CommandParameter="3">
-                <Button.ImageSource>
-                    <FileImageSource File="productos_retorno.svg"/>
-                </Button.ImageSource>
-            </Button>
+            <!-- Inventario en mobile -->
+            <Border Grid.Row="1" Grid.Column="0"
+                    StrokeShape="RoundRectangle 14"
+                    StrokeThickness="0"
+                    BackgroundColor="{StaticResource CardColor}"
+                    Padding="0"
+                    HeightRequest="170">
+                <Border.Shadow>
+                    <Shadow Brush="{StaticResource Gray300}"
+                            Offset="0,4"
+                            Radius="12"
+                            Opacity="0.4" />
+                </Border.Shadow>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnCardTapped" CommandParameter="3" />
+                </Border.GestureRecognizers>
+                <Grid RowDefinitions="Auto,*,Auto" Padding="16,20,16,16">
+                    <Border Grid.Row="0"
+                            StrokeShape="RoundRectangle 12"
+                            StrokeThickness="0"
+                            BackgroundColor="#E6F5ED"
+                            WidthRequest="48"
+                            HeightRequest="48"
+                            HorizontalOptions="Start">
+                        <Image Source="productos_retorno.svg"
+                               WidthRequest="24"
+                               HeightRequest="24"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+                    </Border>
+                    <Label Grid.Row="1"
+                           Text="Inventario"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="15"
+                           TextColor="{StaticResource PrimaryDark}"
+                           VerticalOptions="End"
+                           Margin="0,12,0,0" />
+                    <Label Grid.Row="2"
+                           Text="En el mobile"
+                           FontSize="12"
+                           TextColor="{StaticResource Tertiary}" />
+                </Grid>
+            </Border>
 
-            <!-- Botón a la derecha -->
-            <Button Text="Vendidos"
-            BackgroundColor="#e74c3c"
-            TextColor="White"
-            Padding="10,10"
-            Margin="0,20,10,0"
-            WidthRequest="150"
-            HeightRequest="50"
-            HorizontalOptions="StartAndExpand"
-            Clicked="OnButtonClicked"
-            CommandParameter="4">
-                <Button.ImageSource>
-                    <FileImageSource File="productos_retorno.svg" />
-                </Button.ImageSource>
-            </Button>
-        </StackLayout>
+            <!-- Productos vendidos -->
+            <Border Grid.Row="1" Grid.Column="1"
+                    StrokeShape="RoundRectangle 14"
+                    StrokeThickness="0"
+                    BackgroundColor="{StaticResource CardColor}"
+                    Padding="0"
+                    HeightRequest="170">
+                <Border.Shadow>
+                    <Shadow Brush="{StaticResource Gray300}"
+                            Offset="0,4"
+                            Radius="12"
+                            Opacity="0.4" />
+                </Border.Shadow>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnCardTapped" CommandParameter="4" />
+                </Border.GestureRecognizers>
+                <Grid RowDefinitions="Auto,*,Auto" Padding="16,20,16,16">
+                    <Border Grid.Row="0"
+                            StrokeShape="RoundRectangle 12"
+                            StrokeThickness="0"
+                            BackgroundColor="#FFF3E0"
+                            WidthRequest="48"
+                            HeightRequest="48"
+                            HorizontalOptions="Start">
+                        <Image Source="productos_retorno.svg"
+                               WidthRequest="24"
+                               HeightRequest="24"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+                    </Border>
+                    <Label Grid.Row="1"
+                           Text="Prod. vendidos"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="15"
+                           TextColor="{StaticResource PrimaryDark}"
+                           VerticalOptions="End"
+                           Margin="0,12,0,0" />
+                    <Label Grid.Row="2"
+                           Text="En el mobile"
+                           FontSize="12"
+                           TextColor="{StaticResource Tertiary}" />
+                </Grid>
+            </Border>
 
+        </Grid>
+    </ScrollView>
 
-
-        <!--
-        <StackLayout Orientation="Vertical" HorizontalOptions="FillAndExpand" VerticalOptions="StartAndExpand">
-            <Button Text="Productos"
-                    
-                    BackgroundColor="{StaticResource PrimaryDark}"
-                    TextColor="White"
-                    Padding="10,10"
-                    Margin="0, 20,10, 0"
-                    WidthRequest="150"
-                    HeightRequest="50"
-                    HorizontalOptions="Center"
-                    Clicked="OnButtonClicked"
-                    CommandParameter="3">
-
-                <Button.ImageSource>
-                    <FileImageSource File="productos_retorno.svg"/>
-                </Button.ImageSource>
-            </Button>
-        </StackLayout>
-        -->
-        
-    </StackLayout>
 </ContentPage>
