@@ -149,14 +149,20 @@ public class SeleccionarProductoViewModel : BaseViewModel
             var find = cestaArticulos.FirstOrDefault(response => response.ItemNumber == obj.ItemNumber);
             if (find is not null)
             {
-                ShowToast(Mensajes.MensajeProductoYaAgregado, ToastDuration.Short, 12);
-                return;
+                find.Quantity       += decimal.One;
+                find.Importe        = find.PrecioPublico * find.Quantity;
+                find.MontoDescuento = find.PorcentajeDescuento > 0 
+                    ? find.Importe * (find.PorcentajeDescuento / 100m) 
+                    : find.MontoDescuento;
             }
-            obj.TransactionMasterDetailID   = transactionMasterDetailID;
-            obj.Quantity                    = decimal.One;
-            obj.Importe                     = obj.PrecioPublico;
-            obj.MontoDescuento              = 0m;
-            cestaArticulos.Add(obj);
+            else
+            {
+                obj.TransactionMasterDetailID   = transactionMasterDetailID;
+                obj.Quantity                    = decimal.One;
+                obj.Importe                     = obj.PrecioPublico;
+                obj.MontoDescuento              = 0m;
+                cestaArticulos.Add(obj);
+            }
         }
 
         VariablesGlobales.DtoInvoice.Balance    = VariablesGlobales.DtoInvoice.Items.Sum(response => response.Importe) - VariablesGlobales.DtoInvoice.Items.Sum(response => response.MontoDescuento);
