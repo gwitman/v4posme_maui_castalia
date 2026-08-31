@@ -31,6 +31,7 @@ public class SeleccionarProductoViewModel : BaseViewModel
         SearchCommand           = new Command(OnSearch);
         ProductosSeleccionadosCommand = new Command(OnRevisarProductos);
         LoadMoreCommand         = new Command(OnLoadMore);
+        QuitarProductoCommand   = new Command<Api_AppMobileApi_GetDataDownloadItemsResponse>(OnQuitarProducto);
     }
 
     private async void OnRevisarProductos(object obj)
@@ -171,6 +172,37 @@ public class SeleccionarProductoViewModel : BaseViewModel
         ProductosSeleccionadosCantidadTotal     = $"{VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada} Items = {VariablesGlobales.DtoInvoice.Balance}";
     }
 
+    private void OnQuitarProducto(Api_AppMobileApi_GetDataDownloadItemsResponse? obj)
+    {
+        if (obj is null) return;
+
+        var cestaArticulos  = VariablesGlobales.DtoInvoice.Items;
+        var find            = cestaArticulos.FirstOrDefault(response => response.ItemNumber == obj.ItemNumber);
+        if (find is null) return;
+
+        if (find.Quantity > decimal.One)
+        {
+            find.Quantity       -= decimal.One;
+            find.Importe        = find.PrecioPublico * find.Quantity;
+            find.MontoDescuento = find.PorcentajeDescuento > 0
+                ? find.Importe * (find.PorcentajeDescuento / 100m)
+                : find.MontoDescuento;
+        }
+        else
+        {
+            cestaArticulos.Remove(find);
+        }
+
+        VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada  = cestaArticulos.Count;
+        VariablesGlobales.DtoInvoice.Balance                    = cestaArticulos.Sum(r => r.Importe) - cestaArticulos.Sum(r => r.MontoDescuento);
+        ProductosSeleccionadosCantidad                          = cestaArticulos.Count > 0
+            ? $"Enviar {VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada} Items"
+            : "Seleccionar Productos";
+        ProductosSeleccionadosCantidadTotal                     = cestaArticulos.Count > 0
+            ? $"{VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada} Items = {VariablesGlobales.DtoInvoice.Balance}"
+            : "Items";
+    }
+
     private async void LoadProductos()
     {
         var valueTop = await _helper.GetValueParameter("MOBILE_SHOW_TOP_ITEMS", "10");
@@ -223,6 +255,7 @@ public class SeleccionarProductoViewModel : BaseViewModel
     public Command SearchCommand { get; }
     public Command SearchBarCodeCommand { get; }
     public Command LoadMoreCommand { get; }
+    public Command<Api_AppMobileApi_GetDataDownloadItemsResponse> QuitarProductoCommand { get; }
     private bool _isPanelVisible;
 
     public bool IsPanelVisible

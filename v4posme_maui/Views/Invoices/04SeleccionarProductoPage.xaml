@@ -71,99 +71,109 @@
                             ItemSeparatorThickness="0">
                             <dxcv:DXCollectionView.ItemTemplate>
                                 <DataTemplate>
-                                    <dx:DXBorder
-                                        Margin="12,6"
-                                        Padding="12"
-                                        CornerRadius="12"
-                                        BorderThickness="0"
-                                        BackgroundColor="{StaticResource White}">
-                                        <dx:DXBorder.Shadow>
-                                            <Shadow Brush="{StaticResource Gray300Brush}"
-                                                    Offset="0,2"
-                                                    Radius="6"
-                                                    Opacity="0.35" />
-                                        </dx:DXBorder.Shadow>
-                                        <dx:DXBorder.GestureRecognizers>
-                                            <TapGestureRecognizer
-                                                Command="{Binding BindingContext.AnadirProducto, Source={x:Reference ProductosCollectionView}}"
-                                                CommandParameter="{Binding .}" />
-                                        </dx:DXBorder.GestureRecognizers>
-                                        <Grid ColumnSpacing="12">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="56" />
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="Auto" />
-                                            </Grid.RowDefinitions>
+                                    <SwipeView>
+                                        <SwipeView.LeftItems>
+                                            <SwipeItems Mode="Execute">
+                                                <SwipeItem Text="Quitar"
+                                                           BackgroundColor="#E53935"
+                                                           Command="{Binding BindingContext.QuitarProductoCommand, Source={x:Reference ProductosCollectionView}}"
+                                                           CommandParameter="{Binding .}" />
+                                            </SwipeItems>
+                                        </SwipeView.LeftItems>
+                                        <dx:DXBorder
+                                            Margin="12,6"
+                                            Padding="12"
+                                            CornerRadius="12"
+                                            BorderThickness="0"
+                                            BackgroundColor="{StaticResource White}">
+                                            <dx:DXBorder.Shadow>
+                                                <Shadow Brush="{StaticResource Gray300Brush}"
+                                                        Offset="0,2"
+                                                        Radius="6"
+                                                        Opacity="0.35" />
+                                            </dx:DXBorder.Shadow>
+                                            <dx:DXBorder.GestureRecognizers>
+                                                <TapGestureRecognizer
+                                                    Command="{Binding BindingContext.AnadirProducto, Source={x:Reference ProductosCollectionView}}"
+                                                    CommandParameter="{Binding .}" />
+                                            </dx:DXBorder.GestureRecognizers>
+                                            <Grid ColumnSpacing="12">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="56" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                </Grid.RowDefinitions>
 
-                                            <!-- Icono del producto -->
-                                            <dx:DXBorder
-                                                Grid.Column="0"
-                                                Grid.RowSpan="2"
-                                                WidthRequest="48"
-                                                HeightRequest="48"
-                                                CornerRadius="10"
-                                                BackgroundColor="{StaticResource PageBackground}"
-                                                BorderThickness="0"
-                                                VerticalOptions="Center">
-                                                <dx:DXImage
-                                                    Source="products_50x"
-                                                    WidthRequest="28"
-                                                    HeightRequest="28"
-                                                    TintColor="{StaticResource Primary}"
-                                                    HorizontalOptions="Center"
-                                                    VerticalOptions="Center" />
-                                            </dx:DXBorder>
+                                                <!-- Icono del producto -->
+                                                <dx:DXBorder
+                                                    Grid.Column="0"
+                                                    Grid.RowSpan="2"
+                                                    WidthRequest="48"
+                                                    HeightRequest="48"
+                                                    CornerRadius="10"
+                                                    BackgroundColor="{StaticResource PageBackground}"
+                                                    BorderThickness="0"
+                                                    VerticalOptions="Center">
+                                                    <dx:DXImage
+                                                        Source="products_50x"
+                                                        WidthRequest="28"
+                                                        HeightRequest="28"
+                                                        TintColor="{StaticResource Primary}"
+                                                        HorizontalOptions="Center"
+                                                        VerticalOptions="Center" />
+                                                </dx:DXBorder>
 
-                                            <!-- Nombre del producto en minúsculas -->
-                                            <Label
-                                                Grid.Column="1"
-                                                Grid.Row="0"
-                                                Text="{Binding Name, Converter={StaticResource ToLowerConverter}}"
-                                                FontSize="15"
-                                                FontFamily="OpenSansRegular"
-                                                LineBreakMode="TailTruncation"
-                                                MaxLines="2"
-                                                VerticalOptions="End" />
-
-                                            <!-- Código del producto -->
-                                            <Label
-                                                Grid.Column="1"
-                                                Grid.Row="1"
-                                                Text="{Binding ItemNumber}"
-                                                FontSize="12"
-                                                TextColor="{StaticResource Gray400}"
-                                                VerticalOptions="Start" />
-
-                                            <!-- Precio -->
-                                            <StackLayout
-                                                Grid.Column="2"
-                                                Grid.RowSpan="2"
-                                                VerticalOptions="Center"
-                                                HorizontalOptions="End"
-                                                Spacing="2">
+                                                <!-- Nombre del producto en minúsculas -->
                                                 <Label
-                                                    HorizontalTextAlignment="End"
-                                                    FontSize="16"
-                                                    FontAttributes="Bold"
-                                                    TextColor="{StaticResource Primary}">
-                                                    <Label.FormattedText>
-                                                        <FormattedString>
-                                                            <Span Text="{Binding MonedaSimbolo}"
-                                                                  FontSize="12"
-                                                                  FontAttributes="None"
-                                                                  TextColor="{StaticResource Gray400}" />
-                                                            <Span Text=" " />
-                                                            <Span Text="{Binding PrecioPublico, StringFormat='{0:N2}'}" />
-                                                        </FormattedString>
-                                                    </Label.FormattedText>
-                                                </Label>
-                                            </StackLayout>
-                                        </Grid>
-                                    </dx:DXBorder>
+                                                    Grid.Column="1"
+                                                    Grid.Row="0"
+                                                    Text="{Binding Name, Converter={StaticResource ToLowerConverter}}"
+                                                    FontSize="15"
+                                                    FontFamily="OpenSansRegular"
+                                                    LineBreakMode="TailTruncation"
+                                                    MaxLines="2"
+                                                    VerticalOptions="End" />
+
+                                                <!-- Código del producto -->
+                                                <Label
+                                                    Grid.Column="1"
+                                                    Grid.Row="1"
+                                                    Text="{Binding ItemNumber}"
+                                                    FontSize="12"
+                                                    TextColor="{StaticResource Gray400}"
+                                                    VerticalOptions="Start" />
+
+                                                <!-- Precio -->
+                                                <StackLayout
+                                                    Grid.Column="2"
+                                                    Grid.RowSpan="2"
+                                                    VerticalOptions="Center"
+                                                    HorizontalOptions="End"
+                                                    Spacing="2">
+                                                    <Label
+                                                        HorizontalTextAlignment="End"
+                                                        FontSize="16"
+                                                        FontAttributes="Bold"
+                                                        TextColor="{StaticResource Primary}">
+                                                        <Label.FormattedText>
+                                                            <FormattedString>
+                                                                <Span Text="{Binding MonedaSimbolo}"
+                                                                      FontSize="12"
+                                                                      FontAttributes="None"
+                                                                      TextColor="{StaticResource Gray400}" />
+                                                                <Span Text=" " />
+                                                                <Span Text="{Binding PrecioPublico, StringFormat='{0:N2}'}" />
+                                                            </FormattedString>
+                                                        </Label.FormattedText>
+                                                    </Label>
+                                                </StackLayout>
+                                            </Grid>
+                                        </dx:DXBorder>
+                                    </SwipeView>
                                 </DataTemplate>
                             </dxcv:DXCollectionView.ItemTemplate>
                         </dxcv:DXCollectionView>
