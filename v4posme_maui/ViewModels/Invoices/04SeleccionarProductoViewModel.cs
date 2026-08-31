@@ -15,30 +15,25 @@ public class SeleccionarProductoViewModel : BaseViewModel
 {
     private readonly IRepositoryItems _repositoryItems;
     private readonly HelperCore _helper;
-    private int _loadBatchSize = 10;
-    private int _lastLoadedIndex;
-    private bool _hasMoreItems = true;
-    private bool _isLoadingMore;
 
     public SeleccionarProductoViewModel()
     {
-        Title                   = "Seleccionar producto 4/6";
-        Productos               = new();
-        _repositoryItems        = VariablesGlobales.UnityContainer.Resolve<IRepositoryItems>();
-        AnadirProducto          = new Command<Api_AppMobileApi_GetDataDownloadItemsResponse>(OnAnadirProducto);
-        _helper                 = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
-        SearchBarCodeCommand    = new Command(OnSearchBarCode);
-        SearchCommand           = new Command(OnSearch);
+        Title                         = "Seleccionar producto 4/6";
+        Productos                     = new();
+        _repositoryItems              = VariablesGlobales.UnityContainer.Resolve<IRepositoryItems>();
+        AnadirProducto                = new Command<Api_AppMobileApi_GetDataDownloadItemsResponse>(OnAnadirProducto);
+        _helper                       = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
+        SearchBarCodeCommand          = new Command(OnSearchBarCode);
+        SearchCommand                 = new Command(OnSearch);
         ProductosSeleccionadosCommand = new Command(OnRevisarProductos);
-        LoadMoreCommand         = new Command(OnLoadMore);
-        QuitarProductoCommand   = new Command<Api_AppMobileApi_GetDataDownloadItemsResponse>(OnQuitarProducto);
+        QuitarProductoCommand         = new Command<Api_AppMobileApi_GetDataDownloadItemsResponse>(OnQuitarProducto);
     }
 
     private async void OnRevisarProductos(object obj)
     {
-        if (VariablesGlobales.DtoInvoice.Items.Count<=0)
+        if (VariablesGlobales.DtoInvoice.Items.Count <= 0)
         {
-            ShowToast(Mensajes.MensajeSeleccionarProductos, ToastDuration.Long,12);
+            ShowToast(Mensajes.MensajeSeleccionarProductos, ToastDuration.Long, 12);
             return;
         }
         try
@@ -56,7 +51,7 @@ public class SeleccionarProductoViewModel : BaseViewModel
         }
     }
 
-    private void OnSearch()
+    private async void OnSearch()
     {
         if (string.IsNullOrWhiteSpace(Search))
         {
@@ -64,52 +59,35 @@ public class SeleccionarProductoViewModel : BaseViewModel
             return;
         }
 
-        IsPanelVisible      = !IsPanelVisible;
-        _lastLoadedIndex    = 0;
-        _hasMoreItems       = true;
-        Productos.Clear();
-        LoadProductosBatch();
+        IsPanelVisible = !IsPanelVisible;
+        await LoadAllProductosAsync();
     }
 
-    private void OnLoadMore()
+    private async Task LoadAllProductosAsync()
     {
-        if (_isLoadingMore || !_hasMoreItems) return;
-        _isLoadingMore = true;
-        LoadProductosBatch();
-    }
-
-    private async void LoadProductosBatch()
-    {
+        IsBusy = true;
         try
         {
-            var items = await Task.Run(async () =>
+            List<Api_AppMobileApi_GetDataDownloadItemsResponse> items;
+
+            if (string.IsNullOrWhiteSpace(Search))
             {
-                await Task.Delay(1000);
-                List<Api_AppMobileApi_GetDataDownloadItemsResponse> result;
-
-                if (string.IsNullOrWhiteSpace(Search))
-                {
-                    result = await _repositoryItems.PosMeAscBySizeAndTop(_lastLoadedIndex, _loadBatchSize);
-                }
-                else
-                {
-                    result = await _repositoryItems.PosMeFilterdByItemNumberAndBarCodeAndNameByTop(Search, _lastLoadedIndex, _loadBatchSize);
-                }
-
-                return result;
-            });
-
-            if (items.Count < _loadBatchSize)
-            {
-                _hasMoreItems = false;
+                items = await _repositoryItems.PosMeFindAll();
             }
+            else
+            {
+                items = await _repositoryItems.PosMeFilterdByItemNumberAndBarCodeAndName(Search);
+            }
+
+            items = items.OrderBy(i => i.Name).ToList();
 
             foreach (var item in items)
             {
+                item.Name          = item.Name?.ToLower();
                 item.MonedaSimbolo = VariablesGlobales.DtoInvoice.Currency!.Simbolo;
             }
 
-            _lastLoadedIndex += items.Count;
+            Productos.Clear();
             Productos.AddRange(items);
         }
         catch (Exception ex)
@@ -118,40 +96,32 @@ public class SeleccionarProductoViewModel : BaseViewModel
         }
         finally
         {
-            _isLoadingMore = false;
             IsBusy = false;
         }
     }
 
-
     private async void OnSearchBarCode()
     {
-        var barCodePage     = new BarCodePage();
+        var barCodePage = new BarCodePage();
         await Navigation!.PushModalAsync(barCodePage);
-        var bar             = await barCodePage.WaitForResultAsync();
-        Search              = bar!;
-        IsPanelVisible      = !IsPanelVisible;
+        var bar         = await barCodePage.WaitForResultAsync();
+        Search          = bar!;
+        IsPanelVisible  = !IsPanelVisible;
     }
 
     private async void OnAnadirProducto(Api_AppMobileApi_GetDataDownloadItemsResponse? obj)
     {
-        if (obj is null)
+        if (obj is null) return;
+
+        var permitirRepetidos         = await _helper.GetValueParameter("MOBILE_ALLOW_REPEATED_PRODUCTS", "false");
+        var cestaArticulos            = VariablesGlobales.DtoInvoice.Items;
+        var transactionMasterDetailID = _helper.GetTimestampId();
+
+        if (permitirRepetidos == "true")
         {
-            return;
-        }
-
-        var permitirRepetidos           = await _helper.GetValueParameter("MOBILE_ALLOW_REPEATED_PRODUCTS", "false");
-        var cestaArticulos              = VariablesGlobales.DtoInvoice.Items;
-        var transactionMasterDetailID   = _helper.GetTimestampId();
-
-
-        if ( (permitirRepetidos == "true")  )
-        {
-            // Agregar siempre como nueva línea independiente (clonar el ítem)
             var nuevo = new Api_AppMobileApi_GetDataDownloadItemsResponse
             {
-                TransactionMasterDetailID 
-                                    = transactionMasterDetailID,
+                TransactionMasterDetailID = transactionMasterDetailID,
                 ItemPk              = obj.ItemPk,
                 ItemId              = obj.ItemId,
                 BarCode             = obj.BarCode,
@@ -175,32 +145,32 @@ public class SeleccionarProductoViewModel : BaseViewModel
             {
                 find.Quantity       += decimal.One;
                 find.Importe        = find.PrecioPublico * find.Quantity;
-                find.MontoDescuento = find.PorcentajeDescuento > 0 
-                    ? find.Importe * (find.PorcentajeDescuento / 100m) 
+                find.MontoDescuento = find.PorcentajeDescuento > 0
+                    ? find.Importe * (find.PorcentajeDescuento / 100m)
                     : find.MontoDescuento;
             }
             else
             {
-                obj.TransactionMasterDetailID   = transactionMasterDetailID;
-                obj.Quantity                    = decimal.One;
-                obj.Importe                     = obj.PrecioPublico;
-                obj.MontoDescuento              = 0m;
+                obj.TransactionMasterDetailID = transactionMasterDetailID;
+                obj.Quantity                  = decimal.One;
+                obj.Importe                   = obj.PrecioPublico;
+                obj.MontoDescuento            = 0m;
                 cestaArticulos.Add(obj);
             }
         }
 
-        VariablesGlobales.DtoInvoice.Balance    = VariablesGlobales.DtoInvoice.Items.Sum(response => response.Importe) - VariablesGlobales.DtoInvoice.Items.Sum(response => response.MontoDescuento);
+        VariablesGlobales.DtoInvoice.Balance = cestaArticulos.Sum(r => r.Importe) - cestaArticulos.Sum(r => r.MontoDescuento);
         VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada++;
-        ProductosSeleccionadosCantidad          = $"Enviar {VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada} Items";
-        ProductosSeleccionadosCantidadTotal     = $"{VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada} Items = {VariablesGlobales.DtoInvoice.Balance}";
+        ProductosSeleccionadosCantidad      = $"Enviar {VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada} Items";
+        ProductosSeleccionadosCantidadTotal = $"{VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada} Items = {VariablesGlobales.DtoInvoice.Balance}";
     }
 
     private void OnQuitarProducto(Api_AppMobileApi_GetDataDownloadItemsResponse? obj)
     {
         if (obj is null) return;
 
-        var cestaArticulos  = VariablesGlobales.DtoInvoice.Items;
-        var find            = cestaArticulos.FirstOrDefault(response => response.ItemNumber == obj.ItemNumber);
+        var cestaArticulos = VariablesGlobales.DtoInvoice.Items;
+        var find           = cestaArticulos.FirstOrDefault(response => response.ItemNumber == obj.ItemNumber);
         if (find is null) return;
 
         if (find.Quantity > decimal.One)
@@ -216,51 +186,31 @@ public class SeleccionarProductoViewModel : BaseViewModel
             cestaArticulos.Remove(find);
         }
 
-        VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada  = cestaArticulos.Count;
-        VariablesGlobales.DtoInvoice.Balance                    = cestaArticulos.Sum(r => r.Importe) - cestaArticulos.Sum(r => r.MontoDescuento);
-        ProductosSeleccionadosCantidad                          = cestaArticulos.Count > 0
+        VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada = cestaArticulos.Count;
+        VariablesGlobales.DtoInvoice.Balance = cestaArticulos.Sum(r => r.Importe) - cestaArticulos.Sum(r => r.MontoDescuento);
+        ProductosSeleccionadosCantidad = cestaArticulos.Count > 0
             ? $"Enviar {VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada} Items"
             : "Seleccionar Productos";
-        ProductosSeleccionadosCantidadTotal                     = cestaArticulos.Count > 0
+        ProductosSeleccionadosCantidadTotal = cestaArticulos.Count > 0
             ? $"{VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada} Items = {VariablesGlobales.DtoInvoice.Balance}"
             : "Items";
     }
 
-    private async void LoadProductos()
-    {
-        IsBusy = true;
-        try
-        {
-            var valueTop = await _helper.GetValueParameter("MOBILE_SHOW_TOP_ITEMS", "10");
-            _loadBatchSize = int.Parse(valueTop);
-            _lastLoadedIndex = 0;
-            _hasMoreItems = true;
-            Productos.Clear();
-            LoadProductosBatch();
-
-            if (VariablesGlobales.DtoInvoice.Items.Count > 0)
-            {
-                ProductosSeleccionadosCantidad      = $"Enviar {VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada} Items";
-                ProductosSeleccionadosCantidadTotal = $"{VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada} Items = {VariablesGlobales.DtoInvoice.Balance}";
-            }
-        }
-        catch (Exception ex)
-        {
-            ShowToast($"Error al iniciar carga: {ex.Message}", ToastDuration.Long, 12);
-            IsBusy = false;
-        }
-    }
-
-    public void OnAppearing(INavigation navigation)
+    public async void OnAppearing(INavigation navigation)
     {
         Navigation = navigation;
-        LoadProductos();
+        await LoadAllProductosAsync();
+
+        if (VariablesGlobales.DtoInvoice.Items.Count > 0)
+        {
+            ProductosSeleccionadosCantidad      = $"Enviar {VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada} Items";
+            ProductosSeleccionadosCantidadTotal = $"{VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada} Items = {VariablesGlobales.DtoInvoice.Balance}";
+        }
     }
 
     public DXObservableCollection<Api_AppMobileApi_GetDataDownloadItemsResponse> Productos { get; }
 
     private string _productosSeleccionadosCantidadTotal = "Items";
-
     public string ProductosSeleccionadosCantidadTotal
     {
         get => _productosSeleccionadosCantidadTotal;
@@ -268,7 +218,6 @@ public class SeleccionarProductoViewModel : BaseViewModel
     }
 
     private string _productosSeleccionadosCantidad = "Seleccionar Productos";
-
     public string ProductosSeleccionadosCantidad
     {
         get => _productosSeleccionadosCantidad;
@@ -276,7 +225,6 @@ public class SeleccionarProductoViewModel : BaseViewModel
     }
 
     private int _cantidad;
-
     public int Cantidad
     {
         get => _cantidad;
@@ -286,10 +234,9 @@ public class SeleccionarProductoViewModel : BaseViewModel
     public Command AnadirProducto { get; }
     public Command SearchCommand { get; }
     public Command SearchBarCodeCommand { get; }
-    public Command LoadMoreCommand { get; }
     public Command<Api_AppMobileApi_GetDataDownloadItemsResponse> QuitarProductoCommand { get; }
-    private bool _isPanelVisible;
 
+    private bool _isPanelVisible;
     public bool IsPanelVisible
     {
         get => _isPanelVisible;

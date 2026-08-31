@@ -66,8 +66,6 @@
                             Grid.Row="1"
                             x:Name="ProductosCollectionView"
                             ItemsSource="{Binding Productos}"
-                            IsLoadMoreEnabled="True"
-                            LoadMoreCommand="{Binding LoadMoreCommand}"
                             ItemSeparatorThickness="0">
                             <dxcv:DXCollectionView.ItemTemplate>
                                 <DataTemplate>
