@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+﻿﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Maui.Core;
 using DevExpress.Maui.Core;
 using DevExpress.Maui.Core.Internal;
@@ -41,9 +41,19 @@ public class SeleccionarProductoViewModel : BaseViewModel
             ShowToast(Mensajes.MensajeSeleccionarProductos, ToastDuration.Long,12);
             return;
         }
-        IsBusy = true;
-        await NavigationService.NavigateToAsync<RevisarProductosSeleccionadosViewModel>();
-        IsBusy = false;
+        try
+        {
+            IsBusy = true;
+            await NavigationService.NavigateToAsync<RevisarProductosSeleccionadosViewModel>();
+        }
+        catch (Exception ex)
+        {
+            ShowToast($"Error al navegar: {ex.Message}", ToastDuration.Long, 12);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     private void OnSearch()
@@ -70,19 +80,24 @@ public class SeleccionarProductoViewModel : BaseViewModel
 
     private async void LoadProductosBatch()
     {
-        await Task.Run(async () =>
+        try
         {
-            Thread.Sleep(1000);
-            List<Api_AppMobileApi_GetDataDownloadItemsResponse> items;
+            var items = await Task.Run(async () =>
+            {
+                await Task.Delay(1000);
+                List<Api_AppMobileApi_GetDataDownloadItemsResponse> result;
 
-            if (string.IsNullOrWhiteSpace(Search))
-            {
-                items = await _repositoryItems.PosMeAscBySizeAndTop(_lastLoadedIndex, _loadBatchSize);
-            }
-            else
-            {
-                items = await _repositoryItems.PosMeFilterdByItemNumberAndBarCodeAndNameByTop(Search, _lastLoadedIndex, _loadBatchSize);
-            }
+                if (string.IsNullOrWhiteSpace(Search))
+                {
+                    result = await _repositoryItems.PosMeAscBySizeAndTop(_lastLoadedIndex, _loadBatchSize);
+                }
+                else
+                {
+                    result = await _repositoryItems.PosMeFilterdByItemNumberAndBarCodeAndNameByTop(Search, _lastLoadedIndex, _loadBatchSize);
+                }
+
+                return result;
+            });
 
             if (items.Count < _loadBatchSize)
             {
@@ -96,10 +111,18 @@ public class SeleccionarProductoViewModel : BaseViewModel
 
             _lastLoadedIndex += items.Count;
             Productos.AddRange(items);
+        }
+        catch (Exception ex)
+        {
+            ShowToast($"Error al cargar productos: {ex.Message}", ToastDuration.Long, 12);
+        }
+        finally
+        {
             _isLoadingMore = false;
             IsBusy = false;
-        });
+        }
     }
+
 
     private async void OnSearchBarCode()
     {
@@ -205,17 +228,26 @@ public class SeleccionarProductoViewModel : BaseViewModel
 
     private async void LoadProductos()
     {
-        var valueTop = await _helper.GetValueParameter("MOBILE_SHOW_TOP_ITEMS", "10");
-        _loadBatchSize = int.Parse(valueTop);
-        _lastLoadedIndex = 0;
-        _hasMoreItems = true;
-        Productos.Clear();
-        LoadProductosBatch();
-
-        if (VariablesGlobales.DtoInvoice.Items.Count > 0)
+        IsBusy = true;
+        try
         {
-            ProductosSeleccionadosCantidad      = $"Enviar {VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada} Items";
-            ProductosSeleccionadosCantidadTotal = $"{VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada} Items = {VariablesGlobales.DtoInvoice.Balance}";
+            var valueTop = await _helper.GetValueParameter("MOBILE_SHOW_TOP_ITEMS", "10");
+            _loadBatchSize = int.Parse(valueTop);
+            _lastLoadedIndex = 0;
+            _hasMoreItems = true;
+            Productos.Clear();
+            LoadProductosBatch();
+
+            if (VariablesGlobales.DtoInvoice.Items.Count > 0)
+            {
+                ProductosSeleccionadosCantidad      = $"Enviar {VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada} Items";
+                ProductosSeleccionadosCantidadTotal = $"{VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada} Items = {VariablesGlobales.DtoInvoice.Balance}";
+            }
+        }
+        catch (Exception ex)
+        {
+            ShowToast($"Error al iniciar carga: {ex.Message}", ToastDuration.Long, 12);
+            IsBusy = false;
         }
     }
 
