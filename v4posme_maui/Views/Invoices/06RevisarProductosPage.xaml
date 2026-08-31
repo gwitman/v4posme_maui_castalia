@@ -3,352 +3,404 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:invoices="clr-namespace:v4posme_maui.ViewModels.Invoices"
+             xmlns:converters="clr-namespace:v4posme_maui.Services.Converters"
              Title="{Binding Title}"
              xmlns:dxc="clr-namespace:DevExpress.Maui.Controls;assembly=DevExpress.Maui.Controls"
              xmlns:collectionView="clr-namespace:DevExpress.Maui.CollectionView;assembly=DevExpress.Maui.CollectionView"
              xmlns:dx="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
-             xmlns:dataGrid="clr-namespace:DevExpress.Maui.DataGrid;assembly=DevExpress.Maui.DataGrid"
+             BackgroundColor="{StaticResource PageBackground}"
              x:Class="v4posme_maui.Views.Invoices.RevisarProductosSeleccionadosPage">
 
     <ContentPage.BindingContext>
         <invoices:RevisarProductosSeleccionadosViewModel />
     </ContentPage.BindingContext>
+    <ContentPage.Resources>
+        <converters:ToLowerConverter x:Key="ToLowerConverter" />
+    </ContentPage.Resources>
     <ContentPage.Content>
         <dxc:ShimmerView
             Style="{StaticResource ShimmerEffect}"
             IsLoading="{Binding IsBusy}">
             <dxc:ShimmerView.Content>
-                <AbsoluteLayout>
-                    <Grid
-                        AbsoluteLayout.LayoutFlags="All"
-                        AbsoluteLayout.LayoutBounds="0, 0, 1, 1">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                        <ScrollView Grid.Row="0">
-                            <collectionView:DXCollectionView
-                                x:Name="CollectionView"
-                                TapCommand="{Binding TapCommandProducto}"
-                                SelectedItem="{Binding SelectedItem}"
-                                SelectionMode="Single"
-                                ItemsSource="{Binding ProductosSeleccionados}">
-                                <collectionView:DXCollectionView.ItemTemplate>
-                                    <DataTemplate>
-                                        <StackLayout>
-                                            <Grid
-                                                Padding="15"
-                                                HeightRequest="50">
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="Auto" />
-                                                </Grid.RowDefinitions>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="35" />
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="80" />
-                                                    <ColumnDefinition Width="80" />
-                                                </Grid.ColumnDefinitions>
-                                                <dx:DXStackLayout
-                                                    Grid.Row="0"
-                                                    Grid.Column="0"
-                                                    Orientation="Horizontal">
-                                                    <Label
-                                                        FontSize="14"
-                                                        Text="{Binding Quantity}">
-                                                        <Label.Triggers>
-                                                            <DataTrigger TargetType="Label"
-                                                                         Binding="{Binding IsSelected}"
-                                                                         Value="True">
-                                                                <Setter Property="TextColor" Value="White" />
-                                                            </DataTrigger>
-                                                            <DataTrigger TargetType="Label"
-                                                                         Binding="{Binding IsSelected}"
-                                                                         Value="False">
-                                                                <Setter Property="TextColor" Value="Black" />
-                                                            </DataTrigger>
-                                                        </Label.Triggers>
-                                                    </Label>
-                                                    <Label
-                                                        FontSize="12"
-                                                        TextColor="{StaticResource Gray300}"
-                                                        Text="x">
-                                                        <Label.Triggers>
-                                                            <DataTrigger TargetType="Label"
-                                                                         Binding="{Binding IsSelected}"
-                                                                         Value="True">
-                                                                <Setter Property="TextColor" Value="White" />
-                                                            </DataTrigger>
-                                                            <DataTrigger TargetType="Label"
-                                                                         Binding="{Binding IsSelected}"
-                                                                         Value="False">
-                                                                <Setter Property="TextColor" Value="Black" />
-                                                            </DataTrigger>
-                                                        </Label.Triggers>
-                                                    </Label>
-                                                </dx:DXStackLayout>
-                                                <Label
-                                                    Grid.Row="0"
-                                                    Grid.Column="1"
-                                                    FontSize="14"
-                                                    Text="{Binding Name}">
-                                                    <Label.Triggers>
-                                                        <DataTrigger TargetType="Label" Binding="{Binding IsSelected}"
-                                                                     Value="True">
-                                                            <Setter Property="TextColor" Value="White" />
-                                                        </DataTrigger>
-                                                        <DataTrigger TargetType="Label" Binding="{Binding IsSelected}"
-                                                                     Value="False">
-                                                            <Setter Property="TextColor" Value="Black" />
-                                                        </DataTrigger>
-                                                    </Label.Triggers>
-                                                </Label>
-                                                <Label
-                                                    Grid.Row="0"
-                                                    Grid.Column="2"
-                                                    FontSize="14">
-                                                    <Label.FormattedText>
-                                                        <FormattedString>
-                                                            <Span Text="{Binding MonedaSimbolo}" />
-                                                            <Span Text=" " />
-                                                            <Span Text="{Binding Importe}" />
-                                                        </FormattedString>
-                                                    </Label.FormattedText>
-                                                    <Label.Triggers>
-                                                        <DataTrigger TargetType="Label" Binding="{Binding IsSelected}"
-                                                                     Value="True">
-                                                            <Setter Property="TextColor" Value="White" />
-                                                        </DataTrigger>
-                                                        <DataTrigger TargetType="Label" Binding="{Binding IsSelected}"
-                                                                     Value="False">
-                                                            <Setter Property="TextColor" Value="Black" />
-                                                        </DataTrigger>
-                                                    </Label.Triggers>
-                                                </Label>
-                                                <Label
-                                                    Grid.Row="0"
-                                                    Grid.Column="3"
-                                                    FontSize="12"
-                                                    TextColor="Red">
-                                                    <Label.FormattedText>
-                                                        <FormattedString>
-                                                            <Span Text="-" />
-                                                            <Span Text="{Binding MonedaSimbolo}" />
-                                                            <Span Text=" " />
-                                                            <Span Text="{Binding MontoDescuento}" />
-                                                        </FormattedString>
-                                                    </Label.FormattedText>
-                                                    <Label.Triggers>
-                                                        <DataTrigger TargetType="Label" Binding="{Binding IsSelected}"
-                                                                     Value="True">
-                                                            <Setter Property="TextColor" Value="White" />
-                                                        </DataTrigger>
-                                                    </Label.Triggers>
-                                                </Label>
-                                                <Grid.Triggers>
-                                                    <DataTrigger TargetType="Grid"
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Lista de productos seleccionados -->
+                    <collectionView:DXCollectionView
+                        Grid.Row="0"
+                        x:Name="CollectionView"
+                        TapCommand="{Binding TapCommandProducto}"
+                        SelectedItem="{Binding SelectedItem}"
+                        SelectionMode="Single"
+                        ItemSeparatorThickness="0"
+                        ItemsSource="{Binding ProductosSeleccionados}">
+                        <collectionView:DXCollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <StackLayout Spacing="0">
+                                    <!-- Card del producto -->
+                                    <dx:DXBorder
+                                        Margin="12,6"
+                                        Padding="14"
+                                        CornerRadius="12"
+                                        BorderThickness="0"
+                                        BackgroundColor="{StaticResource White}">
+                                        <dx:DXBorder.Shadow>
+                                            <Shadow Brush="{StaticResource Gray300Brush}"
+                                                    Offset="0,2"
+                                                    Radius="6"
+                                                    Opacity="0.35" />
+                                        </dx:DXBorder.Shadow>
+                                        <dx:DXBorder.Triggers>
+                                            <DataTrigger TargetType="dx:DXBorder"
+                                                         Binding="{Binding IsSelected}"
+                                                         Value="True">
+                                                <Setter Property="BackgroundColor"
+                                                        Value="{StaticResource Primary}" />
+                                            </DataTrigger>
+                                        </dx:DXBorder.Triggers>
+                                        <Grid ColumnSpacing="10" RowSpacing="4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+
+                                            <!-- Badge cantidad -->
+                                            <dx:DXBorder
+                                                Grid.Column="0"
+                                                Grid.RowSpan="2"
+                                                WidthRequest="40"
+                                                HeightRequest="40"
+                                                CornerRadius="10"
+                                                BackgroundColor="{StaticResource PageBackground}"
+                                                BorderThickness="0"
+                                                VerticalOptions="Center">
+                                                <dx:DXBorder.Triggers>
+                                                    <DataTrigger TargetType="dx:DXBorder"
                                                                  Binding="{Binding IsSelected}"
                                                                  Value="True">
-                                                        <Setter Property="BackgroundColor"
-                                                                Value="{StaticResource SecondaryDarkText}" />
+                                                        <Setter Property="BackgroundColor" Value="#FFFFFF30" />
                                                     </DataTrigger>
-                                                </Grid.Triggers>
-                                            </Grid>
-                                            <dx:DXSeparator SideMargin="0"
-                                                            BackgroundColor="{StaticResource Primary}" />
-                                            <ContentView
-                                                Padding="0"
+                                                </dx:DXBorder.Triggers>
+                                                <Label
+                                                    Text="{Binding Quantity, StringFormat='{0:0.##}'}"
+                                                    FontSize="14"
+                                                    FontAttributes="Bold"
+                                                    TextColor="{StaticResource Primary}"
+                                                    HorizontalOptions="Center"
+                                                    VerticalOptions="Center">
+                                                    <Label.Triggers>
+                                                        <DataTrigger TargetType="Label"
+                                                                     Binding="{Binding IsSelected}"
+                                                                     Value="True">
+                                                            <Setter Property="TextColor" Value="White" />
+                                                        </DataTrigger>
+                                                    </Label.Triggers>
+                                                </Label>
+                                            </dx:DXBorder>
+
+                                            <!-- Nombre del producto -->
+                                            <Label
+                                                Grid.Column="1"
+                                                Grid.Row="0"
+                                                Text="{Binding Name, Converter={StaticResource ToLowerConverter}}"
+                                                FontSize="14"
+                                                FontFamily="OpenSansRegular"
+                                                LineBreakMode="TailTruncation"
+                                                MaxLines="2"
+                                                VerticalOptions="End"
+                                                TextColor="Black">
+                                                <Label.Triggers>
+                                                    <DataTrigger TargetType="Label"
+                                                                 Binding="{Binding IsSelected}"
+                                                                 Value="True">
+                                                        <Setter Property="TextColor" Value="White" />
+                                                    </DataTrigger>
+                                                </Label.Triggers>
+                                            </Label>
+
+                                            <!-- Precio unitario -->
+                                            <Label
+                                                Grid.Column="1"
+                                                Grid.Row="1"
+                                                FontSize="12"
+                                                TextColor="{StaticResource Gray400}"
+                                                VerticalOptions="Start">
+                                                <Label.FormattedText>
+                                                    <FormattedString>
+                                                        <Span Text="{Binding MonedaSimbolo}" />
+                                                        <Span Text=" " />
+                                                        <Span Text="{Binding PrecioPublico, StringFormat='{0:N2}'}" />
+                                                        <Span Text=" c/u" />
+                                                    </FormattedString>
+                                                </Label.FormattedText>
+                                                <Label.Triggers>
+                                                    <DataTrigger TargetType="Label"
+                                                                 Binding="{Binding IsSelected}"
+                                                                 Value="True">
+                                                        <Setter Property="TextColor" Value="#FFFFFFB0" />
+                                                    </DataTrigger>
+                                                </Label.Triggers>
+                                            </Label>
+
+                                            <!-- Importe total -->
+                                            <Label
+                                                Grid.Column="2"
+                                                Grid.Row="0"
+                                                HorizontalTextAlignment="End"
+                                                FontSize="15"
+                                                FontAttributes="Bold"
+                                                TextColor="{StaticResource Primary}"
+                                                VerticalOptions="End">
+                                                <Label.FormattedText>
+                                                    <FormattedString>
+                                                        <Span Text="{Binding MonedaSimbolo}"
+                                                              FontSize="11"
+                                                              FontAttributes="None" />
+                                                        <Span Text=" " />
+                                                        <Span Text="{Binding Importe, StringFormat='{0:N2}'}" />
+                                                    </FormattedString>
+                                                </Label.FormattedText>
+                                                <Label.Triggers>
+                                                    <DataTrigger TargetType="Label"
+                                                                 Binding="{Binding IsSelected}"
+                                                                 Value="True">
+                                                        <Setter Property="TextColor" Value="White" />
+                                                    </DataTrigger>
+                                                </Label.Triggers>
+                                            </Label>
+
+                                            <!-- Descuento -->
+                                            <Label
+                                                Grid.Column="2"
+                                                Grid.Row="1"
+                                                HorizontalTextAlignment="End"
+                                                FontSize="11"
+                                                TextColor="#E53935"
+                                                VerticalOptions="Start">
+                                                <Label.FormattedText>
+                                                    <FormattedString>
+                                                        <Span Text="-" />
+                                                        <Span Text="{Binding MonedaSimbolo}" />
+                                                        <Span Text=" " />
+                                                        <Span Text="{Binding MontoDescuento, StringFormat='{0:N2}'}" />
+                                                    </FormattedString>
+                                                </Label.FormattedText>
+                                            </Label>
+
+                                            <!-- Panel de acciones expandible -->
+                                            <Grid
+                                                Grid.Column="0"
+                                                Grid.ColumnSpan="3"
+                                                Grid.Row="2"
                                                 IsVisible="{Binding IsSelected}"
-                                                BackgroundColor="White">
-                                                <Grid>
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="Auto" />
-                                                    </Grid.RowDefinitions>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="*" />
-                                                    </Grid.ColumnDefinitions>
-                                                    <Grid>
-                                                        <dx:DXButton
-                                                            Command="{Binding  BindingContext.QuantityCommand, Source={x:Reference CollectionView}}"
-                                                            CommandParameter="{Binding .}"
-                                                            BorderThickness="1"
-                                                            BorderColor="{StaticResource Gray300}"
-                                                            CornerRadius="0"
-                                                            BackgroundColor="Transparent">
-                                                            <Grid RowSpacing="10">
-                                                                <Grid.RowDefinitions>
-                                                                    <RowDefinition Height="Auto" />
-                                                                    <RowDefinition Height="Auto" />
-                                                                </Grid.RowDefinitions>
-                                                                <dx:DXImage
-                                                                    HeightRequest="35"
-                                                                    WidthRequest="35"
-                                                                    Source="closed_package" />
-                                                                <Label
-                                                                    HorizontalTextAlignment="Center"
-                                                                    Text="{Binding Quantity}"
-                                                                    FontSize="12"
-                                                                    FontAttributes="Bold"
-                                                                    TextColor="{DynamicResource GridCellFontColor}"
-                                                                    Grid.Row="1" />
-                                                            </Grid>
-                                                        </dx:DXButton>
-                                                    </Grid>
-                                                    <Grid
-                                                        Grid.Column="1">
-                                                        <dx:DXButton
-                                                            Command="{Binding  BindingContext.PrecioCommand, Source={x:Reference CollectionView}}"
-                                                            CommandParameter="{Binding .}"
-                                                            BorderThickness="1"
-                                                            BorderColor="{StaticResource Gray300}"
-                                                            CornerRadius="0"
-                                                            BackgroundColor="Transparent">
-                                                            <Grid RowSpacing="10">
-                                                                <Grid.RowDefinitions>
-                                                                    <RowDefinition Height="Auto" />
-                                                                    <RowDefinition Height="Auto" />
-                                                                </Grid.RowDefinitions>
-                                                                <dx:DXImage
-                                                                    HeightRequest="35"
-                                                                    WidthRequest="35"
-                                                                    Source="dollar" />
-
-                                                                <Label
-                                                                    Grid.Row="1"
-                                                                    HorizontalOptions="Center">
-                                                                    <Label.FormattedText>
-                                                                        <FormattedString>
-                                                                            <Span Text="{Binding MonedaSimbolo}" />
-                                                                            <Span Text=" " />
-                                                                            <Span Text="{Binding PrecioPublico}" />
-                                                                        </FormattedString>
-                                                                    </Label.FormattedText>
-                                                                </Label>
-
-                                                            </Grid>
-                                                        </dx:DXButton>
-                                                    </Grid>
-                                                    <Grid
-                                                        Grid.Column="2">
-                                                        <dx:DXButton
-                                                            Command="{Binding BindingContext.DescuentoCommand, Source={x:Reference CollectionView}}"
-                                                            CommandParameter="{Binding .}"
-                                                            BorderThickness="1"
-                                                            BorderColor="{StaticResource Gray300}"
-                                                            CornerRadius="0"
-                                                            BackgroundColor="Transparent"
-                                                            IsVisible="{Binding BindingContext.MostrarDescuento, Source={x:Reference CollectionView}}">
-                                                            <Grid RowSpacing="10">
-                                                                <Grid.RowDefinitions>
-                                                                    <RowDefinition Height="Auto" />
-                                                                    <RowDefinition Height="Auto" />
-                                                                </Grid.RowDefinitions>
-                                                                <dx:DXImage
-                                                                    TintColor="Red"
-                                                                    HeightRequest="35"
-                                                                    WidthRequest="35"
-                                                                    Source="discount" />
-                                                                <Label
-                                                                    HorizontalOptions="Center"
-                                                                    Text="{Binding PorcentajeDescuento, StringFormat='{0}%'}"
-                                                                    FontSize="12"
-                                                                    FontAttributes="Bold"
-                                                                    TextColor="Red"
-                                                                    Grid.Row="1" />
-                                                            </Grid>
-                                                        </dx:DXButton>
-                                                    </Grid>
-                                                    <Grid
-                                                        Grid.Column="3">
-                                                        <dx:DXButton
-                                                            Command="{Binding BindingContext.ReferenciaCommand, Source={x:Reference CollectionView}}"
-                                                            CommandParameter="{Binding .}"
-                                                            BorderThickness="1"
-                                                            BorderColor="{StaticResource Gray300}"
-                                                            CornerRadius="0"
-                                                            BackgroundColor="Transparent">
-                                                            <Grid RowSpacing="10">
-                                                                <Grid.RowDefinitions>
-                                                                    <RowDefinition Height="Auto" />
-                                                                    <RowDefinition Height="Auto" />
-                                                                </Grid.RowDefinitions>
-                                                                <dx:DXImage
-                                                                    HeightRequest="35"
-                                                                    WidthRequest="35"
-                                                                    Source="note" />
-                                                                <Label
-                                                                    HorizontalOptions="Center"
-                                                                    Text="{Binding Referencia}"
-                                                                    FontSize="12"
-                                                                    FontAttributes="Bold"
-                                                                    TextColor="{DynamicResource GridCellFontColor}"
-                                                                    LineBreakMode="TailTruncation"
-                                                                    Grid.Row="1" />
-                                                            </Grid>
-                                                        </dx:DXButton>
-                                                    </Grid>
-                                                </Grid>
-                                            </ContentView>
-                                        </StackLayout>
-                                    </DataTemplate>
-                                </collectionView:DXCollectionView.ItemTemplate>
-                            </collectionView:DXCollectionView>
-                        </ScrollView>
-                        <dx:DXStackLayout
-                            Grid.Row="1"
-                            Orientation="Vertical">
-                            <Label
-                                FontSize="20"
-                                HorizontalOptions="End"
-                                Margin="0,0,50,0"
-                                HeightRequest="100">
-                                <Label.FormattedText>
-                                    <FormattedString>
-                                        <Span Text="TOTAL: " />
-                                        <Span Text="{Binding MonedaSimbolo}" />
-                                        <Span Text="{Binding Balance,StringFormat='{0:N2}'}" />
-                                    </FormattedString>
-                                </Label.FormattedText>
-                            </Label>
-                            <dx:DXButton
-                                Command="{Binding PagoCommand}"
-                                Margin="0,0,0,10"
-                                VerticalOptions="End">
-                                <StackLayout Orientation="Horizontal">
-                                    <Label
-                                        TextColor="White"
-                                        FontAttributes="Bold"
-                                        Text="{Binding CantidadTotalItems}" />
-                                    <Label
-                                        TextColor="White"
-                                        FontAttributes="Bold"
-                                        Text=" Items = " />
-                                    <Label
-                                        TextColor="White"
-                                        FontAttributes="Bold"
-                                        Text="{Binding MonedaSimbolo}" />
-                                    <Label
-                                        TextColor="White"
-                                        FontAttributes="Bold"
-                                        Text="{Binding Balance,StringFormat='{0:N2}'}" />
+                                                Padding="0,8,0,0"
+                                                ColumnSpacing="6">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <dx:DXButton
+                                                    Grid.Column="0"
+                                                    Command="{Binding BindingContext.QuantityCommand, Source={x:Reference CollectionView}}"
+                                                    CommandParameter="{Binding .}"
+                                                    CornerRadius="8"
+                                                    BackgroundColor="{StaticResource PageBackground}"
+                                                    Padding="6">
+                                                    <StackLayout Spacing="4">
+                                                        <dx:DXImage
+                                                            HeightRequest="26"
+                                                            WidthRequest="26"
+                                                            Source="closed_package"
+                                                            HorizontalOptions="Center" />
+                                                        <Label
+                                                            HorizontalTextAlignment="Center"
+                                                            Text="{Binding Quantity, StringFormat='{0:0.##}'}"
+                                                            FontSize="11"
+                                                            FontAttributes="Bold"
+                                                            TextColor="{StaticResource PrimaryDark}" />
+                                                    </StackLayout>
+                                                </dx:DXButton>
+                                                <dx:DXButton
+                                                    Grid.Column="1"
+                                                    Command="{Binding BindingContext.PrecioCommand, Source={x:Reference CollectionView}}"
+                                                    CommandParameter="{Binding .}"
+                                                    CornerRadius="8"
+                                                    BackgroundColor="{StaticResource PageBackground}"
+                                                    Padding="6">
+                                                    <StackLayout Spacing="4">
+                                                        <dx:DXImage
+                                                            HeightRequest="26"
+                                                            WidthRequest="26"
+                                                            Source="dollar"
+                                                            HorizontalOptions="Center" />
+                                                        <Label
+                                                            HorizontalTextAlignment="Center"
+                                                            FontSize="11"
+                                                            FontAttributes="Bold"
+                                                            TextColor="{StaticResource PrimaryDark}">
+                                                            <Label.FormattedText>
+                                                                <FormattedString>
+                                                                    <Span Text="{Binding MonedaSimbolo}" FontSize="9" />
+                                                                    <Span Text=" " />
+                                                                    <Span Text="{Binding PrecioPublico, StringFormat='{0:N2}'}" />
+                                                                </FormattedString>
+                                                            </Label.FormattedText>
+                                                        </Label>
+                                                    </StackLayout>
+                                                </dx:DXButton>
+                                                <dx:DXButton
+                                                    Grid.Column="2"
+                                                    Command="{Binding BindingContext.DescuentoCommand, Source={x:Reference CollectionView}}"
+                                                    CommandParameter="{Binding .}"
+                                                    IsVisible="{Binding BindingContext.MostrarDescuento, Source={x:Reference CollectionView}}"
+                                                    CornerRadius="8"
+                                                    BackgroundColor="{StaticResource PageBackground}"
+                                                    Padding="6">
+                                                    <StackLayout Spacing="4">
+                                                        <dx:DXImage
+                                                            TintColor="#E53935"
+                                                            HeightRequest="26"
+                                                            WidthRequest="26"
+                                                            Source="discount"
+                                                            HorizontalOptions="Center" />
+                                                        <Label
+                                                            HorizontalTextAlignment="Center"
+                                                            Text="{Binding PorcentajeDescuento, StringFormat='{0:0.##}%'}"
+                                                            FontSize="11"
+                                                            FontAttributes="Bold"
+                                                            TextColor="#E53935" />
+                                                    </StackLayout>
+                                                </dx:DXButton>
+                                                <dx:DXButton
+                                                    Grid.Column="3"
+                                                    Command="{Binding BindingContext.ReferenciaCommand, Source={x:Reference CollectionView}}"
+                                                    CommandParameter="{Binding .}"
+                                                    CornerRadius="8"
+                                                    BackgroundColor="{StaticResource PageBackground}"
+                                                    Padding="6">
+                                                    <StackLayout Spacing="4">
+                                                        <dx:DXImage
+                                                            HeightRequest="26"
+                                                            WidthRequest="26"
+                                                            Source="note"
+                                                            HorizontalOptions="Center" />
+                                                        <Label
+                                                            HorizontalTextAlignment="Center"
+                                                            Text="{Binding Referencia}"
+                                                            FontSize="11"
+                                                            FontAttributes="Bold"
+                                                            TextColor="{StaticResource PrimaryDark}"
+                                                            LineBreakMode="TailTruncation"
+                                                            MaxLines="1" />
+                                                    </StackLayout>
+                                                </dx:DXButton>
+                                            </Grid>
+                                        </Grid>
+                                    </dx:DXBorder>
                                 </StackLayout>
-                            </dx:DXButton>
+                            </DataTemplate>
+                        </collectionView:DXCollectionView.ItemTemplate>
+                    </collectionView:DXCollectionView>
+
+                    <!-- Panel inferior: total y acciones -->
+                    <dx:DXBorder
+                        Grid.Row="1"
+                        BackgroundColor="{StaticResource White}"
+                        CornerRadius="20,20,0,0"
+                        BorderThickness="0"
+                        Padding="16,14">
+                        <dx:DXBorder.Shadow>
+                            <Shadow Brush="{StaticResource Gray400Brush}"
+                                    Offset="0,-3"
+                                    Radius="10"
+                                    Opacity="0.2" />
+                        </dx:DXBorder.Shadow>
+                        <StackLayout Spacing="10">
+                            <!-- Resumen -->
+                            <dx:DXBorder
+                                Padding="14,10"
+                                CornerRadius="10"
+                                BackgroundColor="{StaticResource PageBackground}"
+                                BorderThickness="0">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Label
+                                        Grid.Column="0"
+                                        Text="TOTAL"
+                                        FontSize="15"
+                                        FontAttributes="Bold"
+                                        TextColor="{StaticResource PrimaryDark}"
+                                        VerticalOptions="Center" />
+                                    <Label
+                                        Grid.Column="1"
+                                        FontSize="18"
+                                        FontAttributes="Bold"
+                                        TextColor="{StaticResource PrimaryDark}"
+                                        VerticalOptions="Center">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="{Binding MonedaSimbolo}" FontSize="13" />
+                                                <Span Text=" " />
+                                                <Span Text="{Binding Balance, StringFormat='{0:N2}'}" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                </Grid>
+                            </dx:DXBorder>
+
+                            <!-- Botón Pago -->
                             <dx:DXButton
-                                Command="{Binding ClonarCommand}"
-                                Margin="0,0,0,10"
-                                BackgroundColor="Green"
-                                IsVisible="{Binding MostrarClonar}"
-                                VerticalOptions="End">
+                                CornerRadius="12"
+                                HeightRequest="48"
+                                Command="{Binding PagoCommand}">
                                 <Label
                                     TextColor="White"
                                     FontAttributes="Bold"
-                                    Text="Clonar Producto" />
+                                    FontSize="15"
+                                    HorizontalTextAlignment="Center">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="{Binding CantidadTotalItems}" />
+                                            <Span Text=" Items = " />
+                                            <Span Text="{Binding MonedaSimbolo}" />
+                                            <Span Text=" " />
+                                            <Span Text="{Binding Balance, StringFormat='{0:N2}'}" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
                             </dx:DXButton>
-                        </dx:DXStackLayout>
-                    </Grid>
-                </AbsoluteLayout>
+
+                            <!-- Botón Clonar -->
+                            <dx:DXButton
+                                CornerRadius="12"
+                                HeightRequest="48"
+                                BackgroundColor="#43A047"
+                                IsVisible="{Binding MostrarClonar}"
+                                Command="{Binding ClonarCommand}">
+                                <Label
+                                    Text="Clonar Producto"
+                                    TextColor="White"
+                                    FontAttributes="Bold"
+                                    FontSize="15"
+                                    HorizontalTextAlignment="Center" />
+                            </dx:DXButton>
+                        </StackLayout>
+                    </dx:DXBorder>
+                </Grid>
             </dxc:ShimmerView.Content>
             <dxc:ShimmerView.LoadingView>
                 <ActivityIndicator IsRunning="{Binding IsBusy}"
