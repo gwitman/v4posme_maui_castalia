@@ -68,17 +68,17 @@ public class RepositoryItems(DataBase dataBase)
     public Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeDescendingBySizeAndTop(int size,int take)
     {
         return _dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadItemsResponse>()
+            .OrderByDescending(response => response.ItemNumber)
             .Skip(size)
             .Take(take)
-            .OrderByDescending(response => response.ItemNumber)
             .ToListAsync();
     }
     public Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeAscBySizeAndTop(int size, int take)
     {
         return _dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadItemsResponse>()
+            .OrderBy(response => response.Name)
             .Skip(size)
             .Take(take)
-            .OrderBy(response => response.Name)
             .ToListAsync();
     }
 
