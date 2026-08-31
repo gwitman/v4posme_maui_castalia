@@ -3,194 +3,247 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:invoices="clr-namespace:v4posme_maui.ViewModels.Invoices"
+             xmlns:converters="clr-namespace:v4posme_maui.Services.Converters"
              xmlns:dx="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
              xmlns:dxc="clr-namespace:DevExpress.Maui.Controls;assembly=DevExpress.Maui.Controls"
              xmlns:dxcv="clr-namespace:DevExpress.Maui.CollectionView;assembly=DevExpress.Maui.CollectionView"
+             xmlns:dxe="clr-namespace:DevExpress.Maui.Editors;assembly=DevExpress.Maui.Editors"
              Title="{Binding Title}"
+             BackgroundColor="{StaticResource PageBackground}"
              x:Class="v4posme_maui.Views.Invoices.SeleccionarProductoPage">
     <ContentPage.BindingContext>
         <invoices:SeleccionarProductoViewModel />
     </ContentPage.BindingContext>
+    <ContentPage.Resources>
+        <converters:ToLowerConverter x:Key="ToLowerConverter" />
+    </ContentPage.Resources>
     <ContentPage.Content>
-        <dxc:ShimmerView Style="{StaticResource ShimmerEffect}" 
+        <dxc:ShimmerView Style="{StaticResource ShimmerEffect}"
                          IsLoading="{Binding IsBusy}">
             <dxc:ShimmerView.Content>
                 <AbsoluteLayout>
-                    <Grid
-                        AbsoluteLayout.LayoutFlags="All"
-                        AbsoluteLayout.LayoutBounds="0, 0, 1, 1">
+                    <Grid AbsoluteLayout.LayoutFlags="All"
+                          AbsoluteLayout.LayoutBounds="0, 0, 1, 1">
                         <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
-                        <ScrollView Grid.Row="0">
-                            <StackLayout>
-                                <dx:DXStackLayout
-                                    VerticalOptions="Start"
-                                    Orientation="Vertical">
-                                    <Grid
-                                        Margin="10,0,10,0"
-                                        Padding="5">
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="50" />
-                                        </Grid.RowDefinitions>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="0.2*" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="50" />
-                                        </Grid.ColumnDefinitions>
-                                        <dx:DXStackLayout
-                                            Grid.Column="0"
-                                            Grid.Row="0"
-                                            Orientation="Horizontal"
-                                            HorizontalOptions="Start">
-                                            <dx:DXButton
-                                                IconHeight="30"
-                                                IconWidth="30"
-                                                Style="{StaticResource SinFondoColorRedondeado}"
-                                                Command="{Binding SearchCommand}"
-                                                Icon="search" />
-                                        </dx:DXStackLayout>
-                                        <dx:DXStackLayout
-                                            Grid.Column="1"
-                                            Grid.Row="0"
-                                            Orientation="Horizontal">
-                                            <dx:DXButton
-                                                IconHeight="30"
-                                                IconWidth="30"
-                                                Style="{StaticResource SinFondoColorRedondeado}"
-                                                Icon="filter_clear" />
-                                        </dx:DXStackLayout>
-                                        <dx:DXStackLayout
-                                            Grid.Column="2"
-                                            Grid.Row="0"
-                                            HorizontalOptions="End"
-                                            Orientation="Horizontal">
-                                            <dx:DXButton
-                                                IconHeight="30"
-                                                IconWidth="30"
-                                                Style="{StaticResource SinFondoColorRedondeado}"
-                                                Command="{Binding SearchBarCodeCommand}"
-                                                Icon="barcode_scaner" />
-                                        </dx:DXStackLayout>
-                                    </Grid>
-                                    <dxcv:DXCollectionView
-                                        x:Name="ProductosCollectionView"
-                                        ItemsSource="{Binding Productos}">
-                                        <dxcv:DXCollectionView.ItemTemplate>
-                                            <DataTemplate>
-                                                <Grid
-                                                    Margin="20,5,20,5">
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="70" />
-                                                        <RowDefinition Height="Auto" />
-                                                    </Grid.RowDefinitions>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="80" />
-                                                        <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="150" />
-                                                    </Grid.ColumnDefinitions>
-                                                    <dx:DXButton
-                                                        Grid.Row="0"
-                                                        Grid.Column="0"
-                                                        CornerRadius="5"
-                                                        IconWidth="60"
-                                                        IconHeight="60"
-                                                        TextHorizontalAlignment="Center"
-                                                        Width="80"
-                                                        Command="{Binding BindingContext.AnadirProducto, Source={x:Reference ProductosCollectionView}}"
-                                                        CommandParameter="{Binding .}"
-                                                        Icon="products_50x" />
-                                                    <Label
-                                                        Margin="10,0,0,0"
-                                                        Grid.Row="0"
-                                                        Grid.Column="1"
-                                                        HorizontalOptions="Start"
-                                                        VerticalTextAlignment="Center"
-                                                        Text="{Binding Name}" />
-                                                    <Label
-                                                        Grid.Row="0"
-                                                        Grid.Column="2"
-                                                        VerticalTextAlignment="Center"
-                                                        HorizontalOptions="End">
-                                                        <Label.FormattedText>
-                                                            <FormattedString>
-                                                                <Span Text="{Binding MonedaSimbolo}" />
-                                                                <Span Text="{Binding PrecioPublico}" />
-                                                            </FormattedString>
-                                                        </Label.FormattedText>
-                                                    </Label>
-                                                    <Border
-                                                        Margin="0,10,0,0"
-                                                        Stroke="{StaticResource Gray200}"
-                                                        Grid.Row="1"
-                                                        Grid.Column="0"
-                                                        Grid.ColumnSpan="3" />
-                                                </Grid>
-                                            </DataTemplate>
-                                        </dxcv:DXCollectionView.ItemTemplate>
-                                    </dxcv:DXCollectionView>
-                                </dx:DXStackLayout>
-                            </StackLayout>
-                        </ScrollView>
-                        <StackLayout Grid.Row="1"
-                                     BackgroundColor="White"
-                                     Padding="10">
+                        <!-- Barra de búsqueda -->
+                        <Grid Grid.Row="0"
+                              Padding="12,10"
+                              ColumnSpacing="8"
+                              BackgroundColor="{StaticResource White}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="44" />
+                                <ColumnDefinition Width="44" />
+                            </Grid.ColumnDefinitions>
+                            <dxe:TextEdit
+                                Grid.Column="0"
+                                Style="{StaticResource SearchEditorStyle}"
+                                PlaceholderText="Buscar producto..."
+                                Text="{Binding Search}" />
+                            <dx:DXButton
+                                Grid.Column="1"
+                                Style="{StaticResource SinFondoColorRedondeado}"
+                                IconHeight="24"
+                                IconWidth="24"
+                                Command="{Binding SearchCommand}"
+                                Icon="search" />
+                            <dx:DXButton
+                                Grid.Column="2"
+                                Style="{StaticResource SinFondoColorRedondeado}"
+                                IconHeight="24"
+                                IconWidth="24"
+                                Command="{Binding SearchBarCodeCommand}"
+                                Icon="barcode_scaner" />
+                        </Grid>
+
+                        <!-- Lista de productos -->
+                        <dxcv:DXCollectionView
+                            Grid.Row="1"
+                            x:Name="ProductosCollectionView"
+                            ItemsSource="{Binding Productos}"
+                            IsLoadMoreEnabled="True"
+                            LoadMoreCommand="{Binding LoadMoreCommand}"
+                            ItemSeparatorThickness="0">
+                            <dxcv:DXCollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <dx:DXBorder
+                                        Margin="12,6"
+                                        Padding="12"
+                                        CornerRadius="12"
+                                        BorderThickness="0"
+                                        BackgroundColor="{StaticResource White}">
+                                        <dx:DXBorder.Shadow>
+                                            <Shadow Brush="{StaticResource Gray300Brush}"
+                                                    Offset="0,2"
+                                                    Radius="6"
+                                                    Opacity="0.35" />
+                                        </dx:DXBorder.Shadow>
+                                        <dx:DXBorder.GestureRecognizers>
+                                            <TapGestureRecognizer
+                                                Command="{Binding BindingContext.AnadirProducto, Source={x:Reference ProductosCollectionView}}"
+                                                CommandParameter="{Binding .}" />
+                                        </dx:DXBorder.GestureRecognizers>
+                                        <Grid ColumnSpacing="12">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="56" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+
+                                            <!-- Icono del producto -->
+                                            <dx:DXBorder
+                                                Grid.Column="0"
+                                                Grid.RowSpan="2"
+                                                WidthRequest="48"
+                                                HeightRequest="48"
+                                                CornerRadius="10"
+                                                BackgroundColor="{StaticResource PageBackground}"
+                                                BorderThickness="0"
+                                                VerticalOptions="Center">
+                                                <dx:DXImage
+                                                    Source="products_50x"
+                                                    WidthRequest="28"
+                                                    HeightRequest="28"
+                                                    TintColor="{StaticResource Primary}"
+                                                    HorizontalOptions="Center"
+                                                    VerticalOptions="Center" />
+                                            </dx:DXBorder>
+
+                                            <!-- Nombre del producto en minúsculas -->
+                                            <Label
+                                                Grid.Column="1"
+                                                Grid.Row="0"
+                                                Text="{Binding Name, Converter={StaticResource ToLowerConverter}}"
+                                                FontSize="15"
+                                                FontFamily="OpenSansRegular"
+                                                LineBreakMode="TailTruncation"
+                                                MaxLines="2"
+                                                VerticalOptions="End" />
+
+                                            <!-- Código del producto -->
+                                            <Label
+                                                Grid.Column="1"
+                                                Grid.Row="1"
+                                                Text="{Binding ItemNumber}"
+                                                FontSize="12"
+                                                TextColor="{StaticResource Gray400}"
+                                                VerticalOptions="Start" />
+
+                                            <!-- Precio -->
+                                            <StackLayout
+                                                Grid.Column="2"
+                                                Grid.RowSpan="2"
+                                                VerticalOptions="Center"
+                                                HorizontalOptions="End"
+                                                Spacing="2">
+                                                <Label
+                                                    HorizontalTextAlignment="End"
+                                                    FontSize="16"
+                                                    FontAttributes="Bold"
+                                                    TextColor="{StaticResource Primary}">
+                                                    <Label.FormattedText>
+                                                        <FormattedString>
+                                                            <Span Text="{Binding MonedaSimbolo}"
+                                                                  FontSize="12"
+                                                                  FontAttributes="None"
+                                                                  TextColor="{StaticResource Gray400}" />
+                                                            <Span Text=" " />
+                                                            <Span Text="{Binding PrecioPublico, StringFormat='{0:N2}'}" />
+                                                        </FormattedString>
+                                                    </Label.FormattedText>
+                                                </Label>
+                                            </StackLayout>
+                                        </Grid>
+                                    </dx:DXBorder>
+                                </DataTemplate>
+                            </dxcv:DXCollectionView.ItemTemplate>
+                        </dxcv:DXCollectionView>
+
+                        <!-- Panel inferior: resumen y acción -->
+                        <dx:DXBorder
+                            Grid.Row="2"
+                            BackgroundColor="{StaticResource White}"
+                            CornerRadius="20,20,0,0"
+                            BorderThickness="0"
+                            Padding="16,12">
+                            <dx:DXBorder.Shadow>
+                                <Shadow Brush="{StaticResource Gray400Brush}"
+                                        Offset="0,-3"
+                                        Radius="10"
+                                        Opacity="0.2" />
+                            </dx:DXBorder.Shadow>
                             <Grid RowSpacing="10">
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="50" />
-                                    <RowDefinition Height="50" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="48" />
                                 </Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-                                <dx:DXButton
+
+                                <dx:DXBorder
                                     Grid.Row="0"
-                                    Grid.Column="0"
-                                    Grid.ColumnSpan="2"
-                                    Style="{StaticResource ButtonDefault}"
+                                    Padding="14,10"
+                                    CornerRadius="10"
+                                    BackgroundColor="{StaticResource PageBackground}"
+                                    BorderThickness="0">
+                                    <Label
+                                        Text="{Binding ProductosSeleccionadosCantidadTotal}"
+                                        FontSize="15"
+                                        FontAttributes="Bold"
+                                        TextColor="{StaticResource PrimaryDark}"
+                                        HorizontalTextAlignment="Center" />
+                                </dx:DXBorder>
+
+                                <dx:DXButton
+                                    Grid.Row="1"
+                                    CornerRadius="12"
                                     Command="{Binding ProductosSeleccionadosCommand}"
                                     Content="{Binding ProductosSeleccionadosCantidad}" />
-                                <!--<dx:DXButton
-                                    Grid.Row="1"
-                                    Grid.Column="0"
-                                    HorizontalOptions="Center"
-                                    Style="{StaticResource ButtonDefault}"
-                                    Content="Pedidos y Mesas" />-->
-                                <dx:DXButton
-                                    Grid.Row="1"
-                                    Grid.Column="0"
-                                    Grid.ColumnSpan="2"
-                                    Content="{Binding ProductosSeleccionadosCantidadTotal}" />
                             </Grid>
-                        </StackLayout>
+                        </dx:DXBorder>
                     </Grid>
 
-                    <!-- PopUP para filtrar prouctos -->
+                    <!-- Popup de búsqueda -->
                     <ContentView IsVisible="{Binding IsPanelVisible}"
                                  BackgroundColor="#80000000"
                                  AbsoluteLayout.LayoutFlags="All"
                                  AbsoluteLayout.LayoutBounds="0, 0, 1, 1">
-                        <Frame VerticalOptions="Center"
-                               HorizontalOptions="Center"
-                               WidthRequest="300"
-                               Padding="20"
-                               BackgroundColor="White"
-                               CornerRadius="10">
-                            <StackLayout>
-                                <Label Text="Buscar"
+                        <dx:DXBorder
+                            VerticalOptions="Center"
+                            HorizontalOptions="Center"
+                            WidthRequest="300"
+                            Padding="24"
+                            BackgroundColor="{StaticResource White}"
+                            CornerRadius="16"
+                            BorderThickness="0">
+                            <dx:DXBorder.Shadow>
+                                <Shadow Brush="{StaticResource Gray600Brush}"
+                                        Offset="0,4"
+                                        Radius="16"
+                                        Opacity="0.3" />
+                            </dx:DXBorder.Shadow>
+                            <StackLayout Spacing="16">
+                                <Label Text="Buscar producto"
                                        FontAttributes="Bold"
-                                       FontSize="Medium"
+                                       FontSize="18"
+                                       TextColor="{StaticResource PrimaryDark}"
                                        HorizontalOptions="Center" />
-                                <Entry Placeholder="Buscar..."
-                                       TextColor="Black"
-                                       Text="{Binding Search}" />
-                                <Button Text="Buscar"
-                                        Command="{Binding SearchCommand}" />
+                                <dxe:TextEdit
+                                    PlaceholderText="Nombre, código o barcode..."
+                                    Text="{Binding Search}" />
+                                <dx:DXButton
+                                    Content="Buscar"
+                                    CornerRadius="10"
+                                    Command="{Binding SearchCommand}" />
                             </StackLayout>
-                        </Frame>
+                        </dx:DXBorder>
                     </ContentView>
                 </AbsoluteLayout>
             </dxc:ShimmerView.Content>

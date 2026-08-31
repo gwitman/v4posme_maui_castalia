@@ -1,5 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Maui.Core;
+using DevExpress.Maui.Core;
+using DevExpress.Maui.Core.Internal;
 using v4posme_maui.Models;
 using v4posme_maui.Services.Repository;
 using v4posme_maui.Services.SystemNames;
@@ -13,6 +15,10 @@ public class SeleccionarProductoViewModel : BaseViewModel
 {
     private readonly IRepositoryItems _repositoryItems;
     private readonly HelperCore _helper;
+    private int _loadBatchSize = 10;
+    private int _lastLoadedIndex;
+    private bool _hasMoreItems = true;
+    private bool _isLoadingMore;
 
     public SeleccionarProductoViewModel()
     {
@@ -24,6 +30,7 @@ public class SeleccionarProductoViewModel : BaseViewModel
         SearchBarCodeCommand    = new Command(OnSearchBarCode);
         SearchCommand           = new Command(OnSearch);
         ProductosSeleccionadosCommand = new Command(OnRevisarProductos);
+        LoadMoreCommand         = new Command(OnLoadMore);
     }
 
     private async void OnRevisarProductos(object obj)
@@ -38,7 +45,7 @@ public class SeleccionarProductoViewModel : BaseViewModel
         IsBusy = false;
     }
 
-    private async void OnSearch()
+    private void OnSearch()
     {
         if (string.IsNullOrWhiteSpace(Search))
         {
@@ -46,31 +53,51 @@ public class SeleccionarProductoViewModel : BaseViewModel
             return;
         }
 
-        IsPanelVisible = !IsPanelVisible;
-        IsBusy = true;
+        IsPanelVisible      = !IsPanelVisible;
+        _lastLoadedIndex    = 0;
+        _hasMoreItems       = true;
+        Productos.Clear();
+        LoadProductosBatch();
+    }
+
+    private void OnLoadMore()
+    {
+        if (_isLoadingMore || !_hasMoreItems) return;
+        _isLoadingMore = true;
+        LoadProductosBatch();
+    }
+
+    private async void LoadProductosBatch()
+    {
         await Task.Run(async () =>
         {
-            
-            var valueTop    = await _helper.GetValueParameter("MOBILE_SHOW_TOP_ITEMS", "10");
-            Productos.Clear();
-            List<Api_AppMobileApi_GetDataDownloadItemsResponse> searchItems;
+            Thread.Sleep(1000);
+            List<Api_AppMobileApi_GetDataDownloadItemsResponse> items;
 
             if (string.IsNullOrWhiteSpace(Search))
             {
-                searchItems = await _repositoryItems.PosMeDescending10(int.Parse(valueTop));
+                items = await _repositoryItems.PosMeAscBySizeAndTop(_lastLoadedIndex, _loadBatchSize);
             }
             else
             {
-                searchItems = await _repositoryItems.PosMeFilterdByItemNumberAndBarCodeAndName(Search);
+                items = await _repositoryItems.PosMeFilterdByItemNumberAndBarCodeAndNameByTop(Search, _lastLoadedIndex, _loadBatchSize);
             }
 
-            foreach (var itemsResponse in searchItems)
+            if (items.Count < _loadBatchSize)
             {
-                itemsResponse.MonedaSimbolo = VariablesGlobales.DtoInvoice.Currency!.Simbolo;
-                Productos.Add(itemsResponse);
+                _hasMoreItems = false;
             }
+
+            foreach (var item in items)
+            {
+                item.MonedaSimbolo = VariablesGlobales.DtoInvoice.Currency!.Simbolo;
+            }
+
+            _lastLoadedIndex += items.Count;
+            Productos.AddRange(items);
+            _isLoadingMore = false;
+            IsBusy = false;
         });
-        IsBusy = false;
     }
 
     private async void OnSearchBarCode()
@@ -140,22 +167,18 @@ public class SeleccionarProductoViewModel : BaseViewModel
 
     private async void LoadProductos()
     {
-        var valueTop        = await _helper.GetValueParameter("MOBILE_SHOW_TOP_ITEMS", "10");
-        var findProductos   = await _repositoryItems.PosMeDescending10(int.Parse(valueTop));
+        var valueTop = await _helper.GetValueParameter("MOBILE_SHOW_TOP_ITEMS", "10");
+        _loadBatchSize = int.Parse(valueTop);
+        _lastLoadedIndex = 0;
+        _hasMoreItems = true;
         Productos.Clear();
-        foreach (var itemsResponse in findProductos.OrderBy(p => p.Name ))
-        {
-            itemsResponse.MonedaSimbolo = VariablesGlobales.DtoInvoice.Currency!.Simbolo;
-            Productos.Add(itemsResponse);
-        }
+        LoadProductosBatch();
 
         if (VariablesGlobales.DtoInvoice.Items.Count > 0)
         {
             ProductosSeleccionadosCantidad      = $"Enviar {VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada} Items";
             ProductosSeleccionadosCantidadTotal = $"{VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada} Items = {VariablesGlobales.DtoInvoice.Balance}";
         }
-
-        IsBusy = false;
     }
 
     public void OnAppearing(INavigation navigation)
@@ -164,7 +187,7 @@ public class SeleccionarProductoViewModel : BaseViewModel
         LoadProductos();
     }
 
-    public ObservableCollection<Api_AppMobileApi_GetDataDownloadItemsResponse> Productos { get; }
+    public DXObservableCollection<Api_AppMobileApi_GetDataDownloadItemsResponse> Productos { get; }
 
     private string _productosSeleccionadosCantidadTotal = "Items";
 
@@ -193,6 +216,7 @@ public class SeleccionarProductoViewModel : BaseViewModel
     public Command AnadirProducto { get; }
     public Command SearchCommand { get; }
     public Command SearchBarCodeCommand { get; }
+    public Command LoadMoreCommand { get; }
     private bool _isPanelVisible;
 
     public bool IsPanelVisible

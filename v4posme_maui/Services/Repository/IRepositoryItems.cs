@@ -20,9 +20,13 @@ public interface IRepositoryItems : IRepositoryFacade<Api_AppMobileApi_GetDataDo
 
     Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeDescendingBySizeAndTop(int size,int top );
 
+    Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeAscBySizeAndTop(int size, int top);
+
     Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeTakeModificado();
     
     Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeDescending10(int take = 10);
-    
+
+    Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeNameAsc10(int take = 10);
+
     Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeQuantityDistintoZero();
 }

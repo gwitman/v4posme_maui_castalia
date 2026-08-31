@@ -105,7 +105,7 @@ namespace v4posme_maui.ViewModels
                 List<Api_AppMobileApi_GetDataDownloadItemsResponse> newItems;
                 if (string.IsNullOrWhiteSpace(Search))
                 { 
-                    newItems = await _repositoryItems.PosMeDescendingBySizeAndTop(_lastLoadedIndex, _loadBatchSize);
+                    newItems = await _repositoryItems.PosMeAscBySizeAndTop(_lastLoadedIndex, _loadBatchSize);
                 }
                 else
                 {
