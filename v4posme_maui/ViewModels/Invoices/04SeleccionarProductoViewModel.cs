@@ -15,18 +15,52 @@ public class SeleccionarProductoViewModel : BaseViewModel
 {
     private readonly IRepositoryItems _repositoryItems;
     private readonly HelperCore _helper;
+    private readonly HelperInvoiceFlow _helperInvoiceFlow;
 
     public SeleccionarProductoViewModel()
     {
         Title                         = "Seleccionar producto 4/6";
         Productos                     = new();
         _repositoryItems              = VariablesGlobales.UnityContainer.Resolve<IRepositoryItems>();
+        _helperInvoiceFlow            = VariablesGlobales.UnityContainer.Resolve<HelperInvoiceFlow>();
         AnadirProducto                = new Command<Api_AppMobileApi_GetDataDownloadItemsResponse>(OnAnadirProducto);
         _helper                       = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
         SearchBarCodeCommand          = new Command(OnSearchBarCode);
         SearchCommand                 = new Command(OnSearch);
         ProductosSeleccionadosCommand = new Command(OnRevisarProductos);
         QuitarProductoCommand         = new Command<Api_AppMobileApi_GetDataDownloadItemsResponse>(OnQuitarProducto);
+        IrSeleccionClienteCommand     = new Command(OnIrSeleccionCliente);
+        IrDatosFacturaCommand         = new Command(OnIrDatosFactura);
+        IrDatosCreditoCommand         = new Command(OnIrDatosCredito);
+    }
+
+    // Navegacion desde el menu desplegable (toolbar) de la pantalla 4/6 para modificar
+    // los datos de las pantallas anteriores. Los productos seleccionados se conservan
+    // porque viven en VariablesGlobales.DtoInvoice.Items.
+    public Command IrSeleccionClienteCommand { get; }
+    public Command IrDatosFacturaCommand { get; }
+    public Command IrDatosCreditoCommand { get; }
+
+    private async void OnIrSeleccionCliente()
+    {
+        // Se marca que la lista de clientes se abre desde el menu desplegable para que
+        // muestre la lista (y no salte automaticamente a la seleccion de producto).
+        VariablesGlobales.InvoiceSeleccionandoCliente = true;
+        await NavigationService.NavigateToAsync<InvoicesViewModel>();
+    }
+
+    private async void OnIrDatosFactura()
+    {
+        var customerNumber = VariablesGlobales.DtoInvoice.CustomerResponse?.CustomerNumber
+                             ?? VariablesGlobales.DtoInvoice.CustomerNumber;
+        await NavigationService.NavigateToAsync<DataInvoicesViewModel>(customerNumber!);
+    }
+
+    private async void OnIrDatosCredito()
+    {
+        var customerNumber = VariablesGlobales.DtoInvoice.CustomerResponse?.CustomerNumber
+                             ?? VariablesGlobales.DtoInvoice.CustomerNumber;
+        await NavigationService.NavigateToAsync<DataInvoiceCreditViewModel>(customerNumber!);
     }
 
     private async void OnRevisarProductos(object obj)
@@ -81,10 +115,15 @@ public class SeleccionarProductoViewModel : BaseViewModel
 
             items = items.OrderBy(i => i.Name).ToList();
 
+            // El simbolo de moneda puede no estar disponible si el DTO aun no fue
+            // inicializado (por ejemplo justo despues de reiniciar el flujo). Se usa un
+            // valor seguro para evitar NullReferenceException en el foreach.
+            var monedaSimbolo = VariablesGlobales.DtoInvoice.Currency?.Simbolo ?? string.Empty;
+
             foreach (var item in items)
             {
                 item.Name          = item.Name?.ToLower();
-                item.MonedaSimbolo = VariablesGlobales.DtoInvoice.Currency!.Simbolo;
+                item.MonedaSimbolo = monedaSimbolo;
             }
 
             Productos.Clear();
@@ -199,6 +238,12 @@ public class SeleccionarProductoViewModel : BaseViewModel
     public async void OnAppearing(INavigation navigation)
     {
         Navigation = navigation;
+
+        // Facturacion rapida: si se llega a esta pantalla con el flujo sin inicializar
+        // (por ejemplo, tras dar "Nueva factura" o desde el boton Facturar de la barra
+        // inferior), se cargan los datos iniciales por defecto de la factura.
+        await _helperInvoiceFlow.InicializarFacturaRapidaAsync();
+
         await LoadAllProductosAsync();
 
         if (VariablesGlobales.DtoInvoice.Items.Count > 0)

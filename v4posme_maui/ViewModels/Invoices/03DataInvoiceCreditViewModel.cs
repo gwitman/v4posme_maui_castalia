@@ -34,6 +34,7 @@ public class DataInvoiceCreditViewModel : BaseViewModel, IQueryAttributable
         if (SelectedPeriodPay is null)
         {
             ShowToast(Mensajes.MensajeSeleccionarFrecuenciaPago, ToastDuration.Long, 16);
+            IsBusy = false;
             return;
         }
 
@@ -41,7 +42,9 @@ public class DataInvoiceCreditViewModel : BaseViewModel, IQueryAttributable
         Item.Plazo          = Plazo;
         Item.FixedExpenses  = FixedExpenses;
         Item.PeriodPay      = SelectedPeriodPay;
-        await NavigationService.NavigateToAsync<SeleccionarProductoViewModel>();
+        // Facturacion rapida: se regresa mediante pop a la pantalla de seleccion de
+        // producto (4/6) conservando los productos y sin apilar una nueva instancia.
+        await NavigationService.GoBackAsync();
         IsBusy              = false;
     }
 
@@ -115,10 +118,13 @@ public class DataInvoiceCreditViewModel : BaseViewModel, IQueryAttributable
         var customer    = await _repositoryTbCustomer.PosMeFindCustomer(id!);
         Item            = VariablesGlobales.DtoInvoice;
         VariablesGlobales.DtoInvoice.CustomerResponse = customer;
-        
-        NextVisit       = DateTime.Now.Date;
-        FixedExpenses   = 0;
-        Plazo           = 1;  
+
+        // Respetar los valores ya definidos en el DTO (por ejemplo, al volver desde el
+        // menu desplegable de la pantalla 4/6). Solo se aplican los valores por defecto
+        // cuando aun no existen datos previos.
+        NextVisit       = Item.NextVisit == default ? DateTime.Now.Date : Item.NextVisit;
+        FixedExpenses   = Item.FixedExpenses;
+        Plazo           = Item.Plazo <= 0 ? 1 : Item.Plazo;
 
         LoadComboBox();
         IsBusy = false;

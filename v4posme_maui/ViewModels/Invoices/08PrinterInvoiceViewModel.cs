@@ -177,6 +177,11 @@ public class PrinterInvoiceViewModel : BaseViewModel
 
     private void OnAplicarOtroCommand()
     {
+        // Reiniciar el flujo de facturacion rapida. Al marcar el flujo como no
+        // inicializado, la pantalla de seleccion de producto (o la de cliente) volvera a
+        // construir el DtoInvoice con sus valores por defecto en el proximo OnAppearing.
+        HelperInvoiceFlow.ReiniciarFlujo();
+
         var stack = Shell.Current.Navigation.NavigationStack.ToArray();
         for (var i = stack.Length - 1; i > 0; i--)
         {

@@ -44,6 +44,7 @@ namespace v4posme_maui
             Routing.RegisterRoute(typeof(DataInvoicesPage).FullName, typeof(DataInvoicesPage));
             Routing.RegisterRoute(typeof(DataInvoiceCreditPage).FullName, typeof(DataInvoiceCreditPage));
             Routing.RegisterRoute(typeof(SeleccionarProductoPage).FullName, typeof(SeleccionarProductoPage));
+            Routing.RegisterRoute(typeof(InvoicesPage).FullName, typeof(InvoicesPage));
             Routing.RegisterRoute(typeof(PaymentInvoicePage).FullName, typeof(PaymentInvoicePage));
             Routing.RegisterRoute(typeof(RevisarProductosSeleccionadosPage).FullName, typeof(RevisarProductosSeleccionadosPage));
             Routing.RegisterRoute(typeof(VoucherInvoicePage).FullName, typeof(VoucherInvoicePage));

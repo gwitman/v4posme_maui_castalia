@@ -62,12 +62,14 @@ public class DataInvoicesViewModel : BaseViewModel, IQueryAttributable
         if (SelectedCurrency is null)
         {
             ShowToast(Mensajes.MensajeSeleccionarMoneda, ToastDuration.Long, 16);
+            IsBusy = false;
             return;
         }
 
         if (SelectedTipoDocumento is null)
         {
             ShowToast(Mensajes.MensajeSeleccionarTipoDocumento, ToastDuration.Long, 16);
+            IsBusy = false;
             return;
         }
 
@@ -77,7 +79,10 @@ public class DataInvoicesViewModel : BaseViewModel, IQueryAttributable
         Item.TipoDocumento          = SelectedTipoDocumento;
         Item.ReferenceClientName    = ReferenceClientName;
         Item.Mesa                   = SelectedMesa;
-        await NavigationService.NavigateToAsync<DataInvoiceCreditViewModel>(Item.CustomerResponse!.CustomerNumber!);
+        // Facturacion rapida: al guardar los datos de facturacion se regresa mediante pop
+        // a la pantalla de seleccion de producto (4/6) conservando los productos y sin
+        // apilar una nueva instancia.
+        await NavigationService.GoBackAsync();
         IsBusy = false;
     }
 

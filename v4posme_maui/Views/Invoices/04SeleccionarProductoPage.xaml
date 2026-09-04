@@ -14,6 +14,25 @@
     <ContentPage.BindingContext>
         <invoices:SeleccionarProductoViewModel />
     </ContentPage.BindingContext>
+    <!-- Se oculta y desactiva la flecha de retroceso de la barra de navegacion. La 4/6 es
+         la pantalla base del flujo de facturacion rapida; solo se sale por el menu
+         desplegable o al completar la factura. -->
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsEnabled="False"
+                            IsVisible="False" />
+    </Shell.BackButtonBehavior>
+    <!-- Menu desplegable (overflow ⋮) para modificar los datos de las pantallas anteriores -->
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Seleccionar cliente"
+                     Order="Secondary"
+                     Command="{Binding IrSeleccionClienteCommand}" />
+        <ToolbarItem Text="Datos de facturación"
+                     Order="Secondary"
+                     Command="{Binding IrDatosFacturaCommand}" />
+        <ToolbarItem Text="Datos de crédito"
+                     Order="Secondary"
+                     Command="{Binding IrDatosCreditoCommand}" />
+    </ContentPage.ToolbarItems>
     <ContentPage.Resources>
         <converters:ToLowerConverter x:Key="ToLowerConverter" />
     </ContentPage.Resources>

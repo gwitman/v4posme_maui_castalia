@@ -10,37 +10,69 @@
             <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
             <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
             <DataTemplate x:Key="ShellMenuItemTemplate">
-                <Grid ColumnDefinitions="51,*" ColumnSpacing="0" RowSpacing="0"
-                      Padding="35,15,0,0"
-                      BackgroundColor="White">
+                <Grid Padding="10,3" BackgroundColor="Transparent">
                     <VisualStateManager.VisualStateGroups>
                         <VisualStateGroupList>
                             <VisualStateGroup x:Name="CommonStates">
-                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="Normal">
+                                    <VisualState.Setters>
+                                        <Setter TargetName="SelectionBar" Property="BoxView.Color" Value="Transparent" />
+                                        <Setter TargetName="ItemBackground" Property="Border.BackgroundColor" Value="Transparent" />
+                                        <Setter TargetName="FlyoutItemLabel" Property="Label.TextColor" Value="{StaticResource Gray600}" />
+                                        <Setter TargetName="FlyoutItemLabel" Property="Label.FontAttributes" Value="None" />
+                                        <Setter TargetName="Image" Property="dx:DXImage.TintColor" Value="{StaticResource Gray500}" />
+                                    </VisualState.Setters>
+                                </VisualState>
                                 <VisualState x:Name="Selected">
                                     <VisualState.Setters>
-                                        <Setter TargetName="FlyoutItemLabel" Property="Label.TextColor"
-                                                Value="{StaticResource Primary}" />
+                                        <Setter TargetName="SelectionBar" Property="BoxView.Color" Value="{StaticResource Primary}" />
+                                        <Setter TargetName="ItemBackground" Property="Border.BackgroundColor" Value="{StaticResource PageBackground}" />
+                                        <Setter TargetName="FlyoutItemLabel" Property="Label.TextColor" Value="{StaticResource Primary}" />
+                                        <Setter TargetName="FlyoutItemLabel" Property="Label.FontAttributes" Value="Bold" />
+                                        <Setter TargetName="Image" Property="dx:DXImage.TintColor" Value="{StaticResource Primary}" />
                                     </VisualState.Setters>
                                 </VisualState>
                             </VisualStateGroup>
                         </VisualStateGroupList>
                     </VisualStateManager.VisualStateGroups>
-                    <dx:DXImage x:Name="Image"
-                                WidthRequest="24"
-                                HeightRequest="24"
-                                Source="{Binding Icon}"
-                                HorizontalOptions="Center"
-                                TintColor="{StaticResource Primary}" />
-                    <Label x:Name="FlyoutItemLabel"
-                           Text="{Binding Title}"
-                           Grid.Column="1"
-                           FontSize="18"
-                           TextColor="{dx:ThemeColor OnSurface}"
-                           VerticalOptions="Center"
-                           FontFamily="Roboto"
-                           HorizontalOptions="StartAndExpand">
-                    </Label>
+
+                    <Border x:Name="ItemBackground"
+                            Padding="0"
+                            StrokeThickness="0"
+                            BackgroundColor="Transparent">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="14" />
+                        </Border.StrokeShape>
+                        <Grid ColumnDefinitions="4,52,*" ColumnSpacing="0" HeightRequest="52">
+                            <!-- Indicador de seleccion lateral -->
+                            <BoxView x:Name="SelectionBar"
+                                     Grid.Column="0"
+                                     WidthRequest="4"
+                                     CornerRadius="2"
+                                     Color="Transparent"
+                                     HorizontalOptions="Start"
+                                     VerticalOptions="Fill"
+                                     Margin="0,8" />
+
+                            <dx:DXImage x:Name="Image"
+                                        Grid.Column="1"
+                                        WidthRequest="22"
+                                        HeightRequest="22"
+                                        Source="{Binding Icon}"
+                                        HorizontalOptions="Center"
+                                        VerticalOptions="Center"
+                                        TintColor="{StaticResource Gray500}" />
+
+                            <Label x:Name="FlyoutItemLabel"
+                                   Grid.Column="2"
+                                   Text="{Binding Title}"
+                                   FontSize="16"
+                                   TextColor="{StaticResource Gray600}"
+                                   VerticalOptions="Center"
+                                   FontFamily="Roboto"
+                                   HorizontalOptions="StartAndExpand" />
+                        </Grid>
+                    </Border>
                 </Grid>
             </DataTemplate>
 

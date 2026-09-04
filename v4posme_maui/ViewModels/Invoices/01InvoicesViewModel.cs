@@ -18,6 +18,7 @@ public class InvoicesViewModel : BaseViewModel
     private readonly IRepositoryTbCustomer _customerRepositoryTbCustomer;
     private readonly IRepositoryTbParameterSystem _repositoryTbParameterSystem;
 	private readonly HelperCore _helper;
+    private readonly HelperInvoiceFlow _helperInvoiceFlow;
 	public ICommand ItemTapped { get; }
     public ICommand SearchCommand { get; }
     public ICommand LoadMoreCommand { get; }
@@ -33,6 +34,7 @@ public class InvoicesViewModel : BaseViewModel
         _customerRepositoryTbCustomer   = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCustomer>();
         _repositoryTbParameterSystem    = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbParameterSystem>();
 		_helper         = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
+        _helperInvoiceFlow = VariablesGlobales.UnityContainer.Resolve<HelperInvoiceFlow>();
 		ItemTapped      = new Command<Api_AppMobileApi_GetDataDownloadCustomerResponse>(OnItemTapped);
         SearchCommand   = new Command(OnSearchCommand);
         OnBarCode       = new Command(OnBarCodeShow);
@@ -90,13 +92,20 @@ public class InvoicesViewModel : BaseViewModel
         }
 
         IsBusy = true;
-        VariablesGlobales.DtoInvoice = new ViewTempDtoInvoice
-        {
-            FirstName = item.FirstName,
-            LastName = item.LastName,
-            Balance = item.Balance
-        };
-        await NavigationService.NavigateToAsync<DataInvoicesViewModel>(item.CustomerNumber!);
+
+        // Se conserva el DtoInvoice actual (incluyendo los productos ya seleccionados) y
+        // solo se actualizan los datos del cliente. Luego se regresa a la pantalla de
+        // seleccion de producto (4/6).
+        var dto                 = VariablesGlobales.DtoInvoice;
+        dto.CustomerResponse    = item;
+        dto.CustomerNumber      = item.CustomerNumber;
+        dto.FirstName           = item.FirstName;
+        dto.LastName            = item.LastName;
+        dto.Balance             = item.Balance;
+
+        // Se regresa a la pantalla de seleccion de producto (4/6) haciendo pop del stack
+        // para conservar la instancia existente en lugar de apilar una nueva.
+        await NavigationService.GoBackAsync();
         IsBusy = false;
     }
 
@@ -283,6 +292,30 @@ public class InvoicesViewModel : BaseViewModel
         try
         {
             Navigation              = navigation;
+
+            // Facturacion rapida: en la primera entrada al flujo (desde la pestaña Factura)
+            // se inicializa el DtoInvoice con los valores por defecto y se salta directo a
+            // la pantalla de seleccion de producto (4/6). Si el flujo ya fue inicializado
+            // (por ejemplo, se llega aqui desde el menu desplegable de la pantalla 4/6 para
+            // modificar el cliente) se muestra la lista de clientes de forma normal.
+            // Si se abrio la lista desde el menu desplegable de la pantalla 4/6 (para cambiar
+            // el cliente), se muestra la lista de clientes de forma normal y se limpia el
+            // flag. En caso contrario, en la primera entrada al flujo se inicializa el
+            // DtoInvoice y se salta directo a la seleccion de producto (4/6).
+            if (!VariablesGlobales.InvoiceFlowInicializado && !VariablesGlobales.InvoiceSeleccionandoCliente)
+            {
+                IsBusy = true;
+                await _helperInvoiceFlow.InicializarFacturaRapidaAsync();
+                // Se navega (push) a la seleccion de producto (4/6). El bloqueo del boton
+                // atras en esa pantalla se maneja en SeleccionarProductoPage para evitar
+                // que se regrese a la lista de clientes.
+                await NavigationService.NavigateToAsync<SeleccionarProductoViewModel>();
+                IsBusy = false;
+                return;
+            }
+
+            VariablesGlobales.InvoiceSeleccionandoCliente = false;
+
             var valueTop            = await _helper.GetValueParameter("MOBILE_SHOW_TOP_CUSTOMER", "10");
             _loadBatchSize          = int.Parse(valueTop);
             _lastLoadedIndex        = 0;

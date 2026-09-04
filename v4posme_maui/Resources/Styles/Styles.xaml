@@ -314,10 +314,13 @@
         <Setter Property="ForegroundColor" Value="{StaticResource White}" />
         <Setter Property="TitleColor" Value="{StaticResource White}" />
         <Setter Property="NavBarHasShadow" Value="True" />
-        <Setter Property="TabBarBackgroundColor" Value="{StaticResource Secondary}" />
-        <Setter Property="TabBarForegroundColor" Value="{StaticResource White}" />
-        <Setter Property="TabBarTitleColor" Value="{StaticResource White}" />
-        <Setter Property="TabBarUnselectedColor" Value="{StaticResource PrimaryDark}" />
+        <!-- Barra de accesos directos inferior (TabBar): estilo moderno con fondo blanco,
+             item seleccionado en color de marca y no seleccionados en gris. Aplica a todas
+             las paginas del Shell de forma homogenea. -->
+        <Setter Property="TabBarBackgroundColor" Value="{StaticResource White}" />
+        <Setter Property="TabBarForegroundColor" Value="{StaticResource Primary}" />
+        <Setter Property="TabBarTitleColor" Value="{StaticResource Primary}" />
+        <Setter Property="TabBarUnselectedColor" Value="{StaticResource Gray400}" />
     </Style>
 
     <Style TargetType="NavigationPage">

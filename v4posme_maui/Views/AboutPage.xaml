@@ -5,188 +5,254 @@
              xmlns:viewModels="clr-namespace:v4posme_maui.ViewModels"
              xmlns:controls="clr-namespace:DevExpress.Maui.Controls;assembly=DevExpress.Maui.Controls"
              xmlns:core="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
+             xmlns:converters="clr-namespace:v4posme_maui.Services.Converters"
              ios:Page.UseSafeArea="true"
+             BackgroundColor="{StaticResource PageBackground}"
              x:Class="v4posme_maui.Views.AboutPage">
     <ContentPage.BindingContext>
-        <viewModels:AboutViewModel /> 
+        <viewModels:AboutViewModel />
     </ContentPage.BindingContext>
+    <ContentPage.Resources>
+        <converters:PorcentajeProgresoConverter x:Key="PorcentajeProgresoConverter" />
+    </ContentPage.Resources>
     <ContentPage.Content>
         <controls:ShimmerView Style="{StaticResource ShimmerEffect}" IsLoading="{Binding IsBusy}">
-
             <ScrollView>
-                <StackLayout Padding="10" Spacing="10">
-                    <!--FACTURAS CONTADO-->
-                    <core:DXBorder Style="{StaticResource PropertyBorder}" BorderThickness="0,0,5,0"
-                                   BorderColor="Yellow">
-                        <Grid Padding="10" ColumnSpacing="25">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <Image Source="invoice_bill" WidthRequest="40" HeightRequest="40" />
-                            <StackLayout Grid.Column="1" Spacing="0">
-                                <Label Text="{Binding CantidadFacutrasContado}" FontSize="24" FontAttributes="Bold" />
-                                <Label Text="Facturas de Contado" FontSize="14" />
-                                <StackLayout Orientation="Horizontal">
-                                    <Label Text="Monto Córdobas: C$"
-                                           FontSize="12"
-                                           FontAttributes="Bold"
-                                           TextColor="{StaticResource Primary}" />
-                                    <Label Text="{Binding MontoFacturasContadoCordobas,StringFormat='{0:N2}'}"
-                                           FontSize="12"
-                                           FontAttributes="Bold"
-                                           TextColor="{StaticResource Primary}" />
-                                    <Label Text=" " />
-                                </StackLayout>
-                                <StackLayout Orientation="Horizontal">
-                                    <Label Text="Monto Dólares: $"
-                                           FontSize="12"
-                                           FontAttributes="Bold"
-                                           TextColor="{StaticResource Primary}" />
-                                    <Label Text="{Binding MontoFacturasContadoDolares,StringFormat='{0:N2}'}"
-                                           FontSize="12"
-                                           FontAttributes="Bold"
-                                           TextColor="{StaticResource Primary}" />
-                                </StackLayout>
-                            </StackLayout>
-                        </Grid>
-                    </core:DXBorder>
-                    <!--FACTURAS CREDITO-->
-                    <core:DXBorder Style="{StaticResource PropertyBorder}" BorderThickness="0,0,5,0"
-                                   BorderColor="Green">
-                        <Grid Padding="10" ColumnSpacing="25">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <Image Source="cash_pay" WidthRequest="40" HeightRequest="40" />
-                            <StackLayout Grid.Column="1" Spacing="0">
-                                <Label Text="{Binding CantidadFacutrasCredito}" FontSize="24" FontAttributes="Bold" />
-                                <Label Text="Facturas de Crédito" FontSize="14" />
-                                <StackLayout Orientation="Horizontal">
-                                    <Label Text="Monto Córdobas: C$"
-                                           FontSize="12"
-                                           FontAttributes="Bold"
-                                           TextColor="Green" />
-                                    <Label Text="{Binding MontoFacturasCreditoCordobas,StringFormat='{0:N2}'}"
-                                           FontSize="12"
-                                           FontAttributes="Bold"
-                                           TextColor="Green" />
-                                    <Label Text=" " />
-                                </StackLayout>
-                                <StackLayout Orientation="Horizontal">
-                                    <Label Text="Monto Dólares: $"
-                                           FontSize="12"
-                                           FontAttributes="Bold"
-                                           TextColor="Green" />
-                                    <Label Text="{Binding MontoFacturasCreditoDolares,StringFormat='{0:N2}'}"
-                                           FontSize="12"
-                                           FontAttributes="Bold"
-                                           TextColor="Green" />
-                                </StackLayout>
-                            </StackLayout>
-                        </Grid>
-                    </core:DXBorder>
-                    <!--ABONOS-->
-                    <core:DXBorder Style="{StaticResource PropertyBorder}" BorderThickness="0,0,5,0" BorderColor="Red">
-                        <Grid Padding="10" ColumnSpacing="25">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <Image Source="payment_2" WidthRequest="40" HeightRequest="40" />
-                            <StackLayout Grid.Column="1" Spacing="0">
-                                <StackLayout Orientation="Horizontal">
-                                    <Label Text="{Binding CantidadAbonos}"
-                                           FontSize="24"
-                                           FontAttributes="Bold" />
-                                </StackLayout>
-                                <Label Text="Abonos Aplicados" FontSize="14" />
-                                <StackLayout Orientation="Horizontal">
-                                    <Label Text="Monto Córdobas: C$"
-                                           FontSize="12"
-                                           FontAttributes="Bold"
-                                           TextColor="Red" />
-                                    <Label Text="{Binding MontoAbonosCordobas,StringFormat='{0:N2}'}"
-                                           FontSize="12"
-                                           FontAttributes="Bold"
-                                           TextColor="Red" />
-                                    <Label Text=" " />
-                                </StackLayout>
-                                <StackLayout Orientation="Horizontal">
-                                    <Label Text="{Binding MontoTotalAbonosCordobas,StringFormat='Meta Córdobas: C$ {0:N2}'}"
-                                           FontSize="12"
-                                           FontAttributes="Bold"
-                                           TextColor="Red" />
-                                </StackLayout>
-                                <StackLayout Orientation="Horizontal">
-                                    <Label Text="{Binding PorcentajeAbonosTotalesCordobas, StringFormat='Cumplimiento Córdobas: {0:F2}%'}"
-                                           FontSize="12"
-                                           FontAttributes="Bold"
-                                           TextColor="Red" />
-                                </StackLayout>
-                                <Label Text="" FontSize="14" />
-                                <StackLayout Orientation="Horizontal">
-                                    <Label Text="Monto Dólares: $"
-                                           FontSize="12"
-                                           FontAttributes="Bold"
-                                           TextColor="Red" />
-                                    <Label Text="{Binding MontoAbonosDolares,StringFormat='{0:N2}'}"
-                                           FontSize="12"
-                                           FontAttributes="Bold"
-                                           TextColor="Red" />
-                                </StackLayout>
-                                <StackLayout Orientation="Horizontal">
-                                    <Label Text="{Binding MontoTotalAbonosDolares,StringFormat='Meta Dólares: $ {0:N2}'}"
-                                           FontSize="12"
-                                           FontAttributes="Bold"
-                                           TextColor="Red" />
-                                </StackLayout>
-                                <StackLayout Orientation="Horizontal">
-                                    <Label Text="{Binding PorcentajeAbonosTotalesDolares, StringFormat='Cumplimiento Dólares: {0:F2}%'}"
-                                           FontSize="12"
-                                           FontAttributes="Bold"
-                                           TextColor="Red" />
-                                </StackLayout>
-                            </StackLayout>
-                        </Grid>
-                    </core:DXBorder>
-                    <!-- TOTALES -->
-                    <Grid Padding="0" ColumnSpacing="25">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <StackLayout 
-                            Grid.Column="1" 
-                            Margin="0,10,10,0"
-                            Spacing="0">
-                            <StackLayout Orientation="Horizontal" HorizontalOptions="End">
-                                <Label Text="TOTAL: C$"
-                                       FontSize="18"
-                                       FontAttributes="Bold"
-                                       TextColor="{StaticResource Secondary}" />
-                                <Label Text="{Binding TotalCordobas,StringFormat='{0:N2}'}"
-                                       FontSize="18"
-                                       FontAttributes="Bold"
-                                       TextColor="{StaticResource Secondary}" />
-                            </StackLayout>
-                            <StackLayout Orientation="Horizontal" HorizontalOptions="End">
-                                <Label Text="TOTAL: $"
-                                       FontSize="18"
-                                       FontAttributes="Bold"
-                                       TextColor="{StaticResource Secondary}" />
-                                <Label Text="{Binding TotalDolares,StringFormat='{0:N2}'}"
-                                       FontSize="18"
-                                       FontAttributes="Bold"
-                                       TextColor="{StaticResource Secondary}" />
-                            </StackLayout>
-                        </StackLayout>
-                    </Grid>
-                </StackLayout>
-            </ScrollView>
+                <VerticalStackLayout Padding="16,18,16,24" Spacing="16">
 
+                    <!-- Encabezado con total consolidado -->
+                    <core:DXBorder CornerRadius="20" BorderThickness="0">
+                        <core:DXBorder.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="{StaticResource PrimaryDark}" Offset="0.0" />
+                                <GradientStop Color="{StaticResource Primary}" Offset="1.0" />
+                            </LinearGradientBrush>
+                        </core:DXBorder.Background>
+                        <Grid Padding="20,18" RowSpacing="14">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Label Grid.Row="0"
+                                   Text="Resumen del día"
+                                   FontSize="15"
+                                   TextColor="#DCEFF7"
+                                   FontFamily="Roboto" />
+                            <Grid Grid.Row="1" ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="1" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                    <Label Text="Total Córdobas" FontSize="12" TextColor="#DCEFF7" />
+                                    <Label FontSize="22" FontAttributes="Bold" TextColor="White">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="C$ " FontSize="14" />
+                                                <Span Text="{Binding TotalCordobas, StringFormat='{0:N2}'}" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                </VerticalStackLayout>
+                                <BoxView Grid.Column="1" Color="#40FFFFFF" WidthRequest="1" VerticalOptions="Fill" />
+                                <VerticalStackLayout Grid.Column="2" Spacing="2">
+                                    <Label Text="Total Dólares" FontSize="12" TextColor="#DCEFF7" />
+                                    <Label FontSize="22" FontAttributes="Bold" TextColor="White">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="$ " FontSize="14" />
+                                                <Span Text="{Binding TotalDolares, StringFormat='{0:N2}'}" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Grid>
+                    </core:DXBorder>
+
+                    <!-- FACTURAS CONTADO -->
+                    <core:DXBorder CornerRadius="16" BorderThickness="0" BackgroundColor="{StaticResource White}">
+                        <core:DXBorder.Shadow>
+                            <Shadow Brush="{StaticResource Gray300Brush}" Offset="0,2" Radius="8" Opacity="0.3" />
+                        </core:DXBorder.Shadow>
+                        <Grid ColumnSpacing="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="5" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <BoxView Grid.Column="0" Color="{StaticResource Primary}" VerticalOptions="Fill" />
+                            <Grid Grid.Column="1" Padding="16,14" ColumnSpacing="14">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="52" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <core:DXBorder Grid.Column="0"
+                                               WidthRequest="48" HeightRequest="48"
+                                               CornerRadius="12"
+                                               BorderThickness="0"
+                                               BackgroundColor="#E5F1F6"
+                                               VerticalOptions="Center">
+                                    <Image Source="invoice_bill" WidthRequest="26" HeightRequest="26"
+                                           HorizontalOptions="Center" VerticalOptions="Center" />
+                                </core:DXBorder>
+                                <VerticalStackLayout Grid.Column="1" Spacing="1">
+                                    <Label Text="Facturas de Contado" FontSize="13" TextColor="{StaticResource Gray500}" />
+                                    <Label Text="{Binding CantidadFacutrasContado}" FontSize="26" FontAttributes="Bold"
+                                           TextColor="{StaticResource PrimaryDark}" />
+                                    <Label Margin="0,4,0,0" FontSize="12" TextColor="{StaticResource Primary}">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="C$ " FontAttributes="Bold" />
+                                                <Span Text="{Binding MontoFacturasContadoCordobas, StringFormat='{0:N2}'}" FontAttributes="Bold" />
+                                                <Span Text="   ·   $ " FontAttributes="Bold" />
+                                                <Span Text="{Binding MontoFacturasContadoDolares, StringFormat='{0:N2}'}" FontAttributes="Bold" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Grid>
+                    </core:DXBorder>
+
+                    <!-- FACTURAS CREDITO -->
+                    <core:DXBorder CornerRadius="16" BorderThickness="0" BackgroundColor="{StaticResource White}">
+                        <core:DXBorder.Shadow>
+                            <Shadow Brush="{StaticResource Gray300Brush}" Offset="0,2" Radius="8" Opacity="0.3" />
+                        </core:DXBorder.Shadow>
+                        <Grid ColumnSpacing="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="5" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <BoxView Grid.Column="0" Color="{StaticResource Secondary}" VerticalOptions="Fill" />
+                            <Grid Grid.Column="1" Padding="16,14" ColumnSpacing="14">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="52" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <core:DXBorder Grid.Column="0"
+                                               WidthRequest="48" HeightRequest="48"
+                                               CornerRadius="12"
+                                               BorderThickness="0"
+                                               BackgroundColor="#E3F7EC"
+                                               VerticalOptions="Center">
+                                    <Image Source="cash_pay" WidthRequest="26" HeightRequest="26"
+                                           HorizontalOptions="Center" VerticalOptions="Center" />
+                                </core:DXBorder>
+                                <VerticalStackLayout Grid.Column="1" Spacing="1">
+                                    <Label Text="Facturas de Crédito" FontSize="13" TextColor="{StaticResource Gray500}" />
+                                    <Label Text="{Binding CantidadFacutrasCredito}" FontSize="26" FontAttributes="Bold"
+                                           TextColor="{StaticResource PrimaryDark}" />
+                                    <Label Margin="0,4,0,0" FontSize="12" TextColor="{StaticResource Secondary}">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="C$ " FontAttributes="Bold" />
+                                                <Span Text="{Binding MontoFacturasCreditoCordobas, StringFormat='{0:N2}'}" FontAttributes="Bold" />
+                                                <Span Text="   ·   $ " FontAttributes="Bold" />
+                                                <Span Text="{Binding MontoFacturasCreditoDolares, StringFormat='{0:N2}'}" FontAttributes="Bold" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Grid>
+                    </core:DXBorder>
+
+                    <!-- ABONOS -->
+                    <core:DXBorder CornerRadius="16" BorderThickness="0" BackgroundColor="{StaticResource White}">
+                        <core:DXBorder.Shadow>
+                            <Shadow Brush="{StaticResource Gray300Brush}" Offset="0,2" Radius="8" Opacity="0.3" />
+                        </core:DXBorder.Shadow>
+                        <Grid ColumnSpacing="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="5" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <BoxView Grid.Column="0" Color="{StaticResource Magenta}" VerticalOptions="Fill" />
+                            <VerticalStackLayout Grid.Column="1" Padding="16,14" Spacing="12">
+                                <Grid ColumnSpacing="14">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="52" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <core:DXBorder Grid.Column="0"
+                                                   WidthRequest="48" HeightRequest="48"
+                                                   CornerRadius="12"
+                                                   BorderThickness="0"
+                                                   BackgroundColor="#FBE6F5"
+                                                   VerticalOptions="Center">
+                                        <Image Source="payment_2" WidthRequest="26" HeightRequest="26"
+                                               HorizontalOptions="Center" VerticalOptions="Center" />
+                                    </core:DXBorder>
+                                    <VerticalStackLayout Grid.Column="1" Spacing="1">
+                                        <Label Text="Abonos Aplicados" FontSize="13" TextColor="{StaticResource Gray500}" />
+                                        <Label Text="{Binding CantidadAbonos}" FontSize="26" FontAttributes="Bold"
+                                               TextColor="{StaticResource PrimaryDark}" />
+                                    </VerticalStackLayout>
+                                </Grid>
+
+                                <BoxView HeightRequest="1" Color="{StaticResource Gray100}" />
+
+                                <!-- Detalle Córdobas -->
+                                <VerticalStackLayout Spacing="4">
+                                    <Grid ColumnSpacing="8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Label Grid.Column="0" Text="Córdobas" FontSize="13" FontAttributes="Bold"
+                                               TextColor="{StaticResource Gray600}" />
+                                        <Label Grid.Column="1" FontSize="12" TextColor="{StaticResource Gray500}">
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="C$ " />
+                                                    <Span Text="{Binding MontoAbonosCordobas, StringFormat='{0:N2}'}" FontAttributes="Bold" TextColor="{StaticResource PrimaryDark}" />
+                                                    <Span Text=" / " />
+                                                    <Span Text="{Binding MontoTotalAbonosCordobas, StringFormat='{0:N2}'}" />
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                    </Grid>
+                                    <ProgressBar Progress="{Binding PorcentajeAbonosTotalesCordobas, Converter={StaticResource PorcentajeProgresoConverter}}"
+                                                 ProgressColor="{StaticResource Primary}"
+                                                 HeightRequest="6" />
+                                    <Label Text="{Binding PorcentajeAbonosTotalesCordobas, StringFormat='Cumplimiento {0:F2}%'}"
+                                           FontSize="11" TextColor="{StaticResource Gray400}" HorizontalOptions="End" />
+                                </VerticalStackLayout>
+
+                                <!-- Detalle Dólares -->
+                                <VerticalStackLayout Spacing="4">
+                                    <Grid ColumnSpacing="8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Label Grid.Column="0" Text="Dólares" FontSize="13" FontAttributes="Bold"
+                                               TextColor="{StaticResource Gray600}" />
+                                        <Label Grid.Column="1" FontSize="12" TextColor="{StaticResource Gray500}">
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="$ " />
+                                                    <Span Text="{Binding MontoAbonosDolares, StringFormat='{0:N2}'}" FontAttributes="Bold" TextColor="{StaticResource PrimaryDark}" />
+                                                    <Span Text=" / " />
+                                                    <Span Text="{Binding MontoTotalAbonosDolares, StringFormat='{0:N2}'}" />
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                    </Grid>
+                                    <ProgressBar Progress="{Binding PorcentajeAbonosTotalesDolares, Converter={StaticResource PorcentajeProgresoConverter}}"
+                                                 ProgressColor="{StaticResource Secondary}"
+                                                 HeightRequest="6" />
+                                    <Label Text="{Binding PorcentajeAbonosTotalesDolares, StringFormat='Cumplimiento {0:F2}%'}"
+                                           FontSize="11" TextColor="{StaticResource Gray400}" HorizontalOptions="End" />
+                                </VerticalStackLayout>
+                            </VerticalStackLayout>
+                        </Grid>
+                    </core:DXBorder>
+
+                </VerticalStackLayout>
+            </ScrollView>
         </controls:ShimmerView>
     </ContentPage.Content>
-
 </ContentPage>
