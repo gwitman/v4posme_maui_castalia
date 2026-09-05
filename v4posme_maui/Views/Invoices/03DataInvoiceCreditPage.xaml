@@ -19,21 +19,37 @@
             
             
             <controls:ShimmerView.Content>
-                <ScrollView>
-                    <StackLayout>
+                <ScrollView BackgroundColor="{AppThemeBinding Light={StaticResource PageBackground}, Dark={StaticResource PageBackgroundDark}}">
+                    <StackLayout Padding="0,0,0,20">
                         
-                        <dx:DXStackLayout Orientation="Vertical">
-                            <dx:DXBorder HeightRequest="1" BorderThickness="1"
-                                         BackgroundColor="{AppThemeBinding Light={StaticResource SeparatorColor}, Dark={StaticResource SeparatorColorDark}}" />
-                            <dx:DXImage Source="invoice_green" WidthRequest="150" HeightRequest="150" />
-                        </dx:DXStackLayout>
+                        <dx:DXBorder BackgroundColor="{StaticResource Primary}"
+                                     CornerRadius="0,0,28,28"
+                                     BorderThickness="0"
+                                     Padding="0,18,0,22">
+                            <dx:DXBorder WidthRequest="120"
+                                         HeightRequest="120"
+                                         CornerRadius="60"
+                                         BorderThickness="0"
+                                         HorizontalOptions="Center"
+                                         BackgroundColor="#33FFFFFF">
+                                <dx:DXImage Source="invoice_green"
+                                            WidthRequest="80"
+                                            HeightRequest="80"
+                                            HorizontalOptions="Center"
+                                            VerticalOptions="Center"
+                                            Aspect="AspectFit" />
+                            </dx:DXBorder>
+                        </dx:DXBorder>
                         
                         
                         <dx:DXBorder
-                            Margin="15"
+                            Margin="14,16,14,14"
                             BackgroundColor="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}"
-                            BorderThickness="0" CornerRadius="10">
-                            <Grid RowSpacing="15" Padding="15">
+                            BorderThickness="0" CornerRadius="16">
+                            <dx:DXBorder.Shadow>
+                                <Shadow Brush="{StaticResource Primary}" Opacity="0.15" Radius="14" Offset="0,4" />
+                            </dx:DXBorder.Shadow>
+                            <Grid RowSpacing="15" Padding="14">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />

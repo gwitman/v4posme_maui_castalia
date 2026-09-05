@@ -18,99 +18,123 @@
             Style="{StaticResource ShimmerEffect}"
             IsLoading="{Binding IsBusy}">
             <controls:ShimmerView.Content>
-                <ScrollView>
-                    <Grid
-                        RowDefinitions="Auto,*"
-                        HorizontalOptions="Center">
-                        <Grid ColumnDefinitions="0.2*">
-                            <dxe:TextEdit x:Name="SearchBar"
-                                          Grid.Column="1"
-                                          Margin="5"
-                                          StartIcon="search"
-                                          Text="{Binding Search}"
-                                          StartIconCommand="{Binding SearchCommand}"
-                                          ReturnCommand="{Binding SearchCommand}"
-                                          PlaceholderText="Buscar por código de factura" />
-                        </Grid>
-                        <dxcv:DXCollectionView x:Name="InvoicesCollectionView"
-                                               Grid.Row="1"
-                                               ItemsSource="{Binding Invoices}"
-                                               SelectedItem="{Binding SelectedInvoice}"
-                                               SelectionMode="Single"
-                                               TapCommand="{Binding Source={x:Reference InvoicesCollectionView}, Path=Commands.ShowDetailForm}"
-                                               IsRefreshing="{Binding  IsBusy, Mode=OneWay}">
-                            <dxcv:DXCollectionView.ItemTemplate>
-                                <DataTemplate>
-                                    <dxc:DXStackLayout
-                                        CornerRadius="15"
-                                        Margin="10">
-                                        <Grid
-                                            x:DataType="models:Api_AppMobileApi_GetDataDownloadDocumentCreditResponse"
-                                            HorizontalOptions="Fill"
-                                            Padding="10"
-                                            VerticalOptions="Fill"
-                                            BackgroundColor="{StaticResource Primary}">
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="Auto" />
-                                            </Grid.RowDefinitions>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition Width="1.5*" />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
+                <Grid
+                    RowDefinitions="Auto,*"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource PageBackground}, Dark={StaticResource PageBackgroundDark}}">
+                    <dxc:DXBorder Grid.Row="0"
+                                  Margin="12,12,12,6"
+                                  CornerRadius="16"
+                                  BorderThickness="0"
+                                  BackgroundColor="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}">
+                        <dxc:DXBorder.Shadow>
+                            <Shadow Brush="{StaticResource Primary}" Opacity="0.18" Radius="14" Offset="0,4" />
+                        </dxc:DXBorder.Shadow>
+                        <dxe:TextEdit x:Name="SearchBar"
+                                      Margin="6,2"
+                                      BackgroundColor="Transparent"
+                                      BorderThickness="0"
+                                      StartIcon="search"
+                                      StartIconColor="{StaticResource Primary}"
+                                      Text="{Binding Search}"
+                                      StartIconCommand="{Binding SearchCommand}"
+                                      ReturnCommand="{Binding SearchCommand}"
+                                      PlaceholderText="Buscar por código de factura" />
+                    </dxc:DXBorder>
+                    <dxcv:DXCollectionView x:Name="InvoicesCollectionView"
+                                           Grid.Row="1"
+                                           ItemsSource="{Binding Invoices}"
+                                           SelectedItem="{Binding SelectedInvoice}"
+                                           SelectionMode="Single"
+                                           TapCommand="{Binding Source={x:Reference InvoicesCollectionView}, Path=Commands.ShowDetailForm}"
+                                           IsRefreshing="{Binding  IsBusy, Mode=OneWay}">
+                        <dxcv:DXCollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <dxc:DXBorder
+                                    CornerRadius="18"
+                                    BorderThickness="0"
+                                    Padding="0"
+                                    Margin="12,6">
+                                    <dxc:DXBorder.Shadow>
+                                        <Shadow Brush="{StaticResource Black}" Opacity="0.12" Radius="10" Offset="0,3" />
+                                    </dxc:DXBorder.Shadow>
+                                    <Grid
+                                        x:DataType="models:Api_AppMobileApi_GetDataDownloadDocumentCreditResponse"
+                                        HorizontalOptions="Fill"
+                                        Padding="14"
+                                        VerticalOptions="Fill"
+                                        BackgroundColor="{StaticResource Primary}">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="1.5*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
 
-                                            <Frame
-                                                WidthRequest="60"
-                                                HeightRequest="60"
-                                                BackgroundColor="Transparent"
-                                                Grid.Column="0"
-                                                Grid.RowSpan="3">
-                                                <dxc:DXImage WidthRequest="55"
-                                                             HeightRequest="55"
-                                                             Source="invoice_outline"
-                                                             Aspect="Fill" />
-                                            </Frame>
-                                            <Label Grid.Column="1" Grid.Row="0" FontAttributes="Bold"
-                                                   Grid.ColumnSpan="2"
+                                        <dxc:DXBorder
+                                            WidthRequest="58"
+                                            HeightRequest="58"
+                                            CornerRadius="29"
+                                            VerticalOptions="Center"
+                                            BorderThickness="0"
+                                            BackgroundColor="#33FFFFFF"
+                                            Grid.Column="0"
+                                            Grid.RowSpan="3">
+                                            <dxc:DXImage WidthRequest="38"
+                                                         HeightRequest="38"
+                                                         HorizontalOptions="Center"
+                                                         VerticalOptions="Center"
+                                                         Source="invoice_outline"
+                                                         Aspect="AspectFit" />
+                                        </dxc:DXBorder>
+                                        <Label Grid.Column="1" Grid.Row="0" FontAttributes="Bold"
+                                               Grid.ColumnSpan="2"
+                                               Margin="12,0,0,0"
+                                               FontSize="16"
+                                               TextColor="White"
+                                               Text="{Binding DocumentNumber}" />
+                                        <HorizontalStackLayout Grid.Column="1" Grid.Row="1" Margin="12,0,0,0">
+                                            <Label Text="{Binding Remaining,StringFormat='{0:N0}'}"
+                                                   FontAttributes="Bold"
                                                    TextColor="White"
-                                                   Text="{Binding DocumentNumber}" />
-                                            <HorizontalStackLayout Grid.Column="1" Grid.Row="1">
-                                                <Label Text="{Binding Remaining,StringFormat='{0:N0}'}"
-                                                       TextColor="White"
-                                                       HorizontalOptions="Start" />
-                                            </HorizontalStackLayout>
-                                            <HorizontalStackLayout Grid.Row="1" Grid.Column="2">
-                                                <Label
-                                                    HorizontalOptions="End">
-                                                    <Label.FormattedText>
-                                                        <FormattedString>
-                                                            <Span
-                                                                Text="{Binding DateApply,StringFormat='{0:yyyy-MM-dd}'}"
-                                                                TextColor="White" />
-                                                        </FormattedString>
-                                                    </Label.FormattedText>
-                                                </Label>
-                                            </HorizontalStackLayout>
-                                            <HorizontalStackLayout Grid.Row="2"
-                                                                   Grid.Column="1"
-                                                                   Grid.ColumnSpan="2">
-                                                <Label Text="{Binding CurrencyName}" TextColor="White" />
-                                            </HorizontalStackLayout>
-                                            <Grid.GestureRecognizers>
-                                                <TapGestureRecognizer
-                                                    NumberOfTapsRequired="1"
-                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type abonos:CustomerDetailInvoiceViewModel}}, Path=ItemTapped}"
-                                                    CommandParameter="{Binding .}" />
-                                            </Grid.GestureRecognizers>
-                                        </Grid>
-                                    </dxc:DXStackLayout>
-                                </DataTemplate>
-                            </dxcv:DXCollectionView.ItemTemplate>
-                        </dxcv:DXCollectionView>
-                    </Grid>
-                </ScrollView>
+                                                   HorizontalOptions="Start" />
+                                        </HorizontalStackLayout>
+                                        <HorizontalStackLayout Grid.Row="1" Grid.Column="2">
+                                            <Label
+                                                HorizontalOptions="End">
+                                                <Label.FormattedText>
+                                                    <FormattedString>
+                                                        <Span
+                                                            Text="{Binding DateApply,StringFormat='{0:yyyy-MM-dd}'}"
+                                                            TextColor="White" />
+                                                    </FormattedString>
+                                                </Label.FormattedText>
+                                            </Label>
+                                        </HorizontalStackLayout>
+                                        <HorizontalStackLayout Grid.Row="2"
+                                                               Grid.Column="1"
+                                                               Margin="12,2,0,0"
+                                                               Grid.ColumnSpan="2">
+                                            <Label Text="{Binding CurrencyName}"
+                                                   FontSize="13"
+                                                   Opacity="0.9"
+                                                   TextColor="White" />
+                                        </HorizontalStackLayout>
+                                        <Grid.GestureRecognizers>
+                                            <TapGestureRecognizer
+                                                NumberOfTapsRequired="1"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type abonos:CustomerDetailInvoiceViewModel}}, Path=ItemTapped}"
+                                                CommandParameter="{Binding .}" />
+                                        </Grid.GestureRecognizers>
+                                    </Grid>
+                                </dxc:DXBorder>
+                            </DataTemplate>
+                        </dxcv:DXCollectionView.ItemTemplate>
+                    </dxcv:DXCollectionView>
+                </Grid>
             </controls:ShimmerView.Content>
             <controls:ShimmerView.LoadingView>
                 <ActivityIndicator IsRunning="{Binding IsBusy}"

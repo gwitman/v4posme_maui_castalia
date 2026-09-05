@@ -16,7 +16,7 @@
             Style="{StaticResource ShimmerEffect}" 
             IsLoading="{Binding IsBusy}">
             <controls:ShimmerView.Content>
-                <Grid>
+                <Grid BackgroundColor="{AppThemeBinding Light={StaticResource PageBackground}, Dark={StaticResource PageBackgroundDark}}">
                 <!-- Define the rows -->
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" /> <!-- Header -->
@@ -25,46 +25,67 @@
                 </Grid.RowDefinitions>
 
                 <!-- Header -->
-                <StackLayout
+                <dx:DXBorder
                     Grid.Row="0"
-                    BackgroundColor="{StaticResource Secondary}"
-                    Padding="10">
+                    BackgroundColor="{StaticResource Primary}"
+                    CornerRadius="0,0,24,24"
+                    BorderThickness="0"
+                    Padding="10,18">
                     <Label
                         FontSize="24"
+                        FontAttributes="Bold"
                         TextColor="White"
                         Text="Procesar Pago"
                         HorizontalOptions="Center"
                         VerticalOptions="Center" />
-                </StackLayout>
+                </dx:DXBorder>
 
                 <!-- Body -->
                 <Grid
                     Grid.Row="1"
-                    RowSpacing="25"
+                    RowSpacing="20"
                     VerticalOptions="Center"
-                    Padding="10">
+                    Padding="16">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <Label
-                        FontSize="48"
-                        FontAttributes="Bold"
-                        HorizontalOptions="Center"
-                        VerticalOptions="Center">
-                        <Label.FormattedText>
-                            <FormattedString>
-                                <Span Text="{Binding Moneda}" />
-                                <Span Text=" " />
-                                <Span Text="{Binding Balance, StringFormat='{0:N2}'}" />
-                            </FormattedString>
-                        </Label.FormattedText>
-                    </Label>
+                    <dx:DXBorder
+                        CornerRadius="16"
+                        BorderThickness="0"
+                        Padding="16,24"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}">
+                        <dx:DXBorder.Shadow>
+                            <Shadow Brush="{StaticResource Primary}" Opacity="0.15" Radius="14" Offset="0,4" />
+                        </dx:DXBorder.Shadow>
+                        <dx:DXStackLayout Orientation="Vertical" ItemSpacing="2" HorizontalOptions="Center">
+                            <Label
+                                Text="Total a pagar"
+                                FontSize="14"
+                                Opacity="0.7"
+                                HorizontalOptions="Center" />
+                            <Label
+                                FontSize="48"
+                                FontAttributes="Bold"
+                                TextColor="{StaticResource Primary}"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="{Binding Moneda}" />
+                                        <Span Text=" " />
+                                        <Span Text="{Binding Balance, StringFormat='{0:N2}'}" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                        </dx:DXStackLayout>
+                    </dx:DXBorder>
                     <editors:TextEdit
                         Grid.Row="1"
                         IconColor="{StaticResource Primary}"
                         StartIcon="quantity"
+                        LabelText="Monto recibido"
                         PlaceholderText="Ingrese monto..."
                         ClearIconCommand="{Binding ClearMontoCommand}"
                         ClearIconCommandParameter="{Binding Monto}"
@@ -75,6 +96,7 @@
                         IconColor="{StaticResource Primary}"
                         IsReadOnly="True"
                         StartIcon="quantity"
+                        LabelText="Cambio"
                         Text="{Binding Cambio}"
                         PlaceholderText="Cambio..."
                         Keyboard="Numeric" />
@@ -173,9 +195,14 @@
                         
                     </Grid>
                     <dx:DXStackLayout
-                        Orientation="Vertical">
+                        Orientation="Vertical"
+                        Margin="0,8,0,0">
                         <dx:DXButton
                             Content="{Binding PagarSeleccion}"
+                            BackgroundColor="{StaticResource Primary}"
+                            TextColor="White"
+                            CornerRadius="12"
+                            HeightRequest="52"
                             Command="{Binding AplicarPagoCommand}" />
                     </dx:DXStackLayout>
                 </StackLayout>

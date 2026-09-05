@@ -6,6 +6,7 @@
              xmlns:printers="clr-namespace:v4posme_maui.ViewModels.Printers"
              xmlns:core="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
              xmlns:editors="clr-namespace:DevExpress.Maui.Editors;assembly=DevExpress.Maui.Editors"
+             BackgroundColor="{AppThemeBinding Light={StaticResource PageBackground}, Dark={StaticResource PageBackgroundDark}}"
              x:Class="v4posme_maui.Views.Printers.DashboardPrinterPage">
     <ContentPage.BindingContext>
         <printers:DashboardPrinterViewModel />
@@ -35,32 +36,49 @@
             IsLoading="{Binding IsBusy}">
             <dxco:ShimmerView.Content>
                 <dxco:TabView
-                    SelectedItemIndicatorColor="{StaticResource Secondary}"
-                    HeaderPanelBackgroundColor="{StaticResource Gray200}"
+                    SelectedItemIndicatorColor="{StaticResource Primary}"
+                    HeaderPanelBackgroundColor="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}"
                     SelectedItemIndex="{Binding SelectedIndex}">
                     <dxco:TabViewItem HeaderText="Facturas">
                         <dxco:TabViewItem.Content>
                             <ScrollView>
                                 <core:DXStackLayout>
-                                    <Grid
-                                        Padding="15">
+                                    <core:DXBorder
+                                        Margin="12,12,12,4"
+                                        CornerRadius="16"
+                                        BorderThickness="0"
+                                        BackgroundColor="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}">
+                                        <core:DXBorder.Shadow>
+                                            <Shadow Brush="{StaticResource Primary}" Opacity="0.18" Radius="14" Offset="0,4" />
+                                        </core:DXBorder.Shadow>
                                         <editors:TextEdit
+                                            Margin="6,2"
+                                            BackgroundColor="Transparent"
+                                            BorderThickness="0"
                                             StartIcon="search"
+                                            StartIconColor="{StaticResource Primary}"
                                             Text="{Binding Search}"
                                             StartIconCommand="{Binding SearchFacturaCommand}"
                                             ReturnCommand="{Binding SearchFacturaCommand}"
                                             PlaceholderText="Buscar por código"/>
-                                    </Grid>
+                                    </core:DXBorder>
                                     <CollectionView
-                                        Margin="10"
+                                        Margin="0"
                                         x:Name="FacturaCollectionView"
                                         ItemsSource="{Binding Facturas}"
                                         SelectionMode="Single">
                                         <CollectionView.ItemTemplate>
                                             <DataTemplate>
-                                                <core:DXStackLayout>
+                                                <core:DXBorder
+                                                    CornerRadius="16"
+                                                    BorderThickness="0"
+                                                    Margin="12,6"
+                                                    Padding="14"
+                                                    BackgroundColor="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}">
+                                                    <core:DXBorder.Shadow>
+                                                        <Shadow Brush="{StaticResource Black}" Opacity="0.10" Radius="8" Offset="0,2" />
+                                                    </core:DXBorder.Shadow>
                                                     <Grid
-                                                        Margin="5"
                                                         RowSpacing="5"
                                                         ColumnSpacing="5">
                                                         <Grid.RowDefinitions>
@@ -78,6 +96,8 @@
                                                         <Label
                                                             Grid.Row="0"
                                                             Grid.Column="0"
+                                                            FontAttributes="Bold"
+                                                            TextColor="{StaticResource Primary}"
                                                             Text="{Binding Codigo}" />
                                                         <Label
                                                             Grid.Row="0"
@@ -86,7 +106,8 @@
                                                             Text="{Binding FirstName}" />
                                                         <Label
                                                             Grid.Row="1"
-                                                            Grid.Column="0">
+                                                            Grid.Column="0"
+                                                            FontAttributes="Bold">
                                                             <Label.FormattedText>
                                                                 <FormattedString>
                                                                     <Span Text="{Binding Currency.Simbolo}" />
@@ -104,6 +125,8 @@
                                                             Grid.Row="2"
                                                             Grid.Column="0"
                                                             Grid.ColumnSpan="2"
+                                                            FontSize="12"
+                                                            Opacity="0.7"
                                                             Text="{Binding TransactionOn, StringFormat='{0:yyyy-MM-dd hh:mm tt}'}" />
 
                                                         <Label
@@ -125,45 +148,51 @@
                                                             IconWidth="30"
                                                             Icon="view_1" />
                                                     </Grid>
-                                                    <core:DXSeparator BackgroundColor="{StaticResource Secondary}" />
-                                                </core:DXStackLayout>
+                                                </core:DXBorder>
                                             </DataTemplate>
                                         </CollectionView.ItemTemplate>
                                     </CollectionView>
-                                    <core:DXStackLayout
-                                        Margin="10"
-                                        HorizontalOptions="End"
-                                        Orientation="Horizontal">
-                                        <Label
-                                            FontSize="20"
-                                            FontAttributes="Bold"
-                                            HorizontalOptions="End"
-                                            TextColor="{StaticResource Secondary}"
-                                            Text="TOTAL: " />
-                                        <Label
-                                            FontSize="20"
-                                            FontAttributes="Bold"
-                                            TextColor="{StaticResource Secondary}"
-                                            HorizontalOptions="End"
-                                            Text="{Binding TotalCordobasFacturado}" />
-                                    </core:DXStackLayout>
-                                    <core:DXStackLayout
-                                        Margin="10"
-                                        HorizontalOptions="End"
-                                        Orientation="Horizontal">
-                                        <Label
-                                            FontSize="20"
-                                            FontAttributes="Bold"
-                                            HorizontalOptions="End"
-                                            TextColor="{StaticResource Secondary}"
-                                            Text="TOTAL: " />
-                                        <Label
-                                            FontSize="20"
-                                            FontAttributes="Bold"
-                                            TextColor="{StaticResource Secondary}"
-                                            HorizontalOptions="End"
-                                            Text="{Binding TotalDolaresFacturado}" />
-                                    </core:DXStackLayout>
+                                    <core:DXBorder
+                                        Margin="12,8"
+                                        Padding="16,12"
+                                        CornerRadius="16"
+                                        BorderThickness="0"
+                                        BackgroundColor="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}">
+                                        <core:DXStackLayout Orientation="Vertical" ItemSpacing="4">
+                                            <core:DXStackLayout
+                                                HorizontalOptions="End"
+                                                Orientation="Horizontal">
+                                                <Label
+                                                    FontSize="20"
+                                                    FontAttributes="Bold"
+                                                    HorizontalOptions="End"
+                                                    TextColor="{StaticResource Primary}"
+                                                    Text="TOTAL: " />
+                                                <Label
+                                                    FontSize="20"
+                                                    FontAttributes="Bold"
+                                                    TextColor="{StaticResource Primary}"
+                                                    HorizontalOptions="End"
+                                                    Text="{Binding TotalCordobasFacturado}" />
+                                            </core:DXStackLayout>
+                                            <core:DXStackLayout
+                                                HorizontalOptions="End"
+                                                Orientation="Horizontal">
+                                                <Label
+                                                    FontSize="20"
+                                                    FontAttributes="Bold"
+                                                    HorizontalOptions="End"
+                                                    TextColor="{StaticResource Primary}"
+                                                    Text="TOTAL: " />
+                                                <Label
+                                                    FontSize="20"
+                                                    FontAttributes="Bold"
+                                                    TextColor="{StaticResource Primary}"
+                                                    HorizontalOptions="End"
+                                                    Text="{Binding TotalDolaresFacturado}" />
+                                            </core:DXStackLayout>
+                                        </core:DXStackLayout>
+                                    </core:DXBorder>
                                 </core:DXStackLayout>
                             </ScrollView>
                         </dxco:TabViewItem.Content>
@@ -172,25 +201,42 @@
                         <dxco:TabViewItem.Content>
                             <ScrollView>
                                 <core:DXStackLayout>
-                                    <Grid
-                                        Padding="15">
+                                    <core:DXBorder
+                                        Margin="12,12,12,4"
+                                        CornerRadius="16"
+                                        BorderThickness="0"
+                                        BackgroundColor="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}">
+                                        <core:DXBorder.Shadow>
+                                            <Shadow Brush="{StaticResource Primary}" Opacity="0.18" Radius="14" Offset="0,4" />
+                                        </core:DXBorder.Shadow>
                                         <editors:TextEdit
+                                            Margin="6,2"
+                                            BackgroundColor="Transparent"
+                                            BorderThickness="0"
                                             StartIcon="search"
+                                            StartIconColor="{StaticResource Primary}"
                                             Text="{Binding SearchAbonos}"
                                             StartIconCommand="{Binding SearchAbonoCommand}"
                                             ReturnCommand="{Binding SearchAbonoCommand}"
                                             PlaceholderText="Buscar por código" />
-                                    </Grid>
+                                    </core:DXBorder>
                                     <CollectionView
-                                        Margin="10"
+                                        Margin="0"
                                         x:Name="AbonosCollectionView"
                                         ItemsSource="{Binding Abonos}"
                                         SelectionMode="Single">
                                         <CollectionView.ItemTemplate>
                                             <DataTemplate>
-                                                <core:DXStackLayout>
+                                                <core:DXBorder
+                                                    CornerRadius="16"
+                                                    BorderThickness="0"
+                                                    Margin="12,6"
+                                                    Padding="14"
+                                                    BackgroundColor="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}">
+                                                    <core:DXBorder.Shadow>
+                                                        <Shadow Brush="{StaticResource Black}" Opacity="0.10" Radius="8" Offset="0,2" />
+                                                    </core:DXBorder.Shadow>
                                                     <Grid
-                                                        Margin="5"
                                                         RowSpacing="5"
                                                         ColumnSpacing="5">
                                                         <Grid.RowDefinitions>
@@ -208,6 +254,8 @@
                                                         <Label
                                                             Grid.Row="0"
                                                             Grid.Column="0"
+                                                            FontAttributes="Bold"
+                                                            TextColor="{StaticResource Primary}"
                                                             Text="{Binding CodigoAbono}" />
                                                         <core:DXStackLayout Orientation="Horizontal"
                                                                             Grid.Row="0"
@@ -217,7 +265,8 @@
                                                         </core:DXStackLayout>
                                                         <Label
                                                             Grid.Row="1"
-                                                            Grid.Column="0">
+                                                            Grid.Column="0"
+                                                            FontAttributes="Bold">
                                                             <Label.FormattedText>
                                                                 <FormattedString>
                                                                     <Span Text="{Binding CurrencyName}" />
@@ -236,6 +285,8 @@
                                                             Grid.Row="2"
                                                             Grid.Column="0"
                                                             Grid.ColumnSpan="2"
+                                                            FontSize="12"
+                                                            Opacity="0.7"
                                                             Text="{Binding Fecha, StringFormat='{0:yyyy-MM-dd}'}" />
                                                         <core:DXButton
                                                             Command="{Binding BindingContext.SelectedAbonoCommand,Source={x:Reference AbonosCollectionView}}"
@@ -248,45 +299,51 @@
                                                             IconWidth="30"
                                                             Icon="view_1" />
                                                     </Grid>
-                                                    <core:DXSeparator BackgroundColor="{StaticResource Secondary}" />
-                                                </core:DXStackLayout>
+                                                </core:DXBorder>
                                             </DataTemplate>
                                         </CollectionView.ItemTemplate>
                                     </CollectionView>
-                                    <core:DXStackLayout
-                                        Margin="20"
-                                        HorizontalOptions="End"
-                                        Orientation="Horizontal">
-                                        <Label
-                                            FontSize="20"
-                                            FontAttributes="Bold"
-                                            HorizontalOptions="End"
-                                            TextColor="{StaticResource Secondary}"
-                                            Text="TOTAL: " />
-                                        <Label
-                                            FontSize="20"
-                                            FontAttributes="Bold"
-                                            TextColor="{StaticResource Secondary}"
-                                            HorizontalOptions="End"
-                                            Text="{Binding TotalCordobasAbonos}" />
-                                    </core:DXStackLayout>
-                                    <core:DXStackLayout
-                                        Margin="20"
-                                        HorizontalOptions="End"
-                                        Orientation="Horizontal">
-                                        <Label
-                                            FontSize="20"
-                                            FontAttributes="Bold"
-                                            HorizontalOptions="End"
-                                            TextColor="{StaticResource Secondary}"
-                                            Text="TOTAL: " />
-                                        <Label
-                                            FontSize="20"
-                                            FontAttributes="Bold"
-                                            TextColor="{StaticResource Secondary}"
-                                            HorizontalOptions="End"
-                                            Text="{Binding TotalDolaresAbonos}" />
-                                    </core:DXStackLayout>
+                                    <core:DXBorder
+                                        Margin="12,8"
+                                        Padding="16,12"
+                                        CornerRadius="16"
+                                        BorderThickness="0"
+                                        BackgroundColor="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}">
+                                        <core:DXStackLayout Orientation="Vertical" ItemSpacing="4">
+                                            <core:DXStackLayout
+                                                HorizontalOptions="End"
+                                                Orientation="Horizontal">
+                                                <Label
+                                                    FontSize="20"
+                                                    FontAttributes="Bold"
+                                                    HorizontalOptions="End"
+                                                    TextColor="{StaticResource Primary}"
+                                                    Text="TOTAL: " />
+                                                <Label
+                                                    FontSize="20"
+                                                    FontAttributes="Bold"
+                                                    TextColor="{StaticResource Primary}"
+                                                    HorizontalOptions="End"
+                                                    Text="{Binding TotalCordobasAbonos}" />
+                                            </core:DXStackLayout>
+                                            <core:DXStackLayout
+                                                HorizontalOptions="End"
+                                                Orientation="Horizontal">
+                                                <Label
+                                                    FontSize="20"
+                                                    FontAttributes="Bold"
+                                                    HorizontalOptions="End"
+                                                    TextColor="{StaticResource Primary}"
+                                                    Text="TOTAL: " />
+                                                <Label
+                                                    FontSize="20"
+                                                    FontAttributes="Bold"
+                                                    TextColor="{StaticResource Primary}"
+                                                    HorizontalOptions="End"
+                                                    Text="{Binding TotalDolaresAbonos}" />
+                                            </core:DXStackLayout>
+                                        </core:DXStackLayout>
+                                    </core:DXBorder>
                                 </core:DXStackLayout>
                             </ScrollView>
                         </dxco:TabViewItem.Content>
@@ -295,27 +352,41 @@
                         <dxco:TabViewItem.Content>
                             <ScrollView>
                                 <StackLayout>
-                                    <Grid ColumnDefinitions="0.2*">
+                                    <core:DXBorder
+                                        Margin="12,12,12,4"
+                                        CornerRadius="16"
+                                        BorderThickness="0"
+                                        BackgroundColor="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}">
+                                        <core:DXBorder.Shadow>
+                                            <Shadow Brush="{StaticResource Primary}" Opacity="0.18" Radius="14" Offset="0,4" />
+                                        </core:DXBorder.Shadow>
                                         <editors:TextEdit x:Name="SearchBar"
-                                                          Grid.Column="1"
-                                                          Margin="5"
+                                                          Margin="6,2"
+                                                          BackgroundColor="Transparent"
+                                                          BorderThickness="0"
                                                           StartIcon="search"
+                                                          StartIconColor="{StaticResource Primary}"
                                                           Text="{Binding SearchProduct}"
                                                           StartIconCommand="{Binding SearchProductCommand}"
                                                           ReturnCommand="{Binding SearchProductCommand}"
                                                           PlaceholderText="Buscar por código, código de barra y descripción"/>
-                                    </Grid>
+                                    </core:DXBorder>
                                     <CollectionView x:Name="ItemsListView"
                                                     ItemsSource="{Binding Productos}"
                                                     SelectionMode="Single">
                                         <CollectionView.ItemTemplate>
                                             <DataTemplate>
-                                                <core:DXStackLayout
-                                                    CornerRadius="15"
-                                                    Margin="10">
+                                                <core:DXBorder
+                                                    CornerRadius="16"
+                                                    BorderThickness="0"
+                                                    Margin="12,6"
+                                                    Padding="14"
+                                                    BackgroundColor="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}">
+                                                    <core:DXBorder.Shadow>
+                                                        <Shadow Brush="{StaticResource Black}" Opacity="0.10" Radius="8" Offset="0,2" />
+                                                    </core:DXBorder.Shadow>
                                                     <Grid
                                                         HorizontalOptions="Fill"
-                                                        Padding="10"
                                                         VerticalOptions="Fill">
                                                         <Grid.RowDefinitions>
                                                             <RowDefinition Height="Auto" />
@@ -332,6 +403,7 @@
                                                             Grid.Column="0"
                                                             Grid.Row="0"
                                                             FontAttributes="Bold"
+                                                            TextColor="{StaticResource Primary}"
                                                             Grid.ColumnSpan="2"
                                                             Text="{Binding BarCode}" />
                                                         <HorizontalStackLayout
@@ -351,6 +423,7 @@
                                                             Grid.Row="1">
                                                             <Label Text="Precio: C$ " />
                                                             <Label
+                                                                FontAttributes="Bold"
                                                                 HorizontalOptions="End"
                                                                 Text="{Binding PrecioPublico}" />
                                                         </HorizontalStackLayout>
@@ -372,8 +445,7 @@
                                                             IconWidth="30"
                                                             Icon="view_1" />
                                                     </Grid>
-                                                    <core:DXSeparator BackgroundColor="{StaticResource Secondary}" />
-                                                </core:DXStackLayout>
+                                                </core:DXBorder>
                                             </DataTemplate>
                                         </CollectionView.ItemTemplate>
                                     </CollectionView>
@@ -385,6 +457,7 @@
             </dxco:ShimmerView.Content>
             <dxco:ShimmerView.LoadingView>
                 <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                   Color="{StaticResource Primary}"
                                    HeightRequest="50"
                                    WidthRequest="50"/>
             </dxco:ShimmerView.LoadingView>

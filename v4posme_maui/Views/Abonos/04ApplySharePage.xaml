@@ -18,34 +18,56 @@
             IsLoading="{Binding IsBusy}">
             <controls:ShimmerView.Content>
                 <ScrollView>
-                    <dx:DXStackLayout Orientation="Vertical">
+                    <dx:DXStackLayout Orientation="Vertical" Padding="0,0,0,20">
                         <ActivityIndicator IsRunning="{Binding IsBusy}"
                                            IsVisible="{Binding IsBusy}" />
-                        <dx:DXStackLayout Orientation="Vertical">
-                            <dx:DXBorder HeightRequest="1" BorderThickness="1"
-                                         BackgroundColor="{AppThemeBinding Light={StaticResource SeparatorColor}, Dark={StaticResource SeparatorColorDark}}" />
-                            <dx:DXImage Source="invoice_green" WidthRequest="150" HeightRequest="150" />
-                            <Label Text="{Binding DocumentCreditAmortizationResponse.CustomerNumber}"
-                                   FontSize="16"
-                                   HorizontalTextAlignment="Center"
-                                   FontAttributes="Bold" />
-                            <Label HorizontalTextAlignment="Center"
-                                   FontSize="16"
-                                   FontAttributes="Bold">
-                                <Label.FormattedText>
-                                    <FormattedString>
-                                        <Span Text="{Binding DocumentCreditAmortizationResponse.FirstName}" />
-                                        <Span Text=" " />
-                                        <Span Text="{Binding DocumentCreditAmortizationResponse.LastName}" />
-                                    </FormattedString>
-                                </Label.FormattedText>
-                            </Label>
-                        </dx:DXStackLayout>
+                        <dx:DXBorder BackgroundColor="{StaticResource Primary}"
+                                     CornerRadius="0,0,28,28"
+                                     BorderThickness="0"
+                                     Padding="0,20,0,26">
+                            <dx:DXStackLayout Orientation="Vertical" HorizontalOptions="Center">
+                                <dx:DXBorder WidthRequest="120"
+                                             HeightRequest="120"
+                                             CornerRadius="60"
+                                             BorderThickness="0"
+                                             HorizontalOptions="Center"
+                                             BackgroundColor="#33FFFFFF">
+                                    <dx:DXImage Source="invoice_green"
+                                                WidthRequest="80"
+                                                HeightRequest="80"
+                                                HorizontalOptions="Center"
+                                                VerticalOptions="Center"
+                                                Aspect="AspectFit" />
+                                </dx:DXBorder>
+                                <Label Text="{Binding DocumentCreditAmortizationResponse.CustomerNumber}"
+                                       FontSize="16"
+                                       TextColor="White"
+                                       Margin="0,12,0,0"
+                                       HorizontalTextAlignment="Center"
+                                       FontAttributes="Bold" />
+                                <Label HorizontalTextAlignment="Center"
+                                       FontSize="16"
+                                       TextColor="White"
+                                       Opacity="0.95"
+                                       FontAttributes="Bold">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="{Binding DocumentCreditAmortizationResponse.FirstName}" />
+                                            <Span Text=" " />
+                                            <Span Text="{Binding DocumentCreditAmortizationResponse.LastName}" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                            </dx:DXStackLayout>
+                        </dx:DXBorder>
                         <dx:DXBorder
-                            Margin="15"
+                            Margin="14,16,14,14"
                             BackgroundColor="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}"
-                            BorderThickness="0" CornerRadius="10">
-                            <Grid RowSpacing="15" Padding="10">
+                            BorderThickness="0" CornerRadius="16">
+                            <dx:DXBorder.Shadow>
+                                <Shadow Brush="{StaticResource Primary}" Opacity="0.15" Radius="14" Offset="0,4" />
+                            </dx:DXBorder.Shadow>
+                            <Grid RowSpacing="15" Padding="14">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />

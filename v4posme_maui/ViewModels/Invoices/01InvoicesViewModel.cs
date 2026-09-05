@@ -293,16 +293,19 @@ public class InvoicesViewModel : BaseViewModel
         {
             Navigation              = navigation;
 
-            // Facturacion rapida: en la primera entrada al flujo (desde la pestaña Factura)
-            // se inicializa el DtoInvoice con los valores por defecto y se salta directo a
-            // la pantalla de seleccion de producto (4/6). Si el flujo ya fue inicializado
-            // (por ejemplo, se llega aqui desde el menu desplegable de la pantalla 4/6 para
-            // modificar el cliente) se muestra la lista de clientes de forma normal.
-            // Si se abrio la lista desde el menu desplegable de la pantalla 4/6 (para cambiar
-            // el cliente), se muestra la lista de clientes de forma normal y se limpia el
-            // flag. En caso contrario, en la primera entrada al flujo se inicializa el
-            // DtoInvoice y se salta directo a la seleccion de producto (4/6).
-            if (!VariablesGlobales.InvoiceFlowInicializado && !VariablesGlobales.InvoiceSeleccionandoCliente)
+            // Facturacion rapida: al entrar a la pestaña Factura desde la barra inferior
+            // siempre se salta directo a la pantalla de seleccion de producto (4/6).
+            // La lista de clientes solo se muestra cuando se abre explicitamente desde el
+            // menu desplegable de la pantalla 4/6 para cambiar el cliente
+            // (InvoiceSeleccionandoCliente == true).
+            //
+            // Nota: no se usa InvoiceFlowInicializado para decidir la navegacion porque ese
+            // flag solo se reinicia al completar/imprimir una factura. Si el usuario abandona
+            // el flujo sin terminarlo, el flag quedaba en true y al volver a entrar mostraba
+            // la lista de clientes en lugar de los productos (bug intermitente). El flag se
+            // sigue usando dentro de InicializarFacturaRapidaAsync para conservar los
+            // productos ya seleccionados y no re-inicializar el DtoInvoice.
+            if (!VariablesGlobales.InvoiceSeleccionandoCliente)
             {
                 IsBusy = true;
                 await _helperInvoiceFlow.InicializarFacturaRapidaAsync();

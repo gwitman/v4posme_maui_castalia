@@ -28,149 +28,189 @@
                 <Grid
                     RowDefinitions="Auto,*"
                     ColumnDefinitions="*"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource PageBackground}, Dark={StaticResource PageBackgroundDark}}"
                     HorizontalOptions="FillAndExpand"
                     VerticalOptions="FillAndExpand">
-                    <dxe:TextEdit x:Name="SearchBar"
-                                  Grid.Row="0"
-                                  Margin="5"
-                                  StartIcon="search"
-                                  Text="{Binding Search}"
-                                  StartIconCommand="{Binding SearchCommand}"
-                                  ReturnCommand="{Binding SearchCommand}"
-                                  PlaceholderText="Buscar por código, identificacion y nombres" />
+                    <dxc:DXBorder Grid.Row="0"
+                                  Margin="12,12,12,6"
+                                  CornerRadius="16"
+                                  BorderThickness="0"
+                                  BackgroundColor="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}">
+                        <dxc:DXBorder.Shadow>
+                            <Shadow Brush="{StaticResource Primary}" Opacity="0.18" Radius="14" Offset="0,4" />
+                        </dxc:DXBorder.Shadow>
+                        <dxe:TextEdit x:Name="SearchBar"
+                                      Margin="6,2"
+                                      BackgroundColor="Transparent"
+                                      BorderThickness="0"
+                                      StartIcon="search"
+                                      StartIconColor="{StaticResource Primary}"
+                                      Text="{Binding Search}"
+                                      StartIconCommand="{Binding SearchCommand}"
+                                      ReturnCommand="{Binding SearchCommand}"
+                                      PlaceholderText="Buscar por código, identificación y nombres" />
+                    </dxc:DXBorder>
 
-                    <ScrollView Grid.Row="1">
-                        <VerticalStackLayout>
-                            <dxcv:DXCollectionView x:Name="ClientesCollectionView"
-                                                   VerticalOptions="FillAndExpand"
-                                                   ItemsSource="{Binding Customers}"
-                                                   SelectedItem="{Binding SelectedCustomer}"
-                                                   SelectionMode="Single"
-                                                   AllowDragDropItems="True"
-                                                   DropItem="ClientesCollectionView_OnDropItem"
-                                                   IsRefreshing="{Binding  IsBusy, Mode=TwoWay}">
-                                <dxcv:DXCollectionView.ItemTemplate>
-                                    <DataTemplate>
-                                        <dxc:DXStackLayout
-                                            CornerRadius="15"
-                                            Margin="10">
-                                            <Grid
-                                                HorizontalOptions="Fill"
-                                                Padding="10"
-                                                VerticalOptions="Fill">
-                                                <Grid.BackgroundColor>
-                                                    <MultiBinding Converter="{StaticResource EstadoToColorConverter}">
-                                                        <Binding Path="Asignado" />
-                                                        <Binding Path="HasAbono" />
-                                                    </MultiBinding>
-                                                </Grid.BackgroundColor>
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="Auto" />
-                                                    <RowDefinition Height="Auto" />
-                                                    <RowDefinition Height="Auto" />
-                                                    <RowDefinition Height="Auto" />
-                                                    <RowDefinition Height="Auto" />
-                                                    <RowDefinition Height="Auto" />
-                                                </Grid.RowDefinitions>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto" />
-                                                    <ColumnDefinition Width="1.5*" />
-                                                    <ColumnDefinition Width="Auto" />
-                                                </Grid.ColumnDefinitions>
+                    <dxcv:DXCollectionView x:Name="ClientesCollectionView"
+                                           Grid.Row="1"
+                                           VerticalOptions="FillAndExpand"
+                                           ItemsSource="{Binding Customers}"
+                                           SelectedItem="{Binding SelectedCustomer}"
+                                           SelectionMode="Single"
+                                           AllowDragDropItems="True"
+                                           DropItem="ClientesCollectionView_OnDropItem"
+                                           IsRefreshing="{Binding  IsBusy, Mode=TwoWay}">
+                        <dxcv:DXCollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <dxc:DXBorder
+                                    CornerRadius="18"
+                                    BorderThickness="0"
+                                    Padding="0"
+                                    Margin="12,6">
+                                    <dxc:DXBorder.Shadow>
+                                        <Shadow Brush="{StaticResource Black}" Opacity="0.12" Radius="10" Offset="0,3" />
+                                    </dxc:DXBorder.Shadow>
+                                    <Grid
+                                        HorizontalOptions="Fill"
+                                        Padding="14"
+                                        VerticalOptions="Fill">
+                                        <Grid.BackgroundColor>
+                                            <MultiBinding Converter="{StaticResource EstadoToColorConverter}">
+                                                <Binding Path="Asignado" />
+                                                <Binding Path="HasAbono" />
+                                            </MultiBinding>
+                                        </Grid.BackgroundColor>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="1.5*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
 
-                                                <Frame
-                                                    WidthRequest="60"
-                                                    HeightRequest="60"
-                                                    BackgroundColor="Transparent"
-                                                    Grid.Column="0"
-                                                    Grid.RowSpan="3">
-                                                    <dxc:DXImage WidthRequest="55"
-                                                                 HeightRequest="55"
-                                                                 Source="person_charge"
-                                                                 Aspect="Fill" />
-                                                </Frame>
-                                                <Label Grid.Column="1" Grid.Row="0" FontAttributes="Bold"
-                                                       TextColor="White" Grid.ColumnSpan="2"
-                                                       Text="{Binding Identification}" />
-                                                <HorizontalStackLayout Grid.Column="1" Grid.Row="1">
-                                                    <Label Text="{Binding CustomerNumber}"
-                                                           TextColor="White"
-                                                           HorizontalOptions="Start" />
-                                                </HorizontalStackLayout>
-                                                <HorizontalStackLayout Grid.Row="1" Grid.Column="2">
-                                                    <Label
-                                                        HorizontalOptions="End">
-                                                        <Label.FormattedText>
-                                                            <FormattedString>
-                                                                <Span Text="Balance: "
-                                                                      TextColor="White" />
-                                                                <Span Text="{Binding CurrencyName}"
-                                                                      TextColor="White" />
-                                                                <Span Text="{Binding Balance,StringFormat='{0:N2}'}"
-                                                                      TextColor="White" />
-                                                            </FormattedString>
-                                                        </Label.FormattedText>
-                                                    </Label>
-                                                </HorizontalStackLayout>
-                                                <HorizontalStackLayout Grid.Row="2"
-                                                                       Grid.Column="1"
-                                                                       Grid.ColumnSpan="2">
-                                                    <Label Text="{Binding FirstName}" TextColor="White" />
-                                                    <Label Text=" " />
-                                                    <Label Text="{Binding LastName}" TextColor="White" />
-                                                </HorizontalStackLayout>
-                                                <HorizontalStackLayout
-                                                    Grid.Row="3"
-                                                    Grid.Column="1"
-                                                    Grid.ColumnSpan="2">
-                                                    <Label
-                                                        Text="NO-LC: "
-                                                        TextColor="White" />
-                                                    <Label
-                                                        TextColor="White"
-                                                        Text="{Binding CustomerCreditLineId}" />
-                                                </HorizontalStackLayout>
-                                                <HorizontalStackLayout Grid.Row="4" Grid.ColumnSpan="2" Grid.Column="1">
-                                                    <Label FontAttributes="Bold"
-                                                           TextColor="White"
-                                                           Text="{Binding FirstBalanceDate, StringFormat='{0:yyyy-MM-dd}'}" />
-                                                </HorizontalStackLayout>
-                                                <HorizontalStackLayout Grid.Row="5" Grid.ColumnSpan="2" Grid.Column="1" IsVisible="{Binding ShowFrecuenciInCustomerIntoShare}">
-                                                    <Label FontAttributes="Bold"
-                                                           TextColor="White"
-                                                           Text="{Binding FrecuencyNameIntoShare}" />
-                                                </HorizontalStackLayout>
-                                                <Grid.GestureRecognizers>
-                                                    <TapGestureRecognizer
-                                                        NumberOfTapsRequired="1"
-                                                        Command="{Binding Source={RelativeSource AncestorType={x:Type abonos:AbonosViewModel}}, Path=ItemTapped}"
-                                                        CommandParameter="{Binding .}">
-                                                    </TapGestureRecognizer>
-                                                </Grid.GestureRecognizers>
-                                            </Grid>
-                                        </dxc:DXStackLayout>
-                                    </DataTemplate>
-                                </dxcv:DXCollectionView.ItemTemplate>
-                            </dxcv:DXCollectionView>
-                        </VerticalStackLayout>
-                    </ScrollView>
+                                        <dxc:DXBorder
+                                            WidthRequest="58"
+                                            HeightRequest="58"
+                                            CornerRadius="29"
+                                            VerticalOptions="Center"
+                                            BorderThickness="0"
+                                            BackgroundColor="#33FFFFFF"
+                                            Grid.Column="0"
+                                            Grid.RowSpan="3">
+                                            <dxc:DXImage WidthRequest="40"
+                                                         HeightRequest="40"
+                                                         HorizontalOptions="Center"
+                                                         VerticalOptions="Center"
+                                                         Source="person_charge"
+                                                         Aspect="AspectFit" />
+                                        </dxc:DXBorder>
+                                        <Label Grid.Column="1" Grid.Row="0" FontAttributes="Bold"
+                                               Margin="12,0,0,0"
+                                               FontSize="16"
+                                               TextColor="White" Grid.ColumnSpan="2"
+                                               Text="{Binding Identification}" />
+                                        <HorizontalStackLayout Grid.Column="1" Grid.Row="1" Margin="12,0,0,0">
+                                            <Label Text="{Binding CustomerNumber}"
+                                                   FontSize="13"
+                                                   Opacity="0.9"
+                                                   TextColor="White"
+                                                   HorizontalOptions="Start" />
+                                        </HorizontalStackLayout>
+                                        <HorizontalStackLayout Grid.Row="1" Grid.Column="2">
+                                            <Label
+                                                HorizontalOptions="End">
+                                                <Label.FormattedText>
+                                                    <FormattedString>
+                                                        <Span Text="Balance: "
+                                                              FontAttributes="Bold"
+                                                              TextColor="White" />
+                                                        <Span Text="{Binding CurrencyName}"
+                                                              TextColor="White" />
+                                                        <Span Text="{Binding Balance,StringFormat='{0:N2}'}"
+                                                              FontAttributes="Bold"
+                                                              TextColor="White" />
+                                                    </FormattedString>
+                                                </Label.FormattedText>
+                                            </Label>
+                                        </HorizontalStackLayout>
+                                        <HorizontalStackLayout Grid.Row="2"
+                                                               Grid.Column="1"
+                                                               Margin="12,2,0,0"
+                                                               Grid.ColumnSpan="2">
+                                            <Label Text="{Binding FirstName}" FontSize="14" TextColor="White" />
+                                            <Label Text=" " />
+                                            <Label Text="{Binding LastName}" FontSize="14" TextColor="White" />
+                                        </HorizontalStackLayout>
+                                        <HorizontalStackLayout
+                                            Grid.Row="3"
+                                            Grid.Column="1"
+                                            Margin="12,2,0,0"
+                                            Grid.ColumnSpan="2">
+                                            <Label
+                                                Text="NO-LC: "
+                                                FontSize="13"
+                                                Opacity="0.9"
+                                                TextColor="White" />
+                                            <Label
+                                                FontSize="13"
+                                                Opacity="0.9"
+                                                TextColor="White"
+                                                Text="{Binding CustomerCreditLineId}" />
+                                        </HorizontalStackLayout>
+                                        <HorizontalStackLayout Grid.Row="4" Grid.ColumnSpan="2" Grid.Column="1" Margin="12,2,0,0">
+                                            <Label FontAttributes="Bold"
+                                                   FontSize="13"
+                                                   TextColor="White"
+                                                   Text="{Binding FirstBalanceDate, StringFormat='{0:yyyy-MM-dd}'}" />
+                                        </HorizontalStackLayout>
+                                        <HorizontalStackLayout Grid.Row="5" Grid.ColumnSpan="2" Grid.Column="1" Margin="12,2,0,0" IsVisible="{Binding ShowFrecuenciInCustomerIntoShare}">
+                                            <Label FontAttributes="Bold"
+                                                   FontSize="13"
+                                                   TextColor="White"
+                                                   Text="{Binding FrecuencyNameIntoShare}" />
+                                        </HorizontalStackLayout>
+                                        <Grid.GestureRecognizers>
+                                            <TapGestureRecognizer
+                                                NumberOfTapsRequired="1"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type abonos:AbonosViewModel}}, Path=ItemTapped}"
+                                                CommandParameter="{Binding .}">
+                                            </TapGestureRecognizer>
+                                        </Grid.GestureRecognizers>
+                                    </Grid>
+                                </dxc:DXBorder>
+                            </DataTemplate>
+                        </dxcv:DXCollectionView.ItemTemplate>
+                    </dxcv:DXCollectionView>
 
                     <controls:DXPopup x:Name="Popup"
+                                      Grid.Row="1"
                                       AllowScrim="True"
                                       BackgroundColor="{Binding PopupBackgroundColor}"
                                       VerticalAlignment="Bottom"
+                                      HorizontalAlignment="Stretch"
+                                      Margin="16"
+                                      CornerRadius="16"
                                       ScrimColor="#b3adb9ce"
                                       IsOpen="{Binding PopUpShow}">
-                        <StackLayout WidthRequest="250">
+                        <StackLayout WidthRequest="250" Padding="4">
                             <Label Text="{Binding Mensaje}"
                                    FontAttributes="Bold"
                                    FontSize="15"
+                                   HorizontalTextAlignment="Center"
                                    TextColor="{StaticResource White}"
                                    Margin="20, 20" />
                             <Button Text="Aceptar"
                                     Clicked="ClosePopup_Clicked"
                                     BackgroundColor="{StaticResource Gray600}"
-                                    FontSize="20"
+                                    CornerRadius="12"
+                                    HeightRequest="46"
+                                    FontSize="18"
                                     TextColor="White" />
                         </StackLayout>
                     </controls:DXPopup>

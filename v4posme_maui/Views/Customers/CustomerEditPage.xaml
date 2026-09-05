@@ -13,7 +13,7 @@
         <DataTrigger Binding="{Binding IsNew}" Value="True" TargetType="ContentPage">
             <Setter Property="Title" Value="Agregar Cliente" />
             <Setter Property="BackgroundColor"
-                    Value="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}" />
+                    Value="{AppThemeBinding Light={StaticResource PageBackground}, Dark={StaticResource PageBackgroundDark}}" />
         </DataTrigger>
     </ContentPage.Triggers>
     <ContentPage.ToolbarItems>
@@ -22,46 +22,73 @@
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
         <ScrollView>
-            <dx:DXStackLayout Orientation="Vertical">
+            <dx:DXStackLayout Orientation="Vertical" Padding="0,0,0,20">
                 <controls:DXPopup x:Name="Popup"
                               AllowScrim="True"
                               BackgroundColor="Red"
                               VerticalAlignment="Bottom"
+                              HorizontalAlignment="Stretch"
+                              Margin="16"
+                              CornerRadius="16"
                               ScrimColor="#b3adb9ce">
-                    <StackLayout WidthRequest="250">
+                    <StackLayout WidthRequest="250" Padding="4">
                         <Label x:Name="TxtMensaje"
                                FontAttributes="Bold"
                                FontSize="15"
+                               HorizontalTextAlignment="Center"
                                TextColor="{StaticResource White}"
                                Margin="20, 20" />
                         <Button Text="Aceptar"
                                 Clicked="ClosePopup_Clicked"
                                 BackgroundColor="{StaticResource Gray600}"
-                                FontSize="20"
+                                CornerRadius="12"
+                                HeightRequest="46"
+                                FontSize="18"
                                 TextColor="White" />
                     </StackLayout>
                 </controls:DXPopup>
+
+                <!-- Encabezado con avatar (solo edicion) -->
                 <dx:DXStackLayout Orientation="Vertical">
                     <dx:DXStackLayout.Triggers>
                         <DataTrigger Binding="{Binding IsNew}" Value="True" TargetType="dx:DXStackLayout">
                             <Setter Property="IsVisible" Value="False" />
                         </DataTrigger>
                     </dx:DXStackLayout.Triggers>
-                    <dx:DXBorder HeightRequest="1" BorderThickness="1"
-                                 BackgroundColor="{AppThemeBinding Light={StaticResource SeparatorColor}, Dark={StaticResource SeparatorColorDark}}" />
-                    <dx:DXImage Source="person_charge" WidthRequest="150" HeightRequest="150" />
+                    <dx:DXBorder BackgroundColor="{StaticResource Primary}"
+                                 CornerRadius="0,0,28,28"
+                                 BorderThickness="0"
+                                 Padding="0,18,0,22">
+                        <dx:DXBorder WidthRequest="120"
+                                     HeightRequest="120"
+                                     CornerRadius="60"
+                                     BorderThickness="0"
+                                     HorizontalOptions="Center"
+                                     BackgroundColor="#33FFFFFF">
+                            <dx:DXImage Source="person_charge"
+                                        WidthRequest="80"
+                                        HeightRequest="80"
+                                        HorizontalOptions="Center"
+                                        VerticalOptions="Center"
+                                        Aspect="AspectFit" />
+                        </dx:DXBorder>
+                    </dx:DXBorder>
                 </dx:DXStackLayout>
+
                 <dx:DXBorder
-                    Margin="15"
+                    Margin="14,16,14,14"
                     BackgroundColor="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}"
-                    BorderThickness="0" CornerRadius="10">
+                    BorderThickness="0" CornerRadius="16">
+                    <dx:DXBorder.Shadow>
+                        <Shadow Brush="{StaticResource Primary}" Opacity="0.15" Radius="14" Offset="0,4" />
+                    </dx:DXBorder.Shadow>
                     <dxdf:DataFormView x:Name="DataForm" DataObject="{Binding Item}"
                                        EditorLabelColor="{StaticResource Primary}"
                                        EditorLabelWidth="0"
                                        IsAutoGenerationEnabled="False"
                                        ValidationMode="LostFocus"
                                        ValidateForm="DataForm_OnValidateForm"
-                                       Margin="0,10,0,0" Background="Transparent">
+                                       Margin="6,10,6,6" Background="Transparent">
                         <dxdf:DataFormCustomItem>
                             <dxe:TextEdit
                                 x:Name="TxtBarCode"
@@ -135,15 +162,6 @@
                                 LabelText="Celular:" />
                         </dxdf:DataFormCustomItem>
                     </dxdf:DataFormView>
-                    <dx:DXBorder.Triggers>
-                        <DataTrigger Binding="{Binding IsNew}" Value="False" TargetType="dx:DXBorder">
-                            <Setter Property="Shadow">
-                                <Setter.Value>
-                                    <Shadow Brush="Gray" Offset="2,2" Radius="4" />
-                                </Setter.Value>
-                            </Setter>
-                        </DataTrigger>
-                    </dx:DXBorder.Triggers>
                 </dx:DXBorder>
             </dx:DXStackLayout>
         </ScrollView>

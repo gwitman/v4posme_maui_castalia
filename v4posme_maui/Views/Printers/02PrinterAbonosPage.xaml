@@ -26,7 +26,7 @@
                             BackgroundColor="White"
                             x:Name="DxStackLayout"
                             Orientation="Vertical"
-                            Padding="20">
+                            Padding="24">
                             <dx:DXStackLayout Orientation="Vertical"
                                               Margin="0,0,0,10"
                                               HorizontalOptions="Center">
@@ -36,15 +36,24 @@
                                             Source="{Binding LogoSource}" />
                                 <Label Text="Comprobante de Abono"
                                        FontSize="24"
+                                       TextColor="{StaticResource Primary}"
                                        HorizontalTextAlignment="Center"
                                        FontAttributes="Bold" />
-                                <Label FontSize="16">
+                                <dx:DXBorder HeightRequest="3"
+                                             WidthRequest="60"
+                                             CornerRadius="2"
+                                             BorderThickness="0"
+                                             Margin="0,6,0,10"
+                                             HorizontalOptions="Center"
+                                             BackgroundColor="{StaticResource Secondary}" />
+                                <Label FontSize="16"
+                                       HorizontalTextAlignment="Center">
                                     <Label.FormattedText>
                                         <FormattedString>
                                             <Span Text="Le informamos que: " />
-                                            <Span Text="{Binding Item.FirstName}" />
+                                            <Span Text="{Binding Item.FirstName}" FontAttributes="Bold" />
                                             <Span Text=" " />
-                                            <Span Text="{Binding Item.LastName}" />
+                                            <Span Text="{Binding Item.LastName}" FontAttributes="Bold" />
                                             <Span Text=" creó un código para abono de factura con los siguientes datos" />
                                         </FormattedString>
                                     </Label.FormattedText>
@@ -52,7 +61,10 @@
                             </dx:DXStackLayout>
                             <dx:DXStackLayout Orientation="Horizontal">
                                 <Label Text="Código de abono: " FontAttributes="Bold" FontSize="14" />
-                                <Label Text="{Binding Item.CodigoAbono}" FontSize="14" />
+                                <Label Text="{Binding Item.CodigoAbono}"
+                                       TextColor="{StaticResource Primary}"
+                                       FontAttributes="Bold"
+                                       FontSize="14" />
                             </dx:DXStackLayout>
                             <StackLayout Spacing="5">
                                 <dx:DXStackLayout Orientation="Horizontal">
@@ -63,8 +75,15 @@
                                     <Label Text="Apellidos: " FontAttributes="Bold" FontSize="14" />
                                     <Label Text="{Binding Item.LastName}" FontSize="14" />
                                 </dx:DXStackLayout>
+                                <dx:DXBorder
+                                    Margin="0,6"
+                                    Padding="16"
+                                    CornerRadius="12"
+                                    BorderThickness="1"
+                                    BorderColor="{StaticResource SeparatorColor}"
+                                    BackgroundColor="#FAFAFA">
                                 <Grid
-                                    RowSpacing="5">
+                                    RowSpacing="8">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="*" />
@@ -129,6 +148,7 @@
                                                FontSize="14" />
                                     </dx:DXStackLayout>
                                 </Grid>
+                                </dx:DXBorder>
                                 <dx:DXStackLayout Orientation="Vertical">
                                     <Label Text="Comentarios: " FontAttributes="Bold" FontSize="14" />
                                     <Label Text="{Binding Item.Description}" FontSize="14" />

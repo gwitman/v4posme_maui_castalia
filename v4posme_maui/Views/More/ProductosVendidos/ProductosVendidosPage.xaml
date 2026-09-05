@@ -4,7 +4,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:productosVendidos="clr-namespace:v4posme_maui.ViewModels.More.ProductosVendidos"
              xmlns:dx="http://schemas.devexpress.com/maui"
+             xmlns:core="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
              x:Class="v4posme_maui.Views.More.Productos.ProductosVendidosPage"
+             BackgroundColor="{AppThemeBinding Light={StaticResource PageBackground}, Dark={StaticResource PageBackgroundDark}}"
              Title="Productos Vendidos">
     <ContentPage.BindingContext>
         <productosVendidos:ProductosVendidosViewModel />
@@ -19,70 +21,96 @@
         
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
-        <StackLayout>
+        <Grid RowDefinitions="Auto,*">
             <dx:DXPopup x:Name="Popup"
                         AllowScrim="True"
                         BackgroundColor="{Binding PopupBackgroundColor}"
                         VerticalAlignment="Bottom"
+                        HorizontalAlignment="Stretch"
+                        Margin="16"
+                        CornerRadius="16"
                         ScrimColor="#b3adb9ce"
                         IsOpen="{Binding PopUpShow}">
-                <StackLayout WidthRequest="250">
+                <StackLayout WidthRequest="250" Padding="4">
                     <Label Text="{Binding Mensaje}"
                            FontAttributes="Bold"
                            FontSize="15"
+                           HorizontalTextAlignment="Center"
                            TextColor="{StaticResource White}"
                            Margin="20, 20" />
                     <Button Text="Aceptar"
                             Clicked="ClosePopup_Clicked"
                             BackgroundColor="{StaticResource Gray600}"
-                            FontSize="20"
+                            CornerRadius="12"
+                            HeightRequest="46"
+                            FontSize="18"
                             TextColor="White" />
                 </StackLayout>
             </dx:DXPopup>
 
-            <Grid Margin="0,0,0,10" HorizontalOptions="Center" >
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+            <core:DXBorder Grid.Row="0"
+                           Margin="12,12,12,6"
+                           Padding="12"
+                           CornerRadius="16"
+                           BorderThickness="0"
+                           BackgroundColor="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}">
+                <core:DXBorder.Shadow>
+                    <Shadow Brush="{StaticResource Primary}" Opacity="0.15" Radius="12" Offset="0,3" />
+                </core:DXBorder.Shadow>
+                <Grid ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
 
-                <dx:DateEdit
-                x:Name="fechaInicio"
-                DisplayFormat="d"
-                StartIcon="editorscalendar"
-                IconColor="{StaticResource Primary}"
-                LabelText="Fecha Inicio"
-                Grid.Column="0" 
-                Date="{Binding FechaInical}"/>
+                    <dx:DateEdit
+                        x:Name="fechaInicio"
+                        DisplayFormat="d"
+                        StartIcon="editorscalendar"
+                        IconColor="{StaticResource Primary}"
+                        LabelText="Fecha Inicio"
+                        Grid.Column="0"
+                        Date="{Binding FechaInical}"/>
 
-                <dx:DateEdit
-                x:Name="fechaFinal"
-                DisplayFormat="d"
-                StartIcon="editorscalendar"
-                IconColor="{StaticResource Primary}"
-                LabelText="Fecha Final"
-                Grid.Column="1"
-                Date="{Binding FechaFinal}" />
-            </Grid>
+                    <dx:DateEdit
+                        x:Name="fechaFinal"
+                        DisplayFormat="d"
+                        StartIcon="editorscalendar"
+                        IconColor="{StaticResource Primary}"
+                        LabelText="Fecha Final"
+                        Grid.Column="1"
+                        Date="{Binding FechaFinal}" />
+                </Grid>
+            </core:DXBorder>
 
-            <dx:DataGridView ItemsSource="{Binding Items}" x:Name="ItemsGridView">
-                <dx:DataGridView.Columns>
-                    <dx:TemplateColumn FieldName="Quantity" Caption="Cantidad" Width="100">
-                        <dx:TemplateColumn.DisplayTemplate>
-                            <DataTemplate>
-                                <Grid VerticalOptions="Center">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="*" />
-                                    </Grid.RowDefinitions>
-                                    <Label Text="{Binding Item.Quantity, StringFormat = '{0:N2}'}" HorizontalTextAlignment="End" />
-                                </Grid>
-                            </DataTemplate>
-                        </dx:TemplateColumn.DisplayTemplate>
-                    </dx:TemplateColumn>
-                    <dx:TextColumn FieldName="Name" Caption="Descripción" Width="300" />
-                    <dx:TextColumn FieldName="BarCode" Caption="Código Barra" Width="150" />
-                </dx:DataGridView.Columns>
-            </dx:DataGridView>
-        </StackLayout>
+            <core:DXBorder Grid.Row="1"
+                           Margin="12,6,12,12"
+                           Padding="4"
+                           CornerRadius="16"
+                           BorderThickness="0"
+                           BackgroundColor="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}">
+                <core:DXBorder.Shadow>
+                    <Shadow Brush="{StaticResource Black}" Opacity="0.10" Radius="10" Offset="0,3" />
+                </core:DXBorder.Shadow>
+                <dx:DataGridView ItemsSource="{Binding Items}" x:Name="ItemsGridView">
+                    <dx:DataGridView.Columns>
+                        <dx:TemplateColumn FieldName="Quantity" Caption="Cantidad" Width="100">
+                            <dx:TemplateColumn.DisplayTemplate>
+                                <DataTemplate>
+                                    <Grid VerticalOptions="Center">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*" />
+                                        </Grid.RowDefinitions>
+                                        <Label Text="{Binding Item.Quantity, StringFormat = '{0:N2}'}" HorizontalTextAlignment="End" />
+                                    </Grid>
+                                </DataTemplate>
+                            </dx:TemplateColumn.DisplayTemplate>
+                        </dx:TemplateColumn>
+                        <dx:TextColumn FieldName="Name" Caption="Descripción" Width="300" />
+                        <dx:TextColumn FieldName="BarCode" Caption="Código Barra" Width="150" />
+                    </dx:DataGridView.Columns>
+                </dx:DataGridView>
+            </core:DXBorder>
+        </Grid>
     </ContentPage.Content>
 </ContentPage>

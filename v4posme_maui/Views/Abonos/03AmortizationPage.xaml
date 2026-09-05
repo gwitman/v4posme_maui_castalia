@@ -37,7 +37,7 @@
                     </dxg:DataGridView.CellAppearance>
 
                     <dxg:DataGridView.ColumnHeaderAppearance>
-                        <dxg:ColumnHeaderAppearance BackgroundColor="#333333" BorderColor="#515151"
+                        <dxg:ColumnHeaderAppearance BackgroundColor="{StaticResource Primary}" BorderColor="#515151"
                                                     FontSize="16" FontColor="{StaticResource White}"
                                                     FontAttributes="Bold"
                                                     HorizontalLineThickness="2" />

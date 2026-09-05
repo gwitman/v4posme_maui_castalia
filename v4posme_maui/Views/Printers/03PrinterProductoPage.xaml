@@ -48,6 +48,7 @@
                                     Margin="0,0,0,0" />
                                 <Label
                                     Grid.Row="1"
+                                    FontSize="16"
                                     FontAttributes="Bold"
                                     HorizontalOptions="Center"
                                     Text="{Binding ItemsResponse.Name}" />
@@ -58,29 +59,43 @@
                                     Text="{Binding ItemsResponse.BarCode}" />
                                 <Label
                                     Grid.Row="3"
+                                    Opacity="0.7"
                                     HorizontalOptions="Center"
                                     Text="{Binding ItemsResponse.ItemNumber}" />
                                 <HorizontalStackLayout
                                     Grid.Row="4"
                                     HorizontalOptions="Center">
-                                    <Label Text="Precio: C$ " />
+                                    <Label Text="Precio: C$ "
+                                           FontAttributes="Bold" />
                                     <Label
+                                        FontSize="16"
+                                        FontAttributes="Bold"
+                                        TextColor="{StaticResource Primary}"
                                         HorizontalOptions="End"
                                         Text="{Binding ItemsResponse.PrecioPublico}" />
                                 </HorizontalStackLayout>
                             </Grid>
                         </core:DXBorder>
                     </core:DXStackLayout>
-                    <core:DXStackLayout
-                        Margin="10"
-                        ItemSpacing="10">
+                    <core:DXBorder
+                        Margin="12,4,12,12"
+                        Padding="6,2"
+                        CornerRadius="16"
+                        BorderThickness="0"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}">
+                        <core:DXBorder.Shadow>
+                            <Shadow Brush="{StaticResource Primary}" Opacity="0.15" Radius="12" Offset="0,3" />
+                        </core:DXBorder.Shadow>
                         <editors:TextEdit
                             Keyboard="Numeric"
+                            BackgroundColor="Transparent"
+                            BorderThickness="0"
                             IconColor="#006E98"
                             StartIcon="quantity"
+                            LabelText="Cantidad a imprimir"
                             ClearIconCommand="{Binding ClearCommand}"
                             Text="{Binding CantidadImprimir}" />
-                    </core:DXStackLayout>
+                    </core:DXBorder>
                 </core:DXStackLayout>
             </controls:ShimmerView.Content>
             <controls:ShimmerView.LoadingView>

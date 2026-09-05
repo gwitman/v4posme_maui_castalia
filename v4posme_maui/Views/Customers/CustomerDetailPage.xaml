@@ -20,57 +20,79 @@
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
         <ScrollView>
-            <dx:DXStackLayout Orientation="Vertical" Padding="0, 10, 0, 0">
-                <dx:DXImage Source="person_charge" WidthRequest="150" HeightRequest="150" />
-                <dx:DXStackLayout Orientation="Vertical"
-                                  HorizontalOptions="Center">
-                    <Label Text="{Binding Item.EntityId}"
-                           FontSize="24"
-                           HorizontalTextAlignment="Center"
-                           FontAttributes="Bold" />
-                    <Label Text="{Binding Item.Identification}"
-                           HorizontalTextAlignment="Center"
-                           FontSize="24"
-                           FontAttributes="Bold" />
-                </dx:DXStackLayout>
+            <dx:DXStackLayout Orientation="Vertical" Padding="0,0,0,20">
 
-                <dx:DXBorder Style="{StaticResource PropertyBorder}">
-                    <dx:DXStackLayout Orientation="Vertical">
-                        <Label Text="Nombres: " FontAttributes="Bold" FontSize="18" />
-                        <Label Text="{Binding Item.FirstName}" FontSize="18" />
+                <!-- Encabezado -->
+                <dx:DXBorder BackgroundColor="{StaticResource Primary}"
+                             CornerRadius="0,0,28,28"
+                             BorderThickness="0"
+                             Padding="0,20,0,28">
+                    <dx:DXStackLayout Orientation="Vertical" HorizontalOptions="Center">
+                        <dx:DXBorder WidthRequest="120"
+                                     HeightRequest="120"
+                                     CornerRadius="60"
+                                     BorderThickness="0"
+                                     HorizontalOptions="Center"
+                                     BackgroundColor="#33FFFFFF">
+                            <dx:DXImage Source="person_charge"
+                                        WidthRequest="80"
+                                        HeightRequest="80"
+                                        HorizontalOptions="Center"
+                                        VerticalOptions="Center"
+                                        Aspect="AspectFit" />
+                        </dx:DXBorder>
+                        <Label Text="{Binding Item.EntityId}"
+                               FontSize="24"
+                               TextColor="White"
+                               Margin="0,12,0,0"
+                               HorizontalTextAlignment="Center"
+                               FontAttributes="Bold" />
+                        <Label Text="{Binding Item.Identification}"
+                               HorizontalTextAlignment="Center"
+                               TextColor="White"
+                               Opacity="0.9"
+                               FontSize="16" />
                     </dx:DXStackLayout>
                 </dx:DXBorder>
-                <dx:DXBorder Style="{StaticResource PropertyBorder}">
+
+                <dx:DXBorder Style="{StaticResource PropertyBorder}" Margin="14,16,14,8">
                     <dx:DXStackLayout Orientation="Vertical">
-                        <Label Text="Apellidos: " FontAttributes="Bold" FontSize="18" />
-                        <Label Text="{Binding Item.LastName}" FontSize="18" />
+                        <Label Text="Nombres" FontAttributes="Bold" TextColor="{StaticResource Primary}" FontSize="13" />
+                        <Label Text="{Binding Item.FirstName}" FontSize="18" Margin="0,2,0,0" />
                     </dx:DXStackLayout>
                 </dx:DXBorder>
-                <dx:DXBorder Style="{StaticResource PropertyBorder}">
+                <dx:DXBorder Style="{StaticResource PropertyBorder}" Margin="14,8">
                     <dx:DXStackLayout Orientation="Vertical">
-                        <Label Text="Dirección: " FontAttributes="Bold" FontSize="18" />
-                        <Label Text="{Binding Item.Location}" FontSize="18" />
+                        <Label Text="Apellidos" FontAttributes="Bold" TextColor="{StaticResource Primary}" FontSize="13" />
+                        <Label Text="{Binding Item.LastName}" FontSize="18" Margin="0,2,0,0" />
                     </dx:DXStackLayout>
                 </dx:DXBorder>
-                <dx:DXBorder Style="{StaticResource PropertyBorder}">
+                <dx:DXBorder Style="{StaticResource PropertyBorder}" Margin="14,8">
                     <dx:DXStackLayout Orientation="Vertical">
-                        <Label Text="Celular: " FontAttributes="Bold" FontSize="18" />
-                        <Label Text="{Binding Item.Phone}" FontSize="18" />
+                        <Label Text="Dirección" FontAttributes="Bold" TextColor="{StaticResource Primary}" FontSize="13" />
+                        <Label Text="{Binding Item.Location}" FontSize="18" Margin="0,2,0,0" />
                     </dx:DXStackLayout>
                 </dx:DXBorder>
-                <dx:DXBorder Style="{StaticResource PropertyBorder}">
+                <dx:DXBorder Style="{StaticResource PropertyBorder}" Margin="14,8">
                     <dx:DXStackLayout Orientation="Vertical">
-                        <Label Text="Balance: " FontAttributes="Bold" FontSize="18" />
-                        <Label Text="{Binding Item.Balance}" FontSize="18" />
+                        <Label Text="Celular" FontAttributes="Bold" TextColor="{StaticResource Primary}" FontSize="13" />
+                        <Label Text="{Binding Item.Phone}" FontSize="18" Margin="0,2,0,0" />
                     </dx:DXStackLayout>
                 </dx:DXBorder>
+                <dx:DXBorder Style="{StaticResource PropertyBorder}" Margin="14,8">
+                    <dx:DXStackLayout Orientation="Vertical">
+                        <Label Text="Balance" FontAttributes="Bold" TextColor="{StaticResource Primary}" FontSize="13" />
+                        <Label Text="{Binding Item.Balance}" FontSize="20" FontAttributes="Bold" Margin="0,2,0,0" />
+                    </dx:DXStackLayout>
+                </dx:DXBorder>
+
                 <dxcn:DXPopup x:Name="Popup" AllowScrim="True"
                               VerticalAlignment="Bottom"
                               HorizontalAlignment="Stretch"
                               Margin="16" CornerRadius="16"
                               BackgroundColor="{AppThemeBinding Light={StaticResource PageBackground}, Dark={StaticResource PageBackgroundDark}}">
                     <dx:DXStackLayout Orientation="Vertical" Padding="10">
-                        <Label Text="¿Seguro quiere elimar este cliente? Está acción no se puede revertir"
+                        <Label Text="¿Seguro quiere eliminar este cliente? Está acción no se puede revertir"
                                Margin="0,20"
                                HorizontalTextAlignment="Center"
                                FontAttributes="Bold" />

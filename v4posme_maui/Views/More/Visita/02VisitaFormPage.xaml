@@ -31,24 +31,30 @@
     
     <ContentPage.Content>
         <ScrollView>
-            <dx:DXStackLayout Orientation="Vertical">
+            <dx:DXStackLayout Orientation="Vertical" Padding="0,0,0,20">
 
                 <dxcn:DXPopup x:Name="Popup"
                    AllowScrim="True"
                    BackgroundColor="{Binding PopupBackgroundColor}"
                    VerticalAlignment="Bottom"
+                   HorizontalAlignment="Stretch"
+                   Margin="16"
+                   CornerRadius="16"
                    ScrimColor="#b3adb9ce"
                    IsOpen="{Binding PopUpShow}">
-                    <StackLayout WidthRequest="250">
+                    <StackLayout WidthRequest="250" Padding="4">
                         <Label Text="{Binding Mensaje}"
                     FontAttributes="Bold"
                     FontSize="15"
+                    HorizontalTextAlignment="Center"
                     TextColor="{StaticResource White}"
                     Margin="20, 20" />
                         <Button Text="Aceptar"
                      Clicked="ClosePopup_Clicked"
                      BackgroundColor="{StaticResource Gray600}"
-                     FontSize="20"
+                     CornerRadius="12"
+                     HeightRequest="46"
+                     FontSize="18"
                      TextColor="White" />
                     </StackLayout>
                 </dxcn:DXPopup>
@@ -60,16 +66,33 @@
                             <Setter Property="IsVisible" Value="False" />
                         </DataTrigger>
                     </dx:DXStackLayout.Triggers>
-                    <dx:DXBorder HeightRequest="1" BorderThickness="1"
-                      BackgroundColor="{AppThemeBinding Light={StaticResource SeparatorColor}, Dark={StaticResource SeparatorColorDark}}" />
-                    <dx:DXImage Source="person_charge" WidthRequest="150" HeightRequest="150" />
-                    
+                    <dx:DXBorder BackgroundColor="{StaticResource Primary}"
+                                 CornerRadius="0,0,28,28"
+                                 BorderThickness="0"
+                                 Padding="0,18,0,22">
+                        <dx:DXBorder WidthRequest="120"
+                                     HeightRequest="120"
+                                     CornerRadius="60"
+                                     BorderThickness="0"
+                                     HorizontalOptions="Center"
+                                     BackgroundColor="#33FFFFFF">
+                            <dx:DXImage Source="person_charge"
+                                        WidthRequest="80"
+                                        HeightRequest="80"
+                                        HorizontalOptions="Center"
+                                        VerticalOptions="Center"
+                                        Aspect="AspectFit" />
+                        </dx:DXBorder>
+                    </dx:DXBorder>
                 </dx:DXStackLayout>
 
                 <dx:DXBorder
-                        Margin="15"
+                        Margin="14,16,14,14"
                         BackgroundColor="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}"
-                        BorderThickness="0" CornerRadius="10">
+                        BorderThickness="0" CornerRadius="16">
+                    <dx:DXBorder.Shadow>
+                        <Shadow Brush="{StaticResource Primary}" Opacity="0.15" Radius="14" Offset="0,4" />
+                    </dx:DXBorder.Shadow>
 
                     <Grid RowSpacing="15" Padding="15">
                         <Grid.RowDefinitions>
@@ -114,15 +137,6 @@
                         
                     </Grid>
 
-                    <dx:DXBorder.Triggers>
-                        <DataTrigger Value="False" TargetType="dx:DXBorder">
-                            <Setter Property="Shadow">
-                                <Setter.Value>
-                                    <Shadow Brush="Gray" Offset="2,2" Radius="4" />
-                                </Setter.Value>
-                            </Setter>
-                        </DataTrigger>
-                    </dx:DXBorder.Triggers>
                 </dx:DXBorder>
             </dx:DXStackLayout>
         </ScrollView>

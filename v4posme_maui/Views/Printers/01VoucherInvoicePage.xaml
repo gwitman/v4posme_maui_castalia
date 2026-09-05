@@ -47,18 +47,24 @@
                                           AllowScrim="True"
                                           BackgroundColor="{Binding PopupBackgroundColor}"
                                           VerticalAlignment="Bottom"
+                                          HorizontalAlignment="Stretch"
+                                          Margin="16"
+                                          CornerRadius="16"
                                           ScrimColor="#b3adb9ce"
                                           IsOpen="{Binding PopUpShow}">
-                            <StackLayout WidthRequest="250">
+                            <StackLayout WidthRequest="250" Padding="4">
                                 <Label Text="{Binding Mensaje}"
                                        FontAttributes="Bold"
                                        FontSize="15"
+                                       HorizontalTextAlignment="Center"
                                        TextColor="{StaticResource White}"
                                        Margin="20, 20" />
                                 <Button Text="Aceptar"
                                         Clicked="ClosePopup_Clicked"
                                         BackgroundColor="{StaticResource Gray600}"
-                                        FontSize="20"
+                                        CornerRadius="12"
+                                        HeightRequest="46"
+                                        FontSize="18"
                                         TextColor="White" />
                             </StackLayout>
                         </controls:DXPopup>
@@ -86,9 +92,18 @@
                                     </FormattedString>
                                 </Label.FormattedText>
                             </Label>
-                            <Label Text="Factura"
+                            <Label Text="FACTURA"
                                    HorizontalTextAlignment="Center"
+                                   TextColor="{StaticResource Primary}"
+                                   FontSize="18"
                                    FontAttributes="Bold" />
+                            <dx:DXBorder HeightRequest="3"
+                                         WidthRequest="60"
+                                         CornerRadius="2"
+                                         BorderThickness="0"
+                                         Margin="0,4,0,4"
+                                         HorizontalOptions="Center"
+                                         BackgroundColor="{StaticResource Secondary}" />
                             <Label
                                 HorizontalTextAlignment="Center"
                                 FontAttributes="Bold"
@@ -106,8 +121,13 @@
                                 </Label.FormattedText>
                             </Label>
                             <dx:DXBorder
-                                Padding="20">
-                                <Grid>
+                                Margin="0,10"
+                                Padding="16"
+                                CornerRadius="12"
+                                BorderThickness="1"
+                                BorderColor="{StaticResource SeparatorColor}"
+                                BackgroundColor="#FAFAFA">
+                                <Grid RowSpacing="4">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="*" />
@@ -121,15 +141,15 @@
                                         <RowDefinition Height="Auto" />
                                         <RowDefinition Height="Auto" />
                                     </Grid.RowDefinitions>
-                                    <Label Grid.Row="0" Grid.Column="0" Text="Vendedor:" />
+                                    <Label Grid.Row="0" Grid.Column="0" Text="Vendedor:" FontAttributes="Bold" />
                                     <Label Grid.Row="0" Grid.Column="1" Text="{Binding CodigoVendedor}" />
-                                    <Label Grid.Row="1" Grid.Column="0" Text="Codigo:" />
+                                    <Label Grid.Row="1" Grid.Column="0" Text="Codigo:" FontAttributes="Bold" />
                                     <Label Grid.Row="1" Grid.Column="1" Text="{Binding DtoInvoice.Codigo}" />
-                                    <Label Grid.Row="2" Grid.Column="0" Text="Tipo:" />
+                                    <Label Grid.Row="2" Grid.Column="0" Text="Tipo:" FontAttributes="Bold" />
                                     <Label Grid.Row="2" Grid.Column="1" Text="{Binding DtoInvoice.TipoDocumento.Name}" />
-                                    <Label Grid.Row="3" Grid.Column="0" Text="Moneda:" />
+                                    <Label Grid.Row="3" Grid.Column="0" Text="Moneda:" FontAttributes="Bold" />
                                     <Label Grid.Row="3" Grid.Column="1" Text="{Binding SimboloMoneda}" />
-                                    <Label Grid.Row="4" Grid.Column="0" Text="Cliente:" />
+                                    <Label Grid.Row="4" Grid.Column="0" Text="Cliente:" FontAttributes="Bold" />
                                     <Label Grid.Row="5"
                                            Grid.Column="0"
                                            Grid.ColumnSpan="2"
@@ -152,12 +172,18 @@
                                 </Grid.ColumnDefinitions>
                                 <Label Grid.Column="0"
                                        HorizontalTextAlignment="Center"
+                                       FontAttributes="Bold"
+                                       TextColor="{StaticResource Primary}"
                                        Text="Cantidad" />
                                 <Label Grid.Column="1"
                                        HorizontalTextAlignment="Center"
+                                       FontAttributes="Bold"
+                                       TextColor="{StaticResource Primary}"
                                        Text="Precio" />
                                 <Label Grid.Column="2"
                                        HorizontalTextAlignment="Center"
+                                       FontAttributes="Bold"
+                                       TextColor="{StaticResource Primary}"
                                        Text="Importe" />
                             </Grid>
                             <dx:DXSeparator />
@@ -261,13 +287,15 @@
                             
                             
 
+                            <dx:DXSeparator Margin="0,4" />
                             <Label
+                                FontSize="18"
                                 HorizontalOptions="End">
                                 <Label.FormattedText>
                                     <FormattedString>
-                                        <Span Text="Total: " />
-                                        <Span Text="{Binding Moneda}" />
-                                        <Span Text="{Binding Balance}" />
+                                        <Span Text="Total: " FontAttributes="Bold" TextColor="{StaticResource Primary}" />
+                                        <Span Text="{Binding Moneda}" FontAttributes="Bold" TextColor="{StaticResource Primary}" />
+                                        <Span Text="{Binding Balance}" FontAttributes="Bold" TextColor="{StaticResource Primary}" />
                                     </FormattedString>
                                 </Label.FormattedText>
                             </Label>
