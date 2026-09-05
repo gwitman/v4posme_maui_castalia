@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="v4posme_maui.Views.More.MorePage"
              xmlns:dx="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              Title="Más opciones"
              BackgroundColor="{StaticResource PageBackground}">
 
@@ -40,7 +41,11 @@
                                WidthRequest="24"
                                HeightRequest="24"
                                HorizontalOptions="Center"
-                               VerticalOptions="Center" />
+                               VerticalOptions="Center">
+                            <Image.Behaviors>
+                                <toolkit:IconTintColorBehavior TintColor="#1E88E5" />
+                            </Image.Behaviors>
+                        </Image>
                     </Border>
                     <Label Grid.Row="1"
                            Text="Venta "
@@ -84,7 +89,11 @@
                                WidthRequest="24"
                                HeightRequest="24"
                                HorizontalOptions="Center"
-                               VerticalOptions="Center" />
+                               VerticalOptions="Center">
+                            <Image.Behaviors>
+                                <toolkit:IconTintColorBehavior TintColor="#E53935" />
+                            </Image.Behaviors>
+                        </Image>
                     </Border>
                     <Label Grid.Row="1"
                            Text="Visitas"
@@ -128,7 +137,11 @@
                                WidthRequest="24"
                                HeightRequest="24"
                                HorizontalOptions="Center"
-                               VerticalOptions="Center" />
+                               VerticalOptions="Center">
+                            <Image.Behaviors>
+                                <toolkit:IconTintColorBehavior TintColor="#2E7D32" />
+                            </Image.Behaviors>
+                        </Image>
                     </Border>
                     <Label Grid.Row="1"
                            Text="Inventario"
@@ -172,7 +185,11 @@
                                WidthRequest="24"
                                HeightRequest="24"
                                HorizontalOptions="Center"
-                               VerticalOptions="Center" />
+                               VerticalOptions="Center">
+                            <Image.Behaviors>
+                                <toolkit:IconTintColorBehavior TintColor="#FB8C00" />
+                            </Image.Behaviors>
+                        </Image>
                     </Border>
                     <Label Grid.Row="1"
                            Text="Prod. vendidos"
@@ -216,7 +233,11 @@
                                WidthRequest="24"
                                HeightRequest="24"
                                HorizontalOptions="Center"
-                               VerticalOptions="Center" />
+                               VerticalOptions="Center">
+                            <Image.Behaviors>
+                                <toolkit:IconTintColorBehavior TintColor="#8E24AA" />
+                            </Image.Behaviors>
+                        </Image>
                     </Border>
                     <Label Grid.Row="1"
                            Text="Logs"
