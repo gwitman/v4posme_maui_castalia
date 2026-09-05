@@ -103,6 +103,7 @@ public class ValidarAbonoViewModel : BaseViewModel
         }
         catch (Exception e)
         {
+            HelperLogs.Log(e);
             ShowMensajePopUp(e.Message);
         }
     }

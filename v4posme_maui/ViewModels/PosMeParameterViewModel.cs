@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Windows.Input;
 using v4posme_maui.Models;
+using v4posme_maui.Services.Helpers;
 using v4posme_maui.Services.Repository;
 using v4posme_maui.Services.SystemNames;
 using Unity;
@@ -132,6 +133,7 @@ public class PosMeParameterViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
+            HelperLogs.Log(ex);
             Debug.WriteLine(ex);
             PopupBackgroundColor = Colors.Red;
             Mensaje = ex.Message;

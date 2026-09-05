@@ -1,4 +1,5 @@
 using v4posme_maui.ViewModels.More;
+using v4posme_maui.Views.More.Logs;
 using v4posme_maui.Views.More.Productos;
 using v4posme_maui.Views.More.ReporteVenta;
 using v4posme_maui.Views.More.Visita;
@@ -38,6 +39,9 @@ public partial class MorePage : ContentPage
 				break;
 			case "4":
 				await Navigation.PushAsync(new ProductosVendidosPage());
+				break;
+			case "5":
+				await Navigation.PushAsync(new LogsPage());
 				break;
 		}
 	}

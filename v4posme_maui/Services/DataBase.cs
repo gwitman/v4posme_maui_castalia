@@ -21,6 +21,7 @@ public class DataBase
         {
             await Database.CreateTableAsync<Api_CoreAccount_LoginMobileObjUserResponse>();
             await Database.CreateTableAsync<TbParameterSystem>();
+            await Database.CreateTableAsync<TbLogs>();
             var countParameters = await Database.Table<TbParameterSystem>().CountAsync();
             if (countParameters == 0)
             {

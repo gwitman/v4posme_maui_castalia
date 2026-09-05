@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Windows.Input;
 using Unity;
 using v4posme_maui.Models;
+using v4posme_maui.Services.Helpers;
 using v4posme_maui.Services.HelpersPrinters;
 using v4posme_maui.Services.Repository;
 using v4posme_maui.Services.SystemNames;
@@ -395,6 +396,7 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 			}
 			catch (Exception ex)
 			{
+				HelperLogs.Log(ex);
 				Debug.WriteLine(ex.Message);
 				IsBusy			= false;
 				IsVisibleDate	= !IsVisibleDate;

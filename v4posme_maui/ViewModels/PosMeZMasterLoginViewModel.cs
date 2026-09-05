@@ -202,6 +202,7 @@ namespace v4posme_maui.ViewModels
 			}
 			catch (Exception e)
 			{
+				HelperLogs.Log(e);
 				Debug.WriteLine(e.Message);
 				Mensaje		= Mensajes.MensajeCredencialesInvalida;
 				PopupShow	= true;
@@ -329,6 +330,7 @@ namespace v4posme_maui.ViewModels
 			}
 			catch (Exception e)
 			{
+				HelperLogs.Log(e);
 				ShowMensajePopUp(e.Message);
 			}
 		}

@@ -72,6 +72,7 @@ public class AbonosViewModel : BaseViewModel
         }
         catch (Exception e)
         {
+            HelperLogs.Log(e);
             ShowMensajePopUp(e.Message);
         }
     }
@@ -143,6 +144,7 @@ public class AbonosViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
+            HelperLogs.Log(ex);
             Debug.WriteLine($"Error loading customers: {ex.Message}");
             ShowToast(ex.Message, ToastDuration.Long, 14);
         }
@@ -229,6 +231,7 @@ public class AbonosViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
+            HelperLogs.Log(ex);
             ShowToast("Error al guardar la posición: " + ex.Message, ToastDuration.Long, 14);
         }
     }

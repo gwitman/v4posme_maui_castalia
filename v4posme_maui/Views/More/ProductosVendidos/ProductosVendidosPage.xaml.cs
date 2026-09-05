@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CommunityToolkit.Maui.Core;
+using v4posme_maui.Services.Helpers;
 using v4posme_maui.Services.SystemNames;
 using v4posme_maui.ViewModels.More.ProductosVendidos;
 
@@ -46,6 +47,7 @@ public partial class ProductosVendidosPage : ContentPage
         }
         catch (Exception ex)
         {
+            HelperLogs.Log(ex);
             _viewModel.Mensaje = $"Error al compartir: {ex.Message}";
             _viewModel.PopupBackgroundColor = Colors.Red;
             _viewModel.PopUpShow = true;
@@ -73,6 +75,7 @@ public partial class ProductosVendidosPage : ContentPage
         }
         catch (Exception exception)
         {
+            HelperLogs.Log(exception);
             Debug.WriteLine(exception);
         }
     }

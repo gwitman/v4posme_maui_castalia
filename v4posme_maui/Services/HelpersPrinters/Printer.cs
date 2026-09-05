@@ -2,6 +2,7 @@
 using System.Text;
 using Android.Bluetooth;
 using Plugin.BLE.Abstractions.Contracts;
+using v4posme_maui.Services.Helpers;
 using v4posme_maui.Services.HelpersPrinters.Epson_Commands;
 using v4posme_maui.Services.HelpersPrinters.Helper;
 using v4posme_maui.Services.HelpersPrinters.Interfaces.Command;
@@ -50,6 +51,7 @@ namespace v4posme_maui.Services.HelpersPrinters
             }
             catch (Exception e)
             {
+                HelperLogs.Log(e.ToString());
                 Debug.WriteLine(e);
             }
         }

@@ -4,6 +4,7 @@ using System.Web;
 using System.Windows.Input;
 using CommunityToolkit.Maui.Core;
 using v4posme_maui.Models;
+using v4posme_maui.Services.Helpers;
 using v4posme_maui.Services.Repository;
 using Unity;
 using v4posme_maui.Services.SystemNames;
@@ -69,6 +70,7 @@ public class CreditDetailInvoiceViewModel : BaseViewModel, IQueryAttributable
         }
         catch (Exception e)
         {
+            HelperLogs.Log(e);
             Debug.WriteLine(e.Message);
         }
     }

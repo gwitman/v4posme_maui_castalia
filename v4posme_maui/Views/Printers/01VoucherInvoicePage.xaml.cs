@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using CommunityToolkit.Maui.Core;
+using v4posme_maui.Services.Helpers;
 using v4posme_maui.Services.SystemNames;
 using v4posme_maui.ViewModels.Invoices;
 
@@ -27,6 +28,7 @@ public partial class VoucherInvoicePage : ContentPage
         }
         catch (Exception exception)
         {
+            HelperLogs.Log(exception);
             Debug.WriteLine(exception);
         }
     }

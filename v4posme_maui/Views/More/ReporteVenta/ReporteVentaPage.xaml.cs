@@ -1,6 +1,7 @@
 using CommunityToolkit.Maui.Core;
 using DevExpress.Maui.Core;
 using System.Diagnostics;
+using v4posme_maui.Services.Helpers;
 using v4posme_maui.Services.SystemNames;
 using v4posme_maui.ViewModels.More.ReporteVenta;
 
@@ -56,6 +57,7 @@ public partial class ReporteVentaPage : ContentPage
 		}
 		catch (Exception exception)
 		{
+			HelperLogs.Log(exception);
 			Debug.WriteLine(exception);
 		}
 	}
@@ -67,6 +69,7 @@ public partial class ReporteVentaPage : ContentPage
 		}
 		catch (Exception exception)
 		{
+			HelperLogs.Log(exception);
 			Debug.WriteLine(exception);
 		}
 	}

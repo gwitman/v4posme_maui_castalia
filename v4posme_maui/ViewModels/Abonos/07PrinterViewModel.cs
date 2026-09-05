@@ -220,6 +220,7 @@ public class ValidarAbonoFinancieraViewModel : BaseViewModel
         }
         catch (Exception e)
         {
+            HelperLogs.Log(e);
             ShowMensajePopUp(e.Message);
         }
         finally

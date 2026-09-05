@@ -44,6 +44,7 @@ public partial class CustomerDetailPage : ContentPage
         }
         catch (Exception ex)
         {
+            HelperLogs.Log(ex);
             _isDeleting = false;
             await DisplayAlert("Error", ex.Message, "OK");
         }

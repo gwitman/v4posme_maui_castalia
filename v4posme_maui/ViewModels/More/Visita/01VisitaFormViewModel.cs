@@ -155,6 +155,7 @@ namespace v4posme_maui.ViewModels.More.Visita
 			}
 			catch (Exception e)
 			{
+                HelperLogs.Log(e);
                 Debug.WriteLine(e);
                 Mensaje                 = Mensajes.MessageErrorVisita;
                 PopupBackgroundColor    = Colors.Red;

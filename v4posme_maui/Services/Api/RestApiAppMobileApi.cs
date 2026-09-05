@@ -31,10 +31,12 @@ public class RestApiAppMobileApi
     
     public async Task<DtoMenssage> GetDataDownload(bool onlyQuantityNew)
     {
+        HelperLogs.Log($"GetDataDownload: inicio (onlyQuantityNew={onlyQuantityNew})", "Info");
         DtoMenssage mensaje = new DtoMenssage();
         var tempUrl         = Constantes.UrlRequestDownload.Replace("{UrlBase}", VariablesGlobales.CompanyKey);
         if (VariablesGlobales.User is null)
         {
+            HelperLogs.Log("GetDataDownload: usuario nulo, no se puede continuar", "Warning");
             mensaje.Error       = true;
             mensaje.Description = Mensajes.MensajeDownloadError;
             return mensaje;
@@ -42,6 +44,7 @@ public class RestApiAppMobileApi
 
         try
         {
+            HelperLogs.Log("GetDataDownload: preparando petición al servidor", "Info");
             var nickname    = VariablesGlobales.User.Nickname!;
             var password    = VariablesGlobales.User.Password!;
             var nvc         = new List<KeyValuePair<string, string>>
@@ -55,16 +58,20 @@ public class RestApiAppMobileApi
             };
 
             //validar repuesta
+            HelperLogs.Log("GetDataDownload: enviando petición HTTP al servidor", "Info");
             var response    = await _httpClient.SendAsync(req);
             if (!response.IsSuccessStatusCode) {
+                HelperLogs.Log($"GetDataDownload: respuesta HTTP no exitosa ({(int)response.StatusCode})", "Error");
                 mensaje.Error       = true;
                 mensaje.Description = Mensajes.MensajeDownloadError;
                 return mensaje;
             };
 
+            HelperLogs.Log("GetDataDownload: leyendo y deserializando respuesta", "Info");
             var responseBody    = await response.Content.ReadAsStringAsync();
             var apiResponse     = JsonConvert.DeserializeObject<Api_AppMobileApi_GetDataDownloadResponse>(responseBody);
             if (apiResponse is null || apiResponse.Error) {
+                HelperLogs.Log("GetDataDownload: apiResponse nulo o con error", "Error");
                 mensaje.Error       = true;
                 mensaje.Description = Mensajes.MensajeDownloadError;
                 return mensaje;
@@ -73,6 +80,7 @@ public class RestApiAppMobileApi
             //eliminar todo e ingresar nuevamente
             if (onlyQuantityNew == true)
             {
+                HelperLogs.Log("GetDataDownload: procesando solo cantidades nuevas de items", "Info");
                 bool changeInItems                                                  = false;
                 List<Api_AppMobileApi_GetDataDownloadItemsResponse> objListItemNew  = new List<Api_AppMobileApi_GetDataDownloadItemsResponse>();
                 foreach (var item_ in apiResponse.ListItem)
@@ -102,6 +110,7 @@ public class RestApiAppMobileApi
                 //meter todos los nuevos
                 if (objListItemNew.Count > 0)
                 {
+                    HelperLogs.Log($"GetDataDownload: insertando {objListItemNew.Count} items nuevos", "Info");
                     var taskItem = _repositoryItems!.PosMeInsertAll(objListItemNew);
                     await Task.WhenAll([taskItem]);
                 }
@@ -124,6 +133,7 @@ public class RestApiAppMobileApi
             }
             else
             {
+                HelperLogs.Log("GetDataDownload: eliminando datos locales antes de recargar", "Info");
                 var customerDeleteAll                   = _repositoryTbCustomer!.PosMeDeleteAll();
                 var itemsDeleteAll                      = _repositoryItems!.PosMeDeleteAll();
                 var documentCreditAmortizationDeleteAll = _repositoryDocumentCreditAmortization!.PosMeDeleteAll();
@@ -149,9 +159,11 @@ public class RestApiAppMobileApi
                     menuElementDeleteAll,
                     catalogItemAll
                 ]);
+                HelperLogs.Log("GetDataDownload: datos locales eliminados correctamente", "Info");
 
 
                 //Ingresar las transacionces registradas del servidor                
+                HelperLogs.Log("GetDataDownload: procesando transacciones registradas del servidor", "Info");
                 List<TbTransactionMasterDetail> objListTransactionMasterDetailNew   = new List<TbTransactionMasterDetail>();
                 if (apiResponse.ListTransactionMasterRegister != null)
                 {
@@ -215,6 +227,7 @@ public class RestApiAppMobileApi
                 }
 
                 //insertar nuevos movimientos
+                HelperLogs.Log("GetDataDownload: insertando nuevos movimientos descargados", "Info");
                 var taskCompany                     = _repositoryTbCompany.PosMeInsert(apiResponse.ObjCompany);
                 var taskCustomer                    = _repositoryTbCustomer.PosMeInsertAll(apiResponse.ListCustomer);
                 var taskItem                        = _repositoryItems!.PosMeInsertAll(apiResponse.ListItem);
@@ -238,10 +251,12 @@ public class RestApiAppMobileApi
                     taskCatalogItem,
                     taskTransactionMasterDetail
                 ]);
+                HelperLogs.Log("GetDataDownload: nuevos movimientos insertados correctamente", "Info");
 
 
 
                 //inicializar contador 
+                HelperLogs.Log("GetDataDownload: inicializando contador y actualizando compañía", "Info");
                 var objParameterSystem      = await _parameterSystem.PosMeFindByName(Constantes.ParemeterEntityIDAutoIncrement);
                 objParameterSystem.Value    = $"-1";
                 await _parameterSystem.PosMeUpdate(objParameterSystem);
@@ -253,6 +268,7 @@ public class RestApiAppMobileApi
                 VariablesGlobales.OrdenarClientes   = true;
 
 
+                HelperLogs.Log("GetDataDownload: proceso finalizado con éxito", "Info");
                 mensaje.Error       = false;
                 mensaje.Description = Mensajes.MensajeDownloadSuccess;
                 return mensaje;
@@ -263,6 +279,8 @@ public class RestApiAppMobileApi
         }
         catch (Exception ex)
         {
+            HelperLogs.Log(ex);
+            HelperLogs.Log("GetDataDownload: excepción durante el proceso de descarga", "Error");
             Debug.WriteLine($"ERROR {ex.Message}");
 
             mensaje.Error       = true;
@@ -276,6 +294,7 @@ public class RestApiAppMobileApi
     {
         try
         {
+            HelperLogs.Log("SendDataAsync: inicio, recopilando datos locales modificados", "Info");
             var nickname                    = VariablesGlobales.User!.Nickname!;
             var password                    = VariablesGlobales.User.Password!;
             var helper                      = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
@@ -283,6 +302,7 @@ public class RestApiAppMobileApi
             var findItems                   = await _repositoryItems.PosMeTakeModificado();
             var findTransactionMaster       = await _repositoryTbTransactionMaster.PosMeFindAll();
             var findTransactionMasterDetail = await _repositoryTbTransactionMasterDetail.PosMeFindAll();
+            HelperLogs.Log($"SendDataAsync: datos recopilados (clientes={findCustomers.Count}, items={findItems.Count}, transacciones={findTransactionMaster.Count}, detalles={findTransactionMasterDetail.Count})", "Info");
             var data                        = new Dictionary<string, object>
             {
                 { "ObjCustomers", findCustomers },
@@ -290,6 +310,7 @@ public class RestApiAppMobileApi
                 { "ObjTransactionMaster", findTransactionMaster },
                 { "ObjTransactionMasterDetail", findTransactionMasterDetail }
             };
+            HelperLogs.Log("SendDataAsync: serializando datos a JSON", "Info");
             var jsonData = JsonConvert.SerializeObject(data);
             var nvc = new List<KeyValuePair<string, string>>
             {
@@ -304,13 +325,22 @@ public class RestApiAppMobileApi
             {
                 Content = content
             };
+            HelperLogs.Log("SendDataAsync: enviando datos al servidor", "Info");
             var response        = await _httpClient.SendAsync(req);
-            if (!response.IsSuccessStatusCode) return "{'Error': 'false'; 'Message': 'error'}";
+            if (!response.IsSuccessStatusCode)
+            {
+                HelperLogs.Log($"SendDataAsync: respuesta HTTP no exitosa ({(int)response.StatusCode})", "Error");
+                return "{'Error': 'false'; 'Message': 'error'}";
+            }
+            HelperLogs.Log("SendDataAsync: datos enviados, leyendo respuesta del servidor", "Info");
             var responseBody    = await response.Content.ReadAsStringAsync();
+            HelperLogs.Log("SendDataAsync: proceso finalizado con éxito", "Info");
             return responseBody;
         }
         catch (Exception ex)
         {
+            HelperLogs.Log(ex);
+            HelperLogs.Log("SendDataAsync: excepción durante el proceso de subida", "Error");
             return $"Error: {ex.Message}";
         }
     }

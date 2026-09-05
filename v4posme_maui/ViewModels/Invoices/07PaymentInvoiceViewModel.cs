@@ -64,115 +64,135 @@ public class PaymentInvoiceViewModel : BaseViewModel
 
     private async void OnAplicarPagoCommand()
     {
+        HelperLogs.Log("OnAplicarPagoCommand: inicio", "Info");
         if (!ValidarSeleccionPago())
         {
+            HelperLogs.Log("OnAplicarPagoCommand: no se seleccionó tipo de pago", "Warning");
             ShowToast(Mensajes.MensajeSeleccionarTipoPago, ToastDuration.Long, 12);
             return;
         }
 
-        IsBusy          = true;
-        var dtoInvoice  = VariablesGlobales.DtoInvoice;
-        var codigo      = "";
-
-        if (dtoInvoice.TransactionMasterId <= 0 )
-            codigo = await _helper.GetCodigoFactura();
-        else
-            codigo = dtoInvoice.Codigo;
-
-        //Eliminar el registro en caso de ser edicion
-        if(dtoInvoice.TransactionMasterId > 0)
+        try
         {
-            var invoiceOld          = await _repositoryTbTransactionMaster.PosMeFindByTransactionId(dtoInvoice.TransactionMasterId);
-            var invoiceDetailOld    = await _repositoryTbTransactionMasterDetail.PosMeItemByTransactionId(dtoInvoice.TransactionMasterId);
-            foreach (var invoiceDetailOld_i in invoiceDetailOld)
+            IsBusy          = true;
+            var dtoInvoice  = VariablesGlobales.DtoInvoice;
+            var codigo      = "";
+
+            HelperLogs.Log("OnAplicarPagoCommand: obteniendo código de factura", "Info");
+            if (dtoInvoice.TransactionMasterId <= 0 )
+                codigo = await _helper.GetCodigoFactura();
+            else
+                codigo = dtoInvoice.Codigo;
+
+            //Eliminar el registro en caso de ser edicion
+            if(dtoInvoice.TransactionMasterId > 0)
             {
-                await _repositoryTbTransactionMasterDetail.PosMeDelete(invoiceDetailOld_i);
+                HelperLogs.Log($"OnAplicarPagoCommand: edición, eliminando factura anterior (TransactionMasterId={dtoInvoice.TransactionMasterId})", "Info");
+                var invoiceOld          = await _repositoryTbTransactionMaster.PosMeFindByTransactionId(dtoInvoice.TransactionMasterId);
+                var invoiceDetailOld    = await _repositoryTbTransactionMasterDetail.PosMeItemByTransactionId(dtoInvoice.TransactionMasterId);
+                foreach (var invoiceDetailOld_i in invoiceDetailOld)
+                {
+                    await _repositoryTbTransactionMasterDetail.PosMeDelete(invoiceDetailOld_i);
+                }
+                await _repositoryTbTransactionMaster.PosMeDelete(invoiceOld);
             }
-            await _repositoryTbTransactionMaster.PosMeDelete(invoiceOld);
-        }
-        
-        VariablesGlobales.DtoInvoice.Codigo         = codigo;
-        VariablesGlobales.DtoInvoice.Monto          = Monto;
-        VariablesGlobales.DtoInvoice.Cambio         = Cambio;
-        VariablesGlobales.DtoInvoice.TransactionOn  = DateTime.Now;
 
-        //Obtener el estado de la factura
-        int statusID            = 0;
-        bool permission = await _helper.GetPermission(TypeMenuElementID.core_billing_invoice_type_restaurant, TypePermission.Updated, TypeImpact.All);
-        if (!permission)
-        {
-            statusID = (int)TypeStatusBilling.Apply;
-        }
-        else {
-            statusID = (int)TypeStatusBilling.Register;
-        }
+            VariablesGlobales.DtoInvoice.Codigo         = codigo;
+            VariablesGlobales.DtoInvoice.Monto          = Monto;
+            VariablesGlobales.DtoInvoice.Cambio         = Cambio;
+            VariablesGlobales.DtoInvoice.TransactionOn  = DateTime.Now;
 
-        var transactionMaster   = new TbTransactionMaster
-        {
-            TransactionId       = TypeTransaction.TransactionInvoiceBilling,
-            Amount              = Monto,
-            TransactionOn       = DateTime.Now,
-            TransactionCausalId = (TypeTransactionCausal)dtoInvoice.TipoDocumento!.Key,
-            TypePaymentId       = TypePayment,
-            Comment             = dtoInvoice.Comentarios,
-            Discount            = decimal.Zero,
-            Taxi1               = decimal.Zero,
-            ExchangeRate        = decimal.Zero, //definir
-            EntityId            = dtoInvoice.CustomerResponse!.EntityId,
-            EntitySecondaryId   = VariablesGlobales.User!.UserId.ToString(),
-            TransactionNumber   = codigo,
-            CurrencyId          = (TypeCurrency)dtoInvoice.Currency!.Key,
-            CustomerCreditLineId = dtoInvoice.CustomerResponse.CustomerCreditLineId,
-            CustomerIdentification = dtoInvoice.CustomerResponse.Identification!,
-            Plazo               = dtoInvoice.Plazo,
-            NextVisit           = dtoInvoice.NextVisit,
-            FixedExpenses       = dtoInvoice.FixedExpenses,
-            PeriodPay           = (TypePeriodPay)dtoInvoice.PeriodPay!.Key,
-            StatusID            = statusID,
-            MesaID              = dtoInvoice.Mesa!.Key,
-            ReferenceClientName = dtoInvoice.ReferenceClientName,
-            MesaName            = dtoInvoice.Mesa!.Name,
-            RegisterLocal       = 1
-        };
-
-        transactionMaster.SubAmount = dtoInvoice.Balance + dtoInvoice.Items.Sum(P => P.MontoDescuento);
-        transactionMaster.Amount    = dtoInvoice.Balance + dtoInvoice.Items.Sum(P => P.MontoDescuento);
-        transactionMaster.Discount  = dtoInvoice.Items.Sum(P => P.MontoDescuento);
-        var listMasterDetail        = new List<TbTransactionMasterDetail>();
-        await _repositoryTbTransactionMaster.PosMeInsert(transactionMaster);
-        var transactionMasterId     = transactionMaster.TransactionMasterId;
-
-        foreach (var item in dtoInvoice.Items)
-        {
-            var findPrecioOriginal = await _repositoryItems.PosMeFindByItemNumber(item.ItemNumber!);
-            var detail = new TbTransactionMasterDetail
+            //Obtener el estado de la factura
+            HelperLogs.Log("OnAplicarPagoCommand: validando permiso para determinar estado de la factura", "Info");
+            int statusID            = 0;
+            bool permission = await _helper.GetPermission(TypeMenuElementID.core_billing_invoice_type_restaurant, TypePermission.Updated, TypeImpact.All);
+            if (!permission)
             {
-                Quantity            = item.Quantity,
-                UnitaryCost         = findPrecioOriginal.PrecioPublico,
-                UnitaryPrice        = item.PrecioPublico,
-                TransactionMasterId = transactionMasterId, /**/
-                SubAmount           = item.Importe,
-                Discount            = item.MontoDescuento,
-                Tax1                = decimal.Zero,
-                Componentid         = (int)TypeComponent.Itme,
-                ComponentItemId     = item.ItemId,
-                ItemBarCode         = item.BarCode,
-                ReferenciaProducto  = item.Referencia,
+                statusID = (int)TypeStatusBilling.Apply;
+            }
+            else {
+                statusID = (int)TypeStatusBilling.Register;
+            }
+
+            HelperLogs.Log("OnAplicarPagoCommand: construyendo transacción maestra", "Info");
+            var transactionMaster   = new TbTransactionMaster
+            {
+                TransactionId       = TypeTransaction.TransactionInvoiceBilling,
+                Amount              = Monto,
+                TransactionOn       = DateTime.Now,
+                TransactionCausalId = (TypeTransactionCausal)dtoInvoice.TipoDocumento!.Key,
+                TypePaymentId       = TypePayment,
+                Comment             = dtoInvoice.Comentarios,
+                Discount            = decimal.Zero,
+                Taxi1               = decimal.Zero,
+                ExchangeRate        = decimal.Zero, //definir
+                EntityId            = dtoInvoice.CustomerResponse!.EntityId,
+                EntitySecondaryId   = VariablesGlobales.User!.UserId.ToString(),
+                TransactionNumber   = codigo,
+                CurrencyId          = (TypeCurrency)dtoInvoice.Currency!.Key,
+                CustomerCreditLineId = dtoInvoice.CustomerResponse.CustomerCreditLineId,
+                CustomerIdentification = dtoInvoice.CustomerResponse.Identification!,
+                Plazo               = dtoInvoice.Plazo,
+                NextVisit           = dtoInvoice.NextVisit,
+                FixedExpenses       = dtoInvoice.FixedExpenses,
+                PeriodPay           = (TypePeriodPay)dtoInvoice.PeriodPay!.Key,
+                StatusID            = statusID,
+                MesaID              = dtoInvoice.Mesa!.Key,
+                ReferenceClientName = dtoInvoice.ReferenceClientName,
+                MesaName            = dtoInvoice.Mesa!.Name,
                 RegisterLocal       = 1
             };
-            detail.Amount = detail.SubAmount;
-            listMasterDetail.Add(detail);
+
+            transactionMaster.SubAmount = dtoInvoice.Balance + dtoInvoice.Items.Sum(P => P.MontoDescuento);
+            transactionMaster.Amount    = dtoInvoice.Balance + dtoInvoice.Items.Sum(P => P.MontoDescuento);
+            transactionMaster.Discount  = dtoInvoice.Items.Sum(P => P.MontoDescuento);
+            var listMasterDetail        = new List<TbTransactionMasterDetail>();
+            HelperLogs.Log("OnAplicarPagoCommand: insertando transacción maestra", "Info");
+            await _repositoryTbTransactionMaster.PosMeInsert(transactionMaster);
+            var transactionMasterId     = transactionMaster.TransactionMasterId;
+
+            HelperLogs.Log($"OnAplicarPagoCommand: construyendo detalle de {dtoInvoice.Items.Count} items", "Info");
+            foreach (var item in dtoInvoice.Items)
+            {
+                var findPrecioOriginal = await _repositoryItems.PosMeFindByItemNumber(item.ItemNumber!);
+                var detail = new TbTransactionMasterDetail
+                {
+                    Quantity            = item.Quantity,
+                    UnitaryCost         = findPrecioOriginal.PrecioPublico,
+                    UnitaryPrice        = item.PrecioPublico,
+                    TransactionMasterId = transactionMasterId, /**/
+                    SubAmount           = item.Importe,
+                    Discount            = item.MontoDescuento,
+                    Tax1                = decimal.Zero,
+                    Componentid         = (int)TypeComponent.Itme,
+                    ComponentItemId     = item.ItemId,
+                    ItemBarCode         = item.BarCode,
+                    ReferenciaProducto  = item.Referencia,
+                    RegisterLocal       = 1
+                };
+                detail.Amount = detail.SubAmount;
+                listMasterDetail.Add(detail);
+            }
+
+            HelperLogs.Log("OnAplicarPagoCommand: insertando detalle de la factura y actualizando contador", "Info");
+            await _repositoryTbTransactionMasterDetail.PosMeInsertAll(listMasterDetail);
+            await _helper.PlusCounter();
+            VariablesGlobales.EnableBackButton              = false;
+            VariablesGlobales.DtoInvoice.TipoPayment        = TypePayment;
+            VariablesGlobales.DtoInvoice.TransactionMaster  = transactionMaster;
+
+            //Pasar a otra ventana
+            HelperLogs.Log("OnAplicarPagoCommand: proceso finalizado con éxito, navegando a impresión", "Info");
+            await Navigation!.PushAsync(new PrinterInvoicePage());
+            IsBusy = false;
         }
-
-        await _repositoryTbTransactionMasterDetail.PosMeInsertAll(listMasterDetail);
-        await _helper.PlusCounter();
-        VariablesGlobales.EnableBackButton              = false;
-        VariablesGlobales.DtoInvoice.TipoPayment        = TypePayment;
-        VariablesGlobales.DtoInvoice.TransactionMaster  = transactionMaster;
-
-        //Pasar a otra ventana
-        await Navigation!.PushAsync(new PrinterInvoicePage());
-        IsBusy = false;
+        catch (Exception ex)
+        {
+            HelperLogs.Log(ex);
+            HelperLogs.Log("OnAplicarPagoCommand: excepción durante el proceso de pago", "Error");
+            ShowMensajePopUp(ex.Message);
+            IsBusy = false;
+        }
     }
 
     private void OnSelectionOtrosCommand()

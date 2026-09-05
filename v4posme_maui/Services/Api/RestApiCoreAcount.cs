@@ -47,6 +47,7 @@ public class RestApiCoreAcount
         }
         catch (Exception ex)
         {
+            HelperLogs.Log(ex);
             return null;
         }
     }

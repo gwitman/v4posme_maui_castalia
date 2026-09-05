@@ -76,6 +76,7 @@ public partial class CustomerEditPage : ContentPage
         }
         catch (Exception ex)
         {
+            HelperLogs.Log(ex);
             TxtMensaje.Text = ex.Message;
             Popup.IsOpen    = true;
             return;

@@ -4,6 +4,7 @@ using Android.Content;
 using Java.Util;
 using Plugin.BLE;
 using Plugin.BLE.Abstractions.Contracts;
+using v4posme_maui.Services.Helpers;
 
 namespace v4posme_maui.Services;
 
@@ -62,6 +63,7 @@ public class BluetoothService(string nameDevice)
         }
         catch (Exception e)
         {
+            HelperLogs.Log(e);
             Debug.WriteLine(e);
         }
     }

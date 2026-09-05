@@ -152,6 +152,7 @@ namespace v4posme_maui.ViewModels
             }
             catch (Exception e)
             {
+                HelperLogs.Log(e);
                 ShowToast(e.Message, ToastDuration.Long, 14);
             }
         }

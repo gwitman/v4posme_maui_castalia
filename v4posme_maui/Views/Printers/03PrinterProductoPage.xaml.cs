@@ -44,6 +44,7 @@ public partial class PrinterProductoPage : ContentPage
         }
         catch (Exception exception)
         {
+            HelperLogs.Log(exception);
             Debug.WriteLine(exception);
         }
     }
@@ -68,6 +69,7 @@ public partial class PrinterProductoPage : ContentPage
         }
         catch (Exception ex)
         {
+            HelperLogs.Log(ex);
             _printerProductViewModel.ShowToast(ex.Message, ToastDuration.Long, 18);
         }
     }

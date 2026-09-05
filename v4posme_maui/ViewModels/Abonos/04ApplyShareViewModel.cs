@@ -160,6 +160,7 @@ public class AplicarAbonoViewModel : BaseViewModel, IQueryAttributable
 		}
 		catch (Exception e)
 		{
+			HelperLogs.Log(e);
 			Debug.WriteLine(e);
 		}
 	}

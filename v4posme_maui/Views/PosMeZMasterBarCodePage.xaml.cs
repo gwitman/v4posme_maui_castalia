@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using v4posme_maui.Services.Helpers;
 using ZXing.Net.Maui;
 
 namespace v4posme_maui.Views;
@@ -50,6 +51,7 @@ public partial class BarCodePage : ContentPage
         }
         catch (Exception ex)
         {
+            HelperLogs.Log(ex);
             Debug.WriteLine(ex);
         }
     }

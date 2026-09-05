@@ -153,6 +153,7 @@ namespace v4posme_maui.Services
                 }
                 catch (Exception ex)
                 {
+                    HelperLogs.Log(ex);
                     Log.Error(TAG, $"Error sending location: {ex.Message}");
                 }
 
@@ -196,11 +197,13 @@ namespace v4posme_maui.Services
                 }
                 catch (Exception ex)
                 {
+                    HelperLogs.Log(ex);
                     Log.Error(TAG, $"Error sending location: {ex.Message}");
                 }
             }
             catch (Exception e)
             {
+                HelperLogs.Log(e);
                 Log.Error("Error sending location updates", e.Message);
             }
         }

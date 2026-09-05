@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Unity;
+using v4posme_maui.Services.Helpers;
 using v4posme_maui.Services.Repository;
 using v4posme_maui.Services.SystemNames;
 using v4posme_maui.ViewModels.Abonos;
@@ -53,6 +54,7 @@ public partial class CreditDetailInvoicePage : ContentPage
         }
         catch (Exception e)
         {
+            HelperLogs.Log(e);
             Debug.WriteLine(e.Message);
         }
         

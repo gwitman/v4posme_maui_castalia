@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using v4posme_maui.Models;
+using v4posme_maui.Services.Helpers;
 using v4posme_maui.Services.Repository;
 using v4posme_maui.Services.SystemNames;
 using Unity;
@@ -118,6 +119,7 @@ namespace v4posme_maui.Services.Api
             }
             catch (Exception e)
             {
+                HelperLogs.Log(e);
                 Mensaje = e.Message;
                 return null;
             }

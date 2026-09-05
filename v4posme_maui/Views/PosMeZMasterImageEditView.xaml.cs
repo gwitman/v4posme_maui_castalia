@@ -46,6 +46,7 @@ public partial class ImageEditView : ContentPage
         }
         catch (Exception exception)
         {
+            HelperLogs.Log(exception);
             Debug.WriteLine(exception);
         }
     }

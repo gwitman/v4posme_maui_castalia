@@ -69,6 +69,7 @@ namespace v4posme_maui.Views.Items
             }
             catch (Exception ex)
             {
+                HelperLogs.Log(ex);
                 _isDeleting = false;
                 await DisplayAlert("Error", ex.Message, "OK");
             }

@@ -5,6 +5,7 @@ using Plugin.BLE;
 using SkiaSharp;
 using Unity;
 using v4posme_maui.Models;
+using v4posme_maui.Services.Helpers;
 using v4posme_maui.Services.HelpersPrinters;
 using v4posme_maui.Services.HelpersPrinters.Interfaces.Command;
 using v4posme_maui.Services.Repository;
@@ -223,6 +224,7 @@ public class ProductosVendidosViewModel : BaseViewModel
         }
         catch (Exception e)
         {
+            HelperLogs.Log(e);
             ShowMensajePopUp(e.Message);
         }
     }
@@ -282,6 +284,7 @@ public class ProductosVendidosViewModel : BaseViewModel
         }
         catch (Exception e)
         {
+            HelperLogs.Log(e);
             Debug.WriteLine(e);
             ShowMensajePopUp(e.Message);
         }

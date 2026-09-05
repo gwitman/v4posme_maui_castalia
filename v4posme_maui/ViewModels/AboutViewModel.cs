@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Maui.Core;
 using v4posme_maui.Models;
+using v4posme_maui.Services.Helpers;
 using v4posme_maui.Services.Repository;
 using v4posme_maui.Services.SystemNames;
 using Unity;
@@ -241,6 +242,7 @@ namespace v4posme_maui.ViewModels
             }
             catch (Exception e)
             {
+                HelperLogs.Log(e);
                 ShowToast(e.Message,ToastDuration.Long, 14);
             }
         }

@@ -90,6 +90,7 @@ public class PosMeCustomerViewModel : BaseViewModel
         }
         catch (Exception e)
         {
+            HelperLogs.Log(e);
             ShowMensajePopUp(e.Message);
         }
     }
@@ -106,6 +107,7 @@ public class PosMeCustomerViewModel : BaseViewModel
         }
         catch (Exception e)
         {
+            HelperLogs.Log(e);
             ShowMensajePopUp(e.Message);
         }
         finally
@@ -204,6 +206,7 @@ public class PosMeCustomerViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
+            HelperLogs.Log(ex);
             Debug.WriteLine($"Error loading customers: {ex.Message}");
             ShowMensajePopUp(ex.Message);
         }
@@ -285,6 +288,7 @@ public class PosMeCustomerViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
+            HelperLogs.Log(ex);
             Debug.WriteLine(ex.StackTrace);
             ShowMensajePopUp(ex.Message);
         }

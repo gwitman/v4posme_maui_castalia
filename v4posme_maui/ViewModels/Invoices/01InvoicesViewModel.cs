@@ -196,6 +196,7 @@ public class InvoicesViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
+            HelperLogs.Log(ex);
             Debug.WriteLine($"Error loading customers: {ex.Message}");
             ShowMensajePopUp(ex.Message);
         }
@@ -278,6 +279,7 @@ public class InvoicesViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
+            HelperLogs.Log(ex);
             Debug.WriteLine(ex.StackTrace);
             ShowMensajePopUp(ex.Message);
         }
@@ -327,6 +329,7 @@ public class InvoicesViewModel : BaseViewModel
         }
         catch (Exception e)
         {
+            HelperLogs.Log(e);
             Debug.WriteLine(e.StackTrace);
             ShowMensajePopUp(e.Message);
         }
