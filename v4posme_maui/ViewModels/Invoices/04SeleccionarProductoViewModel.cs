@@ -246,10 +246,29 @@ public class SeleccionarProductoViewModel : BaseViewModel
 
         await LoadAllProductosAsync();
 
-        if (VariablesGlobales.DtoInvoice.Items.Count > 0)
+        // Al regresar desde la pantalla 6/6 los productos pueden haberse modificado
+        // (cambios de cantidad, precio, descuento o eliminaciones). Se recalcula el
+        // contador y el balance desde Items (fuente de verdad) para que los labels
+        // reflejen el estado real y no un valor desincronizado.
+        RefrescarResumenSeleccionados();
+    }
+
+    private void RefrescarResumenSeleccionados()
+    {
+        var cestaArticulos = VariablesGlobales.DtoInvoice.Items;
+
+        VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada = (int)cestaArticulos.Sum(r => r.Quantity);
+        VariablesGlobales.DtoInvoice.Balance = cestaArticulos.Sum(r => r.Importe) - cestaArticulos.Sum(r => r.MontoDescuento);
+
+        if (cestaArticulos.Count > 0)
         {
             ProductosSeleccionadosCantidad      = $"Enviar {VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada} Items";
             ProductosSeleccionadosCantidadTotal = $"{VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada} Items = {VariablesGlobales.DtoInvoice.Balance}";
+        }
+        else
+        {
+            ProductosSeleccionadosCantidad      = "Seleccionar Productos";
+            ProductosSeleccionadosCantidadTotal = "Items";
         }
     }
 
