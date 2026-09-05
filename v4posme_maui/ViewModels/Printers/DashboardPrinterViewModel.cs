@@ -49,19 +49,18 @@ public class DashboardPrinterViewModel : BaseViewModel
     private async void OnSearchProductCommand()
     {
         IsBusy = true;
-        await Task.Run(async () =>
+        List<Api_AppMobileApi_GetDataDownloadItemsResponse> searchItems;
+        if (string.IsNullOrWhiteSpace(SearchProduct))
         {
-            Productos.Clear();
-            List<Api_AppMobileApi_GetDataDownloadItemsResponse> searchItems;
-            if (string.IsNullOrWhiteSpace(SearchProduct))
-            {
-                searchItems = await _repositoryItems.PosMeTake10();
-            }
-            else
-            {
-                searchItems = await _repositoryItems.PosMeFilterdByItemNumberAndBarCodeAndName(SearchProduct);
-            }
+            searchItems = await _repositoryItems.PosMeTake10();
+        }
+        else
+        {
+            searchItems = await _repositoryItems.PosMeFilterdByItemNumberAndBarCodeAndName(SearchProduct);
+        }
 
+        await MainThread.InvokeOnMainThreadAsync(() =>
+        {
             Productos = new ObservableCollection<Api_AppMobileApi_GetDataDownloadItemsResponse>(searchItems);
         });
         IsBusy = false;
@@ -103,7 +102,6 @@ public class DashboardPrinterViewModel : BaseViewModel
     private async void OnSearchAbonoCommand(object obj)
     {
         IsBusy = true;
-        Abonos.Clear();
         List<TbTransactionMaster> filters;
         if (string.IsNullOrWhiteSpace(SearchAbonos))
         {
@@ -114,7 +112,7 @@ public class DashboardPrinterViewModel : BaseViewModel
             filters = await _repositoryTbTransactionMaster.PosMeFilterByCodigoAndNombreClienteAbonos(SearchAbonos);
         }
 
-        FillAbonos(filters);
+        await FillAbonos(filters);
         IsBusy = false;
     }
 
@@ -178,7 +176,6 @@ public class DashboardPrinterViewModel : BaseViewModel
     private async void OnSearchFacturaCommand()
     {
         IsBusy = true;
-        Facturas.Clear();
         List<TbTransactionMaster> findAllFactura;
         if (string.IsNullOrWhiteSpace(Search))
         {
@@ -189,7 +186,7 @@ public class DashboardPrinterViewModel : BaseViewModel
             findAllFactura = await _repositoryTbTransactionMaster.PosMeFilterByCodigoAndNombreClienteFacturas(Search);
         }
 
-        FillFacturas(findAllFactura);
+        await FillFacturas(findAllFactura);
         IsBusy = false;
     }
 
@@ -319,30 +316,17 @@ public class DashboardPrinterViewModel : BaseViewModel
             {
                 case 0:
                     var findAllFactura = await _repositoryTbTransactionMaster.PosMeFilterFacturas();
-                    await MainThread.InvokeOnMainThreadAsync(() => 
-                    {
-                        FillFacturas(findAllFactura);
-                    });
+                    await FillFacturas(findAllFactura);
                     break;
 
                 case 1:
                     var findAllAbonos = await _repositoryTbTransactionMaster.PosMeFilterAbonos();
-                    await MainThread.InvokeOnMainThreadAsync(() => 
-                    {
-                        FillAbonos(findAllAbonos);
-                    });
+                    await FillAbonos(findAllAbonos);
                     break;
 
                 case 2:
-                    var findAllProductos = await _repositoryItems.PosMeDescending10();
-                    await MainThread.InvokeOnMainThreadAsync(() => 
-                    {
-                        Productos.Clear();
-                        foreach (var item in findAllProductos)
-                        {
-                            Productos.Add(item);
-                        }
-                    });
+                    var findAllProductos = await _repositoryItems.PosMeNameAsc10();
+                    await FillProductos(findAllProductos);
                     break;
             }
         }
@@ -352,13 +336,29 @@ public class DashboardPrinterViewModel : BaseViewModel
         }
     }
 
-    private async void FillAbonos(List<TbTransactionMaster> findAllAbonos)
+    private async Task FillProductos(List<Api_AppMobileApi_GetDataDownloadItemsResponse> findAllProductos)
+    {
+        try
+        {
+            await MainThread.InvokeOnMainThreadAsync(() =>
+            {
+                Productos = new ObservableCollection<Api_AppMobileApi_GetDataDownloadItemsResponse>(findAllProductos);
+            });
+        }
+        catch (Exception e)
+        {
+            ShowToast(e.Message, ToastDuration.Long, 14);
+        }
+    }
+
+    private async Task FillAbonos(List<TbTransactionMaster> findAllAbonos)
     {
         try
         {
             var totalCordobas = decimal.Zero;
             var totalDolares = decimal.Zero;
-            Abonos.Clear();
+            var buffer = new List<ViewTempDtoAbono>(findAllAbonos.Count);
+
             foreach (var abono in findAllAbonos)
             {
                 var customer = await _repositoryTbCustomer.PosMeFindEntityId(abono.EntityId);
@@ -398,11 +398,15 @@ public class DashboardPrinterViewModel : BaseViewModel
                 tmpAbono.Documentos         = abono.Reference1;
                 tmpAbono.DiasMora           = abono.Plazo;
                 tmpAbono.CuotasPendientes   = abono.CuotasPendientes;
-                Abonos.Add(tmpAbono);
+                buffer.Add(tmpAbono);
             }
 
-            TotalCordobasAbonos = $"C$ {totalCordobas:N2}";
-            TotalDolaresAbonos = $"$ {totalDolares:N2}";
+            await MainThread.InvokeOnMainThreadAsync(() =>
+            {
+                Abonos = new ObservableCollection<ViewTempDtoAbono>(buffer);
+                TotalCordobasAbonos = $"C$ {totalCordobas:N2}";
+                TotalDolaresAbonos = $"$ {totalDolares:N2}";
+            });
         }
         catch (Exception e)
         {
@@ -410,13 +414,16 @@ public class DashboardPrinterViewModel : BaseViewModel
         }
     }
 
-    private async void FillFacturas(List<TbTransactionMaster> findAllFactura)
+    private async Task FillFacturas(List<TbTransactionMaster> findAllFactura)
     {
         var totalCordobas   = decimal.Zero;
         var totalDolares    = decimal.Zero;
-        Facturas.Clear();
+        var buffer          = new List<ViewTempDtoInvoice>(findAllFactura.Count);
         foreach (var master in findAllFactura)
         {
+            if (master.StatusID != (int)TypeStatusBilling.Register && master.RegisterLocal != 1)
+                continue;
+
             var dto = new ViewTempDtoInvoice
             {
                 Balance             = master.SubAmount,
@@ -456,10 +463,15 @@ public class DashboardPrinterViewModel : BaseViewModel
                 dto.Items.Add(findItem);
             }
 
-            Facturas.Add(dto);
+            buffer.Add(dto);
         }
 
-        TotalCordobasFacturado  = $"C$ {totalCordobas:N2}";
-        TotalDolaresFacturado   = $"$ {totalDolares:N2}";
+        await MainThread.InvokeOnMainThreadAsync(() =>
+        {
+            Facturas.Clear();
+            Facturas.AddRange(buffer);
+            TotalCordobasFacturado  = $"C$ {totalCordobas:N2}";
+            TotalDolaresFacturado   = $"$ {totalDolares:N2}";
+        });
     }
 }

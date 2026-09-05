@@ -95,6 +95,12 @@ public class RepositoryItems(DataBase dataBase)
             .Take(take)            
             .ToListAsync();
     }
+    public Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeNameAsc()
+    {
+        return _dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadItemsResponse>()
+            .OrderBy(response => response.Name)
+            .ToListAsync();
+    }
     public Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeNameAsc10(int take = 10)
     {
         return _dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadItemsResponse>()

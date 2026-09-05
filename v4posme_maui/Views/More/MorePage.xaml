@@ -48,7 +48,7 @@
                         </Image>
                     </Border>
                     <Label Grid.Row="1"
-                           Text="Venta "
+                           Text="Ventas"
                            FontFamily="OpenSansSemibold"
                            FontSize="15"
                            TextColor="{StaticResource PrimaryDark}"

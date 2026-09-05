@@ -78,7 +78,6 @@ public class RepositoryTbTransactionMaster(DataBase dataBase) : RepositoryFacade
         return _dataBase.Database.Table<TbTransactionMaster>()
             .Where(master => master.TransactionId == TypeTransaction.TransactionInvoiceBilling)
             .OrderByDescending(master => master.TransactionOn)
-            .Take(10)
             .ToListAsync();
     }
 
@@ -87,7 +86,6 @@ public class RepositoryTbTransactionMaster(DataBase dataBase) : RepositoryFacade
         return _dataBase.Database.Table<TbTransactionMaster>()
             .Where(master => master.TransactionId == TypeTransaction.TransactionShare)
             .OrderByDescending(master => master.TransactionOn)
-            .Take(10)
             .ToListAsync();
     }
 
