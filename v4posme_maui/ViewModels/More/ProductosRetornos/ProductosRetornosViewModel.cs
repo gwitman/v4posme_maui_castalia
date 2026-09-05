@@ -193,9 +193,13 @@ public class ProductosRetornosViewModel : BaseViewModel
                 }
 
                 //Eliminar de la lista aquellos productos con cantidades igual a 0
+                //Nombre en minusculas y ordenado ascendente por nombre
                 var itemsFiltrados = Items.Where(x => x.Quantity != 0).ToList();
-                Items.Clear();
                 foreach (var item in itemsFiltrados)
+                    item.Name = item.Name?.ToLower();
+
+                Items.Clear();
+                foreach (var item in itemsFiltrados.OrderBy(x => x.Name))
                     Items.Add(item);
 
 

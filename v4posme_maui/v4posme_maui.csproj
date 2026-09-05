@@ -129,6 +129,9 @@
 	  <Compile Update="Views\More\Visita\02VisitaFormPage.xaml.cs">
 	    <DependentUpon>02VisitaFormPage.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Views\More\Logs\LogsPage.xaml.cs">
+	    <DependentUpon>LogsPage.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Views\Abonos\07PrinterPage.xaml.cs">
 	    <DependentUpon>25PrinterPage.xaml</DependentUpon>
 	    <SubType>Code</SubType>
@@ -154,6 +157,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\More\Visita\01CustomerPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\More\Logs\LogsPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>

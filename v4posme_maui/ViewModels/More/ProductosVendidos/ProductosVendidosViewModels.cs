@@ -258,6 +258,7 @@ public class ProductosVendidosViewModel : BaseViewModel
             //Calcular los prodcutos cantidade finales
             if (itemsTemporal is not null)
             {
+                var itemsProcesados = new List<Api_AppMobileApi_GetDataDownloadItemsResponse>();
                 foreach (var item in itemsTemporal)
                 {
                     decimal quantityInvoice = 0;
@@ -272,10 +273,16 @@ public class ProductosVendidosViewModel : BaseViewModel
 
                     if (item.Quantity > 0)
                     {
-                        Items.Add(item);
+                        //Nombre en minusculas
+                        item.Name = item.Name?.ToLower();
+                        itemsProcesados.Add(item);
                     }
 
                 }
+
+                //Ordenar ascendente por nombre para visualizacion e impresion
+                foreach (var item in itemsProcesados.OrderBy(x => x.Name))
+                    Items.Add(item);
             }
 
             CompanyTelefono = await _repositoryParameters.PosMeFindByKey("CORE_PHONE");
