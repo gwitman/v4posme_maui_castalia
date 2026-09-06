@@ -16,6 +16,11 @@ namespace v4posme_maui.Views.Items
         private bool _isDeleting;        
         private readonly IRepositoryTbTransactionMasterDetail _transactionMasterDetail;
 
+        // Ultimo producto que mostro esta pantalla de detalle. Sirve para detectar, al
+        // reaparecer (por ejemplo al volver desde la edicion), si en la otra pantalla se
+        // navego con Anterior/Siguiente a un producto distinto.
+        private int _ultimoItemIdMostrado = -1;
+
         private Api_AppMobileApi_GetDataDownloadItemsResponse SelectedItem { get; set; }
 
         public ItemDetailPage()
@@ -32,27 +37,38 @@ namespace v4posme_maui.Views.Items
             base.OnAppearing();
             var item                        = (Api_AppMobileApi_GetDataDownloadItemsResponse)ViewModel.Item;
 
-            // Si en otra pantalla (edicion) se navego a otro producto, retomar esa posicion.
-            var lista = VariablesGlobales.ItemsNavegacion;
+            // Punto de partida: el producto que entrega DevExpress (el tocado en la lista).
+            var itemIdAbrir = item.ItemId;
+            var lista       = VariablesGlobales.ItemsNavegacion;
+
             if (lista is { Count: > 0 })
             {
                 var indice = VariablesGlobales.ItemsNavegacionIndex;
-                if (indice >= 0 && indice < lista.Count && lista[indice].ItemId != item.ItemId)
+                var itemIdEnIndice = (indice >= 0 && indice < lista.Count) ? lista[indice].ItemId : -1;
+
+                // Determinar de forma fiable el producto a mostrar:
+                // - Si el item de DevExpress cambio respecto a lo mostrado antes, se abrio un
+                //   producto nuevo desde la lista: ese manda y sincronizamos el indice.
+                // - Si no cambio pero el indice apunta a otro producto (navegacion en edicion),
+                //   ese indice manda.
+                if (item.ItemId != _ultimoItemIdMostrado)
                 {
-                    item = lista[indice];
-                }
-                else
-                {
+                    itemIdAbrir = item.ItemId;
                     var indiceActual = lista.FindIndex(p => p.ItemId == item.ItemId);
                     if (indiceActual >= 0)
                         VariablesGlobales.ItemsNavegacionIndex = indiceActual;
                 }
+                else if (itemIdEnIndice != -1)
+                {
+                    itemIdAbrir = itemIdEnIndice;
+                }
             }
 
-            var findItem                    = await _repositoryItems.PosMeFindByItemId(item.ItemId);
+            var findItem                    = await _repositoryItems.PosMeFindByItemId(itemIdAbrir);
             SelectedItem                    = findItem;
+            _ultimoItemIdMostrado           = itemIdAbrir;
 
-            var objListTransactionDetail = await _transactionMasterDetail.PosMeByTransactionIDAndItemID((int)TypeTransaction.TransactionInvoiceBilling, item.ItemId);
+            var objListTransactionDetail = await _transactionMasterDetail.PosMeByTransactionIDAndItemID((int)TypeTransaction.TransactionInvoiceBilling, itemIdAbrir);
             if (objListTransactionDetail is null)
                 SelectedItem.CantidadFacturadas = 0;
             else
@@ -136,6 +152,7 @@ namespace v4posme_maui.Views.Items
 
                 SelectedItem.CantidadFinal = (SelectedItem.Quantity + SelectedItem.CantidadEntradas) - (SelectedItem.CantidadSalidas + SelectedItem.CantidadFacturadas);
                 ViewModel.Item = SelectedItem;
+                _ultimoItemIdMostrado = siguiente.ItemId;
 
                 // Mantiene sincronizada la posicion de navegacion con la pantalla de edicion.
                 VariablesGlobales.ItemsNavegacionIndex = nuevoIndice;

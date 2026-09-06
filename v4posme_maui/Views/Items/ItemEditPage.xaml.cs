@@ -145,44 +145,39 @@ public partial class ItemEditPage : ContentPage
     {
         if (!ViewModel.IsNew)
         {
-            _saveItem       = (Api_AppMobileApi_GetDataDownloadItemsResponse)DataForm.DataObject;
+            // La edicion se abre desde el detalle (boton Editar). DevExpress entrega en
+            // DataObject su referencia interna, que corresponde al producto con el que se
+            // ABRIO el detalle, NO al producto al que se navego con Anterior/Siguiente.
+            // Por eso la fuente de verdad del producto vigente es ItemsNavegacionIndex, que
+            // el detalle mantiene actualizado al navegar.
+            var selected = (Api_AppMobileApi_GetDataDownloadItemsResponse)DataForm.DataObject;
+            var itemIdAbrir = selected.ItemId;
 
-            // Si en otra pantalla (detalle) se navego a otro producto, retomar esa posicion.
             var lista = VariablesGlobales.ItemsNavegacion;
             if (lista is { Count: > 0 })
             {
                 var indice = VariablesGlobales.ItemsNavegacionIndex;
-                if (indice >= 0 && indice < lista.Count && lista[indice].ItemId != _saveItem.ItemId)
-                {
-                    var itemSync         = await _repositoryItems.PosMeFindByItemId(lista[indice].ItemId);
-                    _saveItem            = itemSync;
-                    DataForm.DataObject  = itemSync;
-                }
-                else
-                {
-                    var indiceActual = lista.FindIndex(p => p.ItemId == _saveItem.ItemId);
-                    if (indiceActual >= 0)
-                        VariablesGlobales.ItemsNavegacionIndex = indiceActual;
-                }
+                if (indice >= 0 && indice < lista.Count)
+                    itemIdAbrir = lista[indice].ItemId;
             }
 
-            _defaultItem    = await _repositoryItems.PosMeFindByItemNumber(_saveItem.ItemNumber!);
-            
+            // Recargamos los datos frescos del producto vigente (por su ItemId) para reflejar
+            // cualquier cambio guardado y calcular las cantidades derivadas.
+            var itemFresco = await _repositoryItems.PosMeFindByItemId(itemIdAbrir);
 
+            var objListTransactionDetail = await _transactionMasterDetail.PosMeByTransactionIDAndItemID((int)TypeTransaction.TransactionInvoiceBilling, itemFresco.ItemId);
+            var quatityInvoice = objListTransactionDetail is null
+                ? 0
+                : Convert.ToDecimal(objListTransactionDetail.Where(p => p.RegisterLocal == 1).Sum(p => p.Quantity));
 
-            //Total de productos facturados
-            var objListTransactionDetail    = await _transactionMasterDetail.PosMeByTransactionIDAndItemID((int)TypeTransaction.TransactionInvoiceBilling, _defaultItem.ItemId);
-            decimal quatityInvoice          = 0;
-            if (objListTransactionDetail is null)
-                quatityInvoice = 0;
-            else
-                quatityInvoice = Convert.ToDecimal(objListTransactionDetail.Where( p => p.RegisterLocal == 1 ).Sum(p => p.Quantity));
+            itemFresco.CantidadFacturadas = quatityInvoice;
+            itemFresco.CantidadFinal      = (itemFresco.Quantity + itemFresco.CantidadEntradas) - (itemFresco.CantidadSalidas + quatityInvoice);
 
-            _defaultItem.CantidadFacturadas = quatityInvoice;
-            _saveItem.CantidadFacturadas    = quatityInvoice;
-            _defaultItem.CantidadFinal      = (_defaultItem.Quantity + _defaultItem.CantidadEntradas) - (_defaultItem.CantidadSalidas + quatityInvoice);
-            _saveItem.CantidadFinal         = (_defaultItem.Quantity + _defaultItem.CantidadEntradas) - (_defaultItem.CantidadSalidas + quatityInvoice);
-
+            _saveItem           = itemFresco;
+            _defaultItem        = itemFresco;
+            DataForm.DataObject = itemFresco;
+            // El indice de navegacion ya apunta al producto vigente (se leyo arriba),
+            // por lo que no es necesario recalcularlo aqui.
         }
 
         DataForm.CommitMode = CommitMode.LostFocus;
@@ -208,72 +203,5 @@ public partial class ItemEditPage : ContentPage
     private void ClosePopup_Clicked(object? sender, EventArgs e)
     {
         Popup.IsOpen = false;
-    }
-
-    private async void PreviousItemClick(object? sender, EventArgs e)
-    {
-        await NavegarItem(-1);
-    }
-
-    private async void NextItemClick(object? sender, EventArgs e)
-    {
-        await NavegarItem(1);
-    }
-
-    private async Task NavegarItem(int direccion)
-    {
-        try
-        {
-            if (ViewModel.IsNew)
-                return;
-
-            var lista = VariablesGlobales.ItemsNavegacion;
-            if (lista is null || lista.Count == 0)
-                return;
-
-            var actual = (Api_AppMobileApi_GetDataDownloadItemsResponse)DataForm.DataObject;
-            var indiceActual = lista.FindIndex(p => p.ItemId == actual.ItemId);
-            if (indiceActual < 0)
-                indiceActual = 0;
-
-            var nuevoIndice = indiceActual + direccion;
-            if (nuevoIndice < 0 || nuevoIndice >= lista.Count)
-                return;
-
-            var siguiente = lista[nuevoIndice];
-            var item      = await _repositoryItems.PosMeFindByItemId(siguiente.ItemId);
-
-            var objListTransactionDetail = await _transactionMasterDetail.PosMeByTransactionIDAndItemID((int)TypeTransaction.TransactionInvoiceBilling, item.ItemId);
-            var quatityInvoice = objListTransactionDetail is null
-                ? 0
-                : Convert.ToDecimal(objListTransactionDetail.Where(p => p.RegisterLocal == 1).Sum(p => p.Quantity));
-
-            item.CantidadFacturadas = quatityInvoice;
-            item.CantidadFinal      = (item.Quantity + item.CantidadEntradas) - (item.CantidadSalidas + quatityInvoice);
-
-            _saveItem    = item;
-            _defaultItem = item;
-
-            DataForm.DataObject         = item;
-            TxtBarCode.Text             = item.BarCode;
-            TextItemNumber.Text         = item.ItemNumber;
-            TextName.Text               = item.Name;
-            TextPrecioPublico.Text      = item.PrecioPublico.ToString("N2");
-            TextCosto.Text              = item.Cost.ToString("N2");
-            TextCantidadFinal.Text      = item.CantidadFinal.ToString("N2");
-            TextCantidadFacturadas.Text = item.CantidadFacturadas.ToString("N2");
-            TextCantidadEntrada.Text    = item.CantidadEntradas.ToString("N2");
-            TextCantidadSalida.Text     = item.CantidadSalidas.ToString("N2");
-            Title                       = "Editar Producto";
-
-            // Mantiene sincronizada la posicion de navegacion con la pantalla de detalle.
-            VariablesGlobales.ItemsNavegacionIndex = nuevoIndice;
-        }
-        catch (Exception ex)
-        {
-            HelperLogs.Log(ex);
-            TxtMensaje.Text = ex.Message;
-            Popup.IsOpen    = true;
-        }
     }
 }

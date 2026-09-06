@@ -83,6 +83,9 @@ namespace v4posme_maui.ViewModels
             }
             
             _lastLoadedIndex = 0;
+            // Al reiniciar la lista, la posicion de navegacion tambien debe reiniciarse para
+            // no arrastrar un indice que quedaria fuera de rango o apuntando a otro producto.
+            VariablesGlobales.ItemsNavegacionIndex = 0;
             Items.Clear();
             LoadItems();
             
@@ -134,11 +137,14 @@ namespace v4posme_maui.ViewModels
         }
         
         
-        private void CreateDetailFormViewModel(CreateDetailFormViewModelEventArgs e)
+        private async void CreateDetailFormViewModel(CreateDetailFormViewModelEventArgs e)
         {
             if (e.DetailFormType != DetailFormType.Edit) return;
             var eItem = (Api_AppMobileApi_GetDataDownloadItemsResponse)e.Item;
-            var item = _repositoryItems.PosMeFindByItemNumber(eItem.ItemNumber!);
+            // PosMeFindByItemNumber es asincrono: hay que esperar el resultado para pasar el
+            // producto (no la Task) al ViewModel de edicion, de lo contrario el formulario
+            // recibe un objeto invalido y no muestra el registro.
+            var item = await _repositoryItems.PosMeFindByItemNumber(eItem.ItemNumber!);
             e.Result = new DetailEditFormViewModel(item, isNew: false);
         }
 
