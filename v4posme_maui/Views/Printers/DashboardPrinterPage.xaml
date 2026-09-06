@@ -152,47 +152,6 @@
                                             </DataTemplate>
                                         </CollectionView.ItemTemplate>
                                     </CollectionView>
-                                    <core:DXBorder
-                                        Margin="12,8"
-                                        Padding="16,12"
-                                        CornerRadius="16"
-                                        BorderThickness="0"
-                                        BackgroundColor="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}">
-                                        <core:DXStackLayout Orientation="Vertical" ItemSpacing="4">
-                                            <core:DXStackLayout
-                                                HorizontalOptions="End"
-                                                Orientation="Horizontal">
-                                                <Label
-                                                    FontSize="20"
-                                                    FontAttributes="Bold"
-                                                    HorizontalOptions="End"
-                                                    TextColor="{StaticResource Primary}"
-                                                    Text="TOTAL: " />
-                                                <Label
-                                                    FontSize="20"
-                                                    FontAttributes="Bold"
-                                                    TextColor="{StaticResource Primary}"
-                                                    HorizontalOptions="End"
-                                                    Text="{Binding TotalCordobasFacturado}" />
-                                            </core:DXStackLayout>
-                                            <core:DXStackLayout
-                                                HorizontalOptions="End"
-                                                Orientation="Horizontal">
-                                                <Label
-                                                    FontSize="20"
-                                                    FontAttributes="Bold"
-                                                    HorizontalOptions="End"
-                                                    TextColor="{StaticResource Primary}"
-                                                    Text="TOTAL: " />
-                                                <Label
-                                                    FontSize="20"
-                                                    FontAttributes="Bold"
-                                                    TextColor="{StaticResource Primary}"
-                                                    HorizontalOptions="End"
-                                                    Text="{Binding TotalDolaresFacturado}" />
-                                            </core:DXStackLayout>
-                                        </core:DXStackLayout>
-                                    </core:DXBorder>
                                 </core:DXStackLayout>
                             </ScrollView>
                         </dxco:TabViewItem.Content>
@@ -303,47 +262,6 @@
                                             </DataTemplate>
                                         </CollectionView.ItemTemplate>
                                     </CollectionView>
-                                    <core:DXBorder
-                                        Margin="12,8"
-                                        Padding="16,12"
-                                        CornerRadius="16"
-                                        BorderThickness="0"
-                                        BackgroundColor="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}">
-                                        <core:DXStackLayout Orientation="Vertical" ItemSpacing="4">
-                                            <core:DXStackLayout
-                                                HorizontalOptions="End"
-                                                Orientation="Horizontal">
-                                                <Label
-                                                    FontSize="20"
-                                                    FontAttributes="Bold"
-                                                    HorizontalOptions="End"
-                                                    TextColor="{StaticResource Primary}"
-                                                    Text="TOTAL: " />
-                                                <Label
-                                                    FontSize="20"
-                                                    FontAttributes="Bold"
-                                                    TextColor="{StaticResource Primary}"
-                                                    HorizontalOptions="End"
-                                                    Text="{Binding TotalCordobasAbonos}" />
-                                            </core:DXStackLayout>
-                                            <core:DXStackLayout
-                                                HorizontalOptions="End"
-                                                Orientation="Horizontal">
-                                                <Label
-                                                    FontSize="20"
-                                                    FontAttributes="Bold"
-                                                    HorizontalOptions="End"
-                                                    TextColor="{StaticResource Primary}"
-                                                    Text="TOTAL: " />
-                                                <Label
-                                                    FontSize="20"
-                                                    FontAttributes="Bold"
-                                                    TextColor="{StaticResource Primary}"
-                                                    HorizontalOptions="End"
-                                                    Text="{Binding TotalDolaresAbonos}" />
-                                            </core:DXStackLayout>
-                                        </core:DXStackLayout>
-                                    </core:DXBorder>
                                 </core:DXStackLayout>
                             </ScrollView>
                         </dxco:TabViewItem.Content>

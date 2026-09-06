@@ -109,6 +109,32 @@ public class RepositoryItems(DataBase dataBase)
             .ToListAsync();
     }
 
+    public async Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeOrderByNameLowerTake10(int take = 10)
+    {
+        var items = await _dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadItemsResponse>()
+            .ToListAsync();
+
+        return items
+            .OrderBy(response => response.Name.ToLower())
+            .Take(take)
+            .ToList();
+    }
+
+    public async Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeFilterByItemNumberAndBarCodeAndNameOrderByNameTake10(string? textSearch, int take = 10)
+    {
+        textSearch = textSearch!.ToLower();
+        var items = await _dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadItemsResponse>()
+            .Where(response => response.ItemNumber!.ToLower().Contains(textSearch)
+                               || response.BarCode.ToLower().Contains(textSearch)
+                               || response.Name.ToLower().Contains(textSearch))
+            .ToListAsync();
+
+        return items
+            .OrderBy(response => response.Name.ToLower())
+            .Take(take)
+            .ToList();
+    }
+
     public Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeQuantityDistintoZero()
     {
         return _dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadItemsResponse>()

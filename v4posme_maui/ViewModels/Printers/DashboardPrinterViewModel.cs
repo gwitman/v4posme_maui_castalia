@@ -52,11 +52,11 @@ public class DashboardPrinterViewModel : BaseViewModel
         List<Api_AppMobileApi_GetDataDownloadItemsResponse> searchItems;
         if (string.IsNullOrWhiteSpace(SearchProduct))
         {
-            searchItems = await _repositoryItems.PosMeTake10();
+            searchItems = await _repositoryItems.PosMeOrderByNameLowerTake10();
         }
         else
         {
-            searchItems = await _repositoryItems.PosMeFilterdByItemNumberAndBarCodeAndName(SearchProduct);
+            searchItems = await _repositoryItems.PosMeFilterByItemNumberAndBarCodeAndNameOrderByNameTake10(SearchProduct);
         }
 
         await MainThread.InvokeOnMainThreadAsync(() =>
@@ -105,11 +105,11 @@ public class DashboardPrinterViewModel : BaseViewModel
         List<TbTransactionMaster> filters;
         if (string.IsNullOrWhiteSpace(SearchAbonos))
         {
-            filters = await _repositoryTbTransactionMaster.PosMeFilterAbonos();
+            filters = await _repositoryTbTransactionMaster.PosMeFilterTop10Abonos();
         }
         else
         {
-            filters = await _repositoryTbTransactionMaster.PosMeFilterByCodigoAndNombreClienteAbonos(SearchAbonos);
+            filters = await _repositoryTbTransactionMaster.PosMeFilterTop10ByCodigoAndNombreClienteAbonos(SearchAbonos);
         }
 
         await FillAbonos(filters);
@@ -179,11 +179,11 @@ public class DashboardPrinterViewModel : BaseViewModel
         List<TbTransactionMaster> findAllFactura;
         if (string.IsNullOrWhiteSpace(Search))
         {
-            findAllFactura = await _repositoryTbTransactionMaster.PosMeFilterFacturas();
+            findAllFactura = await _repositoryTbTransactionMaster.PosMeFilterTop10Facturas();
         }
         else
         {
-            findAllFactura = await _repositoryTbTransactionMaster.PosMeFilterByCodigoAndNombreClienteFacturas(Search);
+            findAllFactura = await _repositoryTbTransactionMaster.PosMeFilterTop10ByCodigoAndNombreClienteFacturas(Search);
         }
 
         await FillFacturas(findAllFactura);
@@ -315,12 +315,12 @@ public class DashboardPrinterViewModel : BaseViewModel
             switch (index)
             {
                 case 0:
-                    var findAllFactura = await _repositoryTbTransactionMaster.PosMeFilterFacturas();
+                    var findAllFactura = await _repositoryTbTransactionMaster.PosMeFilterTop10Facturas();
                     await FillFacturas(findAllFactura);
                     break;
 
                 case 1:
-                    var findAllAbonos = await _repositoryTbTransactionMaster.PosMeFilterAbonos();
+                    var findAllAbonos = await _repositoryTbTransactionMaster.PosMeFilterTop10Abonos();
                     await FillAbonos(findAllAbonos);
                     break;
 

@@ -29,5 +29,9 @@ public interface IRepositoryItems : IRepositoryFacade<Api_AppMobileApi_GetDataDo
 
     Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeNameAsc10(int take = 10);
 
+    Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeOrderByNameLowerTake10(int take = 10);
+
+    Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeFilterByItemNumberAndBarCodeAndNameOrderByNameTake10(string? textSearch, int take = 10);
+
     Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeQuantityDistintoZero();
 }

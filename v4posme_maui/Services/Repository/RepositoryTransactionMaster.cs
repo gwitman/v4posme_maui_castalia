@@ -98,6 +98,91 @@ public class RepositoryTbTransactionMaster(DataBase dataBase) : RepositoryFacade
             .ToListAsync();
     }
 
+    public Task<List<TbTransactionMaster>> PosMeFilterTop10Facturas()
+    {
+        return _dataBase.Database.Table<TbTransactionMaster>()
+            .Where(master => master.TransactionId == TypeTransaction.TransactionInvoiceBilling)
+            .OrderByDescending(master => master.TransactionOn)
+            .Take(10)
+            .ToListAsync();
+    }
+
+    public Task<List<TbTransactionMaster>> PosMeFilterTop10Abonos()
+    {
+        return _dataBase.Database.Table<TbTransactionMaster>()
+            .Where(master => master.TransactionId == TypeTransaction.TransactionShare)
+            .OrderByDescending(master => master.TransactionOn)
+            .Take(10)
+            .ToListAsync();
+    }
+
+    public Task<List<TbTransactionMaster>> PosMeFilterTop10ByCodigoAndNombreClienteFacturas(string filter)
+    {
+        var query = $"""
+                     select tm.TransactionId,
+                             tm.TransactionMasterId,
+                             tm.TransactionNumber,
+                             tm.EntityId,
+                             tm.TransactionOn,
+                             tm.EntitySecondaryId,
+                             tm.SubAmount,
+                             tm.Discount,
+                             tm.Taxi1,
+                             tm.Amount,
+                             tm.TransactionCausalId,
+                             tm.ExchangeRate,
+                             tm.CurrencyId,
+                             tm.Comment,
+                             tm.Reference1,
+                             tm.Reference2,
+                             tm.Reference3,
+                             tm.ReferenceClientName,
+                             tm.MesaID,
+                             tm.MesaName,
+                             tm.StatusID,
+                             tm.RegisterLocal
+                     from tb_transaction_master tm
+                              join tb_customers c on tm.CustomerCreditLineId = c.CustomerCreditLineId and tm.EntityId=c.EntityId
+                     where tm.TransactionId={(int)TypeTransaction.TransactionInvoiceBilling} and 
+                           tm.TransactionNumber like '%{filter}%' or lower(c.FirstName) like '%{filter.ToLower()}%'
+                     order by tm.TransactionOn DESC
+                     limit 10
+                     """;
+        return _dataBase.Database.QueryAsync<TbTransactionMaster>(query);
+    }
+
+    public Task<List<TbTransactionMaster>> PosMeFilterTop10ByCodigoAndNombreClienteAbonos(string filter)
+    {
+        var param = (int)TypeTransaction.TransactionShare;
+        var query = $"""
+                     select tm.TransactionId,
+                             tm.TransactionMasterId,
+                             tm.TransactionNumber,
+                             tm.EntityId,
+                             tm.TransactionOn,
+                             tm.EntitySecondaryId,
+                             tm.SubAmount,
+                             tm.Discount,
+                             tm.Taxi1,
+                             tm.Amount,
+                             tm.TransactionCausalId,
+                             tm.ExchangeRate,
+                             tm.CurrencyId,
+                             tm.Comment,
+                             tm.Reference1,
+                             tm.Reference2,
+                             tm.Reference3,
+                             tm.RegisterLocal
+                     from tb_transaction_master tm
+                              join tb_customers c on tm.CustomerCreditLineId = c.CustomerCreditLineId and tm.EntityId=c.EntityId
+                     where tm.TransactionId =? and tm.TransactionId={(int)TypeTransaction.TransactionShare} and
+                           tm.TransactionNumber like '%{filter}%' or c.FirstName like '%{filter}%'
+                     order by tm.TransactionOn DESC 
+                     limit 10
+                     """;
+        return _dataBase.Database.QueryAsync<TbTransactionMaster>(query, param);
+    }
+
     public Task<TbTransactionMaster> PosMeFindByTransactionId(int id)
     {
         return _dataBase.Database.Table<TbTransactionMaster>()
