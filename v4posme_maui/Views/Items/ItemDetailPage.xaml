@@ -22,7 +22,8 @@
                      IconImageSource="{AppThemeBinding Light=delete, Dark=delete}" />
     </ContentPage.ToolbarItems>
 
-    <ScrollView>
+    <Grid RowDefinitions="*,Auto">
+    <ScrollView Grid.Row="0">
         <dx:DXStackLayout Orientation="Vertical" Padding="0,0,0,24">
 
             <!-- Encabezado -->
@@ -161,4 +162,29 @@
             </dxcn:DXPopup>
         </dx:DXStackLayout>
     </ScrollView>
+
+        <!-- Barra de navegacion entre productos (anterior / siguiente) -->
+        <Grid Grid.Row="1"
+              ColumnDefinitions="*,*"
+              ColumnSpacing="12"
+              Padding="14,8,14,14"
+              BackgroundColor="{AppThemeBinding Light={StaticResource PageBackground}, Dark={StaticResource PageBackgroundDark}}">
+            <Button Grid.Column="0"
+                    Text="◀ Anterior"
+                    Clicked="PreviousItemClick"
+                    BackgroundColor="{StaticResource Primary}"
+                    TextColor="White"
+                    CornerRadius="12"
+                    HeightRequest="48"
+                    FontAttributes="Bold" />
+            <Button Grid.Column="1"
+                    Text="Siguiente ▶"
+                    Clicked="NextItemClick"
+                    BackgroundColor="{StaticResource Primary}"
+                    TextColor="White"
+                    CornerRadius="12"
+                    HeightRequest="48"
+                    FontAttributes="Bold" />
+        </Grid>
+    </Grid>
 </ContentPage>

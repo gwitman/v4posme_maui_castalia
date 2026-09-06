@@ -189,4 +189,68 @@ public partial class ItemEditPage : ContentPage
     {
         Popup.IsOpen = false;
     }
+
+    private async void PreviousItemClick(object? sender, EventArgs e)
+    {
+        await NavegarItem(-1);
+    }
+
+    private async void NextItemClick(object? sender, EventArgs e)
+    {
+        await NavegarItem(1);
+    }
+
+    private async Task NavegarItem(int direccion)
+    {
+        try
+        {
+            if (ViewModel.IsNew)
+                return;
+
+            var lista = VariablesGlobales.ItemsNavegacion;
+            if (lista is null || lista.Count == 0)
+                return;
+
+            var actual = (Api_AppMobileApi_GetDataDownloadItemsResponse)DataForm.DataObject;
+            var indiceActual = lista.FindIndex(p => p.ItemId == actual.ItemId);
+            if (indiceActual < 0)
+                indiceActual = 0;
+
+            var nuevoIndice = indiceActual + direccion;
+            if (nuevoIndice < 0 || nuevoIndice >= lista.Count)
+                return;
+
+            var siguiente = lista[nuevoIndice];
+            var item      = await _repositoryItems.PosMeFindByItemId(siguiente.ItemId);
+
+            var objListTransactionDetail = await _transactionMasterDetail.PosMeByTransactionIDAndItemID((int)TypeTransaction.TransactionInvoiceBilling, item.ItemId);
+            var quatityInvoice = objListTransactionDetail is null
+                ? 0
+                : Convert.ToDecimal(objListTransactionDetail.Where(p => p.RegisterLocal == 1).Sum(p => p.Quantity));
+
+            item.CantidadFacturadas = quatityInvoice;
+            item.CantidadFinal      = (item.Quantity + item.CantidadEntradas) - (item.CantidadSalidas + quatityInvoice);
+
+            _saveItem    = item;
+            _defaultItem = item;
+
+            DataForm.DataObject         = item;
+            TxtBarCode.Text             = item.BarCode;
+            TextItemNumber.Text         = item.ItemNumber;
+            TextName.Text               = item.Name;
+            TextPrecioPublico.Text      = item.PrecioPublico.ToString("N2");
+            TextCosto.Text              = item.Cost.ToString("N2");
+            TextCantidadFinal.Text      = item.CantidadFinal.ToString("N2");
+            TextCantidadFacturadas.Text = item.CantidadFacturadas.ToString("N2");
+            TextCantidadEntrada.Text    = item.CantidadEntradas.ToString("N2");
+            TextCantidadSalida.Text     = item.CantidadSalidas.ToString("N2");
+            Title                       = "Editar Producto";
+        }
+        catch (Exception ex)
+        {
+            HelperLogs.Log(ex);
+            TxtMensaje.Text = ex.Message;
+            Popup.IsOpen    = true;
+        }
+    }
 }

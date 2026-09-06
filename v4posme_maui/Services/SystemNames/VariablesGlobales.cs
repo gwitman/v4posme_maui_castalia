@@ -27,6 +27,12 @@ public static class VariablesGlobales
 
     public static bool EnableBackButton { get; set; }
     public static Api_AppMobileApi_GetDataDownloadItemsResponse Item { get; set; }
+
+    // Lista de productos actualmente cargada en la pantalla de listado (ItemsPage).
+    // Se usa para navegar entre productos (anterior/siguiente) desde las pantallas
+    // de detalle y edicion sin necesidad de volver al listado principal.
+    public static List<Api_AppMobileApi_GetDataDownloadItemsResponse> ItemsNavegacion { get; set; } = new();
+
     public static List<CustomerOrderShare> CustomerOrderShares { get; set; }
     public static bool OrdenarAbonos { get; set; }
     public static bool OrdenarClientes { get; set; }

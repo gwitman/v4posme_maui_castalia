@@ -79,5 +79,51 @@ namespace v4posme_maui.Views.Items
         {
             Popup.IsOpen = false;
         }
+
+        private async void PreviousItemClick(object? sender, EventArgs e)
+        {
+            await NavegarItem(-1);
+        }
+
+        private async void NextItemClick(object? sender, EventArgs e)
+        {
+            await NavegarItem(1);
+        }
+
+        private async Task NavegarItem(int direccion)
+        {
+            try
+            {
+                var lista = VariablesGlobales.ItemsNavegacion;
+                if (lista is null || lista.Count == 0)
+                    return;
+
+                var actual = (Api_AppMobileApi_GetDataDownloadItemsResponse)ViewModel.Item;
+                var indiceActual = lista.FindIndex(p => p.ItemId == actual.ItemId);
+                if (indiceActual < 0)
+                    indiceActual = 0;
+
+                var nuevoIndice = indiceActual + direccion;
+                if (nuevoIndice < 0 || nuevoIndice >= lista.Count)
+                    return;
+
+                var siguiente = lista[nuevoIndice];
+                var findItem  = await _repositoryItems.PosMeFindByItemId(siguiente.ItemId);
+                SelectedItem  = findItem;
+
+                var objListTransactionDetail = await _transactionMasterDetail.PosMeByTransactionIDAndItemID((int)TypeTransaction.TransactionInvoiceBilling, siguiente.ItemId);
+                SelectedItem.CantidadFacturadas = objListTransactionDetail is null
+                    ? 0
+                    : Convert.ToDecimal(objListTransactionDetail.Where(p => p.RegisterLocal == 1).Sum(p => p.Quantity));
+
+                SelectedItem.CantidadFinal = (SelectedItem.Quantity + SelectedItem.CantidadEntradas) - (SelectedItem.CantidadSalidas + SelectedItem.CantidadFacturadas);
+                ViewModel.Item = SelectedItem;
+            }
+            catch (Exception ex)
+            {
+                HelperLogs.Log(ex);
+                await DisplayAlert("Error", ex.Message, "OK");
+            }
+        }
     }
 }

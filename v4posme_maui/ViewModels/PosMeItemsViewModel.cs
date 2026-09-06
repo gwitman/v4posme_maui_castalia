@@ -125,6 +125,9 @@ namespace v4posme_maui.ViewModels
                 }
 
                 Items.AddRange(newItems);
+                // Mantiene sincronizada la lista usada para navegar entre productos
+                // (anterior/siguiente) desde las pantallas de detalle y edicion.
+                VariablesGlobales.ItemsNavegacion = Items.ToList();
                 IsBusy = false;
             });
             

@@ -126,6 +126,17 @@
                                                            TextColor="White" />
                                                 </HorizontalStackLayout>
 
+                                                <!-- Costo -->
+                                                <HorizontalStackLayout Grid.Column="1" Grid.Row="3">
+                                                    <Label Text="Costo: "
+                                                           FontSize="13"
+                                                           TextColor="#CCFFFFFF" />
+                                                    <Label Text="{Binding Cost, StringFormat='C$ {0:N2}'}"
+                                                           FontSize="14"
+                                                           FontAttributes="Bold"
+                                                           TextColor="White" />
+                                                </HorizontalStackLayout>
+
                                                 <!-- Existencia -->
                                                 <Border Grid.Column="2" Grid.Row="2"
                                                         Grid.RowSpan="2"
