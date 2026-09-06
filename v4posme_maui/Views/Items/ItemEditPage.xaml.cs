@@ -146,6 +146,26 @@ public partial class ItemEditPage : ContentPage
         if (!ViewModel.IsNew)
         {
             _saveItem       = (Api_AppMobileApi_GetDataDownloadItemsResponse)DataForm.DataObject;
+
+            // Si en otra pantalla (detalle) se navego a otro producto, retomar esa posicion.
+            var lista = VariablesGlobales.ItemsNavegacion;
+            if (lista is { Count: > 0 })
+            {
+                var indice = VariablesGlobales.ItemsNavegacionIndex;
+                if (indice >= 0 && indice < lista.Count && lista[indice].ItemId != _saveItem.ItemId)
+                {
+                    var itemSync         = await _repositoryItems.PosMeFindByItemId(lista[indice].ItemId);
+                    _saveItem            = itemSync;
+                    DataForm.DataObject  = itemSync;
+                }
+                else
+                {
+                    var indiceActual = lista.FindIndex(p => p.ItemId == _saveItem.ItemId);
+                    if (indiceActual >= 0)
+                        VariablesGlobales.ItemsNavegacionIndex = indiceActual;
+                }
+            }
+
             _defaultItem    = await _repositoryItems.PosMeFindByItemNumber(_saveItem.ItemNumber!);
             
 
@@ -245,6 +265,9 @@ public partial class ItemEditPage : ContentPage
             TextCantidadEntrada.Text    = item.CantidadEntradas.ToString("N2");
             TextCantidadSalida.Text     = item.CantidadSalidas.ToString("N2");
             Title                       = "Editar Producto";
+
+            // Mantiene sincronizada la posicion de navegacion con la pantalla de detalle.
+            VariablesGlobales.ItemsNavegacionIndex = nuevoIndice;
         }
         catch (Exception ex)
         {

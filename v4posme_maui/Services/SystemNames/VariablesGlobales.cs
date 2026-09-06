@@ -33,6 +33,11 @@ public static class VariablesGlobales
     // de detalle y edicion sin necesidad de volver al listado principal.
     public static List<Api_AppMobileApi_GetDataDownloadItemsResponse> ItemsNavegacion { get; set; } = new();
 
+    // Indice del producto actualmente seleccionado dentro de ItemsNavegacion.
+    // Se comparte entre las pantallas de detalle y edicion para que la navegacion
+    // (anterior/siguiente) continue desde la misma posicion al cambiar de pantalla.
+    public static int ItemsNavegacionIndex { get; set; }
+
     public static List<CustomerOrderShare> CustomerOrderShares { get; set; }
     public static bool OrdenarAbonos { get; set; }
     public static bool OrdenarClientes { get; set; }

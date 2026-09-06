@@ -31,6 +31,24 @@ namespace v4posme_maui.Views.Items
         {
             base.OnAppearing();
             var item                        = (Api_AppMobileApi_GetDataDownloadItemsResponse)ViewModel.Item;
+
+            // Si en otra pantalla (edicion) se navego a otro producto, retomar esa posicion.
+            var lista = VariablesGlobales.ItemsNavegacion;
+            if (lista is { Count: > 0 })
+            {
+                var indice = VariablesGlobales.ItemsNavegacionIndex;
+                if (indice >= 0 && indice < lista.Count && lista[indice].ItemId != item.ItemId)
+                {
+                    item = lista[indice];
+                }
+                else
+                {
+                    var indiceActual = lista.FindIndex(p => p.ItemId == item.ItemId);
+                    if (indiceActual >= 0)
+                        VariablesGlobales.ItemsNavegacionIndex = indiceActual;
+                }
+            }
+
             var findItem                    = await _repositoryItems.PosMeFindByItemId(item.ItemId);
             SelectedItem                    = findItem;
 
@@ -118,6 +136,9 @@ namespace v4posme_maui.Views.Items
 
                 SelectedItem.CantidadFinal = (SelectedItem.Quantity + SelectedItem.CantidadEntradas) - (SelectedItem.CantidadSalidas + SelectedItem.CantidadFacturadas);
                 ViewModel.Item = SelectedItem;
+
+                // Mantiene sincronizada la posicion de navegacion con la pantalla de edicion.
+                VariablesGlobales.ItemsNavegacionIndex = nuevoIndice;
             }
             catch (Exception ex)
             {
