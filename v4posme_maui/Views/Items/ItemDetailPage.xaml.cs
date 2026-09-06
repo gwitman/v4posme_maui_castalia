@@ -1,5 +1,6 @@
 ﻿using DevExpress.Maui.Core;
 using v4posme_maui.Models;
+using v4posme_maui.Services.Api;
 using v4posme_maui.Services.Helpers;
 using v4posme_maui.Services.Repository;
 using v4posme_maui.Services.SystemNames;
@@ -11,8 +12,10 @@ namespace v4posme_maui.Views.Items
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ItemDetailPage : ContentPage
     {
+        private const string ImagenPorDefecto = "product_delivery.png";
         private DetailFormViewModel ViewModel => ((DetailFormViewModel)BindingContext);
         private readonly IRepositoryItems _repositoryItems;
+        private readonly RestApiItemImage _restApiItemImage = new();
         private bool _isDeleting;        
         private readonly IRepositoryTbTransactionMasterDetail _transactionMasterDetail;
 
@@ -76,7 +79,34 @@ namespace v4posme_maui.Views.Items
 
             SelectedItem.CantidadFinal  = (SelectedItem.Quantity +  SelectedItem.CantidadEntradas) - (SelectedItem.CantidadSalidas + SelectedItem.CantidadFacturadas);
             ViewModel.Item              = SelectedItem;
-            
+
+            // La imagen se carga en segundo plano para no bloquear la pantalla mientras
+            // se espera la respuesta del servidor. Si falla, se conserva la imagen por defecto.
+            CargarImagenProducto(itemIdAbrir);
+        }
+
+        private async void CargarImagenProducto(int itemId)
+        {
+            try
+            {
+                ImgProducto.Source = ImagenPorDefecto;
+                var bytes = await _restApiItemImage.GetImageAsync(itemId);
+
+                // Si el producto mostrado cambio mientras se descargaba, se descarta el
+                // resultado para no pintar la imagen de otro producto.
+                if (itemId != _ultimoItemIdMostrado)
+                    return;
+
+                if (bytes is { Length: > 0 })
+                    ImgProducto.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
+                else
+                    ImgProducto.Source = ImagenPorDefecto;
+            }
+            catch (Exception ex)
+            {
+                HelperLogs.Log(ex);
+                ImgProducto.Source = ImagenPorDefecto;
+            }
         }
 
         private void DeleteItemClick(object? sender, EventArgs e)

@@ -36,6 +36,8 @@ public static class Constantes
     public static string UrlRequestLogin            = UrlBase + "core_acount/loginMobile";
     public static string UrlRequestDownload         = UrlBase + "app_mobile_api/getDataDownload";
     public static string UrlUpload                  = UrlBase + "app_mobile_api/setDataUpload";
+    public static string UrlSetUploadImageItem      = UrlBase + "app_mobile_api/setDataUploadImageItem";
+    public static string UrlGetUploadImageItem      = UrlBase + "app_mobile_api/getDataUploadImageItem";
     public const string UrlGPSShare                 = UrlBase + "app_mobile_api/setPositionGps";
     public const string UrlGpSShareOnly             = "app_mobile_api/setPositionGps";
     public const string UrlPagadito                 = "https://connect.pagadito.com/api/v2/exec-trans";

@@ -37,13 +37,15 @@
                                  CornerRadius="56"
                                  BorderThickness="0"
                                  HorizontalOptions="Center"
+                                 IsClippedToBounds="True"
                                  BackgroundColor="#33FFFFFF">
-                        <dx:DXImage Source="product_delivery.png"
-                                    WidthRequest="72"
-                                    HeightRequest="72"
-                                    HorizontalOptions="Center"
-                                    VerticalOptions="Center"
-                                    Aspect="AspectFit" />
+                        <Image x:Name="ImgProducto"
+                               Source="product_delivery.png"
+                               WidthRequest="112"
+                               HeightRequest="112"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               Aspect="AspectFill" />
                     </dx:DXBorder>
                     <Label Text="{Binding Item.Name}"
                            FontSize="22"

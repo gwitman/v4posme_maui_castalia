@@ -59,19 +59,33 @@
                                  CornerRadius="0,0,28,28"
                                  BorderThickness="0"
                                  Padding="0,18,0,22">
-                        <dx:DXBorder WidthRequest="120"
-                                     HeightRequest="120"
-                                     CornerRadius="60"
-                                     BorderThickness="0"
-                                     HorizontalOptions="Center"
-                                     BackgroundColor="#33FFFFFF">
-                            <dx:DXImage Source="product_item"
-                                        WidthRequest="80"
-                                        HeightRequest="80"
-                                        HorizontalOptions="Center"
-                                        VerticalOptions="Center"
-                                        Aspect="AspectFit" />
-                        </dx:DXBorder>
+                        <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
+                            <dx:DXBorder WidthRequest="120"
+                                         HeightRequest="120"
+                                         CornerRadius="60"
+                                         BorderThickness="0"
+                                         HorizontalOptions="Center"
+                                         IsClippedToBounds="True"
+                                         BackgroundColor="#33FFFFFF">
+                                <Image x:Name="ImgProducto"
+                                       Source="product_item"
+                                       WidthRequest="120"
+                                       HeightRequest="120"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center"
+                                       Aspect="AspectFill" />
+                            </dx:DXBorder>
+                            <Button x:Name="BtnCambiarImagen"
+                                    Text="Cambiar imagen"
+                                    Clicked="CambiarImagenClick"
+                                    BackgroundColor="#33FFFFFF"
+                                    TextColor="White"
+                                    CornerRadius="12"
+                                    HeightRequest="40"
+                                    Padding="16,0"
+                                    FontSize="13"
+                                    FontAttributes="Bold" />
+                        </VerticalStackLayout>
                     </dx:DXBorder>
                 </dx:DXStackLayout>
 

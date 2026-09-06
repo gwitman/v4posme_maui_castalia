@@ -4,6 +4,7 @@ using DevExpress.Maui.Core;
 using DevExpress.Maui.DataForm;
 using v4posme_maui.Models;
 using v4posme_maui.Services;
+using v4posme_maui.Services.Api;
 using v4posme_maui.Services.Helpers;
 using v4posme_maui.Services.Repository;
 using v4posme_maui.Services.SystemNames;
@@ -15,12 +16,15 @@ namespace v4posme_maui.Views.Items;
 
 public partial class ItemEditPage : ContentPage
 {
+    private const string ImagenPorDefecto = "product_item";
     private DetailEditFormViewModel ViewModel => (DetailEditFormViewModel)BindingContext;
     private readonly IRepositoryItems _repositoryItems = VariablesGlobales.UnityContainer.Resolve<IRepositoryItems>();
     private readonly IRepositoryTbTransactionMasterDetail _transactionMasterDetail;
+    private readonly RestApiItemImage _restApiItemImage = new();
     private Api_AppMobileApi_GetDataDownloadItemsResponse _saveItem;
     private Api_AppMobileApi_GetDataDownloadItemsResponse _defaultItem;
     private readonly HelperCore _helperContador;
+    private int _itemIdActual;
     public ItemEditPage()
     {
         InitializeComponent();
@@ -175,12 +179,87 @@ public partial class ItemEditPage : ContentPage
 
             _saveItem           = itemFresco;
             _defaultItem        = itemFresco;
+            _itemIdActual       = itemFresco.ItemId;
             DataForm.DataObject = itemFresco;
             // El indice de navegacion ya apunta al producto vigente (se leyo arriba),
             // por lo que no es necesario recalcularlo aqui.
+
+            // La imagen se carga en segundo plano para no bloquear la pantalla.
+            CargarImagenProducto(itemFresco.ItemId);
         }
 
         DataForm.CommitMode = CommitMode.LostFocus;
+    }
+
+    private async void CargarImagenProducto(int itemId)
+    {
+        try
+        {
+            ImgProducto.Source = ImagenPorDefecto;
+            var bytes = await _restApiItemImage.GetImageAsync(itemId);
+
+            // Si el producto abierto cambio mientras se descargaba, se descarta el resultado.
+            if (itemId != _itemIdActual)
+                return;
+
+            ImgProducto.Source = bytes is { Length: > 0 }
+                ? ImageSource.FromStream(() => new MemoryStream(bytes))
+                : ImagenPorDefecto;
+        }
+        catch (Exception ex)
+        {
+            HelperLogs.Log(ex);
+            ImgProducto.Source = ImagenPorDefecto;
+        }
+    }
+
+    private async void CambiarImagenClick(object? sender, EventArgs e)
+    {
+        try
+        {
+            if (ViewModel.IsNew)
+            {
+                TxtMensaje.Text = "Guarde el producto antes de asignar una imagen.";
+                Popup.IsOpen    = true;
+                return;
+            }
+
+            var foto = await MediaPicker.Default.PickPhotoAsync();
+            if (foto is null)
+                return;
+
+            byte[] bytes;
+            await using (var stream = await foto.OpenReadAsync())
+            using (var ms = new MemoryStream())
+            {
+                await stream.CopyToAsync(ms);
+                bytes = ms.ToArray();
+            }
+
+            if (bytes.Length == 0)
+                return;
+
+            // Vista previa inmediata de la imagen seleccionada.
+            ImgProducto.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
+
+            // Subida al servidor en segundo plano.
+            var ok = await _restApiItemImage.UploadImageAsync(_itemIdActual, bytes, foto.FileName);
+            if (ok)
+            {
+                await Toast.Make("Imagen actualizada", ToastDuration.Short).Show();
+            }
+            else
+            {
+                TxtMensaje.Text = "No se pudo subir la imagen. Intente nuevamente.";
+                Popup.IsOpen    = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            HelperLogs.Log(ex);
+            TxtMensaje.Text = ex.Message;
+            Popup.IsOpen    = true;
+        }
     }
 
     protected override void OnDisappearing()
