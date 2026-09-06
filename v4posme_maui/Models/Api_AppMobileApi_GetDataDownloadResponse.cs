@@ -283,6 +283,14 @@ public class Api_AppMobileApi_GetDataDownloadItemsResponse : BindableBase
         get => GetValue<decimal>();
         set => SetValue(value);
     }
+
+    [DataMember(Name = "cost")]
+    public decimal Cost
+    {
+        get => GetValue<decimal>();
+        set => SetValue(value);
+    }
+
     [DataMember(Name = "cantidadEntradas")]
     public decimal CantidadEntradas
     {

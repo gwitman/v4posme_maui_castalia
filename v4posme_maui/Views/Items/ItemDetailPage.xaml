@@ -23,81 +23,117 @@
     </ContentPage.ToolbarItems>
 
     <ScrollView>
-        <dx:DXStackLayout Orientation="Vertical" Padding="0,0,0,20">
+        <dx:DXStackLayout Orientation="Vertical" Padding="0,0,0,24">
 
             <!-- Encabezado -->
             <dx:DXBorder BackgroundColor="{StaticResource Primary}"
-                         CornerRadius="0,0,28,28"
+                         CornerRadius="0,0,32,32"
                          BorderThickness="0"
-                         Padding="0,20,0,28">
+                         Padding="0,24,0,32">
                 <dx:DXStackLayout Orientation="Vertical" HorizontalOptions="Center">
-                    <dx:DXBorder WidthRequest="120"
-                                 HeightRequest="120"
-                                 CornerRadius="60"
+                    <dx:DXBorder WidthRequest="112"
+                                 HeightRequest="112"
+                                 CornerRadius="56"
                                  BorderThickness="0"
                                  HorizontalOptions="Center"
                                  BackgroundColor="#33FFFFFF">
                         <dx:DXImage Source="product_delivery.png"
-                                    WidthRequest="80"
-                                    HeightRequest="80"
+                                    WidthRequest="72"
+                                    HeightRequest="72"
                                     HorizontalOptions="Center"
                                     VerticalOptions="Center"
                                     Aspect="AspectFit" />
                     </dx:DXBorder>
-                    <Label Text="{Binding Item.BarCode}"
-                           FontSize="24"
+                    <Label Text="{Binding Item.Name}"
+                           FontSize="22"
                            TextColor="White"
-                           Margin="0,12,0,0"
+                           Margin="24,14,24,0"
                            HorizontalTextAlignment="Center"
                            FontAttributes="Bold" />
-                    <Label Text="{Binding Item.ItemNumber}"
-                           HorizontalTextAlignment="Center"
-                           TextColor="White"
-                           Opacity="0.9"
-                           FontSize="16" />
+                    <dx:DXStackLayout Orientation="Horizontal"
+                                      HorizontalOptions="Center"
+                                      ItemSpacing="8"
+                                      Margin="0,10,0,0">
+                        <dx:DXBorder CornerRadius="12" BorderThickness="0"
+                                     BackgroundColor="#26FFFFFF" Padding="12,5">
+                            <Label Text="{Binding Item.BarCode, StringFormat='Código: {0}'}"
+                                   TextColor="White" FontSize="13" />
+                        </dx:DXBorder>
+                        <dx:DXBorder CornerRadius="12" BorderThickness="0"
+                                     BackgroundColor="#26FFFFFF" Padding="12,5">
+                            <Label Text="{Binding Item.ItemNumber}"
+                                   TextColor="White" FontSize="13" />
+                        </dx:DXBorder>
+                    </dx:DXStackLayout>
                 </dx:DXStackLayout>
             </dx:DXBorder>
 
-            <dx:DXBorder Style="{StaticResource PropertyBorder}" Margin="14,16,14,8">
-                <dx:DXStackLayout Orientation="Vertical">
-                    <Label Text="Descripción" FontAttributes="Bold" TextColor="{StaticResource Primary}" FontSize="13" />
-                    <Label Text="{Binding Item.Name}" FontSize="18" Margin="0,2,0,0" />
-                </dx:DXStackLayout>
-            </dx:DXBorder>
-            <dx:DXBorder Style="{StaticResource PropertyBorder}" Margin="14,8">
-                <dx:DXStackLayout Orientation="Vertical">
-                    <Label Text="Precio al público" FontAttributes="Bold" TextColor="{StaticResource Primary}" FontSize="13" />
-                    <Label Text="{Binding Item.PrecioPublico,StringFormat='{0:N2}'}" FontSize="20" FontAttributes="Bold" Margin="0,2,0,0" />
-                </dx:DXStackLayout>
-            </dx:DXBorder>
-            <dx:DXBorder Style="{StaticResource PropertyBorder}" Margin="14,8">
-                <dx:DXStackLayout Orientation="Vertical">
-                    <Label Text="Existencia final" FontAttributes="Bold" TextColor="{StaticResource Primary}" FontSize="13" />
-                    <Label Text="{Binding Item.CantidadFinal}" FontSize="18" Margin="0,2,0,0" />
-                </dx:DXStackLayout>
-            </dx:DXBorder>
-            <dx:DXBorder Style="{StaticResource PropertyBorder}" Margin="14,8">
-                <dx:DXStackLayout Orientation="Vertical">
-                    <Label Text="Cantidad facturadas" FontAttributes="Bold" TextColor="{StaticResource Primary}" FontSize="13" />
-                    <Label Text="{Binding Item.CantidadFacturadas}" FontSize="18" Margin="0,2,0,0" />
-                </dx:DXStackLayout>
-            </dx:DXBorder>
-            <dx:DXBorder Style="{StaticResource PropertyBorder}" Margin="14,8">
-                <dx:DXStackLayout Orientation="Vertical">
-                    <Label Text="Cantidad ingresadas" FontAttributes="Bold" TextColor="{StaticResource Primary}" FontSize="13" />
-                    <Label Text="{Binding Item.CantidadEntradas}" FontSize="18" Margin="0,2,0,0" />
-                </dx:DXStackLayout>
-            </dx:DXBorder>
-            <dx:DXBorder Style="{StaticResource PropertyBorder}" Margin="14,8">
-                <dx:DXStackLayout Orientation="Vertical">
-                    <Label Text="Cantidad retirada" FontAttributes="Bold" TextColor="{StaticResource Primary}" FontSize="13" />
-                    <Label Text="{Binding Item.CantidadSalidas}" FontSize="18" Margin="0,2,0,0" />
-                </dx:DXStackLayout>
-            </dx:DXBorder>
-            <dx:DXBorder Style="{StaticResource PropertyBorder}" Margin="14,8">
-                <dx:DXStackLayout Orientation="Vertical">
-                    <Label Text="Cantidad inicial" FontAttributes="Bold" TextColor="{StaticResource Primary}" FontSize="13" />
-                    <Label Text="{Binding Item.Quantity}" FontSize="18" Margin="0,2,0,0" />
+            <!-- Precio y Costo destacados -->
+            <dx:DXStackLayout Orientation="Horizontal" Margin="14,18,14,6" ItemSpacing="12">
+                <dx:DXBorder HorizontalOptions="FillAndExpand"
+                             CornerRadius="18" BorderThickness="0" Padding="16,18"
+                             BackgroundColor="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}">
+                    <dx:DXBorder.Shadow>
+                        <Shadow Brush="{StaticResource Primary}" Opacity="0.15" Radius="12" Offset="0,4" />
+                    </dx:DXBorder.Shadow>
+                    <dx:DXStackLayout Orientation="Vertical">
+                        <Label Text="PRECIO AL PÚBLICO" FontSize="11" TextColor="{StaticResource Primary}" FontAttributes="Bold" />
+                        <Label Text="{Binding Item.PrecioPublico, StringFormat='{0:N2}'}"
+                               FontSize="22" FontAttributes="Bold" Margin="0,4,0,0" />
+                    </dx:DXStackLayout>
+                </dx:DXBorder>
+                <dx:DXBorder HorizontalOptions="FillAndExpand"
+                             CornerRadius="18" BorderThickness="0" Padding="16,18"
+                             BackgroundColor="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}">
+                    <dx:DXBorder.Shadow>
+                        <Shadow Brush="{StaticResource Primary}" Opacity="0.15" Radius="12" Offset="0,4" />
+                    </dx:DXBorder.Shadow>
+                    <dx:DXStackLayout Orientation="Vertical">
+                        <Label Text="COSTO" FontSize="11" TextColor="#C62828" FontAttributes="Bold" />
+                        <Label Text="{Binding Item.Cost, StringFormat='{0:N2}'}"
+                               FontSize="22" FontAttributes="Bold" TextColor="#C62828" Margin="0,4,0,0" />
+                    </dx:DXStackLayout>
+                </dx:DXBorder>
+            </dx:DXStackLayout>
+
+            <!-- Tarjeta de existencias -->
+            <dx:DXBorder Margin="14,10,14,6"
+                         CornerRadius="18" BorderThickness="0" Padding="4,6"
+                         BackgroundColor="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}">
+                <dx:DXBorder.Shadow>
+                    <Shadow Brush="{StaticResource Primary}" Opacity="0.12" Radius="12" Offset="0,4" />
+                </dx:DXBorder.Shadow>
+                <dx:DXStackLayout Orientation="Vertical" Padding="12,8">
+                    <Label Text="Inventario" FontAttributes="Bold" TextColor="{StaticResource Primary}" FontSize="15" Margin="4,4,0,6" />
+
+                    <dx:DXStackLayout Orientation="Horizontal" Padding="4,10">
+                        <Label Text="Existencia final " FontSize="15" VerticalOptions="Center" HorizontalOptions="StartAndExpand" />
+                        <Label Text="{Binding Item.CantidadFinal, StringFormat='{0:N2}'}" FontSize="16" FontAttributes="Bold" VerticalOptions="Center" />
+                    </dx:DXStackLayout>
+                    <dx:DXBorder Style="{StaticResource SeparatorStyle}" />
+
+                    <dx:DXStackLayout Orientation="Horizontal" Padding="4,10">
+                        <Label Text="Cantidad facturadas " FontSize="15" VerticalOptions="Center" HorizontalOptions="StartAndExpand" />
+                        <Label Text="{Binding Item.CantidadFacturadas, StringFormat='{0:N2}'}" FontSize="16" FontAttributes="Bold" VerticalOptions="Center" />
+                    </dx:DXStackLayout>
+                    <dx:DXBorder Style="{StaticResource SeparatorStyle}" />
+
+                    <dx:DXStackLayout Orientation="Horizontal" Padding="4,10">
+                        <Label Text="Cantidad ingresadas " FontSize="15" VerticalOptions="Center" HorizontalOptions="StartAndExpand" />
+                        <Label Text="{Binding Item.CantidadEntradas, StringFormat='{0:N2}'}" FontSize="16" FontAttributes="Bold" TextColor="#2E7D32" VerticalOptions="Center" />
+                    </dx:DXStackLayout>
+                    <dx:DXBorder Style="{StaticResource SeparatorStyle}" />
+
+                    <dx:DXStackLayout Orientation="Horizontal" Padding="4,10">
+                        <Label Text="Cantidad retirada " FontSize="15" VerticalOptions="Center" HorizontalOptions="StartAndExpand" />
+                        <Label Text="{Binding Item.CantidadSalidas, StringFormat='{0:N2}'}" FontSize="16" FontAttributes="Bold" TextColor="#C62828" VerticalOptions="Center" />
+                    </dx:DXStackLayout>
+                    <dx:DXBorder Style="{StaticResource SeparatorStyle}" />
+
+                    <dx:DXStackLayout Orientation="Horizontal" Padding="4,10">
+                        <Label Text="Cantidad inicial " FontSize="15" VerticalOptions="Center" HorizontalOptions="StartAndExpand" />
+                        <Label Text="{Binding Item.Quantity, StringFormat='{0:N2}'}" FontSize="16" FontAttributes="Bold" VerticalOptions="Center" />
+                    </dx:DXStackLayout>
                 </dx:DXStackLayout>
             </dx:DXBorder>
 

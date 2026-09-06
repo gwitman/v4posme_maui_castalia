@@ -181,6 +181,7 @@ public partial class ItemEditPage : ContentPage
         TextItemNumber.Text         = _defaultItem.ItemNumber;
         TextCantidadFacturadas.Text = _defaultItem.CantidadFacturadas.ToString("N2");
         TextPrecioPublico.Text      = _defaultItem.PrecioPublico.ToString("N2");
+        TextCosto.Text              = _defaultItem.Cost.ToString("N2");
         DataForm.DataObject         = _defaultItem;
     }
 

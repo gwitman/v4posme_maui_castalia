@@ -129,6 +129,15 @@
                         </dxdf:DataFormCustomItem>
                         <dxdf:DataFormCustomItem>
                             <dxe:TextEdit
+                                x:Name="TextCosto"
+                                Keyboard="Numeric"
+                                IconColor="#006E98"
+                                StartIcon="price"
+                                Text="{Binding Cost}"
+                                LabelText="Costo" />
+                        </dxdf:DataFormCustomItem>
+                        <dxdf:DataFormCustomItem>
+                            <dxe:TextEdit
                                 x:Name="TextCantidadFinal"
                                 Keyboard="Numeric"
                                 IsReadOnly="True"
