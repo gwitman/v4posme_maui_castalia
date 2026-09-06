@@ -202,9 +202,17 @@ public partial class ItemEditPage : ContentPage
             if (itemId != _itemIdActual)
                 return;
 
-            ImgProducto.Source = bytes is { Length: > 0 }
-                ? ImageSource.FromStream(() => new MemoryStream(bytes))
-                : ImagenPorDefecto;
+            if (!RestApiItemImage.EsImagenValida(bytes))
+            {
+                ImgProducto.Source = ImagenPorDefecto;
+                return;
+            }
+
+            var datos = bytes!;
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                ImgProducto.Source = ImageSource.FromStream(() => new MemoryStream(datos));
+            });
         }
         catch (Exception ex)
         {

@@ -97,10 +97,20 @@ namespace v4posme_maui.Views.Items
                 if (itemId != _ultimoItemIdMostrado)
                     return;
 
-                if (bytes is { Length: > 0 })
-                    ImgProducto.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
-                else
+                // Validar que el binario sea realmente una imagen antes de intentar pintarlo.
+                if (!RestApiItemImage.EsImagenValida(bytes))
+                {
                     ImgProducto.Source = ImagenPorDefecto;
+                    return;
+                }
+
+                // La asignacion del Source debe hacerse en el hilo de UI. Se copian los bytes
+                // para que la lambda cree un MemoryStream nuevo cada vez que el control lo pida.
+                var datos = bytes!;
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    ImgProducto.Source = ImageSource.FromStream(() => new MemoryStream(datos));
+                });
             }
             catch (Exception ex)
             {
@@ -186,6 +196,9 @@ namespace v4posme_maui.Views.Items
 
                 // Mantiene sincronizada la posicion de navegacion con la pantalla de edicion.
                 VariablesGlobales.ItemsNavegacionIndex = nuevoIndice;
+
+                // Vuelve a traer la imagen del nuevo producto desde el servidor.
+                CargarImagenProducto(siguiente.ItemId);
             }
             catch (Exception ex)
             {

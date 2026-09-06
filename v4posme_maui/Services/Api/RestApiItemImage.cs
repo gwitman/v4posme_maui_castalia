@@ -156,6 +156,41 @@ public class RestApiItemImage
         }
     }
 
+    /// <summary>
+    /// Verifica que los bytes correspondan a un formato de imagen soportado leyendo su
+    /// "firma magica" (magic number). Sirve para confirmar que el servidor PHP envio el
+    /// binario correcto y no un texto/HTML/JSON o un binario corrupto.
+    /// - JPEG:  FF D8 FF
+    /// - PNG:   89 50 4E 47 0D 0A 1A 0A
+    /// - GIF:   47 49 46 38 ("GIF8")
+    /// - WEBP:  "RIFF"...."WEBP"
+    /// Registra en el log el detalle para diagnostico.
+    /// </summary>
+    public static bool EsImagenValida(byte[]? bytes)
+    {
+        if (bytes is null || bytes.Length < 12)
+        {
+            HelperLogs.Log($"EsImagenValida: bytes nulos o muy cortos (len={bytes?.Length ?? 0})", "Warning");
+            return false;
+        }
+
+        bool esJpeg = bytes[0] == 0xFF && bytes[1] == 0xD8 && bytes[2] == 0xFF;
+        bool esPng  = bytes[0] == 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47;
+        bool esGif  = bytes[0] == 0x47 && bytes[1] == 0x49 && bytes[2] == 0x46 && bytes[3] == 0x38;
+        bool esWebp = bytes[0] == 0x52 && bytes[1] == 0x49 && bytes[2] == 0x46 && bytes[3] == 0x46
+                      && bytes[8] == 0x57 && bytes[9] == 0x45 && bytes[10] == 0x42 && bytes[11] == 0x50;
+
+        var esValida = esJpeg || esPng || esGif || esWebp;
+        if (!esValida)
+        {
+            // Loguear los primeros bytes en hex para ver que devolvio realmente el servidor.
+            var primeros = BitConverter.ToString(bytes, 0, Math.Min(16, bytes.Length));
+            HelperLogs.Log($"EsImagenValida: firma no reconocida. Primeros bytes: {primeros}", "Error");
+        }
+
+        return esValida;
+    }
+
     private sealed class ItemImageResponse
     {
         [JsonProperty("error")]
