@@ -187,6 +187,27 @@ public partial class ItemEditPage : ContentPage
             // La imagen se carga en segundo plano para no bloquear la pantalla.
             CargarImagenProducto(itemFresco.ItemId);
         }
+        else
+        {
+            // Nuevo producto: autogenerar el codigo (ITT + 8 digitos) a partir del maximo
+            // existente y precargarlo tanto en el codigo de barra como en el codigo de producto.
+            try
+            {
+                var nuevoCodigo         = await HelperConsecutivo.PosMeSiguienteCodigoItem();
+                TxtBarCode.Text         = nuevoCodigo;
+                TextItemNumber.Text     = nuevoCodigo;
+
+                if (DataForm.DataObject is Api_AppMobileApi_GetDataDownloadItemsResponse nuevoItem)
+                {
+                    nuevoItem.BarCode    = nuevoCodigo;
+                    nuevoItem.ItemNumber = nuevoCodigo;
+                }
+            }
+            catch (Exception ex)
+            {
+                HelperLogs.Log(ex);
+            }
+        }
 
         DataForm.CommitMode = CommitMode.LostFocus;
     }

@@ -128,7 +128,31 @@ public partial class CustomerEditPage : ContentPage
 
     protected override async void OnAppearing()
     {
-        if (ViewModel.IsNew) return;
+        if (ViewModel.IsNew)
+        {
+            // Nuevo cliente: autogenerar el codigo (CLI + 8 digitos) a partir del maximo
+            // existente y precargarlo en identificacion y numero de cliente.
+            try
+            {
+                var nuevoCodigo         = await HelperConsecutivo.PosMeSiguienteCodigoCustomer();
+                TxtBarCode.Text         = nuevoCodigo;
+                TextCustomerNumber.Text = nuevoCodigo;
+
+                if (DataForm.DataObject is Api_AppMobileApi_GetDataDownloadCustomerResponse nuevoCliente)
+                {
+                    nuevoCliente.Identification = nuevoCodigo;
+                    nuevoCliente.CustomerNumber = nuevoCodigo;
+                }
+            }
+            catch (Exception ex)
+            {
+                HelperLogs.Log(ex);
+            }
+
+            DataForm.CommitMode = CommitMode.LostFocus;
+            return;
+        }
+
         _saveItem = (Api_AppMobileApi_GetDataDownloadCustomerResponse)DataForm.DataObject;
         _defaultItem = await RepositoryTbCustomer.PosMeFindCustomer(_saveItem.CustomerNumber!);
         DataForm.CommitMode = CommitMode.LostFocus;
