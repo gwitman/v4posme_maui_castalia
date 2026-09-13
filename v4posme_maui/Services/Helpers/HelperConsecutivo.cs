@@ -9,13 +9,13 @@ namespace v4posme_maui.Services.Helpers;
 /// Genera codigos consecutivos con un prefijo fijo y 8 digitos.
 /// El siguiente numero se calcula a partir del maximo ya existente en la base
 /// de datos local para ese prefijo.
-///  - Items:     prefijo "ITT" (ej. ITT00000001)
-///  - Clientes:  prefijo "CLI" (ej. CLI00000001)
+///  - Items:     prefijo "ITM" (ej. ITM00000001)
+///  - Clientes:  prefijo "CLM" (ej. CLM00000001)
 /// </summary>
 public static class HelperConsecutivo
 {
-    public const string PrefijoItem     = "ITT";
-    public const string PrefijoCustomer = "CLI";
+    public const string PrefijoItem     = "ITM";
+    public const string PrefijoCustomer = "CLM";
     private const int CantidadDigitos   = 8;
 
     /// <summary>
