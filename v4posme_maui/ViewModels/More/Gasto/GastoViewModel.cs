@@ -1,20 +1,17 @@
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using CommunityToolkit.Maui.Core;
-using Plugin.BLE;
-using SkiaSharp;
 using Unity;
 using v4posme_maui.Models;
 using v4posme_maui.Services.Helpers;
-using v4posme_maui.Services.HelpersPrinters;
 using v4posme_maui.Services.Repository;
 using v4posme_maui.Services.SystemNames;
+using v4posme_maui.Views.More.Gasto;
 
 namespace v4posme_maui.ViewModels.More.Gasto;
 
 public class GastoViewModel : BaseViewModel
 {
-    private readonly IRepositoryTbParameterSystem _parameterSystem;
     private readonly IRepositoryTbTransactionMaster _repositoryTbTransactionMaster;
     private readonly HelperCore _helperCore;
 
@@ -23,7 +20,6 @@ public class GastoViewModel : BaseViewModel
     public GastoViewModel()
     {
         Title = "Registrar Gasto";
-        _parameterSystem               = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbParameterSystem>();
         _repositoryTbTransactionMaster = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMaster>();
         _helperCore                    = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
 
@@ -34,31 +30,10 @@ public class GastoViewModel : BaseViewModel
         ];
         _monedaSeleccionada = Monedas[0];
 
-        GuardarCommand  = new Command(async () => await OnGuardarCommand());
-        ImprimirCommand = new Command(async () => await OnImprimirCommand());
-        CompartirCommand = new Command(OnCompartirRequested);
+        GuardarCommand = new Command(async () => await OnGuardarCommand());
     }
 
     public ICommand GuardarCommand { get; }
-    public ICommand ImprimirCommand { get; }
-    public ICommand CompartirCommand { get; }
-
-    // Evento para que la vista dispare la captura/compartir (patron usado en las demas pantallas).
-    public event EventHandler? CompartirSolicitado;
-
-    private TbCompany? _empresa;
-    public TbCompany? Empresa
-    {
-        get => _empresa;
-        private set => SetProperty(ref _empresa, value);
-    }
-
-    private ImageSource? _logoSource;
-    public ImageSource? LogoSource
-    {
-        get => _logoSource;
-        private set => SetProperty(ref _logoSource, value);
-    }
 
     private TypeMoneda _monedaSeleccionada;
     public TypeMoneda MonedaSeleccionada
@@ -103,27 +78,6 @@ public class GastoViewModel : BaseViewModel
         set => SetProperty(ref _referencia2, value);
     }
 
-    private bool _isGuardado;
-    public bool IsGuardado
-    {
-        get => _isGuardado;
-        private set => SetProperty(ref _isGuardado, value);
-    }
-
-    private string _numeroGasto = string.Empty;
-    public string NumeroGasto
-    {
-        get => _numeroGasto;
-        private set => SetProperty(ref _numeroGasto, value);
-    }
-
-    private DateTime _fechaGasto = DateTime.Now;
-    public DateTime FechaGasto
-    {
-        get => _fechaGasto;
-        private set => SetProperty(ref _fechaGasto, value);
-    }
-
     public string MontoFormateado
     {
         get
@@ -133,29 +87,10 @@ public class GastoViewModel : BaseViewModel
         }
     }
 
-    public async Task OnAppearing(INavigation navigation)
+    public void OnAppearing(INavigation navigation)
     {
         Navigation = navigation;
-        IsBusy = true;
-        try
-        {
-            Empresa = VariablesGlobales.TbCompany;
-
-            var logo = await _parameterSystem.PosMeFindLogo();
-            if (!string.IsNullOrWhiteSpace(logo.Value))
-            {
-                var bytes = Convert.FromBase64String(logo.Value!);
-                LogoSource = ImageSource.FromStream(() => new MemoryStream(bytes));
-            }
-        }
-        catch (Exception ex)
-        {
-            HelperLogs.Log(ex);
-        }
-        finally
-        {
-            IsBusy = false;
-        }
+        IsBusy = false;
     }
 
     private async Task OnGuardarCommand()
@@ -209,11 +144,20 @@ public class GastoViewModel : BaseViewModel
             await _repositoryTbTransactionMaster.PosMeInsert(transactionMaster);
             await _helperCore.PlusCounter();
 
-            NumeroGasto = codigo;
-            FechaGasto  = transactionMaster.TransactionOn;
-            IsGuardado  = true;
+            // Se prepara el estado del comprobante para la pantalla de resultado.
+            VariablesGlobales.DtoGasto = new ViewTempDtoGasto
+            {
+                NumeroGasto   = codigo,
+                Fecha         = transactionMaster.TransactionOn,
+                MonedaNombre  = MonedaSeleccionada.Name,
+                MonedaSimbolo = MonedaSeleccionada.Simbolo,
+                Monto         = monto,
+                Comentario    = Comentario,
+                Referencia1   = Referencia1,
+                Referencia2   = Referencia2
+            };
 
-            ShowToast("Gasto registrado correctamente.", ToastDuration.Short, 16);
+            await Navigation!.PushAsync(new GastoComprobantePage());
         }
         catch (Exception ex)
         {
@@ -224,103 +168,6 @@ public class GastoViewModel : BaseViewModel
         {
             IsBusy = false;
         }
-    }
-
-    private async Task OnImprimirCommand()
-    {
-        if (!IsGuardado)
-        {
-            ShowMensajePopUp("Guarde el gasto antes de imprimir.");
-            return;
-        }
-
-        var parametroPrinter = await _parameterSystem.PosMeFindPrinter();
-        if (string.IsNullOrWhiteSpace(parametroPrinter.Value))
-        {
-            ShowMensajePopUp("No hay impresora configurada.");
-            return;
-        }
-
-        if (!CrossBluetoothLE.Current.IsOn)
-        {
-            ShowToast(Mensajes.MensajeBluetoothState, ToastDuration.Long, 18);
-            return;
-        }
-
-        IsBusy = true;
-        try
-        {
-            var printer = new Printer(parametroPrinter.Value);
-            var logo    = await _parameterSystem.PosMeFindLogo();
-
-            if (!string.IsNullOrWhiteSpace(logo.Value))
-            {
-                var readImage = Convert.FromBase64String(logo.Value!);
-                printer.AlignCenter();
-                printer.Image(SKBitmap.Decode(readImage));
-            }
-
-            printer.AlignCenter();
-            printer.BoldMode(Company?.Name ?? string.Empty);
-            printer.BoldMode("COMPROBANTE DE GASTO");
-            printer.NewLine();
-
-            printer.AlignLeft();
-            printer.Append($"No: {NumeroGasto}");
-            printer.NewLine();
-            printer.Append($"Fecha: {FechaGasto:yyyy-MM-dd hh:mm:ss tt}");
-            printer.NewLine();
-            printer.Separator();
-
-            printer.Append($"Moneda: {MonedaSeleccionada.Name}");
-            printer.NewLine();
-            printer.Append($"Monto: {MontoFormateado}");
-            printer.NewLine();
-            printer.Append($"Comentario: {Comentario}");
-            printer.NewLine();
-
-            if (!string.IsNullOrWhiteSpace(Referencia1))
-            {
-                printer.Append($"Referencia 1: {Referencia1}");
-                printer.NewLine();
-            }
-
-            if (!string.IsNullOrWhiteSpace(Referencia2))
-            {
-                printer.Append($"Referencia 2: {Referencia2}");
-                printer.NewLine();
-            }
-
-            printer.Separator();
-            printer.NewLines(2);
-            printer.FullPaperCut();
-            printer.Print();
-
-            if (printer.Device is null)
-            {
-                ShowToast(Mensajes.MensajeDispositivoNoConectado, ToastDuration.Long, 18);
-            }
-        }
-        catch (Exception ex)
-        {
-            HelperLogs.Log(ex);
-            ShowMensajePopUp(ex.Message);
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
-
-    private void OnCompartirRequested()
-    {
-        if (!IsGuardado)
-        {
-            ShowMensajePopUp("Guarde el gasto antes de compartir.");
-            return;
-        }
-
-        CompartirSolicitado?.Invoke(this, EventArgs.Empty);
     }
 
     public class TypeMoneda

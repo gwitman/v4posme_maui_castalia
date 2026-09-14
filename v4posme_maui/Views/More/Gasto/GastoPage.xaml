@@ -3,7 +3,6 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:dx="http://schemas.devexpress.com/maui"
-             xmlns:core="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
              xmlns:gasto="clr-namespace:v4posme_maui.ViewModels.More.Gasto"
              Title="{Binding Title}"
              x:Class="v4posme_maui.Views.More.Gasto.GastoPage"
@@ -15,8 +14,6 @@
 
     <ContentPage.ToolbarItems>
         <ToolbarItem IconImageSource="basic_home_white" Clicked="BackToHome_OnClicked" />
-        <ToolbarItem Text="Imprimir" Order="Secondary" Command="{Binding ImprimirCommand}" />
-        <ToolbarItem Text="Compartir" Order="Secondary" Command="{Binding CompartirCommand}" />
     </ContentPage.ToolbarItems>
 
     <Grid>
@@ -50,49 +47,9 @@
             <dx:ShimmerView.Content>
                 <ScrollView>
                     <dx:DXStackLayout
-                        x:Name="DxStackLayout_"
                         Orientation="Vertical"
                         BackgroundColor="{StaticResource PageBackground}"
-                        Padding="16,16,16,24">
-
-                        <!-- Header Card -->
-                        <Border StrokeShape="RoundRectangle 14"
-                                StrokeThickness="0"
-                                BackgroundColor="{StaticResource PrimaryDark}"
-                                Padding="20,24"
-                                Margin="0,0,0,14">
-                            <Border.Shadow>
-                                <Shadow Brush="{StaticResource Gray400}" Offset="0,4" Radius="12" Opacity="0.35" />
-                            </Border.Shadow>
-                            <VerticalStackLayout Spacing="6" HorizontalOptions="Center">
-                                <Image Source="{Binding LogoSource}"
-                                       HeightRequest="56"
-                                       Aspect="AspectFit" />
-                                <Label Text="{Binding Empresa.Name}"
-                                       FontSize="18" FontFamily="OpenSansSemibold"
-                                       HorizontalTextAlignment="Center" TextColor="White" />
-                                <Label Text="REGISTRAR GASTO"
-                                       FontSize="13" TextColor="White" Opacity="0.85"
-                                       HorizontalTextAlignment="Center" />
-                            </VerticalStackLayout>
-                        </Border>
-
-                        <!-- Numero de gasto (visible tras guardar) -->
-                        <Border StrokeShape="RoundRectangle 12"
-                                StrokeThickness="0"
-                                BackgroundColor="#E6F5ED"
-                                Padding="16,12"
-                                Margin="0,0,0,12"
-                                IsVisible="{Binding IsGuardado}">
-                            <Grid ColumnDefinitions="Auto,*">
-                                <Label Grid.Column="0" Text="No. Gasto:"
-                                       FontFamily="OpenSansSemibold" FontSize="14"
-                                       TextColor="{StaticResource PrimaryDark}" VerticalOptions="Center" />
-                                <Label Grid.Column="1" Text="{Binding NumeroGasto}"
-                                       FontSize="14" TextColor="#2E7D32"
-                                       HorizontalTextAlignment="End" VerticalOptions="Center" />
-                            </Grid>
-                        </Border>
+                        Padding="16,20,16,24">
 
                         <!-- Formulario -->
                         <Border StrokeShape="RoundRectangle 14"
