@@ -34,6 +34,7 @@ public class DataBase
                     new() { Name = Constantes.ParameterCodigoFactura, Description = "Número de factura", Value = "FAC-0001" },
                     new() { Name = Constantes.ParemeterEntityIDAutoIncrement, Description = "Auto incrementado", Value = "-1" },
                     new() { Name = Constantes.ParameterCodigoVisita, Description = "Número de visita", Value = "VST-0001" },
+                    new() { Name = Constantes.ParameterCodigoGasto, Description = "Número de gasto", Value = "GTO-0001" },
                     new() { Name = Constantes.CustomerOrderShare, Description = "Orden de clientes abonos", Value = "" },
                     new() { Name = Constantes.CustomerOrderCustomer, Description = "Orden de clientes en pantalla cliente", Value = "" },
                     new() { Name = Constantes.CustomerOrderInvoice, Description = "Orden de clientes en pantalla invoice", Value = "" },

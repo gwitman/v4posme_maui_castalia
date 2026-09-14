@@ -21,6 +21,38 @@
         <ToolbarItem IconImageSource="save" Clicked="SaveItemClick" />
     </ContentPage.ToolbarItems>
     <Grid>
+        <dxco:BottomSheet x:Name="ImagenBottomSheet"
+                          HalfExpandedRatio="0.32"
+                          AllowedState="HalfExpanded"
+                          CornerRadius="24,24,0,0">
+            <dx:DXStackLayout Orientation="Vertical" Padding="20,8,20,24" ItemSpacing="4">
+                <dx:DXBorder WidthRequest="44"
+                             HeightRequest="5"
+                             CornerRadius="3"
+                             BorderThickness="0"
+                             BackgroundColor="{StaticResource Gray300}"
+                             HorizontalOptions="Center"
+                             Margin="0,0,0,12" />
+                <Label Text="Cambiar imagen del producto"
+                       FontFamily="OpenSansSemibold"
+                       FontSize="16"
+                       TextColor="{StaticResource PrimaryDark}"
+                       HorizontalTextAlignment="Center"
+                       Margin="0,0,0,14" />
+
+                <dx:DXButton Style="{StaticResource SinFondoColorRedondeado}"
+                             HorizontalContentAlignment="Start"
+                             Icon="take_photo"
+                             Content="Tomar foto"
+                             Tap="TomarFotoClicked" />
+                <dx:DXButton Style="{StaticResource SinFondoColorRedondeado}"
+                             HorizontalContentAlignment="Start"
+                             Icon="gallery"
+                             Content="Seleccionar de la galería"
+                             Tap="SeleccionarGaleriaClicked" />
+            </dx:DXStackLayout>
+        </dxco:BottomSheet>
+
         <ScrollView>
             <dx:DXStackLayout Orientation="Vertical" Padding="0,0,0,20">
                 <dxco:DXPopup x:Name="Popup"

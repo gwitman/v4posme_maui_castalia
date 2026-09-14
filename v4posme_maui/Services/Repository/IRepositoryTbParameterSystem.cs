@@ -16,4 +16,5 @@ public interface IRepositoryTbParameterSystem : IRepositoryFacade<TbParameterSys
     Task<TbParameterSystem> PosMeFindCustomerOrderInvoice();
 	//Carlos Conto
 	Task<TbParameterSystem> PosMeFindCodigoVisita();
+	Task<TbParameterSystem> PosMeFindCodigoGasto();
 }

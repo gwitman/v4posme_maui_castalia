@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Core;
+using DevExpress.Maui.Controls;
 using DevExpress.Maui.Core;
 using DevExpress.Maui.DataForm;
 using v4posme_maui.Models;
@@ -242,18 +243,46 @@ public partial class ItemEditPage : ContentPage
         }
     }
 
-    private async void CambiarImagenClick(object? sender, EventArgs e)
+    private void CambiarImagenClick(object? sender, EventArgs e)
+    {
+        if (ViewModel.IsNew)
+        {
+            TxtMensaje.Text = "Guarde el producto antes de asignar una imagen.";
+            Popup.IsOpen    = true;
+            return;
+        }
+
+        // Se muestra el panel inferior con estilo para elegir el origen de la imagen.
+        ImagenBottomSheet.State = BottomSheetState.HalfExpanded;
+    }
+
+    private async void TomarFotoClicked(object? sender, EventArgs e)
+    {
+        ImagenBottomSheet.State = BottomSheetState.Hidden;
+
+        if (!MediaPicker.Default.IsCaptureSupported)
+        {
+            TxtMensaje.Text = "La camara no esta disponible en este dispositivo.";
+            Popup.IsOpen    = true;
+            return;
+        }
+
+        var foto = await MediaPicker.Default.CapturePhotoAsync();
+        await ProcesarImagenAsync(foto);
+    }
+
+    private async void SeleccionarGaleriaClicked(object? sender, EventArgs e)
+    {
+        ImagenBottomSheet.State = BottomSheetState.Hidden;
+
+        var foto = await MediaPicker.Default.PickPhotoAsync();
+        await ProcesarImagenAsync(foto);
+    }
+
+    private async Task ProcesarImagenAsync(FileResult? foto)
     {
         try
         {
-            if (ViewModel.IsNew)
-            {
-                TxtMensaje.Text = "Guarde el producto antes de asignar una imagen.";
-                Popup.IsOpen    = true;
-                return;
-            }
-
-            var foto = await MediaPicker.Default.PickPhotoAsync();
             if (foto is null)
                 return;
 

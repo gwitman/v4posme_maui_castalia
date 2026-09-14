@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:dx="http://schemas.devexpress.com/maui"
+             xmlns:core="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
+             xmlns:gasto="clr-namespace:v4posme_maui.ViewModels.More.Gasto"
+             Title="{Binding Title}"
+             x:Class="v4posme_maui.Views.More.Gasto.GastoPage"
+             BackgroundColor="{StaticResource PageBackground}">
+
+    <ContentPage.BindingContext>
+        <gasto:GastoViewModel />
+    </ContentPage.BindingContext>
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem IconImageSource="basic_home_white" Clicked="BackToHome_OnClicked" />
+        <ToolbarItem Text="Imprimir" Order="Secondary" Command="{Binding ImprimirCommand}" />
+        <ToolbarItem Text="Compartir" Order="Secondary" Command="{Binding CompartirCommand}" />
+    </ContentPage.ToolbarItems>
+
+    <Grid>
+        <dx:DXPopup x:Name="Popup"
+                    AllowScrim="True"
+                    BackgroundColor="{Binding PopupBackgroundColor}"
+                    VerticalAlignment="Bottom"
+                    HorizontalAlignment="Stretch"
+                    Margin="16"
+                    CornerRadius="16"
+                    ScrimColor="#b3adb9ce"
+                    IsOpen="{Binding PopUpShow}">
+            <StackLayout WidthRequest="250" Padding="4">
+                <Label Text="{Binding Mensaje}"
+                       FontAttributes="Bold"
+                       FontSize="15"
+                       HorizontalTextAlignment="Center"
+                       TextColor="{StaticResource White}"
+                       Margin="20, 20" />
+                <Button Text="Aceptar"
+                        Clicked="ClosePopup_Clicked"
+                        BackgroundColor="{StaticResource Gray600}"
+                        CornerRadius="12"
+                        HeightRequest="46"
+                        FontSize="18"
+                        TextColor="White" />
+            </StackLayout>
+        </dx:DXPopup>
+
+        <dx:ShimmerView Style="{StaticResource ShimmerEffect}" IsLoading="{Binding IsBusy}">
+            <dx:ShimmerView.Content>
+                <ScrollView>
+                    <dx:DXStackLayout
+                        x:Name="DxStackLayout_"
+                        Orientation="Vertical"
+                        BackgroundColor="{StaticResource PageBackground}"
+                        Padding="16,16,16,24">
+
+                        <!-- Header Card -->
+                        <Border StrokeShape="RoundRectangle 14"
+                                StrokeThickness="0"
+                                BackgroundColor="{StaticResource PrimaryDark}"
+                                Padding="20,24"
+                                Margin="0,0,0,14">
+                            <Border.Shadow>
+                                <Shadow Brush="{StaticResource Gray400}" Offset="0,4" Radius="12" Opacity="0.35" />
+                            </Border.Shadow>
+                            <VerticalStackLayout Spacing="6" HorizontalOptions="Center">
+                                <Image Source="{Binding LogoSource}"
+                                       HeightRequest="56"
+                                       Aspect="AspectFit" />
+                                <Label Text="{Binding Empresa.Name}"
+                                       FontSize="18" FontFamily="OpenSansSemibold"
+                                       HorizontalTextAlignment="Center" TextColor="White" />
+                                <Label Text="REGISTRAR GASTO"
+                                       FontSize="13" TextColor="White" Opacity="0.85"
+                                       HorizontalTextAlignment="Center" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- Numero de gasto (visible tras guardar) -->
+                        <Border StrokeShape="RoundRectangle 12"
+                                StrokeThickness="0"
+                                BackgroundColor="#E6F5ED"
+                                Padding="16,12"
+                                Margin="0,0,0,12"
+                                IsVisible="{Binding IsGuardado}">
+                            <Grid ColumnDefinitions="Auto,*">
+                                <Label Grid.Column="0" Text="No. Gasto:"
+                                       FontFamily="OpenSansSemibold" FontSize="14"
+                                       TextColor="{StaticResource PrimaryDark}" VerticalOptions="Center" />
+                                <Label Grid.Column="1" Text="{Binding NumeroGasto}"
+                                       FontSize="14" TextColor="#2E7D32"
+                                       HorizontalTextAlignment="End" VerticalOptions="Center" />
+                            </Grid>
+                        </Border>
+
+                        <!-- Formulario -->
+                        <Border StrokeShape="RoundRectangle 14"
+                                StrokeThickness="0"
+                                BackgroundColor="{StaticResource CardColor}"
+                                Padding="16">
+                            <Border.Shadow>
+                                <Shadow Brush="{StaticResource Gray300}" Offset="0,2" Radius="8" Opacity="0.3" />
+                            </Border.Shadow>
+                            <VerticalStackLayout Spacing="14">
+
+                                <dx:ComboBoxEdit
+                                    LabelText="Moneda"
+                                    StartIcon="quantity"
+                                    IconColor="{StaticResource Primary}"
+                                    DisplayMember="Name"
+                                    ItemsSource="{Binding Monedas}"
+                                    SelectedItem="{Binding MonedaSeleccionada}" />
+
+                                <dx:TextEdit
+                                    LabelText="Monto"
+                                    PlaceholderText="0.00"
+                                    StartIcon="quantity"
+                                    IconColor="{StaticResource Primary}"
+                                    Keyboard="Numeric"
+                                    Text="{Binding Monto}" />
+
+                                <dx:MultilineEdit
+                                    LabelText="Comentario"
+                                    PlaceholderText="Describa el gasto..."
+                                    MaxCharacterCount="250"
+                                    Text="{Binding Comentario}" />
+
+                                <dx:TextEdit
+                                    LabelText="Referencia 1"
+                                    PlaceholderText="Opcional"
+                                    IconColor="{StaticResource Primary}"
+                                    Text="{Binding Referencia1}" />
+
+                                <dx:TextEdit
+                                    LabelText="Referencia 2"
+                                    PlaceholderText="Opcional"
+                                    IconColor="{StaticResource Primary}"
+                                    Text="{Binding Referencia2}" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- Total -->
+                        <Border StrokeShape="RoundRectangle 14"
+                                StrokeThickness="0"
+                                BackgroundColor="{StaticResource CardColor}"
+                                Padding="20,16"
+                                Margin="0,14,0,0">
+                            <Border.Shadow>
+                                <Shadow Brush="{StaticResource Primary}" Opacity="0.15" Radius="12" Offset="0,4" />
+                            </Border.Shadow>
+                            <VerticalStackLayout Spacing="2" HorizontalOptions="Center">
+                                <Label Text="Monto del gasto" FontSize="13" Opacity="0.7"
+                                       HorizontalOptions="Center" />
+                                <Label Text="{Binding MontoFormateado}"
+                                       FontSize="34" FontAttributes="Bold"
+                                       TextColor="{StaticResource Primary}"
+                                       HorizontalOptions="Center" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- Boton Guardar -->
+                        <dx:SimpleButton
+                            Text="Guardar Gasto"
+                            Margin="0,18,0,0"
+                            BackgroundColor="{StaticResource Primary}"
+                            TextColor="White"
+                            Command="{Binding GuardarCommand}" />
+
+                    </dx:DXStackLayout>
+                </ScrollView>
+            </dx:ShimmerView.Content>
+        </dx:ShimmerView>
+    </Grid>
+
+</ContentPage>

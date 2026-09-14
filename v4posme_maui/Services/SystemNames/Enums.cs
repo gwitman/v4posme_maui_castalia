@@ -10,7 +10,8 @@ namespace v4posme_maui.Services.SystemNames
     {
         TransactionInvoiceBilling = 19,
         TransactionShare = 23,
-        TransactionQueryMedical = 35
+        TransactionQueryMedical = 35,
+        TransactionExpense = 38 
     }
 
     public enum TypeQueryMedical

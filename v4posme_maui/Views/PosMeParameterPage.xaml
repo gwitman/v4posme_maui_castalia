@@ -128,6 +128,15 @@
                                 StartIcon="textbox"
                                 Text="{Binding CodigoFactura}"
                                 LabelText="Código de Factura" />
+                            <dxe:TextEdit
+                                x:Name="TextCodigoGasto"
+                                HasError="{Binding GastoHasError}"
+                                ErrorText="Debe especificar un código de gasto..."
+                                IsErrorIconVisible="True"
+                                IconColor="#006E98"
+                                StartIcon="textbox"
+                                Text="{Binding CodigoGasto}"
+                                LabelText="Código de Gasto" />
                         </dx:DXStackLayout>
                     </dx:DXBorder>
 

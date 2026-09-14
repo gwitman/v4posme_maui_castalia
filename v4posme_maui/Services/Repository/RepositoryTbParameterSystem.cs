@@ -53,6 +53,12 @@ public class RepositoryTbParameterSystem(DataBase dataBase) : RepositoryFacade<T
 		return dataBase.Database.Table<TbParameterSystem>()
 			.FirstOrDefaultAsync(system => system.Name == Constantes.ParameterCodigoVisita);
 	}
+
+    public Task<TbParameterSystem> PosMeFindCodigoGasto()
+    {
+        return dataBase.Database.Table<TbParameterSystem>()
+            .FirstOrDefaultAsync(system => system.Name == Constantes.ParameterCodigoGasto);
+    }
     
     public Task<TbParameterSystem> PosMeFindCustomerOrderShare()
     {

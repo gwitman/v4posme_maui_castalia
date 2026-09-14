@@ -10,6 +10,7 @@ using v4posme_maui.Views.Printers;
 using Application = Microsoft.Maui.Controls.Application;
 using Android.Content;
 using v4posme_maui.Views.More;
+using v4posme_maui.Views.More.Gasto;
 using v4posme_maui.Views.More.ReporteVenta;
 using v4posme_maui.Views.More.Visita;
 
@@ -50,6 +51,7 @@ namespace v4posme_maui
             Routing.RegisterRoute(typeof(VoucherInvoicePage).FullName, typeof(VoucherInvoicePage));
             Routing.RegisterRoute(typeof(MorePage).FullName, typeof(MorePage));
             Routing.RegisterRoute(typeof(ReporteVentaPage).FullName, typeof(ReporteVentaPage));
+            Routing.RegisterRoute(typeof(GastoPage).FullName, typeof(GastoPage));
             Routing.RegisterRoute(typeof(VisitaPage).FullName, typeof(VisitaPage));
             Routing.RegisterRoute(typeof(VisitaFormPage).FullName, typeof(VisitaFormPage));
             Routing.RegisterRoute(typeof(ValidarAbonoFinancieraPage).FullName, typeof(ValidarAbonoFinancieraPage));

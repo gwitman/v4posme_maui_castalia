@@ -16,6 +16,7 @@ public class PosMeParameterViewModel : BaseViewModel
     private TbParameterSystem _posmeFindPrinter = new();
     private TbParameterSystem _posmeFindCodigoAbono = new();
     private TbParameterSystem _posmeFindCodigFactura = new();
+    private TbParameterSystem _posmeFindCodigoGasto = new();
     public ICommand RefreshCommand { get; }
     public ICommand SaveCommand { get; }
 
@@ -80,6 +81,12 @@ public class PosMeParameterViewModel : BaseViewModel
                 CodigoFactura = _posmeFindCodigFactura.Value;
             }
 
+            _posmeFindCodigoGasto = await _repositoryTbParameterSystem.PosMeFindCodigoGasto();
+            if (!string.IsNullOrWhiteSpace(_posmeFindCodigoGasto.Value))
+            {
+                CodigoGasto = _posmeFindCodigoGasto.Value;
+            }
+
         });
     }
 
@@ -89,7 +96,8 @@ public class PosMeParameterViewModel : BaseViewModel
         PrinterHasError = string.IsNullOrWhiteSpace(Printer);
         AbonoHasError = string.IsNullOrWhiteSpace(CodigoAbono);
         FacturaHasError = string.IsNullOrWhiteSpace(CodigoFactura);
-        return !( PrinterHasError || AbonoHasError || FacturaHasError);
+        GastoHasError = string.IsNullOrWhiteSpace(CodigoGasto);
+        return !( PrinterHasError || AbonoHasError || FacturaHasError || GastoHasError);
     }
 
     private bool _printerhasError;
@@ -121,6 +129,8 @@ public class PosMeParameterViewModel : BaseViewModel
                 _repositoryTbParameterSystem.PosMeUpdate(_posmeFindCodigFactura);
                 _posmeFindCodigoAbono.Value = CodigoAbono;
                 _repositoryTbParameterSystem.PosMeUpdate(_posmeFindCodigoAbono);
+                _posmeFindCodigoGasto.Value = CodigoGasto;
+                _repositoryTbParameterSystem.PosMeUpdate(_posmeFindCodigoGasto);
                 Mensaje = Mensajes.MensajeParametrosGuardar;
                 PopupBackgroundColor = Colors.Green;
                 LoadValuesDefault();
@@ -217,5 +227,21 @@ public class PosMeParameterViewModel : BaseViewModel
     {
         get => _facturaHasError;
         set => SetProperty(ref _facturaHasError, value);
+    }
+
+    private string? _codigoGasto;
+
+    public string? CodigoGasto
+    {
+        get => _codigoGasto;
+        set => SetProperty(ref _codigoGasto, value);
+    }
+
+    private bool _gastoHasError;
+
+    public bool GastoHasError
+    {
+        get => _gastoHasError;
+        set => SetProperty(ref _gastoHasError, value);
     }
 }

@@ -22,6 +22,7 @@ public static class Mensajes
     public const string MensajeDocumentCreditAmortizationVacio = "No hay datos de detalle para abono de factura con el documento seleccionado";
     public const string MnesajeCountadoDeAbonoMalFormado = "El countador de los abonos tiene un formato incorrecto, ABC-#";
 	public const string MensajeCountadorDeVisitaMalFormado = "El countador de las visitas tiene un formato incorrecto, VST-#";
+	public const string MensajeContadorDeGastoMalFormado = "El contador de los gastos tiene un formato incorrecto, GTO-#";
 	public const string AnularAbonoValidacion = "No puede eliminar este abono, intente nuevamente";
     public const string MensajeMontoMenorIgualCero = "Debe especificar un monto mayor a 0";
     public const string MensajeSaldoNegativo = "No se puede ingresar un saldo negativo";
