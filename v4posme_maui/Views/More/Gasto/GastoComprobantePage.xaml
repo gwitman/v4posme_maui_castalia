@@ -18,7 +18,6 @@
 
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Ir a inicio" Order="Secondary" Clicked="BackToHome_OnClicked" />
-        <ToolbarItem Text="Nuevo gasto" Order="Secondary" Command="{Binding NuevoGastoCommand}" />
         <ToolbarItem Text="Eliminar registro" Order="Secondary" Command="{Binding EliminarCommand}" />
     </ContentPage.ToolbarItems>
 
@@ -71,11 +70,9 @@
                                 <Image Source="{Binding LogoSource}"
                                        HeightRequest="56"
                                        Aspect="AspectFit" />
-                                <Label Text="{Binding Empresa.Name}"
-                                       FontSize="18" FontFamily="OpenSansSemibold"
-                                       HorizontalTextAlignment="Center" TextColor="White" />
                                 <Label Text="COMPROBANTE DE GASTO"
-                                       FontSize="13" TextColor="White" Opacity="0.85"
+                                       FontSize="16" FontFamily="OpenSansSemibold"
+                                       TextColor="White"
                                        HorizontalTextAlignment="Center" />
                             </VerticalStackLayout>
                         </Border>
@@ -88,9 +85,6 @@
                                 Margin="0,0,0,14">
                             <VerticalStackLayout Spacing="6" HorizontalOptions="Center">
                                 <Image Source="check" HeightRequest="40" WidthRequest="40" Aspect="AspectFit" />
-                                <Label Text="Gasto registrado correctamente"
-                                       FontFamily="OpenSansSemibold" FontSize="15"
-                                       TextColor="#2E7D32" HorizontalTextAlignment="Center" />
                                 <Label Text="No. de transacción"
                                        FontSize="12" Opacity="0.7"
                                        HorizontalTextAlignment="Center" Margin="0,6,0,0" />
