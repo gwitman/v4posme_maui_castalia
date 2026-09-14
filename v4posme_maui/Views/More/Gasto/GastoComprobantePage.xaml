@@ -17,7 +17,9 @@
     </ContentPage.BindingContext>
 
     <ContentPage.ToolbarItems>
-        <ToolbarItem IconImageSource="basic_home_white" Clicked="BackToHome_OnClicked" />
+        <ToolbarItem Text="Ir a inicio" Order="Secondary" Clicked="BackToHome_OnClicked" />
+        <ToolbarItem Text="Nuevo gasto" Order="Secondary" Command="{Binding NuevoGastoCommand}" />
+        <ToolbarItem Text="Eliminar registro" Order="Secondary" Command="{Binding EliminarCommand}" />
     </ContentPage.ToolbarItems>
 
     <Grid>

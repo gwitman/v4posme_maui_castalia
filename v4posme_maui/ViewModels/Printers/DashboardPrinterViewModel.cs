@@ -10,6 +10,7 @@ using v4posme_maui.Views;
 using v4posme_maui.Views.Abonos;
 using v4posme_maui.Views.Invoices;
 using v4posme_maui.Views.Printers;
+using v4posme_maui.Views.More.Gasto;
 using Unity;
 using v4posme_maui.Services.Helpers;
 using Android.Test.Suitebuilder.Annotation;
@@ -36,14 +37,59 @@ public class DashboardPrinterViewModel : BaseViewModel
         Facturas                                = new();
         Abonos                                  = new();
         Productos                               = new();
+        Gastos                                  = new();
         OnBarCode                               = new Command(OnSearchBarCode);
         SearchFacturaCommand                    = new Command(OnSearchFacturaCommand);
         SelectedFacturaCommand                  = new Command<ViewTempDtoInvoice>(OnSelectedFacturaCommand);
         SelectedAbonoCommand                    = new Command<ViewTempDtoAbono>(OnSelectedAbonoCommand);
         SelectedProductoCommand                 = new Command<Api_AppMobileApi_GetDataDownloadItemsResponse>(OnSelectedProductoCommand);
+        SelectedGastoCommand                    = new Command<ViewTempDtoGastoLista>(OnSelectedGastoCommand);
         SearchAbonoCommand                      = new Command(OnSearchAbonoCommand);
         SearchProductCommand                    = new Command(OnSearchProductCommand);
+        SearchGastoCommand                      = new Command(OnSearchGastoCommand);
         IsBusy                                  = true;
+    }
+
+    private async void OnSearchGastoCommand()
+    {
+        IsBusy = true;
+        List<TbTransactionMaster> filters;
+        if (string.IsNullOrWhiteSpace(SearchGastos))
+        {
+            filters = await _repositoryTbTransactionMaster.PosMeFilterTop10Gastos();
+        }
+        else
+        {
+            filters = await _repositoryTbTransactionMaster.PosMeFilterTop10ByCodigoGastos(SearchGastos);
+        }
+
+        await FillGastos(filters);
+        IsBusy = false;
+    }
+
+    private async void OnSelectedGastoCommand(ViewTempDtoGastoLista obj)
+    {
+        try
+        {
+            VariablesGlobales.DtoGasto = new ViewTempDtoGasto
+            {
+                TransactionMasterId = obj.TransactionMasterId,
+                NumeroGasto   = obj.Codigo,
+                Fecha         = obj.Fecha,
+                MonedaNombre  = obj.MonedaNombre,
+                MonedaSimbolo = obj.MonedaSimbolo,
+                Monto         = obj.Monto,
+                Comentario    = obj.Comentario,
+                Referencia1   = obj.Referencia1,
+                Referencia2   = obj.Referencia2
+            };
+
+            await Navigation!.PushAsync(new GastoComprobantePage());
+        }
+        catch (Exception e)
+        {
+            ShowToast(e.Message, ToastDuration.Long, 14);
+        }
     }
 
     private async void OnSearchProductCommand()
@@ -224,6 +270,25 @@ public class DashboardPrinterViewModel : BaseViewModel
         set => SetProperty(ref _productos, value);
     }
 
+    private ObservableCollection<ViewTempDtoGastoLista>? _gastos;
+
+    public ObservableCollection<ViewTempDtoGastoLista> Gastos
+    {
+        get => _gastos!;
+        set => SetProperty(ref _gastos, value);
+    }
+
+    private string _searchGastos;
+
+    public string SearchGastos
+    {
+        get => _searchGastos;
+        set => SetProperty(ref _searchGastos, value);
+    }
+
+    public Command SearchGastoCommand { get; }
+    public Command SelectedGastoCommand { get; }
+
     public Command SearchFacturaCommand { get; }
     public Command OnBarCode { get; }
 
@@ -328,11 +393,49 @@ public class DashboardPrinterViewModel : BaseViewModel
                     var findAllProductos = await _repositoryItems.PosMeNameAsc10();
                     await FillProductos(findAllProductos);
                     break;
+
+                case 3:
+                    var findAllGastos = await _repositoryTbTransactionMaster.PosMeFilterTop10Gastos();
+                    await FillGastos(findAllGastos);
+                    break;
             }
         }
         finally
         {
             IsBusy = false;
+        }
+    }
+
+    private async Task FillGastos(List<TbTransactionMaster> findAllGastos)
+    {
+        try
+        {
+            var buffer = new List<ViewTempDtoGastoLista>(findAllGastos.Count);
+            foreach (var master in findAllGastos)
+            {
+                var esCordoba = master.CurrencyId == TypeCurrency.Cordoba;
+                buffer.Add(new ViewTempDtoGastoLista
+                {
+                    TransactionMasterId = master.TransactionMasterId,
+                    Codigo              = master.TransactionNumber!,
+                    Fecha               = master.TransactionOn,
+                    Monto               = master.Amount,
+                    MonedaSimbolo       = esCordoba ? "C$" : "$",
+                    MonedaNombre        = esCordoba ? "Cordoba (C$)" : "Dolar ($)",
+                    Comentario          = master.Comment ?? string.Empty,
+                    Referencia1         = master.Reference1 ?? string.Empty,
+                    Referencia2         = master.Reference2 ?? string.Empty
+                });
+            }
+
+            await MainThread.InvokeOnMainThreadAsync(() =>
+            {
+                Gastos = new ObservableCollection<ViewTempDtoGastoLista>(buffer);
+            });
+        }
+        catch (Exception e)
+        {
+            ShowToast(e.Message, ToastDuration.Long, 14);
         }
     }
 

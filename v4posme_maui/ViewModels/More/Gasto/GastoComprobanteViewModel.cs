@@ -15,25 +15,34 @@ namespace v4posme_maui.ViewModels.More.Gasto;
 public class GastoComprobanteViewModel : BaseViewModel
 {
     private readonly IRepositoryTbParameterSystem _parameterSystem;
+    private readonly IRepositoryTbTransactionMaster _repositoryTbTransactionMaster;
 
     public GastoComprobanteViewModel()
     {
         Title = "Comprobante de Gasto";
-        _parameterSystem = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbParameterSystem>();
+        _parameterSystem               = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbParameterSystem>();
+        _repositoryTbTransactionMaster = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMaster>();
 
         Gasto = VariablesGlobales.DtoGasto;
 
         ImprimirCommand   = new Command(async () => await OnImprimirCommand());
         CompartirCommand  = new Command(OnCompartirRequested);
         NuevoGastoCommand = new Command(async () => await OnNuevoGastoCommand());
+        EliminarCommand   = new Command(async () => await OnEliminarCommand());
     }
 
     public ICommand ImprimirCommand { get; }
     public ICommand CompartirCommand { get; }
     public ICommand NuevoGastoCommand { get; }
+    public ICommand EliminarCommand { get; }
 
     // Evento para que la vista dispare la captura/compartir.
     public event EventHandler? CompartirSolicitado;
+
+    // Evento para que la vista solicite confirmacion antes de eliminar el gasto.
+    // El argumento booleano indica el resultado de la eliminacion (true = eliminado).
+    public event EventHandler<bool>? EliminacionCompletada;
+    public Func<Task<bool>>? ConfirmarEliminacion;
 
     public ViewTempDtoGasto Gasto { get; }
 
@@ -163,7 +172,54 @@ public class GastoComprobanteViewModel : BaseViewModel
 
     private async Task OnNuevoGastoCommand()
     {
-        // Reemplaza la pila para volver a registrar un gasto limpio.
-        await Navigation!.PushAsync(new GastoPage());
+        // Navega a una pantalla de gasto nueva (campos en limpio) y quita este
+        // comprobante de la pila para no acumular pantallas al registrar varios gastos.
+        var comprobantePage = Navigation!.NavigationStack.LastOrDefault();
+        await Navigation.PushAsync(new GastoPage());
+        if (comprobantePage is not null)
+            Navigation.RemovePage(comprobantePage);
+    }
+
+    private async Task OnEliminarCommand()
+    {
+        if (IsBusy) return;
+
+        if (Gasto.TransactionMasterId <= 0)
+        {
+            ShowMensajePopUp("No se encontro la transaccion del gasto a eliminar.");
+            return;
+        }
+
+        // Se solicita confirmacion a la vista antes de eliminar.
+        if (ConfirmarEliminacion is not null)
+        {
+            var confirmado = await ConfirmarEliminacion.Invoke();
+            if (!confirmado) return;
+        }
+
+        IsBusy = true;
+        try
+        {
+            var master = await _repositoryTbTransactionMaster.PosMeFindByTransactionId(Gasto.TransactionMasterId);
+            if (master is null)
+            {
+                ShowMensajePopUp("El gasto ya no existe.");
+                return;
+            }
+
+            await _repositoryTbTransactionMaster.PosMeDelete(master);
+
+            ShowToast("Gasto eliminado correctamente.", ToastDuration.Short, 16);
+            EliminacionCompletada?.Invoke(this, true);
+        }
+        catch (Exception ex)
+        {
+            HelperLogs.Log(ex);
+            ShowMensajePopUp(ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 }

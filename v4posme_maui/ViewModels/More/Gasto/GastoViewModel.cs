@@ -147,6 +147,7 @@ public class GastoViewModel : BaseViewModel
             // Se prepara el estado del comprobante para la pantalla de resultado.
             VariablesGlobales.DtoGasto = new ViewTempDtoGasto
             {
+                TransactionMasterId = transactionMaster.TransactionMasterId,
                 NumeroGasto   = codigo,
                 Fecha         = transactionMaster.TransactionOn,
                 MonedaNombre  = MonedaSeleccionada.Name,

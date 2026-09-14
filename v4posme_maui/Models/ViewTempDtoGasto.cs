@@ -4,6 +4,7 @@ namespace v4posme_maui.Models;
 // en la pantalla de resultado (patron similar a ViewTempDtoInvoice).
 public class ViewTempDtoGasto
 {
+    public int TransactionMasterId { get; set; }
     public string NumeroGasto { get; set; } = string.Empty;
     public DateTime Fecha { get; set; } = DateTime.Now;
     public string MonedaNombre { get; set; } = string.Empty;

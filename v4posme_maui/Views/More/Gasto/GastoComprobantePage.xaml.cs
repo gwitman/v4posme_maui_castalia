@@ -15,6 +15,24 @@ public partial class GastoComprobantePage : ContentPage
         InitializeComponent();
         _viewModel = (GastoComprobanteViewModel)BindingContext;
         _viewModel.CompartirSolicitado += OnCompartirSolicitado;
+        _viewModel.ConfirmarEliminacion  = ConfirmarEliminacionAsync;
+        _viewModel.EliminacionCompletada += OnEliminacionCompletada;
+    }
+
+    private Task<bool> ConfirmarEliminacionAsync()
+    {
+        return DisplayAlert("Eliminar gasto",
+            "¿Está seguro que desea eliminar este gasto? Esta acción no se puede deshacer.",
+            "Eliminar", "Cancelar");
+    }
+
+    private async void OnEliminacionCompletada(object? sender, bool eliminado)
+    {
+        if (!eliminado) return;
+
+        // Tras eliminar se regresa al inicio (la transaccion ya no existe).
+        Application.Current!.MainPage = new MainPage();
+        await Navigation.PopToRootAsync();
     }
 
     protected override void OnAppearing()

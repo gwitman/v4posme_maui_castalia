@@ -16,4 +16,6 @@ public interface IRepositoryTbTransactionMaster : IRepositoryFacade<TbTransactio
     Task<TbTransactionMaster> PosMeFindByTransactionId(int id);
     Task<TbTransactionMaster> PosMeFindByTransactionNumber(string transactionNumber);
 	Task<List<TbTransactionMaster>> PosmeGetAll();
+    Task<List<TbTransactionMaster>> PosMeFilterTop10Gastos();
+    Task<List<TbTransactionMaster>> PosMeFilterTop10ByCodigoGastos(string filter);
 }
