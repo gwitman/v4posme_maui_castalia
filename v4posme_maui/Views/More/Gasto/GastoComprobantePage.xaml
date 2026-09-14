@@ -48,6 +48,45 @@
             </StackLayout>
         </dx:DXPopup>
 
+        <!-- Popup de confirmacion de eliminacion (con estilo) -->
+        <dx:DXPopup x:Name="ConfirmDeletePopup"
+                    AllowScrim="True"
+                    BackgroundColor="{StaticResource CardColor}"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Stretch"
+                    Margin="24"
+                    CornerRadius="16"
+                    ScrimColor="#b3adb9ce"
+                    IsOpen="{Binding ConfirmarEliminarPopUpShow}">
+            <VerticalStackLayout Padding="20" Spacing="14">
+                <Label Text="Eliminar gasto"
+                       FontAttributes="Bold"
+                       FontSize="17"
+                       TextColor="{StaticResource PrimaryDark}"
+                       HorizontalTextAlignment="Center" />
+                <Label Text="¿Está seguro que desea eliminar este gasto? Esta acción no se puede deshacer."
+                       FontSize="14"
+                       TextColor="{StaticResource Gray600}"
+                       HorizontalTextAlignment="Center" />
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="12" Margin="0,6,0,0">
+                    <Button Grid.Column="0"
+                            Text="Cancelar"
+                            BackgroundColor="{StaticResource Gray600}"
+                            TextColor="White"
+                            CornerRadius="12"
+                            HeightRequest="46"
+                            Command="{Binding CancelarEliminarCommand}" />
+                    <Button Grid.Column="1"
+                            Text="Eliminar"
+                            BackgroundColor="#C62828"
+                            TextColor="White"
+                            CornerRadius="12"
+                            HeightRequest="46"
+                            Command="{Binding ConfirmarEliminarCommand}" />
+                </Grid>
+            </VerticalStackLayout>
+        </dx:DXPopup>
+
         <dx:ShimmerView Style="{StaticResource ShimmerEffect}" IsLoading="{Binding IsBusy}">
             <dx:ShimmerView.Content>
                 <ScrollView>
@@ -57,26 +96,6 @@
                         BackgroundColor="{StaticResource PageBackground}"
                         Padding="16,16,16,24">
 
-                        <!-- Encabezado del comprobante -->
-                        <Border StrokeShape="RoundRectangle 14"
-                                StrokeThickness="0"
-                                BackgroundColor="{StaticResource PrimaryDark}"
-                                Padding="20,24"
-                                Margin="0,0,0,14">
-                            <Border.Shadow>
-                                <Shadow Brush="{StaticResource Gray400}" Offset="0,4" Radius="12" Opacity="0.35" />
-                            </Border.Shadow>
-                            <VerticalStackLayout Spacing="6" HorizontalOptions="Center">
-                                <Image Source="{Binding LogoSource}"
-                                       HeightRequest="56"
-                                       Aspect="AspectFit" />
-                                <Label Text="COMPROBANTE DE GASTO"
-                                       FontSize="16" FontFamily="OpenSansSemibold"
-                                       TextColor="White"
-                                       HorizontalTextAlignment="Center" />
-                            </VerticalStackLayout>
-                        </Border>
-
                         <!-- Confirmacion + numero de transaccion -->
                         <Border StrokeShape="RoundRectangle 14"
                                 StrokeThickness="0"
@@ -84,7 +103,10 @@
                                 Padding="20,18"
                                 Margin="0,0,0,14">
                             <VerticalStackLayout Spacing="6" HorizontalOptions="Center">
-                                <Image Source="check" HeightRequest="40" WidthRequest="40" Aspect="AspectFit" />
+                                <Label Text="Comprobante de Gasto"
+                                       FontFamily="OpenSansSemibold" FontSize="16"
+                                       TextColor="{StaticResource PrimaryDark}"
+                                       HorizontalTextAlignment="Center" />
                                 <Label Text="No. de transacción"
                                        FontSize="12" Opacity="0.7"
                                        HorizontalTextAlignment="Center" Margin="0,6,0,0" />

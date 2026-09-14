@@ -141,6 +141,30 @@ namespace v4posme_maui.ViewModels
             set => SetProperty(ref _montoFacturasCreditoDolares, value);
         }
 
+        private int _cantidadGastos;
+
+        public int CantidadGastos
+        {
+            get => _cantidadGastos;
+            set => SetProperty(ref _cantidadGastos, value);
+        }
+
+        private decimal _montoGastosCordobas;
+
+        public decimal MontoGastosCordobas
+        {
+            get => _montoGastosCordobas;
+            set => SetProperty(ref _montoGastosCordobas, value);
+        }
+
+        private decimal _montoGastosDolares;
+
+        public decimal MontoGastosDolares
+        {
+            get => _montoGastosDolares;
+            set => SetProperty(ref _montoGastosDolares, value);
+        }
+
         public async void OnAppearing(INavigation navigation)
         {
             try
@@ -156,13 +180,26 @@ namespace v4posme_maui.ViewModels
                 var listaFacturasCreditoDolares         = new List<TbTransactionMaster>();
                 var listaFacturasContadoCordobas        = new List<TbTransactionMaster>();
                 var listaFacturasContadoDolares         = new List<TbTransactionMaster>();
+                var listaGastosCordobas                 = new List<TbTransactionMaster>();
+                var listaGastosDolares                  = new List<TbTransactionMaster>();
                 
                 
 
                 //Obtener las tansacciones locales
                 foreach (var master in findAll)
                 {
-                    if (master.TransactionId == TypeTransaction.TransactionShare)
+                    if (master.TransactionId == TypeTransaction.TransactionExpense)
+                    {
+                        if (master.CurrencyId == TypeCurrency.Cordoba)
+                        {
+                            listaGastosCordobas.Add(master);
+                        }
+                        else
+                        {
+                            listaGastosDolares.Add(master);
+                        }
+                    }
+                    else if (master.TransactionId == TypeTransaction.TransactionShare)
                     {
                         if (master.CurrencyId == TypeCurrency.Cordoba)
                         {
@@ -235,9 +272,13 @@ namespace v4posme_maui.ViewModels
                 CantidadFacutrasCredito         = listaFacturasCreditoCordobas.Count + listaFacturasCreditoDolares.Count;
                 MontoFacturasCreditoCordobas    = listaFacturasCreditoCordobas.Sum(master => master.SubAmount) - listaFacturasCreditoCordobas.Sum(master => master.Discount);
                 MontoFacturasCreditoDolares     = listaFacturasCreditoDolares.Sum(master => master.SubAmount) - listaFacturasCreditoDolares.Sum(master => master.Discount);
-                //Totales
-                TotalCordobas   = MontoAbonosCordobas + MontoFacturasContadoCordobas;
-                TotalDolares    = MontoAbonosDolares + MontoFacturasContadoDolares;
+                //Gastos
+                CantidadGastos      = listaGastosCordobas.Count + listaGastosDolares.Count;
+                MontoGastosCordobas = listaGastosCordobas.Sum(master => master.Amount);
+                MontoGastosDolares  = listaGastosDolares.Sum(master => master.Amount);
+                //Totales (los gastos son egresos, por lo que restan del total del dia)
+                TotalCordobas   = MontoAbonosCordobas + MontoFacturasContadoCordobas - MontoGastosCordobas;
+                TotalDolares    = MontoAbonosDolares + MontoFacturasContadoDolares - MontoGastosDolares;
                 IsBusy          = false;
             }
             catch (Exception e)

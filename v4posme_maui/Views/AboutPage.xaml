@@ -251,6 +251,50 @@
                         </Grid>
                     </core:DXBorder>
 
+                    <!-- GASTOS -->
+                    <core:DXBorder CornerRadius="16" BorderThickness="0" BackgroundColor="{StaticResource White}">
+                        <core:DXBorder.Shadow>
+                            <Shadow Brush="{StaticResource Gray300Brush}" Offset="0,2" Radius="8" Opacity="0.3" />
+                        </core:DXBorder.Shadow>
+                        <Grid ColumnSpacing="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="5" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <BoxView Grid.Column="0" Color="#C62828" VerticalOptions="Fill" />
+                            <Grid Grid.Column="1" Padding="16,14" ColumnSpacing="14">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="52" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <core:DXBorder Grid.Column="0"
+                                               WidthRequest="48" HeightRequest="48"
+                                               CornerRadius="12"
+                                               BorderThickness="0"
+                                               BackgroundColor="#FDECEE"
+                                               VerticalOptions="Center">
+                                    <Image Source="cash_pay" WidthRequest="26" HeightRequest="26"
+                                           HorizontalOptions="Center" VerticalOptions="Center" />
+                                </core:DXBorder>
+                                <VerticalStackLayout Grid.Column="1" Spacing="1">
+                                    <Label Text="Gastos" FontSize="13" TextColor="{StaticResource Gray500}" />
+                                    <Label Text="{Binding CantidadGastos}" FontSize="26" FontAttributes="Bold"
+                                           TextColor="{StaticResource PrimaryDark}" />
+                                    <Label Margin="0,4,0,0" FontSize="12" TextColor="#C62828">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="C$ " FontAttributes="Bold" />
+                                                <Span Text="{Binding MontoGastosCordobas, StringFormat='{0:N2}'}" FontAttributes="Bold" />
+                                                <Span Text="   ·   $ " FontAttributes="Bold" />
+                                                <Span Text="{Binding MontoGastosDolares, StringFormat='{0:N2}'}" FontAttributes="Bold" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Grid>
+                    </core:DXBorder>
+
                 </VerticalStackLayout>
             </ScrollView>
         </controls:ShimmerView>

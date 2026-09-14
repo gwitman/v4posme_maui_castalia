@@ -25,24 +25,33 @@ public class GastoComprobanteViewModel : BaseViewModel
 
         Gasto = VariablesGlobales.DtoGasto;
 
-        ImprimirCommand   = new Command(async () => await OnImprimirCommand());
-        CompartirCommand  = new Command(OnCompartirRequested);
-        NuevoGastoCommand = new Command(async () => await OnNuevoGastoCommand());
-        EliminarCommand   = new Command(async () => await OnEliminarCommand());
+        ImprimirCommand           = new Command(async () => await OnImprimirCommand());
+        CompartirCommand          = new Command(OnCompartirRequested);
+        NuevoGastoCommand         = new Command(async () => await OnNuevoGastoCommand());
+        EliminarCommand           = new Command(OnEliminarCommand);
+        ConfirmarEliminarCommand  = new Command(async () => await OnConfirmarEliminarCommand());
+        CancelarEliminarCommand   = new Command(() => ConfirmarEliminarPopUpShow = false);
     }
 
     public ICommand ImprimirCommand { get; }
     public ICommand CompartirCommand { get; }
     public ICommand NuevoGastoCommand { get; }
     public ICommand EliminarCommand { get; }
+    public ICommand ConfirmarEliminarCommand { get; }
+    public ICommand CancelarEliminarCommand { get; }
 
     // Evento para que la vista dispare la captura/compartir.
     public event EventHandler? CompartirSolicitado;
 
-    // Evento para que la vista solicite confirmacion antes de eliminar el gasto.
-    // El argumento booleano indica el resultado de la eliminacion (true = eliminado).
+    // Evento para que la vista navegue tras eliminar el gasto (true = eliminado).
     public event EventHandler<bool>? EliminacionCompletada;
-    public Func<Task<bool>>? ConfirmarEliminacion;
+
+    private bool _confirmarEliminarPopUpShow;
+    public bool ConfirmarEliminarPopUpShow
+    {
+        get => _confirmarEliminarPopUpShow;
+        set => SetProperty(ref _confirmarEliminarPopUpShow, value);
+    }
 
     public ViewTempDtoGasto Gasto { get; }
 
@@ -180,7 +189,7 @@ public class GastoComprobanteViewModel : BaseViewModel
             Navigation.RemovePage(comprobantePage);
     }
 
-    private async Task OnEliminarCommand()
+    private void OnEliminarCommand()
     {
         if (IsBusy) return;
 
@@ -190,12 +199,15 @@ public class GastoComprobanteViewModel : BaseViewModel
             return;
         }
 
-        // Se solicita confirmacion a la vista antes de eliminar.
-        if (ConfirmarEliminacion is not null)
-        {
-            var confirmado = await ConfirmarEliminacion.Invoke();
-            if (!confirmado) return;
-        }
+        // Se muestra el popup de confirmacion con estilo.
+        ConfirmarEliminarPopUpShow = true;
+    }
+
+    private async Task OnConfirmarEliminarCommand()
+    {
+        ConfirmarEliminarPopUpShow = false;
+
+        if (IsBusy) return;
 
         IsBusy = true;
         try
