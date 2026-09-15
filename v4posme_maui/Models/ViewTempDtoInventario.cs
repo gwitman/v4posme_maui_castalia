@@ -38,6 +38,12 @@ public class ViewTempDtoInventario
 
     public TbTransactionMaster? TransactionMaster { get; set; }
 
+    // Indica que la visualizacion fue abierta desde la pantalla de Impresiones (solo
+    // lectura de un registro existente). En ese caso la pantalla debe permitir regresar
+    // al listado (tabs) con el boton atras, en lugar de comportarse como paso final del
+    // flujo de creacion.
+    public bool AbiertoDesdeImpresiones { get; set; }
+
     public void ClearItems()
     {
         Items.Clear();

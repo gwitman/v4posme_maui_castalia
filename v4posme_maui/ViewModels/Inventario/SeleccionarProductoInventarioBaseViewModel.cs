@@ -73,13 +73,7 @@ public abstract class SeleccionarProductoInventarioBaseViewModel : BaseViewModel
 
     private async void OnSearch()
     {
-        if (string.IsNullOrWhiteSpace(Search))
-        {
-            IsPanelVisible = !IsPanelVisible;
-            return;
-        }
-
-        IsPanelVisible = !IsPanelVisible;
+        // Busca directamente con el texto actual de la barra de busqueda superior.
         await LoadAllProductosAsync();
     }
 
@@ -87,9 +81,9 @@ public abstract class SeleccionarProductoInventarioBaseViewModel : BaseViewModel
     {
         var barCodePage = new BarCodePage();
         await Navigation!.PushModalAsync(barCodePage);
-        var bar        = await barCodePage.WaitForResultAsync();
-        Search         = bar!;
-        IsPanelVisible = !IsPanelVisible;
+        var bar         = await barCodePage.WaitForResultAsync();
+        Search          = bar!;
+        await LoadAllProductosAsync();
     }
 
     protected async Task LoadAllProductosAsync()

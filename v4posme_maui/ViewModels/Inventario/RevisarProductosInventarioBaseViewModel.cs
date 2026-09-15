@@ -43,11 +43,21 @@ public abstract class RevisarProductosInventarioBaseViewModel : BaseViewModel
 
     protected void RecalcularTotales()
     {
+        // Eliminar de la lista los productos cuya cantidad quede en 0 (o menos) y
+        // actualizar los contadores y totales del DTO.
+        var aEliminar = ProductosSeleccionados.Where(r => r.Quantity <= 0).ToList();
+        foreach (var item in aEliminar)
+        {
+            ProductosSeleccionados.Remove(item);
+        }
+
         foreach (var item in ProductosSeleccionados)
         {
             item.Importe = item.PrecioPublico * item.Quantity;
         }
-        VariablesGlobales.DtoInventario.Balance = ProductosSeleccionados.Sum(r => r.Importe);
+
+        VariablesGlobales.DtoInventario.Balance                   = ProductosSeleccionados.Sum(r => r.Importe);
+        VariablesGlobales.DtoInventario.CantidadTotalSeleccionada = (int)ProductosSeleccionados.Sum(r => r.Quantity);
         OnPropertyChanged(nameof(Total));
         OnPropertyChanged(nameof(CantidadTotalItems));
     }

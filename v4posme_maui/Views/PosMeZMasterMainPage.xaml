@@ -160,15 +160,33 @@
     </FlyoutItem>
 
     <FlyoutItem Title="Invent. Entrada" Icon="products.svg">
-        <ShellContent Title="Invent. Entrada" Icon="products.svg"
+        <ShellContent Title="Entrada" Icon="products.svg"
                       Route="InventEntrada"
                       ContentTemplate="{DataTemplate inventario:DatosEntradaPage}" />
+
+        <ShellContent Title="Abono" Icon="coin.svg"
+                      ContentTemplate="{DataTemplate abonos:AbonosPage}" />
+
+        <ShellContent Title="Factura" Icon="invoice.svg"
+                      ContentTemplate="{DataTemplate invoices:InvoicesPage}" />
+
+        <ShellContent Title="Parametros" Icon="parameters.svg"
+                      ContentTemplate="{DataTemplate local:ParameterPage}" />
     </FlyoutItem>
 
     <FlyoutItem Title="Invent. Salida" Icon="products.svg">
-        <ShellContent Title="Invent. Salida" Icon="products.svg"
+        <ShellContent Title="Salida" Icon="products.svg"
                       Route="InventSalida"
                       ContentTemplate="{DataTemplate inventario:DatosSalidaPage}" />
+
+        <ShellContent Title="Abono" Icon="coin.svg"
+                      ContentTemplate="{DataTemplate abonos:AbonosPage}" />
+
+        <ShellContent Title="Factura" Icon="invoice.svg"
+                      ContentTemplate="{DataTemplate invoices:InvoicesPage}" />
+
+        <ShellContent Title="Parametros" Icon="parameters.svg"
+                      ContentTemplate="{DataTemplate local:ParameterPage}" />
     </FlyoutItem>
 
     <FlyoutItem Title="Mas" Icon="add.svg">

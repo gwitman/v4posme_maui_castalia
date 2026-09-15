@@ -40,15 +40,29 @@ public abstract class VisualizarInventarioBaseViewModel : BaseViewModel
         CompartirCommand          = new Command(OnCompartir);
         EliminarCommand           = new Command(OnEliminar);
         AbrirMenuPrincipalCommand = new Command(OnAbrirMenuPrincipal);
+        RegresarCommand           = new Command(OnRegresar);
     }
 
     // El icono superior izquierdo (drawer) abre el menu principal (flyout) del Shell.
     public Command AbrirMenuPrincipalCommand { get; }
 
+    // Comando del boton atras cuando la pantalla se abre desde Impresiones (solo lectura).
+    public Command RegresarCommand { get; }
+
+    // true cuando la pantalla se abrio desde Impresiones (listado). En ese caso se debe
+    // permitir regresar al listado en lugar de comportarse como paso final del flujo.
+    public bool AbiertoDesdeImpresiones => VariablesGlobales.DtoInventario.AbiertoDesdeImpresiones;
+
     private void OnAbrirMenuPrincipal()
     {
         if (Shell.Current is not null)
             Shell.Current.FlyoutIsPresented = true;
+    }
+
+    private async void OnRegresar()
+    {
+        // Regresa al listado de Impresiones (elimina esta pagina de la pila).
+        await Navigation!.PopAsync();
     }
 
     // Tipo de transaccion de este flujo.
@@ -201,17 +215,11 @@ public abstract class VisualizarInventarioBaseViewModel : BaseViewModel
     private async void OnNueva()
     {
         // Reinicia el estado del flujo y regresa al primer paso (Datos) usando la ruta
-        // del flyout. Se limpia la pila de navegacion del flujo para que el boton atras
-        // no regrese a la visualizacion ya guardada.
+        // absoluta del flyout. La navegacion absoluta (//) reinicia por completo la pila
+        // de navegacion dejando la pantalla de Datos como raiz del flyout, con lo que el
+        // icono de menu (hamburguesa/drawer) vuelve a mostrarse correctamente.
         VariablesGlobales.DtoInventario = new ViewTempDtoInventario { TransactionId = TipoTransaccion };
         await Shell.Current.GoToAsync($"//{RutaNuevo}");
-
-        var stack = Shell.Current.Navigation.NavigationStack.ToArray();
-        for (var i = stack.Length - 1; i > 0; i--)
-        {
-            if (stack[i] is not null)
-                Shell.Current.Navigation.RemovePage(stack[i]);
-        }
     }
 
     private async void OnEliminar()

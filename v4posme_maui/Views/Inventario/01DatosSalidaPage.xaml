@@ -12,25 +12,14 @@
     <ContentPage.BindingContext>
         <inventario:DatosSalidaViewModel />
     </ContentPage.BindingContext>
-    <Shell.BackButtonBehavior>
-        <BackButtonBehavior IconOverride="drawer_button"
-                            Command="{Binding AbrirMenuPrincipalCommand}" />
-    </Shell.BackButtonBehavior>
+    <!-- Pagina raiz del flyout: se muestra el icono de menu (hamburguesa) nativo del Shell.
+         Se fuerza FlyoutBehavior=Flyout para garantizar que el icono siempre aparezca. -->
+    <Shell.FlyoutBehavior>Flyout</Shell.FlyoutBehavior>
     <ContentPage.Content>
         <controls:ShimmerView Style="{StaticResource ShimmerEffect}" IsLoading="{Binding IsBusy}">
             <controls:ShimmerView.Content>
                 <ScrollView>
                     <StackLayout Padding="0,0,0,20">
-                        <dx:DXBorder BackgroundColor="{StaticResource Primary}"
-                                     CornerRadius="0,0,28,28"
-                                     BorderThickness="0"
-                                     Padding="0,18,0,22">
-                            <dx:DXBorder WidthRequest="120" HeightRequest="120" CornerRadius="60"
-                                         BorderThickness="0" HorizontalOptions="Center" BackgroundColor="#33FFFFFF">
-                                <dx:DXImage Source="products_50x" WidthRequest="60" HeightRequest="60"
-                                            TintColor="White" HorizontalOptions="Center" VerticalOptions="Center" />
-                            </dx:DXBorder>
-                        </dx:DXBorder>
                         <dx:DXBorder Margin="14,16,14,14"
                                      BackgroundColor="{StaticResource White}"
                                      BorderThickness="0" CornerRadius="16">

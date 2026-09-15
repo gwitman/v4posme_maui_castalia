@@ -466,15 +466,16 @@ public class DashboardPrinterViewModel : BaseViewModel
 
             var dto = new ViewTempDtoInventario
             {
-                TransactionId       = tipo,
-                TransactionMasterId = master.TransactionMasterId,
-                TransactionMaster   = master,
-                Codigo              = master.TransactionNumber!,
-                Comentarios         = master.Comment,
-                Referencia1         = master.Reference1,
-                Referencia2         = master.Reference2,
-                TransactionOn       = master.TransactionOn,
-                Balance             = master.Amount
+                TransactionId           = tipo,
+                TransactionMasterId     = master.TransactionMasterId,
+                TransactionMaster       = master,
+                Codigo                  = master.TransactionNumber!,
+                Comentarios             = master.Comment,
+                Referencia1             = master.Reference1,
+                Referencia2             = master.Reference2,
+                TransactionOn           = master.TransactionOn,
+                Balance                 = master.Amount,
+                AbiertoDesdeImpresiones = true
             };
 
             foreach (var detalle in detalles)
