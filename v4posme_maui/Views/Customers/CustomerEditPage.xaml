@@ -104,6 +104,7 @@
                                 x:Name="TextCustomerNumber"
                                 ErrorText="No puede estar vacío"
                                 IsErrorIconVisible="True"
+                                IsReadOnly="True"
                                 IconColor="#006E98"
                                 StartIcon="identificacion"
                                 Text="{Binding EntityId}"
