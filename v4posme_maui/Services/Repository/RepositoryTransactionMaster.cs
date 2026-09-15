@@ -241,4 +241,23 @@ public class RepositoryTbTransactionMaster(DataBase dataBase) : RepositoryFacade
 
 		return _dataBase.Database.QueryAsync<TbTransactionMaster>(query);
 	}
+
+    public Task<List<TbTransactionMaster>> PosMeFilterInventarioByTransactionId(int transactionId)
+    {
+        // Lista descendente de las transacciones de inventario (Entrada o Salida) segun el
+        // tipo de transaccion indicado.
+        return _dataBase.Database.Table<TbTransactionMaster>()
+            .Where(master => (int)master.TransactionId == transactionId)
+            .OrderByDescending(master => master.TransactionOn)
+            .ToListAsync();
+    }
+
+    public Task<List<TbTransactionMaster>> PosMeFilterInventarioByCodigo(int transactionId, string filter)
+    {
+        return _dataBase.Database.Table<TbTransactionMaster>()
+            .Where(master => (int)master.TransactionId == transactionId
+                             && master.TransactionNumber!.Contains(filter))
+            .OrderByDescending(master => master.TransactionOn)
+            .ToListAsync();
+    }
 }

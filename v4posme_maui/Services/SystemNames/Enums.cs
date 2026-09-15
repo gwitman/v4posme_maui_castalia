@@ -11,7 +11,11 @@ namespace v4posme_maui.Services.SystemNames
         TransactionInvoiceBilling = 19,
         TransactionShare = 23,
         TransactionQueryMedical = 35,
-        TransactionExpense = 38 
+        TransactionExpense = 38,
+        // Compras: aumenta la existencia de los productos (entrada de inventario).
+        TransactionInventarioEntrada = 21,
+        // Otras salidas: disminuye la existencia de los productos (salida de inventario).
+        TransactionInventarioSalida = 8
     }
 
     public enum TypeQueryMedical

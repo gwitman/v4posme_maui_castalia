@@ -13,6 +13,7 @@ using v4posme_maui.Views.More;
 using v4posme_maui.Views.More.Gasto;
 using v4posme_maui.Views.More.ReporteVenta;
 using v4posme_maui.Views.More.Visita;
+using v4posme_maui.Views.Inventario;
 
 namespace v4posme_maui
 {
@@ -56,6 +57,16 @@ namespace v4posme_maui
             Routing.RegisterRoute(typeof(VisitaPage).FullName, typeof(VisitaPage));
             Routing.RegisterRoute(typeof(VisitaFormPage).FullName, typeof(VisitaFormPage));
             Routing.RegisterRoute(typeof(ValidarAbonoFinancieraPage).FullName, typeof(ValidarAbonoFinancieraPage));
+
+            // Inventario - Entrada (Compras) y Salida (Otras salidas)
+            Routing.RegisterRoute(typeof(DatosEntradaPage).FullName, typeof(DatosEntradaPage));
+            Routing.RegisterRoute(typeof(SeleccionarProductoEntradaPage).FullName, typeof(SeleccionarProductoEntradaPage));
+            Routing.RegisterRoute(typeof(RevisarProductosEntradaPage).FullName, typeof(RevisarProductosEntradaPage));
+            Routing.RegisterRoute(typeof(VisualizarEntradaPage).FullName, typeof(VisualizarEntradaPage));
+            Routing.RegisterRoute(typeof(DatosSalidaPage).FullName, typeof(DatosSalidaPage));
+            Routing.RegisterRoute(typeof(SeleccionarProductoSalidaPage).FullName, typeof(SeleccionarProductoSalidaPage));
+            Routing.RegisterRoute(typeof(RevisarProductosSalidaPage).FullName, typeof(RevisarProductosSalidaPage));
+            Routing.RegisterRoute(typeof(VisualizarSalidaPage).FullName, typeof(VisualizarSalidaPage));
 
             var permissionsGranted = await PermissionsService.CheckAndRequestPermissionsAsync();
             while (!permissionsGranted)

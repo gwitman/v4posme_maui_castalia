@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:inventario="clr-namespace:v4posme_maui.ViewModels.Inventario"
+             xmlns:converters="clr-namespace:v4posme_maui.Services.Converters"
+             xmlns:dx="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
+             xmlns:dxc="clr-namespace:DevExpress.Maui.Controls;assembly=DevExpress.Maui.Controls"
+             xmlns:dxcv="clr-namespace:DevExpress.Maui.CollectionView;assembly=DevExpress.Maui.CollectionView"
+             xmlns:dxe="clr-namespace:DevExpress.Maui.Editors;assembly=DevExpress.Maui.Editors"
+             Title="{Binding Title}"
+             BackgroundColor="{StaticResource PageBackground}"
+             x:Class="v4posme_maui.Views.Inventario.SeleccionarProductoSalidaPage">
+    <ContentPage.BindingContext>
+        <inventario:SeleccionarProductoSalidaViewModel />
+    </ContentPage.BindingContext>
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IconOverride="ic_arrow_back" Command="{Binding AtrasCommand}" />
+    </Shell.BackButtonBehavior>
+    <ContentPage.Resources>
+        <converters:ToLowerConverter x:Key="ToLowerConverter" />
+    </ContentPage.Resources>
+    <ContentPage.Content>
+        <dxc:ShimmerView Style="{StaticResource ShimmerEffect}" IsLoading="{Binding IsBusy}">
+            <dxc:ShimmerView.Content>
+                <AbsoluteLayout>
+                    <Grid AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0, 0, 1, 1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <Grid Grid.Row="0" Padding="12,10" ColumnSpacing="8" BackgroundColor="{StaticResource White}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="44" />
+                                <ColumnDefinition Width="44" />
+                            </Grid.ColumnDefinitions>
+                            <dxe:TextEdit Grid.Column="0" Style="{StaticResource SearchEditorStyle}"
+                                          PlaceholderText="Buscar producto..." Text="{Binding Search}" />
+                            <dx:DXButton Grid.Column="1" Style="{StaticResource SinFondoColorRedondeado}"
+                                         IconHeight="24" IconWidth="24" Command="{Binding SearchCommand}" Icon="search" />
+                            <dx:DXButton Grid.Column="2" Style="{StaticResource SinFondoColorRedondeado}"
+                                         IconHeight="24" IconWidth="24" Command="{Binding SearchBarCodeCommand}" Icon="barcode_scaner" />
+                        </Grid>
+
+                        <dxcv:DXCollectionView Grid.Row="1" x:Name="ProductosCollectionView"
+                                               ItemsSource="{Binding Productos}" ItemSeparatorThickness="0">
+                            <dxcv:DXCollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <SwipeView>
+                                        <SwipeView.LeftItems>
+                                            <SwipeItems Mode="Execute">
+                                                <SwipeItem Text="Quitar" BackgroundColor="#E53935"
+                                                           Command="{Binding BindingContext.QuitarProductoCommand, Source={x:Reference ProductosCollectionView}}"
+                                                           CommandParameter="{Binding .}" />
+                                            </SwipeItems>
+                                        </SwipeView.LeftItems>
+                                        <dx:DXBorder Margin="12,6" Padding="12" CornerRadius="12"
+                                                     BorderThickness="0" BackgroundColor="{StaticResource White}">
+                                            <dx:DXBorder.GestureRecognizers>
+                                                <TapGestureRecognizer
+                                                    Command="{Binding BindingContext.AnadirProducto, Source={x:Reference ProductosCollectionView}}"
+                                                    CommandParameter="{Binding .}" />
+                                            </dx:DXBorder.GestureRecognizers>
+                                            <Grid ColumnSpacing="12">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="56" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                </Grid.RowDefinitions>
+                                                <dx:DXBorder Grid.Column="0" Grid.RowSpan="2" WidthRequest="48" HeightRequest="48"
+                                                             CornerRadius="10" BackgroundColor="{StaticResource PageBackground}"
+                                                             BorderThickness="0" VerticalOptions="Center">
+                                                    <dx:DXImage Source="products_50x" WidthRequest="28" HeightRequest="28"
+                                                                TintColor="{StaticResource Primary}" HorizontalOptions="Center" VerticalOptions="Center" />
+                                                </dx:DXBorder>
+                                                <Label Grid.Column="1" Grid.Row="0"
+                                                       Text="{Binding Name, Converter={StaticResource ToLowerConverter}}"
+                                                       FontSize="15" LineBreakMode="TailTruncation" MaxLines="2" VerticalOptions="End" />
+                                                <Label Grid.Column="1" Grid.Row="1" Text="{Binding ItemNumber}"
+                                                       FontSize="12" TextColor="{StaticResource Gray400}" VerticalOptions="Start" />
+                                                <Label Grid.Column="2" Grid.RowSpan="2" VerticalOptions="Center" HorizontalOptions="End"
+                                                       FontSize="16" FontAttributes="Bold" TextColor="{StaticResource Primary}"
+                                                       Text="{Binding PrecioPublico, StringFormat='C$ {0:N2}'}" />
+                                            </Grid>
+                                        </dx:DXBorder>
+                                    </SwipeView>
+                                </DataTemplate>
+                            </dxcv:DXCollectionView.ItemTemplate>
+                        </dxcv:DXCollectionView>
+
+                        <dx:DXBorder Grid.Row="2" BackgroundColor="{StaticResource White}"
+                                     CornerRadius="20,20,0,0" BorderThickness="0" Padding="16,12">
+                            <Grid RowSpacing="10">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="48" />
+                                </Grid.RowDefinitions>
+                                <dx:DXBorder Grid.Row="0" Padding="14,10" CornerRadius="10"
+                                             BackgroundColor="{StaticResource PageBackground}" BorderThickness="0">
+                                    <Label Text="{Binding ProductosSeleccionadosCantidadTotal}" FontSize="15"
+                                           FontAttributes="Bold" TextColor="{StaticResource PrimaryDark}" HorizontalTextAlignment="Center" />
+                                </dx:DXBorder>
+                                <dx:DXButton Grid.Row="1" CornerRadius="12"
+                                             Command="{Binding ProductosSeleccionadosCommand}"
+                                             Content="{Binding ProductosSeleccionadosCantidad}" />
+                            </Grid>
+                        </dx:DXBorder>
+                    </Grid>
+                </AbsoluteLayout>
+            </dxc:ShimmerView.Content>
+            <dxc:ShimmerView.LoadingView>
+                <ActivityIndicator IsRunning="{Binding IsBusy}" HeightRequest="50" WidthRequest="50" />
+            </dxc:ShimmerView.LoadingView>
+        </dxc:ShimmerView>
+    </ContentPage.Content>
+</ContentPage>

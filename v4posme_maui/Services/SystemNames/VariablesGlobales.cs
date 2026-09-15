@@ -12,6 +12,9 @@ public static class VariablesGlobales
     public static ViewTempDtoAbono? DtoAplicarAbono;
     public static ViewTempDtoInvoice DtoInvoice;
     public static ViewTempDtoGasto DtoGasto = new();
+
+    // Estado temporal del flujo de inventario (Entrada = Compras / Salida = Otras salidas).
+    public static ViewTempDtoInventario DtoInventario = new();
     public static TbCompany? TbCompany  = new();
     public static decimal TipoCambio    = new(36.5);
 

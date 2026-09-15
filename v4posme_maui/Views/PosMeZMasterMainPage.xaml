@@ -13,6 +13,7 @@
        xmlns:printers="clr-namespace:v4posme_maui.Views.Printers"
        xmlns:upload="clr-namespace:v4posme_maui.Views.Upload"
        xmlns:more="clr-namespace:v4posme_maui.Views.More"
+       xmlns:inventario="clr-namespace:v4posme_maui.Views.Inventario"
        ios:Page.UseSafeArea="true"
        x:Class="v4posme_maui.Views.MainPage">
 
@@ -156,6 +157,18 @@
         <ShellContent Title="Parametros" Icon="parameters.svg"
                       ContentTemplate="{DataTemplate local:ParameterPage}" />
 
+    </FlyoutItem>
+
+    <FlyoutItem Title="Invent. Entrada" Icon="products.svg">
+        <ShellContent Title="Invent. Entrada" Icon="products.svg"
+                      Route="InventEntrada"
+                      ContentTemplate="{DataTemplate inventario:DatosEntradaPage}" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Invent. Salida" Icon="products.svg">
+        <ShellContent Title="Invent. Salida" Icon="products.svg"
+                      Route="InventSalida"
+                      ContentTemplate="{DataTemplate inventario:DatosSalidaPage}" />
     </FlyoutItem>
 
     <FlyoutItem Title="Mas" Icon="add.svg">

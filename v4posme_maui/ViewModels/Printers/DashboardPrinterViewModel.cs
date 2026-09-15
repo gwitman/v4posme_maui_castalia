@@ -11,6 +11,7 @@ using v4posme_maui.Views.Abonos;
 using v4posme_maui.Views.Invoices;
 using v4posme_maui.Views.Printers;
 using v4posme_maui.Views.More.Gasto;
+using v4posme_maui.Views.Inventario;
 using Unity;
 using v4posme_maui.Services.Helpers;
 using Android.Test.Suitebuilder.Annotation;
@@ -38,6 +39,12 @@ public class DashboardPrinterViewModel : BaseViewModel
         Abonos                                  = new();
         Productos                               = new();
         Gastos                                  = new();
+        InventarioEntradas                      = new();
+        InventarioSalidas                       = new();
+        SearchInventarioEntradasCommand         = new Command(OnSearchInventarioEntradasCommand);
+        SearchInventarioSalidasCommand          = new Command(OnSearchInventarioSalidasCommand);
+        SelectedInventarioEntradaCommand        = new Command<ViewTempDtoInventarioLista>(OnSelectedInventarioEntradaCommand);
+        SelectedInventarioSalidaCommand         = new Command<ViewTempDtoInventarioLista>(OnSelectedInventarioSalidaCommand);
         OnBarCode                               = new Command(OnSearchBarCode);
         SearchFacturaCommand                    = new Command(OnSearchFacturaCommand);
         SelectedFacturaCommand                  = new Command<ViewTempDtoInvoice>(OnSelectedFacturaCommand);
@@ -358,6 +365,141 @@ public class DashboardPrinterViewModel : BaseViewModel
 
     public Command SearchProductCommand { get; }
 
+    private ObservableCollection<ViewTempDtoInventarioLista>? _inventarioEntradas;
+    public ObservableCollection<ViewTempDtoInventarioLista> InventarioEntradas
+    {
+        get => _inventarioEntradas!;
+        set => SetProperty(ref _inventarioEntradas, value);
+    }
+
+    private ObservableCollection<ViewTempDtoInventarioLista>? _inventarioSalidas;
+    public ObservableCollection<ViewTempDtoInventarioLista> InventarioSalidas
+    {
+        get => _inventarioSalidas!;
+        set => SetProperty(ref _inventarioSalidas, value);
+    }
+
+    private string _searchInventarioEntradas = string.Empty;
+    public string SearchInventarioEntradas
+    {
+        get => _searchInventarioEntradas;
+        set => SetProperty(ref _searchInventarioEntradas, value);
+    }
+
+    private string _searchInventarioSalidas = string.Empty;
+    public string SearchInventarioSalidas
+    {
+        get => _searchInventarioSalidas;
+        set => SetProperty(ref _searchInventarioSalidas, value);
+    }
+
+    public Command SearchInventarioEntradasCommand { get; }
+    public Command SearchInventarioSalidasCommand { get; }
+    public Command SelectedInventarioEntradaCommand { get; }
+    public Command SelectedInventarioSalidaCommand { get; }
+
+    private async void OnSearchInventarioEntradasCommand()
+    {
+        IsBusy = true;
+        var filters = string.IsNullOrWhiteSpace(SearchInventarioEntradas)
+            ? await _repositoryTbTransactionMaster.PosMeFilterInventarioByTransactionId((int)TypeTransaction.TransactionInventarioEntrada)
+            : await _repositoryTbTransactionMaster.PosMeFilterInventarioByCodigo((int)TypeTransaction.TransactionInventarioEntrada, SearchInventarioEntradas);
+        await FillInventario(filters, esEntrada: true);
+        IsBusy = false;
+    }
+
+    private async void OnSearchInventarioSalidasCommand()
+    {
+        IsBusy = true;
+        var filters = string.IsNullOrWhiteSpace(SearchInventarioSalidas)
+            ? await _repositoryTbTransactionMaster.PosMeFilterInventarioByTransactionId((int)TypeTransaction.TransactionInventarioSalida)
+            : await _repositoryTbTransactionMaster.PosMeFilterInventarioByCodigo((int)TypeTransaction.TransactionInventarioSalida, SearchInventarioSalidas);
+        await FillInventario(filters, esEntrada: false);
+        IsBusy = false;
+    }
+
+    private async Task FillInventario(List<TbTransactionMaster> masters, bool esEntrada)
+    {
+        var buffer = new List<ViewTempDtoInventarioLista>(masters.Count);
+        foreach (var master in masters)
+        {
+            var detalles = await _repositoryTbTransactionMasterDetail.PosMeItemByTransactionId(master.TransactionMasterId);
+            buffer.Add(new ViewTempDtoInventarioLista
+            {
+                TransactionMasterId = master.TransactionMasterId,
+                Codigo              = master.TransactionNumber!,
+                Fecha               = master.TransactionOn,
+                CantidadProductos   = detalles.Count,
+                Comentario          = master.Comment ?? string.Empty,
+                Referencia1         = master.Reference1 ?? string.Empty,
+                Referencia2         = master.Reference2 ?? string.Empty,
+                CostoTotal          = master.Amount,
+                MonedaSimbolo       = "C$"
+            });
+        }
+
+        await MainThread.InvokeOnMainThreadAsync(() =>
+        {
+            if (esEntrada)
+                InventarioEntradas = new ObservableCollection<ViewTempDtoInventarioLista>(buffer);
+            else
+                InventarioSalidas = new ObservableCollection<ViewTempDtoInventarioLista>(buffer);
+        });
+    }
+
+    private async void OnSelectedInventarioEntradaCommand(ViewTempDtoInventarioLista obj)
+    {
+        await AbrirInventario(obj, TypeTransaction.TransactionInventarioEntrada);
+    }
+
+    private async void OnSelectedInventarioSalidaCommand(ViewTempDtoInventarioLista obj)
+    {
+        await AbrirInventario(obj, TypeTransaction.TransactionInventarioSalida);
+    }
+
+    private async Task AbrirInventario(ViewTempDtoInventarioLista obj, TypeTransaction tipo)
+    {
+        try
+        {
+            var master   = await _repositoryTbTransactionMaster.PosMeFindByTransactionId(obj.TransactionMasterId);
+            var detalles = await _repositoryTbTransactionMasterDetail.PosMeItemByTransactionId(obj.TransactionMasterId);
+
+            var dto = new ViewTempDtoInventario
+            {
+                TransactionId       = tipo,
+                TransactionMasterId = master.TransactionMasterId,
+                TransactionMaster   = master,
+                Codigo              = master.TransactionNumber!,
+                Comentarios         = master.Comment,
+                Referencia1         = master.Reference1,
+                Referencia2         = master.Reference2,
+                TransactionOn       = master.TransactionOn,
+                Balance             = master.Amount
+            };
+
+            foreach (var detalle in detalles)
+            {
+                var item          = await _repositoryItems.PosMeFindByItemId(detalle.ComponentItemId);
+                item.Quantity     = detalle.Quantity;
+                item.PrecioPublico = detalle.UnitaryPrice;
+                item.Cost         = detalle.UnitaryCost;
+                item.Importe      = detalle.SubAmount;
+                dto.Items.Add(item);
+            }
+
+            VariablesGlobales.DtoInventario = dto;
+
+            if (tipo == TypeTransaction.TransactionInventarioEntrada)
+                await Navigation!.PushAsync(new VisualizarEntradaPage());
+            else
+                await Navigation!.PushAsync(new VisualizarSalidaPage());
+        }
+        catch (Exception e)
+        {
+            ShowToast(e.Message, ToastDuration.Long, 12);
+        }
+    }
+
     public async void OnAppearing(INavigation navigation)
     {
         try
@@ -397,6 +539,16 @@ public class DashboardPrinterViewModel : BaseViewModel
                 case 3:
                     var findAllGastos = await _repositoryTbTransactionMaster.PosMeFilterTop10Gastos();
                     await FillGastos(findAllGastos);
+                    break;
+
+                case 4:
+                    var entradas = await _repositoryTbTransactionMaster.PosMeFilterInventarioByTransactionId((int)TypeTransaction.TransactionInventarioEntrada);
+                    await FillInventario(entradas, esEntrada: true);
+                    break;
+
+                case 5:
+                    var salidas = await _repositoryTbTransactionMaster.PosMeFilterInventarioByTransactionId((int)TypeTransaction.TransactionInventarioSalida);
+                    await FillInventario(salidas, esEntrada: false);
                     break;
             }
         }

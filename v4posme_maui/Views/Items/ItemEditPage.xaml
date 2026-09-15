@@ -202,11 +202,13 @@
                                 IsReadOnly="True"
                                 LabelText="Cantidad facturadas" />
                         </dxdf:DataFormCustomItem>
+                        <!-- Entrada de solo lectura: las entradas de inventario se gestionan
+                             desde el flujo "Invent. Entrada" (Compras). -->
                         <dxdf:DataFormCustomItem>
                             <dxe:TextEdit
-                                TextChanged="TextCantidadEntrada_OnTextChanged"
                                 x:Name="TextCantidadEntrada"
                                 Keyboard="Numeric"
+                                IsReadOnly="True"
                                 IconColor="#2E7D32"
                                 StartIcon="quantity"
                                 TextColor="#2E7D32"
@@ -214,11 +216,13 @@
                                 Text="{Binding CantidadEntradas}"
                                 LabelText="Cantidad a ingresar" />
                         </dxdf:DataFormCustomItem>
+                        <!-- Salida de solo lectura: las salidas de inventario se gestionan
+                             desde el flujo "Invent. Salida" (Otras salidas). -->
                         <dxdf:DataFormCustomItem>
                             <dxe:TextEdit
-                                TextChanged="TextCantidadEntrada_OnTextChanged"
                                 x:Name="TextCantidadSalida"
                                 Keyboard="Numeric"
+                                IsReadOnly="True"
                                 IconColor="#C62828"
                                 StartIcon="quantity"
                                 TextColor="#C62828"

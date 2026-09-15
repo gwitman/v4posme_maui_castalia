@@ -507,6 +507,24 @@ public class HelperCore(
         return long.Parse(DateTime.Now.ToString("yyyyMMddHHmmssfff"));
     }
 
+    /// <summary>
+    /// Genera un codigo unico para una entrada de inventario (Compras). No requiere
+    /// parametro del servidor: usa el prefijo "ENT" mas el timestamp actual.
+    /// </summary>
+    public string GetCodigoEntrada()
+    {
+        return $"ENT-{DateTime.Now:yyMMddHHmmss}";
+    }
+
+    /// <summary>
+    /// Genera un codigo unico para una salida de inventario (Otras salidas). Usa el
+    /// prefijo "SAL" mas el timestamp actual.
+    /// </summary>
+    public string GetCodigoSalida()
+    {
+        return $"SAL-{DateTime.Now:yyMMddHHmmss}";
+    }
+
     public async Task<List<Api_AppMobileApi_GetDataDownloadCustomerResponse>> ReordenarListaAbono(List<Api_AppMobileApi_GetDataDownloadCustomerResponse> listaBase)
     {
         List<Api_AppMobileApi_GetDataDownloadCustomerResponse> listaOrdenada;
