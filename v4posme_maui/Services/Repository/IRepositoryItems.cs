@@ -4,7 +4,7 @@ namespace v4posme_maui.Services.Repository;
 
 public interface IRepositoryItems : IRepositoryFacade<Api_AppMobileApi_GetDataDownloadItemsResponse>
 {
-    Task<int> PosMeExistBarCode(string barcode, int itemId = 0);
+    Task<int> PosMeExistBarCode(string barcode, int itemId = 0, int itemPk = 0);
     
     Task<Api_AppMobileApi_GetDataDownloadItemsResponse?> PosMeFindByBarCode(string barCode);
     

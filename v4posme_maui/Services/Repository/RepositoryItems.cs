@@ -7,14 +7,23 @@ public class RepositoryItems(DataBase dataBase)
 {
     private readonly DataBase _dataBase = dataBase;
 
-    public Task<int> PosMeExistBarCode(string barcode, int itemId = 0)
+    public Task<int> PosMeExistBarCode(string barcode, int itemId = 0, int itemPk = 0)
     {
         var query = _dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadItemsResponse>()
             .Where(response => response.BarCode == barcode);
-        if (itemId > 0)
+
+        // Se excluye el propio producto que se esta editando. Se prioriza ItemPk (clave
+        // primaria local, siempre poblada) porque los productos creados localmente aun no
+        // sincronizados tienen ItemId == 0 y no podrian excluirse por ItemId.
+        if (itemPk > 0)
+        {
+            query = query.Where(response => response.ItemPk != itemPk);
+        }
+        else if (itemId > 0)
         {
             query = query.Where(response => response.ItemId != itemId);
         }
+
         return query.CountAsync();
     }
 
@@ -55,14 +64,19 @@ public class RepositoryItems(DataBase dataBase)
     public async Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeFilterdByItemNumberAndBarCodeAndNameByTop(string? textSearch,int size /*numero o elemento inicial */,int top /*elementos por paginas*/)
     {
         textSearch = textSearch!.ToLower();
-        return await _dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadItemsResponse>()
+        // Se filtra en SQLite y luego se ordena en memoria por Name.ToLower() para un orden
+        // alfabetico consistente (SQLite ordena con collation BINARY, sensible a mayusculas).
+        var items = await _dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadItemsResponse>()
             .Where(response => response.ItemNumber!.ToLower().Contains(textSearch)
                                || response.BarCode.ToLower().Contains(textSearch)
                                || response.Name.ToLower().Contains(textSearch))
-            .OrderBy(response => response.Name)
+            .ToListAsync();
+
+        return items
+            .OrderBy(response => response.Name.ToLower())
             .Skip(size)
             .Take(top)
-            .ToListAsync();
+            .ToList();
     }
 
     public Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeDescendingBySizeAndTop(int size,int take)
@@ -73,13 +87,19 @@ public class RepositoryItems(DataBase dataBase)
             .Take(take)
             .ToListAsync();
     }
-    public Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeAscBySizeAndTop(int size, int take)
+    public async Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeAscBySizeAndTop(int size, int take)
     {
-        return _dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadItemsResponse>()
-            .OrderBy(response => response.Name)
+        // SQLite ordena texto con collation BINARY (sensible a mayusculas), lo que separa los
+        // nombres que empiezan con minuscula de los que empiezan con mayuscula. Se pasa todo a
+        // minuscula y luego se ordena en memoria para un orden alfabetico consistente.
+        var items = await _dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadItemsResponse>()
+            .ToListAsync();
+
+        return items
+            .OrderBy(response => response.Name.ToLower())
             .Skip(size)
             .Take(take)
-            .ToListAsync();
+            .ToList();
     }
 
     public Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeTakeModificado()

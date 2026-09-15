@@ -59,7 +59,9 @@ public partial class ItemEditPage : ContentPage
 
             _saveItem            = (Api_AppMobileApi_GetDataDownloadItemsResponse)DataForm.DataObject;
             _saveItem.Modificado = true;
-            var count            = await _repositoryItems.PosMeExistBarCode(_saveItem.BarCode, _saveItem.ItemId);
+            // Se excluye el propio producto usando su clave primaria local (ItemPk), ya que los
+            // productos creados localmente aun no sincronizados tienen ItemId == 0.
+            var count            = await _repositoryItems.PosMeExistBarCode(_saveItem.BarCode, _saveItem.ItemId, _saveItem.ItemPk);
             if (count >= 1)
             {
                 TxtMensaje.Text = $"{Mensajes.ExisteItem} {_saveItem.BarCode}";
