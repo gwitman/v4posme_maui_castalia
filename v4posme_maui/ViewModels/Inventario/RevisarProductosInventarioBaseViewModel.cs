@@ -180,15 +180,24 @@ public abstract class RevisarProductosInventarioBaseViewModel : BaseViewModel
     }
 
     // Ajusta CantidadEntradas / CantidadSalidas del producto y recalcula CantidadFinal.
+    // En una Entrada (Compra) tambien actualiza el precio publico y el costo del item con
+    // los valores capturados en la revision.
     private async Task AjustarCantidadProductoAsync(Api_AppMobileApi_GetDataDownloadItemsResponse item)
     {
         var producto = await RepositoryItems.PosMeFindByItemId(item.ItemId);
         if (producto is null) return;
 
         if (EsEntrada)
+        {
             producto.CantidadEntradas += item.Quantity;
+            // Actualizar precio publico y costo del item con lo ingresado en la compra.
+            producto.PrecioPublico = item.PrecioPublico;
+            producto.Cost          = item.Cost;
+        }
         else
+        {
             producto.CantidadSalidas += item.Quantity;
+        }
 
         producto.CantidadFinal = (producto.Quantity + producto.CantidadEntradas)
                                  - (producto.CantidadSalidas + producto.CantidadFacturadas);

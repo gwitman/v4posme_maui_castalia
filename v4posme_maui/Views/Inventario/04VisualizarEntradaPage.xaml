@@ -13,8 +13,6 @@
     <ContentPage.BindingContext>
         <inventario:VisualizarEntradaViewModel />
     </ContentPage.BindingContext>
-    <!-- Boton atras: solo visible/activo cuando se abre desde Impresiones (solo lectura),
-         para regresar al listado. En el flujo de creacion permanece deshabilitado. -->
     <Shell.BackButtonBehavior>
         <BackButtonBehavior IsVisible="{Binding AbiertoDesdeImpresiones}"
                             IsEnabled="{Binding AbiertoDesdeImpresiones}"
@@ -33,68 +31,103 @@
         <dxc:ShimmerView Style="{StaticResource ShimmerEffect}" IsLoading="{Binding IsBusy}">
             <dxc:ShimmerView.Content>
                 <Grid x:Name="ShareLayout" RowDefinitions="Auto,*,Auto" BackgroundColor="{StaticResource White}">
-                    <StackLayout Grid.Row="0" Spacing="4" Padding="16,16,16,8" BackgroundColor="{StaticResource White}">
+
+                    <!-- Encabezado compacto -->
+                    <StackLayout Grid.Row="0" Spacing="2" Padding="16,10,16,8" BackgroundColor="{StaticResource White}">
                         <dx:DXImage Source="{Binding LogoSource}"
-                                    HeightRequest="120" WidthRequest="120"
+                                    HeightRequest="200" WidthRequest="200"
+                                    Aspect="AspectFit"
                                     HorizontalOptions="Center" />
-                        <Label Text="{Binding CompanyName}" FontAttributes="Bold" FontSize="16"
-                               TextColor="{StaticResource Gray900}" HorizontalTextAlignment="Center" />
-                        <Label Text="COMPRA" FontAttributes="Bold" FontSize="18"
-                               TextColor="{StaticResource Primary}" HorizontalTextAlignment="Center" />
-                        <dx:DXBorder HeightRequest="3" WidthRequest="60" CornerRadius="2" BorderThickness="0"
-                                     Margin="0,4" HorizontalOptions="Center" BackgroundColor="{StaticResource Secondary}" />
-                        <Label Text="{Binding Codigo}" FontAttributes="Bold" FontSize="14"
-                               TextColor="{StaticResource Gray900}" HorizontalTextAlignment="Center" />
-                        <Label Text="{Binding FechaTexto}" FontSize="12"
-                               TextColor="{StaticResource Gray500}" HorizontalTextAlignment="Center" />
-                        <Label Text="{Binding Comentarios}" FontSize="13"
-                               TextColor="{StaticResource Gray600}" HorizontalTextAlignment="Center" />
+                        <Label Text="{Binding CompanyName}" FontAttributes="Bold" FontSize="15"
+                               TextColor="{StaticResource Gray900}" HorizontalTextAlignment="Center" Margin="0,2,0,0" />
+                        <dx:DXBorder HorizontalOptions="Center" Padding="12,2" CornerRadius="10" BorderThickness="0"
+                                     BackgroundColor="{StaticResource Primary}" Margin="0,2">
+                            <Label Text="COMPRA" FontAttributes="Bold" FontSize="12" TextColor="White" />
+                        </dx:DXBorder>
+                        <Label Text="{Binding Codigo}" FontAttributes="Bold" FontSize="13"
+                               TextColor="{StaticResource PrimaryDark}" HorizontalTextAlignment="Center" />
+                        <Label Text="{Binding FechaTexto}" FontSize="11"
+                               TextColor="{StaticResource Gray400}" HorizontalTextAlignment="Center" />
                     </StackLayout>
 
-                    <dxcv:DXCollectionView Grid.Row="1" ItemSeparatorThickness="0" ItemsSource="{Binding Items}">
-                        <dxcv:DXCollectionView.ItemTemplate>
+                    <!-- Cuerpo -->
+                    <dxcv:DXCollectionView Grid.Row="1" ItemSeparatorThickness="0.5"
+                                           ItemSeparatorColor="{StaticResource SeparatorColor}"
+                                           ItemsSource="{Binding Items}">
+                        <dxcv:DXCollectionView.HeaderTemplate>
                             <DataTemplate>
-                                <dx:DXBorder Margin="12,6" Padding="14" CornerRadius="12"
-                                             BorderThickness="0" BackgroundColor="{StaticResource White}">
-                                    <Grid ColumnSpacing="10">
+                                <StackLayout Spacing="0">
+                                    <dx:DXBorder Margin="12,8,12,4" Padding="10,6" CornerRadius="8" BorderThickness="0"
+                                                 BackgroundColor="{StaticResource PageBackground}">
+                                        <Label Text="{Binding Comentarios}" FontSize="12"
+                                               TextColor="{StaticResource Gray600}" />
+                                    </dx:DXBorder>
+                                    <Grid Padding="14,4,14,4" ColumnSpacing="8">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="44" />
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
-                                        <dx:DXBorder Grid.Column="0" WidthRequest="40" HeightRequest="40" CornerRadius="10"
-                                                     BackgroundColor="{StaticResource PageBackground}" BorderThickness="0" VerticalOptions="Center">
-                                            <Label Text="{Binding Quantity, StringFormat='{0:0.##}'}" FontAttributes="Bold"
-                                                   TextColor="{StaticResource Primary}" HorizontalOptions="Center" VerticalOptions="Center" />
-                                        </dx:DXBorder>
-                                        <Label Grid.Column="1" Text="{Binding Name, Converter={StaticResource ToLowerConverter}}"
-                                               FontSize="14" VerticalOptions="Center" />
-                                        <Label Grid.Column="2" VerticalOptions="Center" FontAttributes="Bold" TextColor="{StaticResource Primary}"
-                                               Text="{Binding Importe, StringFormat='C$ {0:N2}'}" />
+                                        <Label Grid.Column="0" Text="CANT" FontSize="10" FontAttributes="Bold" TextColor="{StaticResource Gray400}" />
+                                        <Label Grid.Column="1" Text="PRODUCTO" FontSize="10" FontAttributes="Bold" TextColor="{StaticResource Gray400}" />
+                                        <Label Grid.Column="2" Text="IMPORTE" FontSize="10" FontAttributes="Bold" TextColor="{StaticResource Gray400}" />
                                     </Grid>
-                                </dx:DXBorder>
+                                </StackLayout>
+                            </DataTemplate>
+                        </dxcv:DXCollectionView.HeaderTemplate>
+                        <dxcv:DXCollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="14,8" ColumnSpacing="8" BackgroundColor="{StaticResource White}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="44" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <dx:DXBorder Grid.Column="0" WidthRequest="34" HeightRequest="26" CornerRadius="6"
+                                                 BackgroundColor="{StaticResource PageBackground}" BorderThickness="0"
+                                                 HorizontalOptions="Start" VerticalOptions="Center">
+                                        <Label Text="{Binding Quantity, StringFormat='{0:0.##}'}" FontAttributes="Bold" FontSize="12"
+                                               TextColor="{StaticResource Primary}" HorizontalOptions="Center" VerticalOptions="Center" />
+                                    </dx:DXBorder>
+                                    <StackLayout Grid.Column="1" Spacing="0" VerticalOptions="Center">
+                                        <Label Text="{Binding Name, Converter={StaticResource ToLowerConverter}}"
+                                               FontSize="13" TextColor="{StaticResource Gray900}"
+                                               LineBreakMode="TailTruncation" MaxLines="1" />
+                                        <Label Text="{Binding PrecioPublico, StringFormat='C$ {0:N2} c/u'}"
+                                               FontSize="11" TextColor="{StaticResource Gray400}" />
+                                    </StackLayout>
+                                    <Label Grid.Column="2" VerticalOptions="Center" FontAttributes="Bold" FontSize="13"
+                                           TextColor="{StaticResource PrimaryDark}"
+                                           Text="{Binding Importe, StringFormat='C$ {0:N2}'}" />
+                                </Grid>
                             </DataTemplate>
                         </dxcv:DXCollectionView.ItemTemplate>
                     </dxcv:DXCollectionView>
 
+                    <!-- Pie de pagina compacto -->
                     <dx:DXBorder Grid.Row="2" BackgroundColor="{StaticResource White}"
-                                 CornerRadius="20,20,0,0" BorderThickness="0" Padding="16,14">
-                        <StackLayout Spacing="6">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <Label Grid.Column="0" Text="TOTAL" FontSize="15" FontAttributes="Bold"
-                                       TextColor="{StaticResource PrimaryDark}" VerticalOptions="Center" />
-                                <Label Grid.Column="1" FontSize="18" FontAttributes="Bold"
-                                       TextColor="{StaticResource PrimaryDark}" VerticalOptions="Center"
-                                       Text="{Binding Total, StringFormat='C$ {0}'}" />
-                            </Grid>
-                            <!-- Direccion y telefono de la empresa (pie de pagina). -->
-                            <Label Text="{Binding CompanyAddress}" FontSize="12"
-                                   TextColor="{StaticResource Gray500}" HorizontalTextAlignment="Center" />
-                            <Label Text="{Binding CompanyTelefono}" FontSize="12"
+                                 CornerRadius="18,18,0,0" BorderThickness="0" Padding="16,10">
+                        <dx:DXBorder.Shadow>
+                            <Shadow Brush="{StaticResource Gray400}" Offset="0,-2" Radius="8" Opacity="0.15" />
+                        </dx:DXBorder.Shadow>
+                        <StackLayout Spacing="4">
+                            <dx:DXBorder Padding="12,8" CornerRadius="10" BorderThickness="0"
+                                         BackgroundColor="{StaticResource Primary}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Label Grid.Column="0" Text="TOTAL" FontSize="14" FontAttributes="Bold"
+                                           TextColor="White" VerticalOptions="Center" />
+                                    <Label Grid.Column="1" FontSize="17" FontAttributes="Bold"
+                                           TextColor="White" VerticalOptions="Center"
+                                           Text="{Binding Total, StringFormat='C$ {0}'}" />
+                                </Grid>
+                            </dx:DXBorder>
+                            <Label Text="{Binding CompanyAddress}" FontSize="11"
+                                   TextColor="{StaticResource Gray500}" HorizontalTextAlignment="Center" Margin="0,2,0,0" />
+                            <Label Text="{Binding CompanyTelefono}" FontSize="11"
                                    TextColor="{StaticResource Gray500}" HorizontalTextAlignment="Center" />
                         </StackLayout>
                     </dx:DXBorder>
