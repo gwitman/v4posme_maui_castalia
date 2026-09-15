@@ -215,7 +215,7 @@
                             FontSize="30"
                             CornerRadius="30"
                             FontAttributes="Bold"
-                            BackgroundColor="{StaticResource Primary}"
+                            BackgroundColor="OrangeRed"
                             TextColor="White"
                             Command="{Binding Source={x:Reference ClientesCollectionView}, Path=Commands.ShowDetailNewItemForm}"
                             HorizontalOptions="End"
@@ -223,7 +223,7 @@
                             Margin="20"
                             ZIndex="1">
                         <Button.Shadow>
-                            <Shadow Brush="{StaticResource Primary}" Opacity="0.5" Radius="16" Offset="0,4" />
+                            <Shadow Brush="OrangeRed" Opacity="0.5" Radius="16" Offset="0,4" />
                         </Button.Shadow>
                     </Button>
                 </Grid>
