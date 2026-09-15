@@ -136,7 +136,6 @@ public partial class CustomerEditPage : ContentPage
             {
                 var nuevoCodigo         = await HelperConsecutivo.PosMeSiguienteCodigoCustomer();
                 TxtBarCode.Text         = nuevoCodigo;
-                TextCustomerNumber.Text = nuevoCodigo;
 
                 if (DataForm.DataObject is Api_AppMobileApi_GetDataDownloadCustomerResponse nuevoCliente)
                 {
