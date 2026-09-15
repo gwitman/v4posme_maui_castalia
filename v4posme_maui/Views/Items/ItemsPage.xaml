@@ -12,11 +12,15 @@
              xmlns:dxc="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
              xmlns:controls="clr-namespace:DevExpress.Maui.Controls;assembly=DevExpress.Maui.Controls"
              xmlns:items="clr-namespace:v4posme_maui.Views.Items"
+             xmlns:converters="clr-namespace:v4posme_maui.Services.Converters"
              ios:Page.UseSafeArea="true"
              x:Class="v4posme_maui.Views.Items.ItemsPage">
     <ContentPage.BindingContext>
         <local:PosMeItemsViewModel />
     </ContentPage.BindingContext>
+    <ContentPage.Resources>
+        <converters:ToLowerConverter x:Key="ToLowerConverter" />
+    </ContentPage.Resources>
     <ContentPage.ToolbarItems>
         <ToolbarItem IconImageSource="barcode_scan" Command="{Binding OnBarCode}" />
     </ContentPage.ToolbarItems>
@@ -100,7 +104,7 @@
                                                        FontSize="15"
                                                        TextColor="White"
                                                        LineBreakMode="TailTruncation"
-                                                       Text="{Binding Name}" />
+                                                       Text="{Binding Name, Converter={StaticResource ToLowerConverter}}" />
 
                                                 <!-- Código de barra -->
                                                 <Label Grid.Column="1" Grid.Row="1"
