@@ -13,7 +13,5 @@ public class VisualizarEntradaViewModel : VisualizarInventarioBaseViewModel
     protected override TypeTransaction TipoTransaccion => TypeTransaction.TransactionInventarioEntrada;
     protected override bool EsEntrada => true;
 
-    protected override string GenerarCodigo() => Helper.GetCodigoEntrada();
-
     protected override string RutaNuevo => "InventEntrada";
 }

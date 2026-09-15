@@ -13,16 +13,17 @@
     <ContentPage.BindingContext>
         <inventario:VisualizarSalidaViewModel />
     </ContentPage.BindingContext>
-    <!-- Boton de menu (drawer) en la parte superior izquierda para abrir el menu principal. -->
+    <!-- Boton atras: solo visible/activo cuando se abre desde Impresiones (solo lectura),
+         para regresar al listado. En el flujo de creacion permanece deshabilitado. -->
     <Shell.BackButtonBehavior>
-        <BackButtonBehavior IconOverride="drawer_button"
-                            Command="{Binding AbrirMenuPrincipalCommand}" />
+        <BackButtonBehavior IsVisible="{Binding AbiertoDesdeImpresiones}"
+                            IsEnabled="{Binding AbiertoDesdeImpresiones}"
+                            Command="{Binding RegresarCommand}" />
     </Shell.BackButtonBehavior>
-    <!-- Menu desplegable (overflow ⋮) en la parte superior derecha. -->
     <ContentPage.ToolbarItems>
+        <ToolbarItem IconImageSource="shared" Clicked="Compartir_OnClicked" />
         <ToolbarItem Text="Nueva salida" Order="Secondary" Command="{Binding NuevaCommand}" />
         <ToolbarItem Text="Imprimir" Order="Secondary" Command="{Binding ImprimirCommand}" />
-        <ToolbarItem Text="Compartir" Order="Secondary" Command="{Binding CompartirCommand}" />
         <ToolbarItem Text="Eliminar" Order="Secondary" Command="{Binding EliminarCommand}" />
     </ContentPage.ToolbarItems>
     <ContentPage.Resources>
@@ -35,6 +36,10 @@
                     <dx:DXBorder Grid.Row="0" BackgroundColor="{StaticResource Primary}"
                                  CornerRadius="0,0,20,20" BorderThickness="0" Padding="16,16">
                         <StackLayout Spacing="4">
+                            <dx:DXImage Source="{Binding LogoSource}"
+                                        HeightRequest="90" WidthRequest="90"
+                                        HorizontalOptions="Center" />
+                            <Label Text="{Binding CompanyName}" FontAttributes="Bold" FontSize="15" TextColor="White" HorizontalOptions="Center" />
                             <Label Text="SALIDA" FontAttributes="Bold" FontSize="18" TextColor="White" HorizontalOptions="Center" />
                             <Label Text="{Binding Codigo}" FontSize="15" TextColor="White" HorizontalOptions="Center" />
                             <Label Text="{Binding FechaTexto}" FontSize="12" TextColor="#DCEFF7" HorizontalOptions="Center" />
@@ -70,17 +75,24 @@
 
                     <dx:DXBorder Grid.Row="2" BackgroundColor="{StaticResource White}"
                                  CornerRadius="20,20,0,0" BorderThickness="0" Padding="16,14">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <Label Grid.Column="0" Text="TOTAL" FontSize="15" FontAttributes="Bold"
-                                   TextColor="{StaticResource PrimaryDark}" VerticalOptions="Center" />
-                            <Label Grid.Column="1" FontSize="18" FontAttributes="Bold"
-                                   TextColor="{StaticResource PrimaryDark}" VerticalOptions="Center"
-                                   Text="{Binding Total, StringFormat='C$ {0}'}" />
-                        </Grid>
+                        <StackLayout Spacing="6">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Label Grid.Column="0" Text="TOTAL" FontSize="15" FontAttributes="Bold"
+                                       TextColor="{StaticResource PrimaryDark}" VerticalOptions="Center" />
+                                <Label Grid.Column="1" FontSize="18" FontAttributes="Bold"
+                                       TextColor="{StaticResource PrimaryDark}" VerticalOptions="Center"
+                                       Text="{Binding Total, StringFormat='C$ {0}'}" />
+                            </Grid>
+                            <!-- Direccion y telefono de la empresa (pie de pagina). -->
+                            <Label Text="{Binding CompanyAddress}" FontSize="12"
+                                   TextColor="{StaticResource Gray500}" HorizontalTextAlignment="Center" />
+                            <Label Text="{Binding CompanyTelefono}" FontSize="12"
+                                   TextColor="{StaticResource Gray500}" HorizontalTextAlignment="Center" />
+                        </StackLayout>
                     </dx:DXBorder>
                 </Grid>
             </dxc:ShimmerView.Content>

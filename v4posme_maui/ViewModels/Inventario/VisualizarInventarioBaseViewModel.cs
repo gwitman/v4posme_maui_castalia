@@ -25,7 +25,7 @@ public abstract class VisualizarInventarioBaseViewModel : BaseViewModel
     protected readonly IRepositoryTbTransactionMaster RepositoryMaster;
     protected readonly IRepositoryTbTransactionMasterDetail RepositoryMasterDetail;
     protected readonly IRepositoryTbParameterSystem ParameterSystem;
-    private bool _guardado;
+    protected readonly IRepositoryParameters RepositoryParameters;
 
     protected VisualizarInventarioBaseViewModel()
     {
@@ -34,6 +34,7 @@ public abstract class VisualizarInventarioBaseViewModel : BaseViewModel
         RepositoryMaster       = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMaster>();
         RepositoryMasterDetail = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMasterDetail>();
         ParameterSystem        = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbParameterSystem>();
+        RepositoryParameters   = VariablesGlobales.UnityContainer.Resolve<IRepositoryParameters>();
 
         NuevaCommand              = new Command(OnNueva);
         ImprimirCommand           = new Command(OnImprimir);
@@ -71,9 +72,6 @@ public abstract class VisualizarInventarioBaseViewModel : BaseViewModel
     // true si es Entrada (aumenta CantidadEntradas); false si es Salida (aumenta CantidadSalidas).
     protected abstract bool EsEntrada { get; }
 
-    // Genera el codigo correspondiente al flujo.
-    protected abstract string GenerarCodigo();
-
     // Ruta (flyout) del primer paso del flujo para iniciar una nueva transaccion.
     protected abstract string RutaNuevo { get; }
 
@@ -99,117 +97,57 @@ public abstract class VisualizarInventarioBaseViewModel : BaseViewModel
         set => SetProperty(ref _transactionMaster, value);
     }
 
+    // Logo de la empresa (icono de "mi mercadito") mostrado en la parte superior.
+    private ImageSource? _logoSource;
+    public ImageSource? LogoSource
+    {
+        get => _logoSource;
+        set => SetProperty(ref _logoSource, value);
+    }
+
+    // Datos de la empresa para mostrar nombre y direccion (abajo).
+    public string CompanyName => VariablesGlobales.TbCompany?.Name ?? string.Empty;
+    public string CompanyAddress => VariablesGlobales.TbCompany?.Address ?? string.Empty;
+
+    private string _companyTelefono = string.Empty;
+    public string CompanyTelefono
+    {
+        get => _companyTelefono;
+        set => SetProperty(ref _companyTelefono, value);
+    }
+
     public async void OnAppearing(INavigation navigation)
     {
         Navigation = navigation;
 
-        // Se guarda una sola vez (al llegar desde la confirmacion). Si el usuario navega
-        // hacia atras y adelante no se vuelve a insertar.
-        if (!_guardado && VariablesGlobales.DtoInventario.TransactionMasterId <= 0)
-        {
-            await GuardarAsync();
-        }
-        else
-        {
-            TransactionMaster = VariablesGlobales.DtoInventario.TransactionMaster;
-        }
+        // Esta pantalla es SOLO de visualizacion. La transaccion ya fue insertada en el
+        // paso de confirmacion (RevisarProductosInventarioBaseViewModel.OnConfirmar) o se
+        // esta cargando un registro existente desde Impresiones. Aqui no se inserta nada.
+        TransactionMaster = VariablesGlobales.DtoInventario.TransactionMaster;
 
-        IsBusy = false;
-    }
-
-    private async Task GuardarAsync()
-    {
+        // Cargar logo de la empresa (icono) y telefono para el pie de pagina, igual que
+        // la visualizacion de factura.
         try
         {
-            IsBusy = true;
-
-            var codigo    = GenerarCodigo();
-            var dto       = VariablesGlobales.DtoInventario;
-            dto.Codigo    = codigo;
-            dto.TransactionOn = DateTime.Now;
-
-            var master = new TbTransactionMaster
+            var logo = await ParameterSystem.PosMeFindLogo();
+            if (!string.IsNullOrWhiteSpace(logo.Value))
             {
-                TransactionId     = TipoTransaccion,
-                TransactionNumber = codigo,
-                TransactionOn     = DateTime.Now,
-                EntitySecondaryId = VariablesGlobales.User!.UserId.ToString(),
-                Comment           = dto.Comentarios,
-                Reference1        = dto.Referencia1,
-                Reference2        = dto.Referencia2,
-                CurrencyId        = TypeCurrency.Cordoba,
-                SubAmount         = dto.Items.Sum(p => p.PrecioPublico * p.Quantity),
-                Amount            = dto.Items.Sum(p => p.PrecioPublico * p.Quantity),
-                Discount          = decimal.Zero,
-                Taxi1             = decimal.Zero,
-                ExchangeRate      = decimal.Zero,
-                StatusID          = (int)TypeStatusBilling.Register,
-                RegisterLocal     = 1
-            };
-
-            await RepositoryMaster.PosMeInsert(master);
-            var masterId = master.TransactionMasterId;
-
-            var detalles = new List<TbTransactionMasterDetail>();
-            foreach (var item in dto.Items)
-            {
-                detalles.Add(new TbTransactionMasterDetail
-                {
-                    TransactionMasterId = masterId,
-                    Componentid         = (int)TypeComponent.Itme,
-                    ComponentItemId     = item.ItemId,
-                    Quantity            = item.Quantity,
-                    UnitaryCost         = item.Cost,
-                    UnitaryPrice        = item.PrecioPublico,
-                    SubAmount           = item.PrecioPublico * item.Quantity,
-                    Amount              = item.PrecioPublico * item.Quantity,
-                    Discount            = decimal.Zero,
-                    Tax1                = decimal.Zero,
-                    ItemBarCode         = item.BarCode,
-                    RegisterLocal       = 1
-                });
-
-                // Ajustar la existencia del producto.
-                await AjustarCantidadProductoAsync(item, sumar: true);
+                var logoBytes = Convert.FromBase64String(logo.Value!);
+                LogoSource    = ImageSource.FromStream(() => new MemoryStream(logoBytes));
             }
 
-            await RepositoryMasterDetail.PosMeInsertAll(detalles);
-            await Helper.PlusCounter();
+            var telefono    = await RepositoryParameters.PosMeFindByKey("CORE_PHONE");
+            CompanyTelefono = telefono?.Value ?? string.Empty;
 
-            dto.TransactionMasterId = masterId;
-            dto.TransactionMaster   = master;
-            TransactionMaster       = master;
-            _guardado               = true;
-
-            OnPropertyChanged(nameof(Codigo));
-            ShowMensajePopUp(EsEntrada ? "Compra registrada correctamente" : "Salida registrada correctamente", Colors.Green);
+            OnPropertyChanged(nameof(CompanyName));
+            OnPropertyChanged(nameof(CompanyAddress));
         }
         catch (Exception e)
         {
-            ShowMensajePopUp(e.Message);
+            Debug.WriteLine(e);
         }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
 
-    // Ajusta CantidadEntradas / CantidadSalidas del producto y recalcula CantidadFinal.
-    // sumar=true suma la cantidad del item; sumar=false la resta (al eliminar).
-    private async Task AjustarCantidadProductoAsync(Api_AppMobileApi_GetDataDownloadItemsResponse item, bool sumar)
-    {
-        var producto = await RepositoryItems.PosMeFindByItemId(item.ItemId);
-        if (producto is null) return;
-
-        var delta = sumar ? item.Quantity : -item.Quantity;
-        if (EsEntrada)
-            producto.CantidadEntradas += delta;
-        else
-            producto.CantidadSalidas += delta;
-
-        producto.CantidadFinal = (producto.Quantity + producto.CantidadEntradas)
-                                 - (producto.CantidadSalidas + producto.CantidadFacturadas);
-        await RepositoryItems.PosMeUpdate(producto);
+        IsBusy = false;
     }
 
     private async void OnNueva()

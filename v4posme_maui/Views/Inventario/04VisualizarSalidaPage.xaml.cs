@@ -19,6 +19,11 @@ public partial class VisualizarSalidaPage : ContentPage
             vm.CompartirSolicitado += OnCompartirSolicitado;
     }
 
+    private async void Compartir_OnClicked(object? sender, EventArgs e)
+    {
+        await CompartirImagenAsync();
+    }
+
     protected override void OnAppearing()
     {
         base.OnAppearing();
@@ -26,7 +31,26 @@ public partial class VisualizarSalidaPage : ContentPage
             vm.OnAppearing(Navigation);
     }
 
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+
+        // Si esta pantalla se abrio desde Impresiones (solo lectura) y el usuario sale de
+        // ella (por ejemplo usando el menu lateral), se elimina de la pila de navegacion
+        // para que al regresar a Impresiones se muestren los tabs y no esta visualizacion.
+        if (VariablesGlobales.DtoInventario.AbiertoDesdeImpresiones
+            && Navigation.NavigationStack.Contains(this))
+        {
+            Navigation.RemovePage(this);
+        }
+    }
+
     private async void OnCompartirSolicitado(object? sender, EventArgs e)
+    {
+        await CompartirImagenAsync();
+    }
+
+    private async Task CompartirImagenAsync()
     {
         try
         {

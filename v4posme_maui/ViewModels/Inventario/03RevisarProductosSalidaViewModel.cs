@@ -13,6 +13,11 @@ public class RevisarProductosSalidaViewModel : RevisarProductosInventarioBaseVie
     public override bool PermiteEditarPrecio => false;
     public override bool PermiteEditarCosto => false;
 
+    protected override Services.SystemNames.TypeTransaction TipoTransaccion
+        => Services.SystemNames.TypeTransaction.TransactionInventarioSalida;
+    protected override bool EsEntrada => false;
+    protected override string GenerarCodigo() => Helper.GetCodigoSalida();
+
     protected override Task NavegarAVisualizacionAsync()
     {
         return NavigationService.NavigateToAsync<VisualizarSalidaViewModel>();
