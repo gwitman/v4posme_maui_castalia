@@ -28,6 +28,35 @@
         <Setter Property="IconColor" Value="{StaticResource Primary}" />
         <Setter Property="FocusedBorderColor" Value="{StaticResource Primary}" />
     </Style>
+
+    <!-- ===== Barra de búsqueda unificada (tarjeta contenedora) ===== -->
+    <Style TargetType="dx:DXBorder" x:Key="SearchBarContainer">
+        <Setter Property="Margin" Value="12,14,12,8" />
+        <Setter Property="Padding" Value="4,0" />
+        <Setter Property="CornerRadius" Value="18" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="BackgroundColor"
+                Value="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}" />
+        <Setter Property="Shadow">
+            <Setter.Value>
+                <Shadow Brush="{StaticResource Primary}" Opacity="0.20" Radius="16" Offset="0,5" />
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ===== Barra de búsqueda unificada (campo de texto) ===== -->
+    <Style TargetType="dxe:TextEdit" x:Key="SearchBarEdit">
+        <Setter Property="Margin" Value="6,4" />
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="BoxMode" Value="Outlined" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="FocusedBorderColor" Value="Transparent" />
+        <Setter Property="StartIcon" Value="search" />
+        <Setter Property="StartIconColor" Value="{StaticResource Primary}" />
+        <Setter Property="TextColor" Value="{StaticResource Black}" />
+        <Setter Property="PlaceholderColor" Value="{StaticResource Gray400}" />
+        <Setter Property="TextFontSize" Value="15" />
+    </Style>
     <Style TargetType="dx:DXToggleButton" x:Key="SinFondoColorSinRedondeado">
         <Setter Property="TextColor" Value="{StaticResource Primary}" />
         <Setter Property="IconColor" Value="{StaticResource Primary}" />

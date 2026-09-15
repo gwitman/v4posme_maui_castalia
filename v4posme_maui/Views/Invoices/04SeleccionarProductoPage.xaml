@@ -14,12 +14,13 @@
     <ContentPage.BindingContext>
         <invoices:SeleccionarProductoViewModel />
     </ContentPage.BindingContext>
-    <!-- Se oculta y desactiva la flecha de retroceso de la barra de navegacion. La 4/6 es
-         la pantalla base del flujo de facturacion rapida; solo se sale por el menu
-         desplegable o al completar la factura. -->
+    <!-- La 4/6 es la pantalla base del flujo de facturacion rapida: no se debe regresar a
+         la lista de clientes (1/6). En lugar de ocultar el icono superior izquierdo, se
+         reemplaza el boton atras por un boton de menu (drawer) que abre el menu principal
+         (flyout) del Shell. Asi el usuario siempre tiene acceso visible al menu principal. -->
     <Shell.BackButtonBehavior>
-        <BackButtonBehavior IsEnabled="False"
-                            IsVisible="False" />
+        <BackButtonBehavior IconOverride="drawer_button"
+                            Command="{Binding AbrirMenuPrincipalCommand}" />
     </Shell.BackButtonBehavior>
     <!-- Menu desplegable (overflow ⋮) para modificar los datos de las pantallas anteriores -->
     <ContentPage.ToolbarItems>

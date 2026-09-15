@@ -12,8 +12,11 @@
              x:Class="v4posme_maui.Views.More.ReporteVenta.ReporteVentaPage"
              Style="{StaticResource DetailPageStyle}">
 
+    <!-- Boton atras visible en la barra superior. Ejecuta la misma logica que el boton
+         atras del dispositivo (retroceder dentro del reporte o salir de la pantalla). -->
     <Shell.BackButtonBehavior>
-        <BackButtonBehavior IsEnabled="False" IsVisible="False" />
+        <BackButtonBehavior IconOverride="ic_arrow_back"
+                            Command="{Binding BackNavigationCommand}" />
     </Shell.BackButtonBehavior>
     <Shell.PresentationMode>Animated</Shell.PresentationMode>
 

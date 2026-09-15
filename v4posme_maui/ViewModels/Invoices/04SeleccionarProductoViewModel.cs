@@ -32,6 +32,20 @@ public class SeleccionarProductoViewModel : BaseViewModel
         IrSeleccionClienteCommand     = new Command(OnIrSeleccionCliente);
         IrDatosFacturaCommand         = new Command(OnIrDatosFactura);
         IrDatosCreditoCommand         = new Command(OnIrDatosCredito);
+        AbrirMenuPrincipalCommand     = new Command(OnAbrirMenuPrincipal);
+    }
+
+    // El icono superior izquierdo (drawer) abre el menu principal (flyout) del Shell.
+    // Reemplaza el boton atras para que el usuario siempre tenga acceso visible al menu
+    // sin poder regresar a la pantalla anterior del flujo de facturacion.
+    public Command AbrirMenuPrincipalCommand { get; }
+
+    private void OnAbrirMenuPrincipal()
+    {
+        if (Shell.Current is not null)
+        {
+            Shell.Current.FlyoutIsPresented = true;
+        }
     }
 
     // Navegacion desde el menu desplegable (toolbar) de la pantalla 4/6 para modificar

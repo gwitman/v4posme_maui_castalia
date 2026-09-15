@@ -30,16 +30,17 @@
             IsLoading="{Binding IsBusy}">
             <controls:ShimmerView.Content>
                 <Grid
-                    RowDefinitions="Auto,*"
-                    HorizontalOptions="Center">
-                    <dxe:TextEdit x:Name="SearchBar"
-                                  Margin="5"
-                                  StartIcon="search"
-                                  Text="{Binding Search}"
-                                  StartIconCommand="{Binding SearchCommand}"
-                                  ReturnCommand="{Binding SearchCommand}"
-                                  TextChangedCommand="{Binding ChangeValueCommand}"
-                                  PlaceholderText="Buscar por código, código de barra y descripción" />
+                    RowDefinitions="Auto,*">
+                    <dxc:DXBorder Grid.Row="0"
+                                  Style="{StaticResource SearchBarContainer}">
+                        <dxe:TextEdit x:Name="SearchBar"
+                                      Style="{StaticResource SearchBarEdit}"
+                                      Text="{Binding Search}"
+                                      StartIconCommand="{Binding SearchCommand}"
+                                      ReturnCommand="{Binding SearchCommand}"
+                                      TextChangedCommand="{Binding ChangeValueCommand}"
+                                      PlaceholderText="Buscar por código, código de barra y descripción" />
+                    </dxc:DXBorder>
 
 
                     <ScrollView Grid.Row="1">

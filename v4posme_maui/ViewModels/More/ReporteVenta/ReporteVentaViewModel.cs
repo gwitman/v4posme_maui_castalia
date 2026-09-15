@@ -24,6 +24,10 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 
 		public ICommand HideFormCommand { get; }
 
+		// Comando del boton atras de la barra superior. Lo asigna el code-behind de la
+		// pagina para reutilizar su logica de navegacion.
+		public ICommand? BackNavigationCommand { get; set; }
+
 		private TbCompany? _company;
 
 		public TbCompany? Company

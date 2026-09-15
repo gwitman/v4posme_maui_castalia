@@ -15,19 +15,17 @@ public partial class ReporteVentaPage : ContentPage
 	{
 		InitializeComponent();
 		viewModel = (ReporteVentaViewModel)BindingContext;
+		// El boton atras de la barra superior reutiliza la misma logica que el boton
+		// atras del dispositivo.
+		viewModel.BackNavigationCommand = new Command(NavigateBack);
 	}
 
-	protected override async void OnAppearing()
-	{
-		base.OnAppearing();
-		await viewModel.OnAppearing(Navigation);		
-	}
-
-	protected override bool OnBackButtonPressed()
+	// Logica compartida entre el boton atras del dispositivo y el de la barra superior.
+	private void NavigateBack()
 	{
 		var stack = Shell.Current.Navigation.NavigationStack.ToArray();
 
-		if(viewModel.IsFormVisible && !viewModel.IsVisibleDate)
+		if (viewModel.IsFormVisible && !viewModel.IsVisibleDate)
 		{
 			viewModel.BackForm();
 		}
@@ -38,7 +36,17 @@ public partial class ReporteVentaPage : ContentPage
 				Shell.Current.Navigation.RemovePage(stack[i]);
 			}
 		}
+	}
 
+	protected override async void OnAppearing()
+	{
+		base.OnAppearing();
+		await viewModel.OnAppearing(Navigation);		
+	}
+
+	protected override bool OnBackButtonPressed()
+	{
+		NavigateBack();
 		return true;
 	}
 
