@@ -94,14 +94,14 @@
                 </core:DXBorder.Shadow>
                 <dx:DataGridView ItemsSource="{Binding Items}" x:Name="ItemsGridView">
                     <dx:DataGridView.Columns>
-                        <dx:TemplateColumn FieldName="Quantity" Caption="Cantidad" Width="100">
+                        <dx:TemplateColumn FieldName="CantidadFacturadas" Caption="Cantidad" Width="100">
                             <dx:TemplateColumn.DisplayTemplate>
                                 <DataTemplate>
                                     <Grid VerticalOptions="Center">
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="*" />
                                         </Grid.RowDefinitions>
-                                        <Label Text="{Binding Item.Quantity, StringFormat = '{0:N2}'}" HorizontalTextAlignment="End" />
+                                        <Label Text="{Binding Item.CantidadFacturadas, StringFormat = '{0:N2}'}" HorizontalTextAlignment="End" />
                                     </Grid>
                                 </DataTemplate>
                             </dx:TemplateColumn.DisplayTemplate>

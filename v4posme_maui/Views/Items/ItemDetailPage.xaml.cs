@@ -19,10 +19,12 @@ namespace v4posme_maui.Views.Items
         private bool _isDeleting;        
         private readonly IRepositoryTbTransactionMasterDetail _transactionMasterDetail;
 
-        // Ultimo producto que mostro esta pantalla de detalle. Sirve para detectar, al
-        // reaparecer (por ejemplo al volver desde la edicion), si en la otra pantalla se
-        // navego con Anterior/Siguiente a un producto distinto.
-        private int _ultimoItemIdMostrado = -1;
+        // Ultimo producto que mostro esta pantalla de detalle (por su clave primaria local
+        // ItemPk, unica). Sirve para detectar, al reaparecer (por ejemplo al volver desde la
+        // edicion), si en la otra pantalla se navego con Anterior/Siguiente a otro producto.
+        // Se usa ItemPk y no ItemId porque los productos locales sin sincronizar tienen
+        // ItemId == 0 y colisionarian entre si.
+        private int _ultimoItemPkMostrado = -1;
 
         private Api_AppMobileApi_GetDataDownloadItemsResponse SelectedItem { get; set; }
 
@@ -41,37 +43,39 @@ namespace v4posme_maui.Views.Items
             var item                        = (Api_AppMobileApi_GetDataDownloadItemsResponse)ViewModel.Item;
 
             // Punto de partida: el producto que entrega DevExpress (el tocado en la lista).
-            var itemIdAbrir = item.ItemId;
+            // Se identifica por ItemPk (clave primaria local, unica) para no confundir
+            // productos locales sin sincronizar cuyo ItemId es 0.
+            var itemPkAbrir = item.ItemPk;
             var lista       = VariablesGlobales.ItemsNavegacion;
 
             if (lista is { Count: > 0 })
             {
                 var indice = VariablesGlobales.ItemsNavegacionIndex;
-                var itemIdEnIndice = (indice >= 0 && indice < lista.Count) ? lista[indice].ItemId : -1;
+                var itemPkEnIndice = (indice >= 0 && indice < lista.Count) ? lista[indice].ItemPk : -1;
 
                 // Determinar de forma fiable el producto a mostrar:
                 // - Si el item de DevExpress cambio respecto a lo mostrado antes, se abrio un
                 //   producto nuevo desde la lista: ese manda y sincronizamos el indice.
                 // - Si no cambio pero el indice apunta a otro producto (navegacion en edicion),
                 //   ese indice manda.
-                if (item.ItemId != _ultimoItemIdMostrado)
+                if (item.ItemPk != _ultimoItemPkMostrado)
                 {
-                    itemIdAbrir = item.ItemId;
-                    var indiceActual = lista.FindIndex(p => p.ItemId == item.ItemId);
+                    itemPkAbrir = item.ItemPk;
+                    var indiceActual = lista.FindIndex(p => p.ItemPk == item.ItemPk);
                     if (indiceActual >= 0)
                         VariablesGlobales.ItemsNavegacionIndex = indiceActual;
                 }
-                else if (itemIdEnIndice != -1)
+                else if (itemPkEnIndice != -1)
                 {
-                    itemIdAbrir = itemIdEnIndice;
+                    itemPkAbrir = itemPkEnIndice;
                 }
             }
 
-            var findItem                    = await _repositoryItems.PosMeFindByItemId(itemIdAbrir);
+            var findItem                    = await _repositoryItems.PosMeFindByItemPk(itemPkAbrir);
             SelectedItem                    = findItem;
-            _ultimoItemIdMostrado           = itemIdAbrir;
+            _ultimoItemPkMostrado           = itemPkAbrir;
 
-            var objListTransactionDetail = await _transactionMasterDetail.PosMeByTransactionIDAndItemID((int)TypeTransaction.TransactionInvoiceBilling, itemIdAbrir);
+            var objListTransactionDetail = await _transactionMasterDetail.PosMeByTransactionIDAndItemID((int)TypeTransaction.TransactionInvoiceBilling, SelectedItem.ItemId);
             if (objListTransactionDetail is null)
                 SelectedItem.CantidadFacturadas = 0;
             else
@@ -82,7 +86,7 @@ namespace v4posme_maui.Views.Items
 
             // La imagen se carga en segundo plano para no bloquear la pantalla mientras
             // se espera la respuesta del servidor. Si falla, se conserva la imagen por defecto.
-            CargarImagenProducto(itemIdAbrir);
+            CargarImagenProducto(SelectedItem.ItemId);
         }
 
         private async void CargarImagenProducto(int itemId)
@@ -94,7 +98,7 @@ namespace v4posme_maui.Views.Items
 
                 // Si el producto mostrado cambio mientras se descargaba, se descarta el
                 // resultado para no pintar la imagen de otro producto.
-                if (itemId != _ultimoItemIdMostrado)
+                if (itemId != SelectedItem.ItemId)
                     return;
 
                 // Validar que el binario sea realmente una imagen antes de intentar pintarlo.
@@ -173,7 +177,7 @@ namespace v4posme_maui.Views.Items
                     return;
 
                 var actual = (Api_AppMobileApi_GetDataDownloadItemsResponse)ViewModel.Item;
-                var indiceActual = lista.FindIndex(p => p.ItemId == actual.ItemId);
+                var indiceActual = lista.FindIndex(p => p.ItemPk == actual.ItemPk);
                 if (indiceActual < 0)
                     indiceActual = 0;
 
@@ -182,23 +186,23 @@ namespace v4posme_maui.Views.Items
                     return;
 
                 var siguiente = lista[nuevoIndice];
-                var findItem  = await _repositoryItems.PosMeFindByItemId(siguiente.ItemId);
+                var findItem  = await _repositoryItems.PosMeFindByItemPk(siguiente.ItemPk);
                 SelectedItem  = findItem;
 
-                var objListTransactionDetail = await _transactionMasterDetail.PosMeByTransactionIDAndItemID((int)TypeTransaction.TransactionInvoiceBilling, siguiente.ItemId);
+                var objListTransactionDetail = await _transactionMasterDetail.PosMeByTransactionIDAndItemID((int)TypeTransaction.TransactionInvoiceBilling, SelectedItem.ItemId);
                 SelectedItem.CantidadFacturadas = objListTransactionDetail is null
                     ? 0
                     : Convert.ToDecimal(objListTransactionDetail.Where(p => p.RegisterLocal == 1).Sum(p => p.Quantity));
 
                 SelectedItem.CantidadFinal = (SelectedItem.Quantity + SelectedItem.CantidadEntradas) - (SelectedItem.CantidadSalidas + SelectedItem.CantidadFacturadas);
                 ViewModel.Item = SelectedItem;
-                _ultimoItemIdMostrado = siguiente.ItemId;
+                _ultimoItemPkMostrado = siguiente.ItemPk;
 
                 // Mantiene sincronizada la posicion de navegacion con la pantalla de edicion.
                 VariablesGlobales.ItemsNavegacionIndex = nuevoIndice;
 
                 // Vuelve a traer la imagen del nuevo producto desde el servidor.
-                CargarImagenProducto(siguiente.ItemId);
+                CargarImagenProducto(SelectedItem.ItemId);
             }
             catch (Exception ex)
             {

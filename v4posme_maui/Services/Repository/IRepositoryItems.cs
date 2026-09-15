@@ -11,6 +11,8 @@ public interface IRepositoryItems : IRepositoryFacade<Api_AppMobileApi_GetDataDo
     Task<Api_AppMobileApi_GetDataDownloadItemsResponse> PosMeFindByItemNumber(string itemNumber);
     
     Task<Api_AppMobileApi_GetDataDownloadItemsResponse> PosMeFindByItemId(int itemId);
+
+    Task<Api_AppMobileApi_GetDataDownloadItemsResponse> PosMeFindByItemPk(int itemPk);
     
     Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeFilterdByItemNumber(string? textSearch);
     

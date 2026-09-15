@@ -268,10 +268,11 @@ public class ProductosVendidosViewModel : BaseViewModel
                     else
                         quantityInvoice = Convert.ToDecimal(objListTransactionDetail.Sum(p => p.Quantity));
 
-                    item.Quantity = (item.Quantity + item.CantidadEntradas) - (item.CantidadSalidas + quantityInvoice);
-                    item.Quantity = quantityInvoice;
+                    // Este reporte muestra lo VENDIDO. Se guarda en CantidadFacturadas y NO se
+                    // sobrescribe Quantity (cantidad base) para no contaminar el dato del producto.
+                    item.CantidadFacturadas = quantityInvoice;
 
-                    if (item.Quantity > 0)
+                    if (quantityInvoice > 0)
                     {
                         //Nombre en minusculas
                         item.Name = item.Name?.ToLower();

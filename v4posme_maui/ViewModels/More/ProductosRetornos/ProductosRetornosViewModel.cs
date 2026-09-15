@@ -188,13 +188,16 @@ public class ProductosRetornosViewModel : BaseViewModel
                     else
                         quantityInvoice = Convert.ToDecimal(objListTransactionDetail.Sum(p => p.Quantity));
 
-                    item.Quantity = (item.Quantity + item.CantidadEntradas) - (item.CantidadSalidas + quantityInvoice);
+                    // La existencia es un valor derivado; se guarda en CantidadFinal y NO se
+                    // sobrescribe Quantity/CantidadEntradas/CantidadSalidas (cantidades base).
+                    item.CantidadFacturadas = quantityInvoice;
+                    item.CantidadFinal      = (item.Quantity + item.CantidadEntradas) - (item.CantidadSalidas + quantityInvoice);
 
                 }
 
-                //Eliminar de la lista aquellos productos con cantidades igual a 0
+                //Eliminar de la lista aquellos productos con existencia igual a 0
                 //Nombre en minusculas y ordenado ascendente por nombre
-                var itemsFiltrados = Items.Where(x => x.Quantity != 0).ToList();
+                var itemsFiltrados = Items.Where(x => x.CantidadFinal != 0).ToList();
                 foreach (var item in itemsFiltrados)
                     item.Name = item.Name?.ToLower();
 

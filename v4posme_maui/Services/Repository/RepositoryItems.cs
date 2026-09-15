@@ -45,6 +45,14 @@ public class RepositoryItems(DataBase dataBase)
             .FirstOrDefaultAsync(response => response.ItemId == itemId);
     }
 
+    // Busca por la clave primaria local (ItemPk), unica siempre. Se usa para identificar
+    // un producto de forma fiable, incluso cuando aun no se sincronizo y su ItemId es 0.
+    public Task<Api_AppMobileApi_GetDataDownloadItemsResponse> PosMeFindByItemPk(int itemPk)
+    {
+        return _dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadItemsResponse>()
+            .FirstOrDefaultAsync(response => response.ItemPk == itemPk);
+    }
+
     public async Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeFilterdByItemNumber(string? textSearch)
     {
         return await _dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadItemsResponse>()

@@ -158,19 +158,21 @@ public partial class ItemEditPage : ContentPage
             // Por eso la fuente de verdad del producto vigente es ItemsNavegacionIndex, que
             // el detalle mantiene actualizado al navegar.
             var selected = (Api_AppMobileApi_GetDataDownloadItemsResponse)DataForm.DataObject;
-            var itemIdAbrir = selected.ItemId;
+            // Se identifica por ItemPk (clave primaria local, unica) para no confundir
+            // productos locales sin sincronizar cuyo ItemId es 0.
+            var itemPkAbrir = selected.ItemPk;
 
             var lista = VariablesGlobales.ItemsNavegacion;
             if (lista is { Count: > 0 })
             {
                 var indice = VariablesGlobales.ItemsNavegacionIndex;
                 if (indice >= 0 && indice < lista.Count)
-                    itemIdAbrir = lista[indice].ItemId;
+                    itemPkAbrir = lista[indice].ItemPk;
             }
 
-            // Recargamos los datos frescos del producto vigente (por su ItemId) para reflejar
+            // Recargamos los datos frescos del producto vigente (por su ItemPk) para reflejar
             // cualquier cambio guardado y calcular las cantidades derivadas.
-            var itemFresco = await _repositoryItems.PosMeFindByItemId(itemIdAbrir);
+            var itemFresco = await _repositoryItems.PosMeFindByItemPk(itemPkAbrir);
 
             var objListTransactionDetail = await _transactionMasterDetail.PosMeByTransactionIDAndItemID((int)TypeTransaction.TransactionInvoiceBilling, itemFresco.ItemId);
             var quatityInvoice = objListTransactionDetail is null
