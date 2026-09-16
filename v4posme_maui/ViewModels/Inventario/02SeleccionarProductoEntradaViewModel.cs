@@ -8,6 +8,8 @@ public class SeleccionarProductoEntradaViewModel : SeleccionarProductoInventario
         Title = "Compra - Productos";
     }
 
+    public override bool PermiteEditarPrecioCosto => true;
+
     protected override Task NavegarARevisarAsync()
     {
         return NavigationService.NavigateToAsync<RevisarProductosEntradaViewModel>();

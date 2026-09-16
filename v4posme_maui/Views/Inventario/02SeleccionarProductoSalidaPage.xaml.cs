@@ -15,4 +15,10 @@ public partial class SeleccionarProductoSalidaPage : ContentPage
         if (BindingContext is SeleccionarProductoSalidaViewModel vm)
             vm.OnAppearing(Navigation);
     }
+
+    private void OnValorChanged(object? sender, EventArgs e)
+    {
+        if (BindingContext is SeleccionarProductoInventarioBaseViewModel vm)
+            vm.RecalcularCommand.Execute(null);
+    }
 }

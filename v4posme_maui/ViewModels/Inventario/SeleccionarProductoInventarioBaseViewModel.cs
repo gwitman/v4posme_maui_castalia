@@ -11,10 +11,11 @@ using v4posme_maui.Services.Helpers;
 namespace v4posme_maui.ViewModels.Inventario;
 
 // Base compartida para la seleccion de productos en los flujos de inventario
-// (Entrada y Salida). Reproduce el comportamiento de la pantalla 4/6 de facturacion:
-// - clic sobre el producto lo agrega (o incrementa cantidad)
-// - deslizar a la izquierda disminuye la cantidad / lo elimina
-// - boton inferior para avanzar a la revision
+// (Entrada y Salida). Muestra TODO el listado de productos con editores en linea:
+// - Entrada (Compra): cantidad, costo y precio (costo/precio precargados del item)
+// - Salida: solo cantidad
+// Un producto queda "seleccionado" cuando su cantidad es mayor que cero. Al avanzar se
+// arman los Items del DTO con los productos que tienen cantidad > 0.
 public abstract class SeleccionarProductoInventarioBaseViewModel : BaseViewModel
 {
     protected readonly IRepositoryItems RepositoryItems;
@@ -25,45 +26,39 @@ public abstract class SeleccionarProductoInventarioBaseViewModel : BaseViewModel
         Productos                     = new();
         RepositoryItems               = VariablesGlobales.UnityContainer.Resolve<IRepositoryItems>();
         Helper                        = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
-        AnadirProducto                = new Command<Api_AppMobileApi_GetDataDownloadItemsResponse>(OnAnadirProducto);
-        QuitarProductoCommand         = new Command<Api_AppMobileApi_GetDataDownloadItemsResponse>(OnQuitarProducto);
         SearchCommand                 = new Command(OnSearch);
         SearchBarCodeCommand          = new Command(OnSearchBarCode);
-        ProductosSeleccionadosCommand = new Command(OnRevisarProductos);
+        ProductosSeleccionadosCommand = new Command(OnAvanzar);
+        RecalcularCommand             = new Command(RefrescarResumen);
         AtrasCommand                  = new Command(OnAtras);
     }
 
     // Navegacion al paso de revision (implementada por cada flujo concreto).
     protected abstract Task NavegarARevisarAsync();
 
+    // Indica si el flujo permite editar costo y precio (Entrada = true, Salida = false).
+    public abstract bool PermiteEditarPrecioCosto { get; }
+
     public DXObservableCollection<Api_AppMobileApi_GetDataDownloadItemsResponse> Productos { get; }
 
-    public Command AnadirProducto { get; }
-    public Command<Api_AppMobileApi_GetDataDownloadItemsResponse> QuitarProductoCommand { get; }
     public Command SearchCommand { get; }
     public Command SearchBarCodeCommand { get; }
     public Command ProductosSeleccionadosCommand { get; }
+    public Command RecalcularCommand { get; }
     public Command AtrasCommand { get; }
 
-    private string _productosSeleccionadosCantidadTotal = "Items";
+    private string _resumen = "0 Items = C$ 0.00";
     public string ProductosSeleccionadosCantidadTotal
     {
-        get => _productosSeleccionadosCantidadTotal;
-        set => SetProperty(ref _productosSeleccionadosCantidadTotal, value);
+        get => _resumen;
+        set => SetProperty(ref _resumen, value);
     }
 
-    private string _productosSeleccionadosCantidad = "Seleccionar Productos";
+    private string _botonTexto = "Continuar";
     public string ProductosSeleccionadosCantidad
     {
-        get => _productosSeleccionadosCantidad;
-        set => SetProperty(ref _productosSeleccionadosCantidad, value);
-    }
-
-    private bool _isPanelVisible;
-    public bool IsPanelVisible
-    {
-        get => _isPanelVisible;
-        set => SetProperty(ref _isPanelVisible, value);
+        get => _botonTexto;
+        set => SetProperty(ref _botonTexto, value);
     }
 
     private async void OnAtras()
@@ -73,7 +68,6 @@ public abstract class SeleccionarProductoInventarioBaseViewModel : BaseViewModel
 
     private async void OnSearch()
     {
-        // Busca directamente con el texto actual de la barra de busqueda superior.
         await LoadAllProductosAsync();
     }
 
@@ -98,10 +92,29 @@ public abstract class SeleccionarProductoInventarioBaseViewModel : BaseViewModel
                 items = await RepositoryItems.PosMeFilterdByItemNumberAndBarCodeAndName(Search);
 
             items = items.OrderBy(i => i.Name).ToList();
+
+            // Productos ya capturados en el DTO (para conservar lo ingresado al buscar).
+            var cesta = VariablesGlobales.DtoInventario.Items;
+
             foreach (var item in items)
             {
                 item.Name          = item.Name?.ToLower();
                 item.MonedaSimbolo = "C$";
+
+                var enCesta = cesta.FirstOrDefault(c => c.ItemNumber == item.ItemNumber);
+                if (enCesta is not null)
+                {
+                    // Conservar lo ya capturado.
+                    item.Quantity      = enCesta.Quantity;
+                    item.PrecioPublico = enCesta.PrecioPublico;
+                    item.Cost          = enCesta.Cost;
+                }
+                else
+                {
+                    // Cantidad inicia en 0; costo y precio quedan precargados del item.
+                    item.Quantity = decimal.Zero;
+                }
+                item.Importe = item.PrecioPublico * item.Quantity;
             }
 
             Productos.Clear();
@@ -117,56 +130,50 @@ public abstract class SeleccionarProductoInventarioBaseViewModel : BaseViewModel
         }
     }
 
-    private void OnAnadirProducto(Api_AppMobileApi_GetDataDownloadItemsResponse? obj)
+    // Recalcula el importe por producto y el resumen total a partir de las cantidades y
+    // precios ingresados en linea.
+    protected void RefrescarResumen()
     {
-        if (obj is null) return;
-
-        var cesta = VariablesGlobales.DtoInventario.Items;
-        var find  = cesta.FirstOrDefault(response => response.ItemNumber == obj.ItemNumber);
-        if (find is not null)
+        decimal total = 0m;
+        int cantidadItems = 0;
+        foreach (var item in Productos)
         {
-            find.Quantity += decimal.One;
-            find.Importe   = find.PrecioPublico * find.Quantity;
-        }
-        else
-        {
-            obj.TransactionMasterDetailID = Helper.GetTimestampId();
-            obj.Quantity                  = decimal.One;
-            obj.Importe                   = obj.PrecioPublico;
-            cesta.Add(obj);
+            if (item.Quantity < 0) item.Quantity = 0;
+            item.Importe = item.PrecioPublico * item.Quantity;
+            if (item.Quantity > 0)
+            {
+                total += item.Importe;
+                cantidadItems++;
+            }
         }
 
-        RefrescarResumen();
+        ProductosSeleccionadosCantidadTotal = $"{cantidadItems} Items = C$ {total:N2}";
+        ProductosSeleccionadosCantidad      = cantidadItems > 0 ? $"Continuar ({cantidadItems})" : "Continuar";
     }
 
-    private void OnQuitarProducto(Api_AppMobileApi_GetDataDownloadItemsResponse? obj)
+    private async void OnAvanzar()
     {
-        if (obj is null) return;
-
-        var cesta = VariablesGlobales.DtoInventario.Items;
-        var find  = cesta.FirstOrDefault(response => response.ItemNumber == obj.ItemNumber);
-        if (find is null) return;
-
-        if (find.Quantity > decimal.One)
-        {
-            find.Quantity -= decimal.One;
-            find.Importe   = find.PrecioPublico * find.Quantity;
-        }
-        else
-        {
-            cesta.Remove(find);
-        }
-
         RefrescarResumen();
-    }
 
-    private async void OnRevisarProductos()
-    {
-        if (VariablesGlobales.DtoInventario.Items.Count <= 0)
+        var seleccionados = Productos.Where(p => p.Quantity > 0).ToList();
+        if (seleccionados.Count == 0)
         {
-            ShowToast("Debe seleccionar al menos un producto", ToastDuration.Long, 12);
+            ShowToast("Debe ingresar cantidad en al menos un producto", ToastDuration.Long, 12);
             return;
         }
+
+        // Armar la cesta del DTO con los productos capturados.
+        var cesta = VariablesGlobales.DtoInventario.Items;
+        cesta.Clear();
+        foreach (var item in seleccionados)
+        {
+            item.TransactionMasterDetailID = Helper.GetTimestampId();
+            item.Importe                   = item.PrecioPublico * item.Quantity;
+            cesta.Add(item);
+        }
+
+        VariablesGlobales.DtoInventario.CantidadTotalSeleccionada = (int)cesta.Sum(r => r.Quantity);
+        VariablesGlobales.DtoInventario.Balance                   = cesta.Sum(r => r.Importe);
 
         try
         {
@@ -180,24 +187,6 @@ public abstract class SeleccionarProductoInventarioBaseViewModel : BaseViewModel
         finally
         {
             IsBusy = false;
-        }
-    }
-
-    protected void RefrescarResumen()
-    {
-        var cesta = VariablesGlobales.DtoInventario.Items;
-        VariablesGlobales.DtoInventario.CantidadTotalSeleccionada = (int)cesta.Sum(r => r.Quantity);
-        VariablesGlobales.DtoInventario.Balance                   = cesta.Sum(r => r.Importe);
-
-        if (cesta.Count > 0)
-        {
-            ProductosSeleccionadosCantidad      = $"Enviar {VariablesGlobales.DtoInventario.CantidadTotalSeleccionada} Items";
-            ProductosSeleccionadosCantidadTotal = $"{VariablesGlobales.DtoInventario.CantidadTotalSeleccionada} Items = {VariablesGlobales.DtoInventario.Balance:N2}";
-        }
-        else
-        {
-            ProductosSeleccionadosCantidad      = "Seleccionar Productos";
-            ProductosSeleccionadosCantidadTotal = "Items";
         }
     }
 

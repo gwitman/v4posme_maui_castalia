@@ -1,4 +1,5 @@
 using CommunityToolkit.Maui.Core;
+using v4posme_maui.Models;
 using v4posme_maui.Services.SystemNames;
 using Unity;
 using v4posme_maui.Services.Helpers;
@@ -56,11 +57,21 @@ public class DatosEntradaViewModel : BaseViewModel
 
     public void OnAppearing(INavigation navigation)
     {
-        Navigation                                = navigation;
-        Comentarios                               = VariablesGlobales.DtoInventario.Comentarios ?? string.Empty;
-        Referencia1                               = VariablesGlobales.DtoInventario.Referencia1 ?? string.Empty;
-        Referencia2                               = VariablesGlobales.DtoInventario.Referencia2 ?? string.Empty;
-        IsBusy                                    = false;
+        Navigation = navigation;
+
+        // Al abrir esta pantalla (primer paso del flujo) se limpia el estado de la
+        // transaccion para que los campos y los productos inicien vacios y no queden
+        // precargados de un flujo anterior.
+        VariablesGlobales.DtoInventario = new ViewTempDtoInventario
+        {
+            TransactionId = TypeTransaction.TransactionInventarioEntrada
+        };
+
+        Comentarios = string.Empty;
+        Referencia1 = string.Empty;
+        Referencia2 = string.Empty;
+        ErrorComentarios = false;
+        IsBusy = false;
     }
 
     private async void OnSiguiente()
