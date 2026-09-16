@@ -41,6 +41,19 @@
                                         <dxe:TextEdit Keyboard="Numeric" LabelText="Cantidad"
                                                       TextChanged="OnValorChanged"
                                                       Text="{Binding Quantity}" />
+                                        <!-- Solo visualizacion: costo unitario y subtotal (costo x cantidad). -->
+                                        <Grid ColumnSpacing="8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <Label Grid.Column="0" FontSize="12" TextColor="{StaticResource Gray500}"
+                                                   VerticalOptions="Center"
+                                                   Text="{Binding Cost, StringFormat='Costo: C$ {0:N2} c/u'}" />
+                                            <Label Grid.Column="1" FontSize="14" FontAttributes="Bold"
+                                                   TextColor="{StaticResource Primary}" VerticalOptions="Center"
+                                                   Text="{Binding Importe, StringFormat='C$ {0:N2}'}" />
+                                        </Grid>
                                     </StackLayout>
                                 </dx:DXBorder>
                             </DataTemplate>
@@ -57,11 +70,15 @@
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
-                                    <Label Grid.Column="0" Text="ITEMS" FontSize="15" FontAttributes="Bold"
-                                           TextColor="{StaticResource PrimaryDark}" VerticalOptions="Center" />
+                                    <StackLayout Grid.Column="0" Spacing="0" VerticalOptions="Center">
+                                        <Label Text="TOTAL" FontSize="15" FontAttributes="Bold"
+                                               TextColor="{StaticResource PrimaryDark}" />
+                                        <Label FontSize="11" TextColor="{StaticResource Gray400}"
+                                               Text="{Binding CantidadTotalItems, StringFormat='{0} items'}" />
+                                    </StackLayout>
                                     <Label Grid.Column="1" FontSize="18" FontAttributes="Bold"
                                            TextColor="{StaticResource PrimaryDark}" VerticalOptions="Center"
-                                           Text="{Binding CantidadTotalItems}" />
+                                           Text="{Binding Total, StringFormat='C$ {0:N2}'}" />
                                 </Grid>
                             </dx:DXBorder>
                             <dx:DXButton CornerRadius="12" HeightRequest="48"

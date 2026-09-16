@@ -50,20 +50,35 @@
                                     <dx:DXBorder.Shadow>
                                         <Shadow Brush="{StaticResource Gray300}" Offset="0,1" Radius="4" Opacity="0.25" />
                                     </dx:DXBorder.Shadow>
-                                    <Grid ColumnSpacing="8">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="120" />
-                                        </Grid.ColumnDefinitions>
-                                        <StackLayout Grid.Column="0" Spacing="0" VerticalOptions="Center">
-                                            <Label Text="{Binding Name, Converter={StaticResource ToLowerConverter}}"
-                                                   FontSize="13" FontAttributes="Bold" TextColor="{StaticResource Gray900}"
-                                                   LineBreakMode="TailTruncation" MaxLines="1" />
-                                            <Label Text="{Binding ItemNumber}" FontSize="11" TextColor="{StaticResource Gray400}" />
-                                        </StackLayout>
-                                        <dxe:TextEdit Grid.Column="1" Keyboard="Numeric" LabelText="Cantidad"
-                                                      TextChanged="OnValorChanged" Text="{Binding Quantity}" />
-                                    </Grid>
+                                    <StackLayout Spacing="6">
+                                        <Grid ColumnSpacing="8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="120" />
+                                            </Grid.ColumnDefinitions>
+                                            <StackLayout Grid.Column="0" Spacing="0" VerticalOptions="Center">
+                                                <Label Text="{Binding Name, Converter={StaticResource ToLowerConverter}}"
+                                                       FontSize="13" FontAttributes="Bold" TextColor="{StaticResource Gray900}"
+                                                       LineBreakMode="TailTruncation" MaxLines="1" />
+                                                <Label Text="{Binding ItemNumber}" FontSize="11" TextColor="{StaticResource Gray400}" />
+                                            </StackLayout>
+                                            <dxe:TextEdit Grid.Column="1" Keyboard="Numeric" LabelText="Cantidad"
+                                                          TextChanged="OnValorChanged" Text="{Binding Quantity}" />
+                                        </Grid>
+                                        <!-- Solo visualizacion: costo unitario y subtotal (costo x cantidad). -->
+                                        <Grid ColumnSpacing="8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <Label Grid.Column="0" FontSize="11" TextColor="{StaticResource Gray400}"
+                                                   VerticalOptions="Center"
+                                                   Text="{Binding Cost, StringFormat='Costo: C$ {0:N2} c/u'}" />
+                                            <Label Grid.Column="1" FontSize="13" FontAttributes="Bold"
+                                                   TextColor="{StaticResource Primary}" VerticalOptions="Center"
+                                                   Text="{Binding Importe, StringFormat='C$ {0:N2}'}" />
+                                        </Grid>
+                                    </StackLayout>
                                 </dx:DXBorder>
                             </DataTemplate>
                         </dxcv:DXCollectionView.ItemTemplate>

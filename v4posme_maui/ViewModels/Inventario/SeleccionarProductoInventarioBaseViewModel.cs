@@ -114,7 +114,8 @@ public abstract class SeleccionarProductoInventarioBaseViewModel : BaseViewModel
                     // Cantidad inicia en 0; costo y precio quedan precargados del item.
                     item.Quantity = decimal.Zero;
                 }
-                item.Importe = item.PrecioPublico * item.Quantity;
+                // Solo visualizacion: el importe mostrado es cantidad x costo.
+                item.Importe = item.Cost * item.Quantity;
             }
 
             Productos.Clear();
@@ -139,7 +140,8 @@ public abstract class SeleccionarProductoInventarioBaseViewModel : BaseViewModel
         foreach (var item in Productos)
         {
             if (item.Quantity < 0) item.Quantity = 0;
-            item.Importe = item.PrecioPublico * item.Quantity;
+            // Solo visualizacion: el importe mostrado es cantidad x costo.
+            item.Importe = item.Cost * item.Quantity;
             if (item.Quantity > 0)
             {
                 total += item.Importe;
@@ -168,7 +170,8 @@ public abstract class SeleccionarProductoInventarioBaseViewModel : BaseViewModel
         foreach (var item in seleccionados)
         {
             item.TransactionMasterDetailID = Helper.GetTimestampId();
-            item.Importe                   = item.PrecioPublico * item.Quantity;
+            // Solo visualizacion: el importe mostrado es cantidad x costo.
+            item.Importe                   = item.Cost * item.Quantity;
             cesta.Add(item);
         }
 

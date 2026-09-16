@@ -93,7 +93,7 @@
                                         <Label Text="{Binding Name, Converter={StaticResource ToLowerConverter}}"
                                                FontSize="13" TextColor="{StaticResource Gray900}"
                                                LineBreakMode="TailTruncation" MaxLines="1" />
-                                        <Label Text="{Binding PrecioPublico, StringFormat='C$ {0:N2} c/u'}"
+                                        <Label Text="{Binding Cost, StringFormat='C$ {0:N2} c/u'}"
                                                FontSize="11" TextColor="{StaticResource Gray400}" />
                                     </StackLayout>
                                     <Label Grid.Column="2" VerticalOptions="Center" FontAttributes="Bold" FontSize="13"

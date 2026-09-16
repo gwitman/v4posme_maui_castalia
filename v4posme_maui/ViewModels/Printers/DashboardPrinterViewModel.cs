@@ -484,9 +484,13 @@ public class DashboardPrinterViewModel : BaseViewModel
                 item.Quantity     = detalle.Quantity;
                 item.PrecioPublico = detalle.UnitaryPrice;
                 item.Cost         = detalle.UnitaryCost;
-                item.Importe      = detalle.SubAmount;
+                // Solo visualizacion: el importe mostrado es cantidad x costo.
+                item.Importe      = detalle.UnitaryCost * detalle.Quantity;
                 dto.Items.Add(item);
             }
+
+            // Solo visualizacion: el balance mostrado es la suma de cantidad x costo.
+            dto.Balance = dto.Items.Sum(p => p.Importe);
 
             VariablesGlobales.DtoInventario = dto;
 

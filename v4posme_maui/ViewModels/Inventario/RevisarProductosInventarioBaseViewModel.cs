@@ -60,7 +60,8 @@ public abstract class RevisarProductosInventarioBaseViewModel : BaseViewModel
 
     public string MonedaSimbolo => "C$";
 
-    public decimal Total => ProductosSeleccionados.Sum(r => r.PrecioPublico * r.Quantity);
+    // Solo visualizacion: el total mostrado es la suma de cantidad x costo.
+    public decimal Total => ProductosSeleccionados.Sum(r => r.Cost * r.Quantity);
 
     public int CantidadTotalItems => (int)ProductosSeleccionados.Sum(r => r.Quantity);
 
@@ -76,7 +77,8 @@ public abstract class RevisarProductosInventarioBaseViewModel : BaseViewModel
 
         foreach (var item in ProductosSeleccionados)
         {
-            item.Importe = item.PrecioPublico * item.Quantity;
+            // Solo visualizacion: el importe mostrado es cantidad x costo.
+            item.Importe = item.Cost * item.Quantity;
         }
 
         VariablesGlobales.DtoInventario.Balance                   = ProductosSeleccionados.Sum(r => r.Importe);
