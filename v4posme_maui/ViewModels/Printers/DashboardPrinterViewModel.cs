@@ -424,6 +424,8 @@ public class DashboardPrinterViewModel : BaseViewModel
         foreach (var master in masters)
         {
             var detalles = await _repositoryTbTransactionMasterDetail.PosMeItemByTransactionId(master.TransactionMasterId);
+            // Costo total = suma de (cantidad x costo unitario) de los detalles.
+            var costoTotal = detalles.Sum(d => d.UnitaryCost * d.Quantity);
             buffer.Add(new ViewTempDtoInventarioLista
             {
                 TransactionMasterId = master.TransactionMasterId,
@@ -433,7 +435,7 @@ public class DashboardPrinterViewModel : BaseViewModel
                 Comentario          = master.Comment ?? string.Empty,
                 Referencia1         = master.Reference1 ?? string.Empty,
                 Referencia2         = master.Reference2 ?? string.Empty,
-                CostoTotal          = master.Amount,
+                CostoTotal          = costoTotal,
                 MonedaSimbolo       = "C$"
             });
         }
