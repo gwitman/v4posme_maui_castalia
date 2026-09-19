@@ -9,7 +9,7 @@
 
     <ScrollView Padding="16,20">
         <Grid ColumnDefinitions="*,*"
-              RowDefinitions="Auto,Auto,Auto"
+              RowDefinitions="Auto,Auto,Auto,Auto"
               ColumnSpacing="14"
               RowSpacing="14">
 
@@ -289,6 +289,54 @@
                     </Border>
                     <Label Grid.Row="1"
                            Text="Gasto"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="15"
+                           TextColor="{StaticResource PrimaryDark}"
+                           VerticalOptions="End"
+                           Margin="0,12,0,0" />
+                    <Label Grid.Row="2"
+                           Text="En el mobile"
+                           FontSize="12"
+                           TextColor="{StaticResource Tertiary}" />
+                </Grid>
+            </Border>
+
+            <!-- Ingreso -->
+            <Border Grid.Row="3" Grid.Column="0"
+                    StrokeShape="RoundRectangle 14"
+                    StrokeThickness="0"
+                    BackgroundColor="{StaticResource CardColor}"
+                    Padding="0"
+                    HeightRequest="170">
+                <Border.Shadow>
+                    <Shadow Brush="{StaticResource Gray300}"
+                            Offset="0,4"
+                            Radius="12"
+                            Opacity="0.4" />
+                </Border.Shadow>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnCardTapped" CommandParameter="7" />
+                </Border.GestureRecognizers>
+                <Grid RowDefinitions="Auto,*,Auto" Padding="16,20,16,16">
+                    <Border Grid.Row="0"
+                            StrokeShape="RoundRectangle 12"
+                            StrokeThickness="0"
+                            BackgroundColor="#E6F5ED"
+                            WidthRequest="48"
+                            HeightRequest="48"
+                            HorizontalOptions="Start">
+                        <Image Source="quantity"
+                               WidthRequest="24"
+                               HeightRequest="24"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center">
+                            <Image.Behaviors>
+                                <toolkit:IconTintColorBehavior TintColor="#2E7D32" />
+                            </Image.Behaviors>
+                        </Image>
+                    </Border>
+                    <Label Grid.Row="1"
+                           Text="Ingreso"
                            FontFamily="OpenSansSemibold"
                            FontSize="15"
                            TextColor="{StaticResource PrimaryDark}"

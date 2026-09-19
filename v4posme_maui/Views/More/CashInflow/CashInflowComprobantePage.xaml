@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:dx="http://schemas.devexpress.com/maui"
+             xmlns:cashinflow="clr-namespace:v4posme_maui.ViewModels.More.CashInflow"
+             Title="{Binding Title}"
+             x:Class="v4posme_maui.Views.More.CashInflow.CashInflowComprobantePage"
+             BackgroundColor="{StaticResource PageBackground}">
+
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsEnabled="False" IsVisible="False" />
+    </Shell.BackButtonBehavior>
+
+    <ContentPage.BindingContext>
+        <cashinflow:CashInflowComprobanteViewModel />
+    </ContentPage.BindingContext>
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Ir a inicio" Order="Secondary" Clicked="BackToHome_OnClicked" />
+        <ToolbarItem Text="Eliminar registro" Order="Secondary" Command="{Binding EliminarCommand}" />
+    </ContentPage.ToolbarItems>
+
+    <Grid>
+        <dx:DXPopup x:Name="Popup"
+                    AllowScrim="True"
+                    BackgroundColor="{Binding PopupBackgroundColor}"
+                    VerticalAlignment="Bottom"
+                    HorizontalAlignment="Stretch"
+                    Margin="16"
+                    CornerRadius="16"
+                    ScrimColor="#b3adb9ce"
+                    IsOpen="{Binding PopUpShow}">
+            <StackLayout WidthRequest="250" Padding="4">
+                <Label Text="{Binding Mensaje}"
+                       FontAttributes="Bold"
+                       FontSize="15"
+                       HorizontalTextAlignment="Center"
+                       TextColor="{StaticResource White}"
+                       Margin="20, 20" />
+                <Button Text="Aceptar"
+                        Clicked="ClosePopup_Clicked"
+                        BackgroundColor="{StaticResource Gray600}"
+                        CornerRadius="12"
+                        HeightRequest="46"
+                        FontSize="18"
+                        TextColor="White" />
+            </StackLayout>
+        </dx:DXPopup>
+
+        <!-- Popup de confirmacion de eliminacion (con estilo) -->
+        <dx:DXPopup x:Name="ConfirmDeletePopup"
+                    AllowScrim="True"
+                    BackgroundColor="{StaticResource CardColor}"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Stretch"
+                    Margin="24"
+                    CornerRadius="16"
+                    ScrimColor="#b3adb9ce"
+                    IsOpen="{Binding ConfirmarEliminarPopUpShow}">
+            <VerticalStackLayout Padding="20" Spacing="14">
+                <Label Text="Eliminar ingreso"
+                       FontAttributes="Bold"
+                       FontSize="17"
+                       TextColor="{StaticResource PrimaryDark}"
+                       HorizontalTextAlignment="Center" />
+                <Label Text="¿Está seguro que desea eliminar este ingreso? Esta acción no se puede deshacer."
+                       FontSize="14"
+                       TextColor="{StaticResource Gray600}"
+                       HorizontalTextAlignment="Center" />
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="12" Margin="0,6,0,0">
+                    <Button Grid.Column="0"
+                            Text="Cancelar"
+                            BackgroundColor="{StaticResource Gray600}"
+                            TextColor="White"
+                            CornerRadius="12"
+                            HeightRequest="46"
+                            Command="{Binding CancelarEliminarCommand}" />
+                    <Button Grid.Column="1"
+                            Text="Eliminar"
+                            BackgroundColor="#C62828"
+                            TextColor="White"
+                            CornerRadius="12"
+                            HeightRequest="46"
+                            Command="{Binding ConfirmarEliminarCommand}" />
+                </Grid>
+            </VerticalStackLayout>
+        </dx:DXPopup>
+
+        <dx:ShimmerView Style="{StaticResource ShimmerEffect}" IsLoading="{Binding IsBusy}">
+            <dx:ShimmerView.Content>
+                <ScrollView>
+                    <dx:DXStackLayout
+                        x:Name="DxStackLayout_"
+                        Orientation="Vertical"
+                        BackgroundColor="{StaticResource PageBackground}"
+                        Padding="16,16,16,24">
+
+                        <!-- Confirmacion + numero de transaccion -->
+                        <Border StrokeShape="RoundRectangle 14"
+                                StrokeThickness="0"
+                                BackgroundColor="#E6F5ED"
+                                Padding="20,18"
+                                Margin="0,0,0,14">
+                            <VerticalStackLayout Spacing="6" HorizontalOptions="Center">
+                                <Label Text="Comprobante de Ingreso"
+                                       FontFamily="OpenSansSemibold" FontSize="16"
+                                       TextColor="{StaticResource PrimaryDark}"
+                                       HorizontalTextAlignment="Center" />
+                                <Label Text="No. de transacción"
+                                       FontSize="12" Opacity="0.7"
+                                       HorizontalTextAlignment="Center" Margin="0,6,0,0" />
+                                <Label Text="{Binding Ingreso.NumeroIngreso}"
+                                       FontSize="22" FontAttributes="Bold"
+                                       TextColor="{StaticResource PrimaryDark}"
+                                       HorizontalTextAlignment="Center" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- Detalle -->
+                        <Border StrokeShape="RoundRectangle 14"
+                                StrokeThickness="0"
+                                BackgroundColor="{StaticResource CardColor}"
+                                Padding="18">
+                            <Border.Shadow>
+                                <Shadow Brush="{StaticResource Gray300}" Offset="0,2" Radius="8" Opacity="0.3" />
+                            </Border.Shadow>
+                            <VerticalStackLayout Spacing="10">
+                                <Grid ColumnDefinitions="Auto,*">
+                                    <Label Grid.Column="0" Text="Fecha" FontSize="13" Opacity="0.7" />
+                                    <Label Grid.Column="1" Text="{Binding Ingreso.Fecha, StringFormat='{0:dd/MM/yyyy hh:mm tt}'}"
+                                           FontSize="13" HorizontalTextAlignment="End"
+                                           TextColor="{StaticResource PrimaryDark}" />
+                                </Grid>
+                                <Grid ColumnDefinitions="Auto,*">
+                                    <Label Grid.Column="0" Text="Moneda" FontSize="13" Opacity="0.7" />
+                                    <Label Grid.Column="1" Text="{Binding Ingreso.MonedaNombre}"
+                                           FontSize="13" HorizontalTextAlignment="End"
+                                           TextColor="{StaticResource PrimaryDark}" />
+                                </Grid>
+                                <Grid ColumnDefinitions="Auto,*">
+                                    <Label Grid.Column="0" Text="Comentario" FontSize="13" Opacity="0.7" />
+                                    <Label Grid.Column="1" Text="{Binding Ingreso.Comentario}"
+                                           FontSize="13" HorizontalTextAlignment="End"
+                                           TextColor="{StaticResource PrimaryDark}" />
+                                </Grid>
+                                <Grid ColumnDefinitions="Auto,*">
+                                    <Label Grid.Column="0" Text="Referencia 1" FontSize="13" Opacity="0.7" />
+                                    <Label Grid.Column="1" Text="{Binding Ingreso.Referencia1}"
+                                           FontSize="13" HorizontalTextAlignment="End"
+                                           TextColor="{StaticResource PrimaryDark}" />
+                                </Grid>
+                                <Grid ColumnDefinitions="Auto,*">
+                                    <Label Grid.Column="0" Text="Referencia 2" FontSize="13" Opacity="0.7" />
+                                    <Label Grid.Column="1" Text="{Binding Ingreso.Referencia2}"
+                                           FontSize="13" HorizontalTextAlignment="End"
+                                           TextColor="{StaticResource PrimaryDark}" />
+                                </Grid>
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- Total -->
+                        <Border StrokeShape="RoundRectangle 14"
+                                StrokeThickness="0"
+                                BackgroundColor="{StaticResource CardColor}"
+                                Padding="20,16"
+                                Margin="0,14,0,0">
+                            <Border.Shadow>
+                                <Shadow Brush="{StaticResource Primary}" Opacity="0.15" Radius="12" Offset="0,4" />
+                            </Border.Shadow>
+                            <VerticalStackLayout Spacing="2" HorizontalOptions="Center">
+                                <Label Text="Monto del ingreso" FontSize="13" Opacity="0.7"
+                                       HorizontalOptions="Center" />
+                                <Label Text="{Binding Ingreso.MontoFormateado}"
+                                       FontSize="34" FontAttributes="Bold"
+                                       TextColor="{StaticResource Primary}"
+                                       HorizontalOptions="Center" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- Acciones -->
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="12" Margin="0,20,0,0">
+                            <dx:SimpleButton Grid.Column="0"
+                                             Text="Imprimir"
+                                             Icon="printer"
+                                             BackgroundColor="{StaticResource Primary}"
+                                             TextColor="White"
+                                             Command="{Binding ImprimirCommand}" />
+                            <dx:SimpleButton Grid.Column="1"
+                                             Text="Compartir"
+                                             Icon="shared_white"
+                                             BackgroundColor="{StaticResource PrimaryDark}"
+                                             TextColor="White"
+                                             Command="{Binding CompartirCommand}" />
+                        </Grid>
+
+                        <dx:SimpleButton Text="Nuevo Ingreso"
+                                         Margin="0,12,0,0"
+                                         BackgroundColor="Transparent"
+                                         BorderColor="{StaticResource Primary}"
+                                         BorderThickness="1"
+                                         TextColor="{StaticResource Primary}"
+                                         Command="{Binding NuevoIngresoCommand}" />
+
+                    </dx:DXStackLayout>
+                </ScrollView>
+            </dx:ShimmerView.Content>
+        </dx:ShimmerView>
+    </Grid>
+
+</ContentPage>

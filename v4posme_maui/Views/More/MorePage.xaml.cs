@@ -1,5 +1,6 @@
 using v4posme_maui.ViewModels.More;
 using v4posme_maui.Views.More.Gasto;
+using v4posme_maui.Views.More.CashInflow;
 using v4posme_maui.Views.More.Logs;
 using v4posme_maui.Views.More.Productos;
 using v4posme_maui.Views.More.ReporteVenta;
@@ -46,6 +47,9 @@ public partial class MorePage : ContentPage
 				break;
 			case "6":
 				await Navigation.PushAsync(new GastoPage());
+				break;
+			case "7":
+				await Navigation.PushAsync(new CashInflowPage());
 				break;
 		}
 	}

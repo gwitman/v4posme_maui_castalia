@@ -165,6 +165,47 @@ namespace v4posme_maui.ViewModels
             set => SetProperty(ref _montoGastosDolares, value);
         }
 
+        private int _cantidadIngresos;
+
+        public int CantidadIngresos
+        {
+            get => _cantidadIngresos;
+            set => SetProperty(ref _cantidadIngresos, value);
+        }
+
+        private decimal _montoIngresosCordobas;
+
+        public decimal MontoIngresosCordobas
+        {
+            get => _montoIngresosCordobas;
+            set => SetProperty(ref _montoIngresosCordobas, value);
+        }
+
+        private decimal _montoIngresosDolares;
+
+        public decimal MontoIngresosDolares
+        {
+            get => _montoIngresosDolares;
+            set => SetProperty(ref _montoIngresosDolares, value);
+        }
+
+        // Ingreso general = facturas de contado + abonos + ingresos de efectivo.
+        private decimal _ingresoGeneralCordobas;
+
+        public decimal IngresoGeneralCordobas
+        {
+            get => _ingresoGeneralCordobas;
+            set => SetProperty(ref _ingresoGeneralCordobas, value);
+        }
+
+        private decimal _ingresoGeneralDolares;
+
+        public decimal IngresoGeneralDolares
+        {
+            get => _ingresoGeneralDolares;
+            set => SetProperty(ref _ingresoGeneralDolares, value);
+        }
+
         public async void OnAppearing(INavigation navigation)
         {
             try
@@ -182,6 +223,8 @@ namespace v4posme_maui.ViewModels
                 var listaFacturasContadoDolares         = new List<TbTransactionMaster>();
                 var listaGastosCordobas                 = new List<TbTransactionMaster>();
                 var listaGastosDolares                  = new List<TbTransactionMaster>();
+                var listaIngresosCordobas               = new List<TbTransactionMaster>();
+                var listaIngresosDolares                = new List<TbTransactionMaster>();
                 
                 
 
@@ -197,6 +240,17 @@ namespace v4posme_maui.ViewModels
                         else
                         {
                             listaGastosDolares.Add(master);
+                        }
+                    }
+                    else if (master.TransactionId == TypeTransaction.TransactionCashInflow)
+                    {
+                        if (master.CurrencyId == TypeCurrency.Cordoba)
+                        {
+                            listaIngresosCordobas.Add(master);
+                        }
+                        else
+                        {
+                            listaIngresosDolares.Add(master);
                         }
                     }
                     else if (master.TransactionId == TypeTransaction.TransactionShare)
@@ -276,9 +330,16 @@ namespace v4posme_maui.ViewModels
                 CantidadGastos      = listaGastosCordobas.Count + listaGastosDolares.Count;
                 MontoGastosCordobas = listaGastosCordobas.Sum(master => master.Amount);
                 MontoGastosDolares  = listaGastosDolares.Sum(master => master.Amount);
-                //Totales (los gastos son egresos, por lo que restan del total del dia)
-                TotalCordobas   = MontoAbonosCordobas + MontoFacturasContadoCordobas - MontoGastosCordobas;
-                TotalDolares    = MontoAbonosDolares + MontoFacturasContadoDolares - MontoGastosDolares;
+                //Ingresos de efectivo
+                CantidadIngresos      = listaIngresosCordobas.Count + listaIngresosDolares.Count;
+                MontoIngresosCordobas = listaIngresosCordobas.Sum(master => master.Amount);
+                MontoIngresosDolares  = listaIngresosDolares.Sum(master => master.Amount);
+                //Ingreso general = facturas de contado + abonos + ingresos de efectivo
+                IngresoGeneralCordobas = MontoFacturasContadoCordobas + MontoAbonosCordobas + MontoIngresosCordobas;
+                IngresoGeneralDolares  = MontoFacturasContadoDolares + MontoAbonosDolares + MontoIngresosDolares;
+                //Totales (los gastos son egresos, por lo que restan del total del dia; los ingresos suman)
+                TotalCordobas   = MontoAbonosCordobas + MontoFacturasContadoCordobas + MontoIngresosCordobas - MontoGastosCordobas;
+                TotalDolares    = MontoAbonosDolares + MontoFacturasContadoDolares + MontoIngresosDolares - MontoGastosDolares;
                 IsBusy          = false;
             }
             catch (Exception e)

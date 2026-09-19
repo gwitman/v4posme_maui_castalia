@@ -12,6 +12,8 @@ namespace v4posme_maui.Services.SystemNames
         TransactionShare = 23,
         TransactionQueryMedical = 35,
         TransactionExpense = 38,
+        // Ingreso de efectivo (Cash Inflow): registra un ingreso general en el mobile.
+        TransactionCashInflow = 29,
         // Compras: aumenta la existencia de los productos (entrada de inventario).
         TransactionInventarioEntrada = 21,
         // Otras salidas: disminuye la existencia de los productos (salida de inventario).

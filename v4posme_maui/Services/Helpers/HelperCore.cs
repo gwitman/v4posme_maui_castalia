@@ -192,6 +192,38 @@ public class HelperCore(
         return codigo;
     }
 
+    public async Task<string> GetCodigoCashInflow()
+    {
+        var find = await repositoryParameters.PosMeFindCodigoCashInflow();
+
+        // Respaldo para instalaciones ya inicializadas donde el parametro aun no existe.
+        if (find is null)
+        {
+            find = new Models.TbParameterSystem
+            {
+                Name        = Constantes.ParameterCodigoCashInflow,
+                Description = "Número de ingreso",
+                Value       = "ING-0001"
+            };
+            await repositoryParameters.PosMeInsert(find);
+        }
+
+        var codigo = find.Value!;
+
+        if (string.IsNullOrWhiteSpace(codigo) || codigo.IndexOf("-", StringComparison.Ordinal) < 0)
+            throw new System.Exception(Mensajes.MensajeContadorDeCashInflowMalFormado);
+
+        var prefix  = codigo.Split("-")[0];
+        var counter = codigo.Split("-")[1];
+        var numero  = Convert.ToInt32(counter);
+        numero      += 1;
+        var nuevoCodigoCashInflow = prefix + "-" + Convert.ToString(numero).PadLeft(4, '0');
+        find.Value  = nuevoCodigoCashInflow;
+        await repositoryParameters.PosMeUpdate(find);
+
+        return codigo;
+    }
+
     private string GetFilePath(string filename)
     {
         var folderPath = Environment.GetFolderPath(DeviceInfo.Platform == DevicePlatform.Android

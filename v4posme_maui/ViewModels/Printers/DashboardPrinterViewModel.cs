@@ -11,6 +11,7 @@ using v4posme_maui.Views.Abonos;
 using v4posme_maui.Views.Invoices;
 using v4posme_maui.Views.Printers;
 using v4posme_maui.Views.More.Gasto;
+using v4posme_maui.Views.More.CashInflow;
 using v4posme_maui.Views.Inventario;
 using Unity;
 using v4posme_maui.Services.Helpers;
@@ -39,6 +40,7 @@ public class DashboardPrinterViewModel : BaseViewModel
         Abonos                                  = new();
         Productos                               = new();
         Gastos                                  = new();
+        Ingresos                                = new();
         InventarioEntradas                      = new();
         InventarioSalidas                       = new();
         SearchInventarioEntradasCommand         = new Command(OnSearchInventarioEntradasCommand);
@@ -51,9 +53,11 @@ public class DashboardPrinterViewModel : BaseViewModel
         SelectedAbonoCommand                    = new Command<ViewTempDtoAbono>(OnSelectedAbonoCommand);
         SelectedProductoCommand                 = new Command<Api_AppMobileApi_GetDataDownloadItemsResponse>(OnSelectedProductoCommand);
         SelectedGastoCommand                    = new Command<ViewTempDtoGastoLista>(OnSelectedGastoCommand);
+        SelectedCashInflowCommand               = new Command<ViewTempDtoCashInflowLista>(OnSelectedCashInflowCommand);
         SearchAbonoCommand                      = new Command(OnSearchAbonoCommand);
         SearchProductCommand                    = new Command(OnSearchProductCommand);
         SearchGastoCommand                      = new Command(OnSearchGastoCommand);
+        SearchCashInflowCommand                 = new Command(OnSearchCashInflowCommand);
         IsBusy                                  = true;
     }
 
@@ -92,6 +96,48 @@ public class DashboardPrinterViewModel : BaseViewModel
             };
 
             await Navigation!.PushAsync(new GastoComprobantePage());
+        }
+        catch (Exception e)
+        {
+            ShowToast(e.Message, ToastDuration.Long, 14);
+        }
+    }
+
+    private async void OnSearchCashInflowCommand()
+    {
+        IsBusy = true;
+        List<TbTransactionMaster> filters;
+        if (string.IsNullOrWhiteSpace(SearchIngresos))
+        {
+            filters = await _repositoryTbTransactionMaster.PosMeFilterTop10CashInflow();
+        }
+        else
+        {
+            filters = await _repositoryTbTransactionMaster.PosMeFilterTop10ByCodigoCashInflow(SearchIngresos);
+        }
+
+        await FillCashInflow(filters);
+        IsBusy = false;
+    }
+
+    private async void OnSelectedCashInflowCommand(ViewTempDtoCashInflowLista obj)
+    {
+        try
+        {
+            VariablesGlobales.DtoCashInflow = new ViewTempDtoCashInflow
+            {
+                TransactionMasterId = obj.TransactionMasterId,
+                NumeroIngreso = obj.Codigo,
+                Fecha         = obj.Fecha,
+                MonedaNombre  = obj.MonedaNombre,
+                MonedaSimbolo = obj.MonedaSimbolo,
+                Monto         = obj.Monto,
+                Comentario    = obj.Comentario,
+                Referencia1   = obj.Referencia1,
+                Referencia2   = obj.Referencia2
+            };
+
+            await Navigation!.PushAsync(new CashInflowComprobantePage());
         }
         catch (Exception e)
         {
@@ -295,6 +341,25 @@ public class DashboardPrinterViewModel : BaseViewModel
 
     public Command SearchGastoCommand { get; }
     public Command SelectedGastoCommand { get; }
+
+    private ObservableCollection<ViewTempDtoCashInflowLista>? _ingresos;
+
+    public ObservableCollection<ViewTempDtoCashInflowLista> Ingresos
+    {
+        get => _ingresos!;
+        set => SetProperty(ref _ingresos, value);
+    }
+
+    private string _searchIngresos;
+
+    public string SearchIngresos
+    {
+        get => _searchIngresos;
+        set => SetProperty(ref _searchIngresos, value);
+    }
+
+    public Command SearchCashInflowCommand { get; }
+    public Command SelectedCashInflowCommand { get; }
 
     public Command SearchFacturaCommand { get; }
     public Command OnBarCode { get; }
@@ -549,11 +614,16 @@ public class DashboardPrinterViewModel : BaseViewModel
                     break;
 
                 case 4:
+                    var findAllIngresos = await _repositoryTbTransactionMaster.PosMeFilterTop10CashInflow();
+                    await FillCashInflow(findAllIngresos);
+                    break;
+
+                case 5:
                     var entradas = await _repositoryTbTransactionMaster.PosMeFilterInventarioByTransactionId((int)TypeTransaction.TransactionInventarioEntrada);
                     await FillInventario(entradas, esEntrada: true);
                     break;
 
-                case 5:
+                case 6:
                     var salidas = await _repositoryTbTransactionMaster.PosMeFilterInventarioByTransactionId((int)TypeTransaction.TransactionInventarioSalida);
                     await FillInventario(salidas, esEntrada: false);
                     break;
@@ -590,6 +660,39 @@ public class DashboardPrinterViewModel : BaseViewModel
             await MainThread.InvokeOnMainThreadAsync(() =>
             {
                 Gastos = new ObservableCollection<ViewTempDtoGastoLista>(buffer);
+            });
+        }
+        catch (Exception e)
+        {
+            ShowToast(e.Message, ToastDuration.Long, 14);
+        }
+    }
+
+    private async Task FillCashInflow(List<TbTransactionMaster> findAllIngresos)
+    {
+        try
+        {
+            var buffer = new List<ViewTempDtoCashInflowLista>(findAllIngresos.Count);
+            foreach (var master in findAllIngresos)
+            {
+                var esCordoba = master.CurrencyId == TypeCurrency.Cordoba;
+                buffer.Add(new ViewTempDtoCashInflowLista
+                {
+                    TransactionMasterId = master.TransactionMasterId,
+                    Codigo              = master.TransactionNumber!,
+                    Fecha               = master.TransactionOn,
+                    Monto               = master.Amount,
+                    MonedaSimbolo       = esCordoba ? "C$" : "$",
+                    MonedaNombre        = esCordoba ? "Cordoba (C$)" : "Dolar ($)",
+                    Comentario          = master.Comment ?? string.Empty,
+                    Referencia1         = master.Reference1 ?? string.Empty,
+                    Referencia2         = master.Reference2 ?? string.Empty
+                });
+            }
+
+            await MainThread.InvokeOnMainThreadAsync(() =>
+            {
+                Ingresos = new ObservableCollection<ViewTempDtoCashInflowLista>(buffer);
             });
         }
         catch (Exception e)

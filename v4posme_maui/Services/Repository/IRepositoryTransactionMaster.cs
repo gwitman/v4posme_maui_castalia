@@ -18,6 +18,8 @@ public interface IRepositoryTbTransactionMaster : IRepositoryFacade<TbTransactio
 	Task<List<TbTransactionMaster>> PosmeGetAll();
     Task<List<TbTransactionMaster>> PosMeFilterTop10Gastos();
     Task<List<TbTransactionMaster>> PosMeFilterTop10ByCodigoGastos(string filter);
+    Task<List<TbTransactionMaster>> PosMeFilterTop10CashInflow();
+    Task<List<TbTransactionMaster>> PosMeFilterTop10ByCodigoCashInflow(string filter);
     Task<List<TbTransactionMaster>> PosMeFilterInventarioByTransactionId(int transactionId);
     Task<List<TbTransactionMaster>> PosMeFilterInventarioByCodigo(int transactionId, string filter);
 }
