@@ -9,7 +9,7 @@
 
     <ScrollView Padding="16,20">
         <Grid ColumnDefinitions="*,*"
-              RowDefinitions="Auto,Auto,Auto,Auto"
+              RowDefinitions="Auto,Auto,Auto,Auto,Auto"
               ColumnSpacing="14"
               RowSpacing="14">
 
@@ -344,6 +344,54 @@
                            Margin="0,12,0,0" />
                     <Label Grid.Row="2"
                            Text="En el mobile"
+                           FontSize="12"
+                           TextColor="{StaticResource Tertiary}" />
+                </Grid>
+            </Border>
+
+            <!-- Reportes Remoto -->
+            <Border Grid.Row="3" Grid.Column="1"
+                    StrokeShape="RoundRectangle 14"
+                    StrokeThickness="0"
+                    BackgroundColor="{StaticResource CardColor}"
+                    Padding="0"
+                    HeightRequest="170">
+                <Border.Shadow>
+                    <Shadow Brush="{StaticResource Gray300}"
+                            Offset="0,4"
+                            Radius="12"
+                            Opacity="0.4" />
+                </Border.Shadow>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnCardTapped" CommandParameter="8" />
+                </Border.GestureRecognizers>
+                <Grid RowDefinitions="Auto,*,Auto" Padding="16,20,16,16">
+                    <Border Grid.Row="0"
+                            StrokeShape="RoundRectangle 12"
+                            StrokeThickness="0"
+                            BackgroundColor="#E8F4FD"
+                            WidthRequest="48"
+                            HeightRequest="48"
+                            HorizontalOptions="Start">
+                        <Image Source="invoice_white.svg"
+                               WidthRequest="24"
+                               HeightRequest="24"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center">
+                            <Image.Behaviors>
+                                <toolkit:IconTintColorBehavior TintColor="#3949AB" />
+                            </Image.Behaviors>
+                        </Image>
+                    </Border>
+                    <Label Grid.Row="1"
+                           Text="Reportes Remoto"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="15"
+                           TextColor="{StaticResource PrimaryDark}"
+                           VerticalOptions="End"
+                           Margin="0,12,0,0" />
+                    <Label Grid.Row="2"
+                           Text="En la web"
                            FontSize="12"
                            TextColor="{StaticResource Tertiary}" />
                 </Grid>
