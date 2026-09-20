@@ -67,6 +67,8 @@
                                 Grid.Column="0"
                                 Style="{StaticResource SearchEditorStyle}"
                                 PlaceholderText="Buscar producto..."
+                                ReturnType="Search"
+                                ReturnCommand="{Binding SearchCommand}"
                                 Text="{Binding Search}" />
                             <dx:DXButton
                                 Grid.Column="1"

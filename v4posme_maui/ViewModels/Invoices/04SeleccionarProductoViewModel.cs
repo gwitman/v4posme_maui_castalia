@@ -147,13 +147,15 @@ public class SeleccionarProductoViewModel : BaseViewModel
 
     private async void OnSearch()
     {
+        // La lupa y el Enter del teclado ejecutan la busqueda directamente,
+        // sin abrir el popup. Si el popup estaba abierto se cierra.
+        IsPanelVisible = false;
+
         if (string.IsNullOrWhiteSpace(Search))
         {
-            IsPanelVisible = !IsPanelVisible;
             return;
         }
 
-        IsPanelVisible = !IsPanelVisible;
         await LoadAllProductosAsync();
     }
 
@@ -205,7 +207,12 @@ public class SeleccionarProductoViewModel : BaseViewModel
         await Navigation!.PushModalAsync(barCodePage);
         var bar         = await barCodePage.WaitForResultAsync();
         Search          = bar!;
-        IsPanelVisible  = !IsPanelVisible;
+        IsPanelVisible  = false;
+
+        if (!string.IsNullOrWhiteSpace(Search))
+        {
+            await LoadAllProductosAsync();
+        }
     }
 
     private async void OnAnadirProducto(Api_AppMobileApi_GetDataDownloadItemsResponse? obj)
