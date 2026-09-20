@@ -274,6 +274,89 @@ public class RepositoryTbCustomer(DataBase dataBase, IRepositoryTbParameterSyste
         return _dataBase.Database.QueryAsync<Api_AppMobileApi_GetDataDownloadCustomerResponse>(query);
     }
 
+    // Igual que PosMeCustomerAscLoad pero sin paginacion: devuelve todos los clientes de una vez.
+    public Task<List<Api_AppMobileApi_GetDataDownloadCustomerResponse>> PosMeCustomerAscLoadAll()
+    {
+        var typeInvoice = (int)TypeTransaction.TransactionInvoiceBilling;
+        var query = $"""
+                    SELECT 
+                        tbc.CustomerId,
+                        tbc.CompanyId,
+                        tbc.BranchId,
+                        tbc.EntityId,
+                        tbc.CustomerNumber,
+                        tbc.Identification,
+                        tbc.FirstName,
+                        tbc.LastName,
+                        tbc.Balance,
+                        tbc.CurrencyId,
+                        tbc.CurrencyName,
+                        tbc.CustomerCreditLineId,
+                        tbc.Location,
+                        tbc.Phone,
+                        tbc.Me,
+                        tbc.Modificado,
+                        tbc.Secuencia,
+                        tbc.Remaining,
+                        CASE
+                            WHEN EXISTS (
+                                SELECT 1
+                                FROM tb_transaction_master ttm
+                                WHERE ttm.EntityId = tbc.EntityId
+                                  AND ttm.TransactionId = {typeInvoice}
+                            ) THEN 1
+                            ELSE 0
+                        END AS Facturado
+                    FROM tb_customers tbc
+                    ORDER BY tbc.Secuencia 
+                    """;
+        return _dataBase.Database.QueryAsync<Api_AppMobileApi_GetDataDownloadCustomerResponse>(query);
+    }
+
+    // Igual que PosMeFilterBySearch pero sin paginacion: devuelve todos los coincidentes de una vez.
+    public Task<List<Api_AppMobileApi_GetDataDownloadCustomerResponse>> PosMeFilterBySearchAll(string search)
+    {
+        search          = search.ToLower();
+        var typeInvoice = (int)TypeTransaction.TransactionInvoiceBilling;
+        var query = $"""
+                      SELECT 
+                          tbc.CustomerId,
+                          tbc.CompanyId,
+                          tbc.BranchId,
+                          tbc.EntityId,
+                          tbc.CustomerNumber,
+                          tbc.Identification,
+                          tbc.FirstName,
+                          tbc.LastName,
+                          tbc.Balance,
+                          tbc.CurrencyId,
+                          tbc.CurrencyName,
+                          tbc.CustomerCreditLineId,
+                          tbc.Location,
+                          tbc.Phone,
+                          tbc.Me,
+                          tbc.Modificado,
+                          tbc.Secuencia,
+                          tbc.Remaining,
+                          CASE
+                              WHEN EXISTS (
+                                  SELECT 1
+                                  FROM tb_transaction_master ttm
+                                  WHERE ttm.EntityId = tbc.EntityId
+                                  AND ttm.TransactionId = {typeInvoice}
+                              ) THEN 1
+                              ELSE 0
+                          END AS Facturado
+                      FROM tb_customers tbc
+                      where tbc.Identification like '%{search}%' OR 
+                            tbc.FirstName like '%{search}%' OR
+                            tbc.LastName like '%{search}%' OR
+                            tbc.CustomerNumber like '%{search}%'
+                      ORDER BY tbc.Secuencia
+                      """;
+        return _dataBase.Database.QueryAsync<Api_AppMobileApi_GetDataDownloadCustomerResponse>(query);
+    }
+
     public async Task<List<Api_AppMobileApi_GetDataDownloadCustomerResponse>> PosMeFilterByShare()
     {
         var typeShare = (int)TypeTransaction.TransactionShare;

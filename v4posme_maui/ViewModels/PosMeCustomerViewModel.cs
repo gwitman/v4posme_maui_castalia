@@ -17,9 +17,6 @@ public class PosMeCustomerViewModel : BaseViewModel
     private readonly IRepositoryTbCustomer _customerRepositoryTbCustomer;
     private readonly IRepositoryTbParameterSystem _repositoryTbParameterSystem;
     private readonly HelperCore _helperCore;
-    private int _lastLoadedIndex;
-    private List<CustomerOrderShare> _customerOrderShares   = new();
-    private int _loadBatchSize                              = 10;
     
 
     public PosMeCustomerViewModel()
@@ -30,12 +27,10 @@ public class PosMeCustomerViewModel : BaseViewModel
         Customers                       = new DXObservableCollection<Api_AppMobileApi_GetDataDownloadCustomerResponse>();
         SearchCommand                   = new Command(OnSearchCommand);
         OnBarCode                       = new Command(OnBarCodeShow);
-        LoadMoreCommand                 = new Command( OnLoadMoreCommand);
     }
 
     public ICommand OnBarCode { get; }
     public ICommand SearchCommand { get; }
-    public ICommand LoadMoreCommand { get; }
 
     private DXObservableCollection<Api_AppMobileApi_GetDataDownloadCustomerResponse> _customers = [];
 
@@ -53,28 +48,13 @@ public class PosMeCustomerViewModel : BaseViewModel
         set => SetProperty(ref _selectedCustomer, value);
     }
 
-    private void OnLoadMoreCommand()
-    {
-        if (_lastLoadedIndex == 0)
-        {   
-        }
-        else
-        {
-            LoadCustomers();
-        }
-        
-    }
-
     private void OnSearchCommand(object? obj)
     {
-        IsBusy = true;
         if (obj is not null)
         {
             Search = obj.ToString() ?? string.Empty;
         }
-        _lastLoadedIndex = 0;
-        LoadCustomers();
-        IsBusy = false;
+        _ = LoadCustomers();
     }
 
     private async void OnBarCodeShow(object obj)
@@ -100,9 +80,6 @@ public class PosMeCustomerViewModel : BaseViewModel
         try
         {
             Navigation           = navigation;
-            _lastLoadedIndex     = 0;
-            var topParameter     = await _helperCore.GetValueParameter("MOBILE_SHOW_TOP_CUSTOMER", "10");
-            _loadBatchSize       = int.Parse(topParameter);
             await LoadCustomers();
         }
         catch (Exception e)
@@ -116,93 +93,31 @@ public class PosMeCustomerViewModel : BaseViewModel
         }
     }
 
-    private async Task<List<CustomerOrderShare>> LoadOrderCustomer()
-    {
-        var customerOrderJson = await _repositoryTbParameterSystem.PosMeFindCustomerOrderCustomer();
-        List<CustomerOrderShare> customOrder = [];
-
-        if (!string.IsNullOrWhiteSpace(customerOrderJson.Value))
-        {
-            customOrder = JsonConvert.DeserializeObject<List<CustomerOrderShare>>(customerOrderJson.Value) ?? [];
-        }
-        return customOrder;
-    }
-    
     private async Task<bool> LoadCustomers()
     {
-        
         try
         {
-            IsBusy                          = true;
-            // 1. Obtener el orden personalizado desde el repositorio
-            var customOrder = _customerOrderShares;
-            
-            // 2. Obtener todos los clientes
-            List<Api_AppMobileApi_GetDataDownloadCustomerResponse> allCustomers;
-            List<Api_AppMobileApi_GetDataDownloadCustomerResponse> finalList;
-            if (_lastLoadedIndex == 0)
-            {
-                Customers.Clear();
-            }
+            IsBusy = true;
 
+            // Si esta activo el reordenamiento personalizado, se aplica antes de leer.
             if (VariablesGlobales.OrdenarClientes)
             {
                 await _helperCore.ReordenarListaClientes();
-                if (string.IsNullOrWhiteSpace(Search))
-                {
-                    allCustomers = await _customerRepositoryTbCustomer.PosMeCustomerAscLoad(_lastLoadedIndex, _loadBatchSize);
-                }
-                else
-                {
-                    allCustomers = await _customerRepositoryTbCustomer.PosMeFilterBySearch(Search, _lastLoadedIndex, _loadBatchSize);
-                }
-                
-                finalList   = allCustomers;
-                if (_lastLoadedIndex == 0)
-                {
-                    Customers = new DXObservableCollection<Api_AppMobileApi_GetDataDownloadCustomerResponse>(finalList);
-                }
-                else
-                {
-                    Customers.AddRange(finalList);
-                }
+            }
 
-                _lastLoadedIndex    += _loadBatchSize;
-                IsBusy              = false;
-                
-
-
+            // Se cargan TODOS los clientes de una sola vez (sin paginacion ni take/limit).
+            List<Api_AppMobileApi_GetDataDownloadCustomerResponse> allCustomers;
+            if (string.IsNullOrWhiteSpace(Search))
+            {
+                allCustomers = await _customerRepositoryTbCustomer.PosMeCustomerAscLoadAll();
             }
             else
             {
-                if (string.IsNullOrWhiteSpace(Search))
-                {
-                    allCustomers = await _customerRepositoryTbCustomer.PosMeCustomerAscLoad(_lastLoadedIndex, _loadBatchSize);
-                }
-                else
-                {
-                    allCustomers = await _customerRepositoryTbCustomer.PosMeFilterBySearch(Search, _lastLoadedIndex, _loadBatchSize);
-                }
-
-                
-                finalList = allCustomers;
-                if (_lastLoadedIndex == 0)
-                {
-                    Customers = new DXObservableCollection<Api_AppMobileApi_GetDataDownloadCustomerResponse>(finalList);
-                }
-                else
-                {
-                    Customers.AddRange(finalList);
-                }
-
-                _lastLoadedIndex    += _loadBatchSize;
-                IsBusy              = false;
-                
+                allCustomers = await _customerRepositoryTbCustomer.PosMeFilterBySearchAll(Search);
             }
 
-            
-
-
+            // Se reemplaza el contenido completo de la lista de una sola vez.
+            Customers = new DXObservableCollection<Api_AppMobileApi_GetDataDownloadCustomerResponse>(allCustomers);
         }
         catch (Exception ex)
         {

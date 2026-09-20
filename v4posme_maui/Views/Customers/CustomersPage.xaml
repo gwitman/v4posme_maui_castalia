@@ -79,8 +79,6 @@
                         SelectionMode="Single"
                         AllowDragDropItems="True"
                         DropItem="ClientesCollectionView_OnDropItem"
-                        IsLoadMoreEnabled="True"
-                        LoadMoreCommand="{Binding LoadMoreCommand}"
                         TapCommand="{Binding Source={x:Reference ClientesCollectionView}, Path=Commands.ShowDetailForm}"
                         IsRefreshing="{Binding  IsBusy, Mode=TwoWay}">
                         <dxcv:DXCollectionView.ItemTemplate>

@@ -22,6 +22,12 @@ public interface IRepositoryTbCustomer : IRepositoryFacade<Api_AppMobileApi_GetD
     Task<List<Api_AppMobileApi_GetDataDownloadCustomerResponse>> PosMeAscTake10(int top = 10);
 
     Task<List<Api_AppMobileApi_GetDataDownloadCustomerResponse>> PosMeCustomerAscLoad(int skip, int take);
+
+    // Devuelve todos los clientes ordenados por Secuencia, sin paginacion.
+    Task<List<Api_AppMobileApi_GetDataDownloadCustomerResponse>> PosMeCustomerAscLoadAll();
+
+    // Devuelve todos los clientes que coinciden con la busqueda, sin paginacion.
+    Task<List<Api_AppMobileApi_GetDataDownloadCustomerResponse>> PosMeFilterBySearchAll(string search);
     
     Task<List<Api_AppMobileApi_GetDataDownloadCustomerResponse>> PosMeTakeModificados();
 
