@@ -33,11 +33,16 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
-                            <Label Grid.Row="0"
-                                   Text="Resumen del día"
-                                   FontSize="15"
-                                   TextColor="#DCEFF7"
-                                   FontFamily="Roboto" />
+                            <VerticalStackLayout Grid.Row="0" Spacing="2">
+                                <Label Text="Resumen del día"
+                                       FontSize="15"
+                                       TextColor="#DCEFF7"
+                                       FontFamily="Roboto" />
+                                <Label Text="Contado + Abonos + Ingresos − Compras − Gastos"
+                                       FontSize="11"
+                                       TextColor="#B7D8E6"
+                                       FontFamily="Roboto" />
+                            </VerticalStackLayout>
                             <Grid Grid.Row="1" ColumnSpacing="12">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />

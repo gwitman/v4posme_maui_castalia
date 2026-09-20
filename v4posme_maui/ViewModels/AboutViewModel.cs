@@ -423,10 +423,10 @@ namespace v4posme_maui.ViewModels
                 //Ingreso general = facturas de contado + abonos + ingresos de efectivo
                 IngresoGeneralCordobas = MontoFacturasContadoCordobas + MontoAbonosCordobas + MontoIngresosCordobas;
                 IngresoGeneralDolares  = MontoFacturasContadoDolares + MontoAbonosDolares + MontoIngresosDolares;
-                //Totales del dia: los gastos y las compras (entradas de inventario) son egresos y restan;
-                //los ingresos, abonos, facturas de contado y salidas de inventario suman.
-                TotalCordobas   = MontoAbonosCordobas + MontoFacturasContadoCordobas + MontoIngresosCordobas + MontoSalidasInventarioCordobas - MontoGastosCordobas - MontoEntradasInventarioCordobas;
-                TotalDolares    = MontoAbonosDolares + MontoFacturasContadoDolares + MontoIngresosDolares + MontoSalidasInventarioDolares - MontoGastosDolares - MontoEntradasInventarioDolares;
+                //Total del dia = ventas de contado + abonos + ingresos - compras (entradas de
+                //inventario) - gastos. Las salidas de inventario no afectan el total de caja.
+                TotalCordobas   = MontoFacturasContadoCordobas + MontoAbonosCordobas + MontoIngresosCordobas - MontoEntradasInventarioCordobas - MontoGastosCordobas;
+                TotalDolares    = MontoFacturasContadoDolares + MontoAbonosDolares + MontoIngresosDolares - MontoEntradasInventarioDolares - MontoGastosDolares;
                 IsBusy          = false;
             }
             catch (Exception e)
