@@ -16,9 +16,6 @@ namespace v4posme_maui.ViewModels
     {
         private readonly IRepositoryItems _repositoryItems;
         private readonly IRepositoryTbTransactionMasterDetail _transactionMasterDetail;
-		private readonly HelperCore _helper;
-        private int _loadBatchSize = 15;
-        private int _lastLoadedIndex;
         
 
 
@@ -27,21 +24,18 @@ namespace v4posme_maui.ViewModels
             IsBusy = true;
             _repositoryItems = VariablesGlobales.UnityContainer.Resolve<IRepositoryItems>();
             _transactionMasterDetail = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMasterDetail>();
-			_helper = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
 			Title = "Productos";
             _items = new DXObservableCollection<Api_AppMobileApi_GetDataDownloadItemsResponse>();
             CreateDetailFormViewModelCommand = new Command<CreateDetailFormViewModelEventArgs>(CreateDetailFormViewModel);
             SearchCommand = new Command(OnSearchItems);
             ChangeValueCommand = new Command(OnChangeValueCommand);
             OnBarCode = new Command(OnSearchBarCode);
-            LoadMoreCommand = new Command(OnLoadMoreCommand);
         }
 
 
         public ICommand OnBarCode { get; }
         public ICommand SearchCommand { get; }
         public ICommand ChangeValueCommand { get;  }
-        public ICommand LoadMoreCommand { get; }
         public ICommand CreateDetailFormViewModelCommand { get; }
         
         private DXObservableCollection<Api_AppMobileApi_GetDataDownloadItemsResponse> _items;
@@ -72,51 +66,37 @@ namespace v4posme_maui.ViewModels
 
         private void OnChangeValueCommand(object? obj)
         {
-            _lastLoadedIndex = 0;            
         }
         private void OnSearchItems(object? obj)
         {
-            IsBusy = true;
             if (obj is not null)
             {
                 Search = obj.ToString()!;
             }
-            
-            _lastLoadedIndex = 0;
+
             // Al reiniciar la lista, la posicion de navegacion tambien debe reiniciarse para
             // no arrastrar un indice que quedaria fuera de rango o apuntando a otro producto.
             VariablesGlobales.ItemsNavegacionIndex = 0;
-            Items.Clear();
             LoadItems();
-            
-        }
-        private void OnLoadMoreCommand()
-        {
-            if (IsBusy)
-                return;
-
-            LoadItems();
-            _lastLoadedIndex += _loadBatchSize;
         }
 
         private async void LoadItems()
         {
-            IsBusy  = true;
+            IsBusy = true;
             await Task.Run(async () =>
             {
-                Thread.Sleep(1000);
-                List<Api_AppMobileApi_GetDataDownloadItemsResponse> newItems;
+                // Se cargan TODOS los productos de una sola vez (sin paginacion ni take/top).
+                List<Api_AppMobileApi_GetDataDownloadItemsResponse> allItems;
                 if (string.IsNullOrWhiteSpace(Search))
-                { 
-                    newItems = await _repositoryItems.PosMeAscBySizeAndTop(_lastLoadedIndex, _loadBatchSize);
+                {
+                    allItems = await _repositoryItems.PosMeAllOrderByName();
                 }
                 else
                 {
-                    
-                    newItems = await _repositoryItems.PosMeFilterdByItemNumberAndBarCodeAndNameByTop(Search, _lastLoadedIndex, _loadBatchSize);
+                    allItems = await _repositoryItems.PosMeFilterdByItemNumberAndBarCodeAndNameAll(Search);
                 }
 
-                foreach (var item in newItems)
+                foreach (var item in allItems)
                 {
                     var details = await _transactionMasterDetail.PosMeByTransactionIDAndItemID(
                         (int)TypeTransaction.TransactionInvoiceBilling, item.ItemId);
@@ -127,13 +107,14 @@ namespace v4posme_maui.ViewModels
                     item.CantidadFinal = (item.Quantity + item.CantidadEntradas) - (item.CantidadSalidas + cantidadFacturadas);
                 }
 
-                Items.AddRange(newItems);
+                // Se reemplaza el contenido completo de la lista de una sola vez.
+                Items.Clear();
+                Items.AddRange(allItems);
                 // Mantiene sincronizada la lista usada para navegar entre productos
                 // (anterior/siguiente) desde las pantallas de detalle y edicion.
                 VariablesGlobales.ItemsNavegacion = Items.ToList();
                 IsBusy = false;
             });
-            
         }
         
         
@@ -148,15 +129,11 @@ namespace v4posme_maui.ViewModels
             e.Result = new DetailEditFormViewModel(item, isNew: false);
         }
 
-        public async void OnAppearing(INavigation navigation)
+        public void OnAppearing(INavigation navigation)
         {
             try
             {
                 Navigation = navigation;
-                var topParameter = await _helper.GetValueParameter("MOBILE_SHOW_TOP_CUSTOMER", "10");
-                _loadBatchSize = int.Parse(topParameter);
-                _lastLoadedIndex = 0;
-                Items.Clear();
                 LoadItems();
             }
             catch (Exception e)

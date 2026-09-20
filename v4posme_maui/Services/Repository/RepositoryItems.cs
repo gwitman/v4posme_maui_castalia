@@ -87,6 +87,34 @@ public class RepositoryItems(DataBase dataBase)
             .ToList();
     }
 
+    // Devuelve todos los productos ordenados alfabeticamente por Name (en memoria, para un
+    // orden consistente ya que SQLite usa collation BINARY sensible a mayusculas). Sin paginacion.
+    public async Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeAllOrderByName()
+    {
+        var items = await _dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadItemsResponse>()
+            .ToListAsync();
+
+        return items
+            .OrderBy(response => response.Name.ToLower())
+            .ToList();
+    }
+
+    // Devuelve todos los productos que coinciden con el texto de busqueda (por numero, codigo de
+    // barra o nombre), ordenados por Name, sin paginacion.
+    public async Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeFilterdByItemNumberAndBarCodeAndNameAll(string? textSearch)
+    {
+        textSearch = textSearch!.ToLower();
+        var items = await _dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadItemsResponse>()
+            .Where(response => response.ItemNumber!.ToLower().Contains(textSearch)
+                               || response.BarCode.ToLower().Contains(textSearch)
+                               || response.Name.ToLower().Contains(textSearch))
+            .ToListAsync();
+
+        return items
+            .OrderBy(response => response.Name.ToLower())
+            .ToList();
+    }
+
     public Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeDescendingBySizeAndTop(int size,int take)
     {
         return _dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadItemsResponse>()

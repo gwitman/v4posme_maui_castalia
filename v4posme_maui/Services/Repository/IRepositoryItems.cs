@@ -20,6 +20,12 @@ public interface IRepositoryItems : IRepositoryFacade<Api_AppMobileApi_GetDataDo
     
     Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeFilterdByItemNumberAndBarCodeAndNameByTop(string? textSearch,int size,int top);
 
+    // Devuelve todos los productos ordenados alfabeticamente por Name, sin paginacion.
+    Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeAllOrderByName();
+
+    // Devuelve todos los productos que coinciden con el texto de busqueda, sin paginacion.
+    Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeFilterdByItemNumberAndBarCodeAndNameAll(string? textSearch);
+
     Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeDescendingBySizeAndTop(int size,int top );
 
     Task<List<Api_AppMobileApi_GetDataDownloadItemsResponse>> PosMeAscBySizeAndTop(int size, int top);
