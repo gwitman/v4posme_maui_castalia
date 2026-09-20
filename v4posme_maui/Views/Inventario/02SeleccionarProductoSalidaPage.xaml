@@ -17,6 +17,10 @@
     <Shell.BackButtonBehavior>
         <BackButtonBehavior IconOverride="ic_arrow_back" Command="{Binding AtrasCommand}" />
     </Shell.BackButtonBehavior>
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Order="Secondary" Text="Limpiar seleccionados"
+                     Command="{Binding LimpiarSeleccionadosCommand}" />
+    </ContentPage.ToolbarItems>
     <ContentPage.Resources>
         <converters:ToLowerConverter x:Key="ToLowerConverter" />
     </ContentPage.Resources>

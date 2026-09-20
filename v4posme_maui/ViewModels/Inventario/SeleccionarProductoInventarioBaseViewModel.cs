@@ -21,6 +21,11 @@ public abstract class SeleccionarProductoInventarioBaseViewModel : BaseViewModel
     protected readonly IRepositoryItems RepositoryItems;
     protected readonly HelperCore Helper;
 
+    // Buffer en memoria de lo capturado en linea por ItemNumber (objeto completo del item).
+    // Persiste entre busquedas para NO perder lo seleccionado, incluso productos que ya no
+    // aparecen en el filtro actual. Solo se limpia con el comando "Limpiar seleccionados".
+    private readonly Dictionary<string, Api_AppMobileApi_GetDataDownloadItemsResponse> _capturados = new();
+
     protected SeleccionarProductoInventarioBaseViewModel()
     {
         Productos                     = new();
@@ -31,6 +36,7 @@ public abstract class SeleccionarProductoInventarioBaseViewModel : BaseViewModel
         ProductosSeleccionadosCommand = new Command(OnAvanzar);
         RecalcularCommand             = new Command(RefrescarResumen);
         AtrasCommand                  = new Command(OnAtras);
+        LimpiarSeleccionadosCommand   = new Command(OnLimpiarSeleccionados);
     }
 
     // Navegacion al paso de revision (implementada por cada flujo concreto).
@@ -46,6 +52,7 @@ public abstract class SeleccionarProductoInventarioBaseViewModel : BaseViewModel
     public Command ProductosSeleccionadosCommand { get; }
     public Command RecalcularCommand { get; }
     public Command AtrasCommand { get; }
+    public Command LimpiarSeleccionadosCommand { get; }
 
     private string _resumen = "0 Items = C$ 0.00";
     public string ProductosSeleccionadosCantidadTotal
@@ -68,16 +75,45 @@ public abstract class SeleccionarProductoInventarioBaseViewModel : BaseViewModel
 
     private async void OnSearch()
     {
+        // Conservar lo capturado antes de recargar el listado filtrado.
+        VolcarCapturadosDesdeVista();
         await LoadAllProductosAsync();
     }
 
     private async void OnSearchBarCode()
     {
+        VolcarCapturadosDesdeVista();
         var barCodePage = new BarCodePage();
         await Navigation!.PushModalAsync(barCodePage);
         var bar         = await barCodePage.WaitForResultAsync();
         Search          = bar!;
         await LoadAllProductosAsync();
+    }
+
+    private async void OnLimpiarSeleccionados()
+    {
+        _capturados.Clear();
+        foreach (var item in Productos)
+        {
+            item.Quantity = decimal.Zero;
+            item.Importe  = decimal.Zero;
+        }
+        await LoadAllProductosAsync();
+        RefrescarResumen();
+        ShowToast("Seleccionados limpiados", ToastDuration.Short, 12);
+    }
+
+    // Guarda en el buffer lo capturado actualmente en la vista (objeto completo).
+    private void VolcarCapturadosDesdeVista()
+    {
+        foreach (var item in Productos)
+        {
+            if (string.IsNullOrEmpty(item.ItemNumber)) continue;
+            if (item.Quantity > 0)
+                _capturados[item.ItemNumber] = item;
+            else
+                _capturados.Remove(item.ItemNumber);
+        }
     }
 
     protected async Task LoadAllProductosAsync()
@@ -93,21 +129,18 @@ public abstract class SeleccionarProductoInventarioBaseViewModel : BaseViewModel
 
             items = items.OrderBy(i => i.Name).ToList();
 
-            // Productos ya capturados en el DTO (para conservar lo ingresado al buscar).
-            var cesta = VariablesGlobales.DtoInventario.Items;
-
             foreach (var item in items)
             {
                 item.Name          = item.Name?.ToLower();
                 item.MonedaSimbolo = "C$";
 
-                var enCesta = cesta.FirstOrDefault(c => c.ItemNumber == item.ItemNumber);
-                if (enCesta is not null)
+                // Conservar lo capturado en memoria (persiste entre busquedas).
+                if (!string.IsNullOrEmpty(item.ItemNumber) &&
+                    _capturados.TryGetValue(item.ItemNumber, out var cap))
                 {
-                    // Conservar lo ya capturado.
-                    item.Quantity      = enCesta.Quantity;
-                    item.PrecioPublico = enCesta.PrecioPublico;
-                    item.Cost          = enCesta.Cost;
+                    item.Quantity      = cap.Quantity;
+                    item.PrecioPublico = cap.PrecioPublico;
+                    item.Cost          = cap.Cost;
                 }
                 else
                 {
@@ -135,18 +168,30 @@ public abstract class SeleccionarProductoInventarioBaseViewModel : BaseViewModel
     // precios ingresados en linea.
     protected void RefrescarResumen()
     {
-        decimal total = 0m;
-        int cantidadItems = 0;
+        // Actualizar importes de lo visible y sincronizar el buffer con lo editado en linea.
         foreach (var item in Productos)
         {
             if (item.Quantity < 0) item.Quantity = 0;
             // Solo visualizacion: el importe mostrado es cantidad x costo.
             item.Importe = item.Cost * item.Quantity;
-            if (item.Quantity > 0)
+
+            if (!string.IsNullOrEmpty(item.ItemNumber))
             {
-                total += item.Importe;
-                cantidadItems++;
+                if (item.Quantity > 0)
+                    _capturados[item.ItemNumber] = item;
+                else
+                    _capturados.Remove(item.ItemNumber);
             }
+        }
+
+        // El resumen refleja TODO lo capturado (visible o no en el filtro actual).
+        decimal total     = 0m;
+        int cantidadItems = 0;
+        foreach (var cap in _capturados.Values)
+        {
+            cap.Importe = cap.Cost * cap.Quantity;
+            total += cap.Importe;
+            cantidadItems++;
         }
 
         ProductosSeleccionadosCantidadTotal = $"{cantidadItems} Items = C$ {total:N2}";
@@ -157,7 +202,8 @@ public abstract class SeleccionarProductoInventarioBaseViewModel : BaseViewModel
     {
         RefrescarResumen();
 
-        var seleccionados = Productos.Where(p => p.Quantity > 0).ToList();
+        // Considerar TODO lo capturado (incluye productos de busquedas anteriores).
+        var seleccionados = _capturados.Values.Where(p => p.Quantity > 0).ToList();
         if (seleccionados.Count == 0)
         {
             ShowToast("Debe ingresar cantidad en al menos un producto", ToastDuration.Long, 12);
