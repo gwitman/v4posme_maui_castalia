@@ -206,6 +206,56 @@ namespace v4posme_maui.ViewModels
             set => SetProperty(ref _ingresoGeneralDolares, value);
         }
 
+        // Compras / entradas de inventario (aumentan existencia).
+        private int _cantidadEntradasInventario;
+
+        public int CantidadEntradasInventario
+        {
+            get => _cantidadEntradasInventario;
+            set => SetProperty(ref _cantidadEntradasInventario, value);
+        }
+
+        private decimal _montoEntradasInventarioCordobas;
+
+        public decimal MontoEntradasInventarioCordobas
+        {
+            get => _montoEntradasInventarioCordobas;
+            set => SetProperty(ref _montoEntradasInventarioCordobas, value);
+        }
+
+        private decimal _montoEntradasInventarioDolares;
+
+        public decimal MontoEntradasInventarioDolares
+        {
+            get => _montoEntradasInventarioDolares;
+            set => SetProperty(ref _montoEntradasInventarioDolares, value);
+        }
+
+        // Salidas de inventario (disminuyen existencia).
+        private int _cantidadSalidasInventario;
+
+        public int CantidadSalidasInventario
+        {
+            get => _cantidadSalidasInventario;
+            set => SetProperty(ref _cantidadSalidasInventario, value);
+        }
+
+        private decimal _montoSalidasInventarioCordobas;
+
+        public decimal MontoSalidasInventarioCordobas
+        {
+            get => _montoSalidasInventarioCordobas;
+            set => SetProperty(ref _montoSalidasInventarioCordobas, value);
+        }
+
+        private decimal _montoSalidasInventarioDolares;
+
+        public decimal MontoSalidasInventarioDolares
+        {
+            get => _montoSalidasInventarioDolares;
+            set => SetProperty(ref _montoSalidasInventarioDolares, value);
+        }
+
         public async void OnAppearing(INavigation navigation)
         {
             try
@@ -225,6 +275,10 @@ namespace v4posme_maui.ViewModels
                 var listaGastosDolares                  = new List<TbTransactionMaster>();
                 var listaIngresosCordobas               = new List<TbTransactionMaster>();
                 var listaIngresosDolares                = new List<TbTransactionMaster>();
+                var listaEntradasInventarioCordobas     = new List<TbTransactionMaster>();
+                var listaEntradasInventarioDolares      = new List<TbTransactionMaster>();
+                var listaSalidasInventarioCordobas      = new List<TbTransactionMaster>();
+                var listaSalidasInventarioDolares       = new List<TbTransactionMaster>();
                 
                 
 
@@ -262,6 +316,30 @@ namespace v4posme_maui.ViewModels
                         else
                         {
                             listaAbonosDolares.Add(master);
+                        }
+                    }
+                    else if (master.TransactionId == TypeTransaction.TransactionInventarioEntrada)
+                    {
+                        // Compras / entradas de inventario (aumentan existencia).
+                        if (master.CurrencyId == TypeCurrency.Cordoba)
+                        {
+                            listaEntradasInventarioCordobas.Add(master);
+                        }
+                        else
+                        {
+                            listaEntradasInventarioDolares.Add(master);
+                        }
+                    }
+                    else if (master.TransactionId == TypeTransaction.TransactionInventarioSalida)
+                    {
+                        // Salidas de inventario (disminuyen existencia).
+                        if (master.CurrencyId == TypeCurrency.Cordoba)
+                        {
+                            listaSalidasInventarioCordobas.Add(master);
+                        }
+                        else
+                        {
+                            listaSalidasInventarioDolares.Add(master);
                         }
                     }
                     else if (master.TransactionId == TypeTransaction.TransactionInvoiceBilling  && master.StatusID == (int)TypeStatusBilling.Apply  && master.RegisterLocal == 1 )
@@ -334,12 +412,21 @@ namespace v4posme_maui.ViewModels
                 CantidadIngresos      = listaIngresosCordobas.Count + listaIngresosDolares.Count;
                 MontoIngresosCordobas = listaIngresosCordobas.Sum(master => master.Amount);
                 MontoIngresosDolares  = listaIngresosDolares.Sum(master => master.Amount);
+                //Compras / entradas de inventario
+                CantidadEntradasInventario      = listaEntradasInventarioCordobas.Count + listaEntradasInventarioDolares.Count;
+                MontoEntradasInventarioCordobas = listaEntradasInventarioCordobas.Sum(master => master.Amount);
+                MontoEntradasInventarioDolares  = listaEntradasInventarioDolares.Sum(master => master.Amount);
+                //Salidas de inventario
+                CantidadSalidasInventario       = listaSalidasInventarioCordobas.Count + listaSalidasInventarioDolares.Count;
+                MontoSalidasInventarioCordobas  = listaSalidasInventarioCordobas.Sum(master => master.Amount);
+                MontoSalidasInventarioDolares   = listaSalidasInventarioDolares.Sum(master => master.Amount);
                 //Ingreso general = facturas de contado + abonos + ingresos de efectivo
                 IngresoGeneralCordobas = MontoFacturasContadoCordobas + MontoAbonosCordobas + MontoIngresosCordobas;
                 IngresoGeneralDolares  = MontoFacturasContadoDolares + MontoAbonosDolares + MontoIngresosDolares;
-                //Totales (los gastos son egresos, por lo que restan del total del dia; los ingresos suman)
-                TotalCordobas   = MontoAbonosCordobas + MontoFacturasContadoCordobas + MontoIngresosCordobas - MontoGastosCordobas;
-                TotalDolares    = MontoAbonosDolares + MontoFacturasContadoDolares + MontoIngresosDolares - MontoGastosDolares;
+                //Totales del dia: los gastos y las compras (entradas de inventario) son egresos y restan;
+                //los ingresos, abonos, facturas de contado y salidas de inventario suman.
+                TotalCordobas   = MontoAbonosCordobas + MontoFacturasContadoCordobas + MontoIngresosCordobas + MontoSalidasInventarioCordobas - MontoGastosCordobas - MontoEntradasInventarioCordobas;
+                TotalDolares    = MontoAbonosDolares + MontoFacturasContadoDolares + MontoIngresosDolares + MontoSalidasInventarioDolares - MontoGastosDolares - MontoEntradasInventarioDolares;
                 IsBusy          = false;
             }
             catch (Exception e)
