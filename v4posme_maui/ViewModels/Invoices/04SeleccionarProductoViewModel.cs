@@ -259,6 +259,9 @@ public class SeleccionarProductoViewModel : BaseViewModel
         VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada++;
         ProductosSeleccionadosCantidad      = $"Enviar {VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada} Items";
         ProductosSeleccionadosCantidadTotal = $"{VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada} Items = {VariablesGlobales.DtoInvoice.Balance}";
+
+        // Confirmacion visual llamativa (popup verde inferior) de que el producto se agrego.
+        MostrarProductoAgregado(obj.Name ?? obj.ItemNumber ?? "Producto");
     }
 
     private void OnQuitarProducto(Api_AppMobileApi_GetDataDownloadItemsResponse? obj)
@@ -365,4 +368,54 @@ public class SeleccionarProductoViewModel : BaseViewModel
     }
 
     public Command ProductosSeleccionadosCommand { get; }
+
+    // Popup verde inferior que confirma visualmente que se agrego un producto a la factura.
+    private bool _productoAgregadoVisible;
+    public bool ProductoAgregadoVisible
+    {
+        get => _productoAgregadoVisible;
+        set => SetProperty(ref _productoAgregadoVisible, value);
+    }
+
+    private string _productoAgregadoMensaje = string.Empty;
+    public string ProductoAgregadoMensaje
+    {
+        get => _productoAgregadoMensaje;
+        set => SetProperty(ref _productoAgregadoMensaje, value);
+    }
+
+    private string _productoAgregadoDetalle = string.Empty;
+    public string ProductoAgregadoDetalle
+    {
+        get => _productoAgregadoDetalle;
+        set => SetProperty(ref _productoAgregadoDetalle, value);
+    }
+
+    // Controla cada "aparicion" del popup para poder auto-ocultarlo sin que un producto
+    // agregado antes cierre el popup de uno agregado despues (evita cierres prematuros).
+    private int _productoAgregadoToken;
+
+    // Muestra el popup verde con el nombre del producto agregado y el total actual, y lo
+    // oculta automaticamente despues de unos segundos.
+    private void MostrarProductoAgregado(string nombreProducto)
+    {
+        var simbolo = VariablesGlobales.DtoInvoice.Currency?.Simbolo ?? string.Empty;
+
+        ProductoAgregadoMensaje = $"✓ {nombreProducto?.ToLower()} agregado";
+        ProductoAgregadoDetalle = $"{VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada} items · {simbolo} {VariablesGlobales.DtoInvoice.Balance:N2}";
+        ProductoAgregadoVisible = true;
+
+        var token = ++_productoAgregadoToken;
+        _ = OcultarProductoAgregadoAsync(token);
+    }
+
+    private async Task OcultarProductoAgregadoAsync(int token)
+    {
+        await Task.Delay(2000);
+        // Solo se oculta si no hubo un nuevo producto agregado mientras tanto.
+        if (token == _productoAgregadoToken)
+        {
+            ProductoAgregadoVisible = false;
+        }
+    }
 }

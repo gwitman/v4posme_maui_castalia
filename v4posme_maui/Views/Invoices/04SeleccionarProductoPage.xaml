@@ -276,6 +276,63 @@
                             </StackLayout>
                         </dx:DXBorder>
                     </ContentView>
+
+                    <!-- Popup verde inferior: confirma que se agrego un producto a la factura.
+                         Se ancla en la parte inferior (sobre el panel de resumen) y se muestra
+                         solo cuando ProductoAgregadoVisible es verdadero. -->
+                    <dx:DXBorder
+                        IsVisible="{Binding ProductoAgregadoVisible}"
+                        AbsoluteLayout.LayoutFlags="PositionProportional,WidthProportional"
+                        AbsoluteLayout.LayoutBounds="0.5, 0.88, 0.92, AutoSize"
+                        CornerRadius="16"
+                        BorderThickness="0"
+                        Padding="16,12"
+                        BackgroundColor="#1B8E3C">
+                        <dx:DXBorder.Shadow>
+                            <Shadow Brush="#0E5C26"
+                                    Offset="0,4"
+                                    Radius="14"
+                                    Opacity="0.45" />
+                        </dx:DXBorder.Shadow>
+                        <Grid ColumnSpacing="12"
+                              VerticalOptions="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="40" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Icono de check en circulo -->
+                            <dx:DXBorder
+                                Grid.Column="0"
+                                WidthRequest="36"
+                                HeightRequest="36"
+                                CornerRadius="18"
+                                BorderThickness="0"
+                                BackgroundColor="#33FFFFFF"
+                                VerticalOptions="Center">
+                                <Label Text="✓"
+                                       FontSize="20"
+                                       FontAttributes="Bold"
+                                       TextColor="{StaticResource White}"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center" />
+                            </dx:DXBorder>
+
+                            <StackLayout Grid.Column="1"
+                                         Spacing="2"
+                                         VerticalOptions="Center">
+                                <Label Text="{Binding ProductoAgregadoMensaje}"
+                                       FontSize="15"
+                                       FontAttributes="Bold"
+                                       TextColor="{StaticResource White}"
+                                       LineBreakMode="TailTruncation"
+                                       MaxLines="1" />
+                                <Label Text="{Binding ProductoAgregadoDetalle}"
+                                       FontSize="13"
+                                       TextColor="#DFF5E4" />
+                            </StackLayout>
+                        </Grid>
+                    </dx:DXBorder>
                 </AbsoluteLayout>
             </dxc:ShimmerView.Content>
             <dxc:ShimmerView.LoadingView>
