@@ -182,6 +182,64 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 			protected set => SetProperty(ref _totalNIO, value);
 		}
 
+		// ---- Indicadores adicionales (equivalentes al AboutPage) ----
+		private string _totalGastosNIO = "C$ 0";
+		public string TotalGastosNIO
+		{
+			get => _totalGastosNIO;
+			protected set => SetProperty(ref _totalGastosNIO, value);
+		}
+
+		private string _totalGastosUSD = "$ 0";
+		public string TotalGastosUSD
+		{
+			get => _totalGastosUSD;
+			protected set => SetProperty(ref _totalGastosUSD, value);
+		}
+
+		private string _totalIngresosNIO = "C$ 0";
+		public string TotalIngresosNIO
+		{
+			get => _totalIngresosNIO;
+			protected set => SetProperty(ref _totalIngresosNIO, value);
+		}
+
+		private string _totalIngresosUSD = "$ 0";
+		public string TotalIngresosUSD
+		{
+			get => _totalIngresosUSD;
+			protected set => SetProperty(ref _totalIngresosUSD, value);
+		}
+
+		private string _totalComprasNIO = "C$ 0";
+		public string TotalComprasNIO
+		{
+			get => _totalComprasNIO;
+			protected set => SetProperty(ref _totalComprasNIO, value);
+		}
+
+		private string _totalComprasUSD = "$ 0";
+		public string TotalComprasUSD
+		{
+			get => _totalComprasUSD;
+			protected set => SetProperty(ref _totalComprasUSD, value);
+		}
+
+		// Total del dia = Contado + Abonos + Ingresos - Compras - Gastos (por moneda).
+		private string _totalDiaNIO = "C$ 0";
+		public string TotalDiaNIO
+		{
+			get => _totalDiaNIO;
+			protected set => SetProperty(ref _totalDiaNIO, value);
+		}
+
+		private string _totalDiaUSD = "$ 0";
+		public string TotalDiaUSD
+		{
+			get => _totalDiaUSD;
+			protected set => SetProperty(ref _totalDiaUSD, value);
+		}
+
 		public ObservableCollection<ViewTempDtoReporteCierre> InvoicesUS { get; }
 		public ObservableCollection<ViewTempDtoReporteCierre> InvoicesNIO { get; }
 		public ObservableCollection<ViewTempDtoReporteCierre> CreditsUS { get; }
@@ -384,6 +442,48 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 					Visits.Add(item);
 				}
 
+				// ---- Indicadores adicionales por moneda (mismo criterio que AboutPage) ----
+				var enRango = transactions
+					.Where(t => t.TransactionOn >= FechaInical && t.TransactionOn <= FechaFinal)
+					.ToList();
+
+				// Gastos (usan Amount)
+				var gastosNIO = enRango
+					.Where(t => t.TransactionId == TypeTransaction.TransactionExpense && t.CurrencyId == TypeCurrency.Cordoba)
+					.Sum(t => t.Amount);
+				var gastosUSD = enRango
+					.Where(t => t.TransactionId == TypeTransaction.TransactionExpense && t.CurrencyId == TypeCurrency.Dolar)
+					.Sum(t => t.Amount);
+
+				// Ingresos de efectivo (usan Amount)
+				var ingresosNIO = enRango
+					.Where(t => t.TransactionId == TypeTransaction.TransactionCashInflow && t.CurrencyId == TypeCurrency.Cordoba)
+					.Sum(t => t.Amount);
+				var ingresosUSD = enRango
+					.Where(t => t.TransactionId == TypeTransaction.TransactionCashInflow && t.CurrencyId == TypeCurrency.Dolar)
+					.Sum(t => t.Amount);
+
+				// Compras / entradas de inventario (usan Amount)
+				var comprasNIO = enRango
+					.Where(t => t.TransactionId == TypeTransaction.TransactionInventarioEntrada && t.CurrencyId == TypeCurrency.Cordoba)
+					.Sum(t => t.Amount);
+				var comprasUSD = enRango
+					.Where(t => t.TransactionId == TypeTransaction.TransactionInventarioEntrada && t.CurrencyId == TypeCurrency.Dolar)
+					.Sum(t => t.Amount);
+
+				TotalGastosNIO   = $"C$ {gastosNIO:N2}";
+				TotalGastosUSD   = $"$ {gastosUSD:N2}";
+				TotalIngresosNIO = $"C$ {ingresosNIO:N2}";
+				TotalIngresosUSD = $"$ {ingresosUSD:N2}";
+				TotalComprasNIO  = $"C$ {comprasNIO:N2}";
+				TotalComprasUSD  = $"$ {comprasUSD:N2}";
+
+				// Total del dia = Contado + Abonos + Ingresos - Compras - Gastos.
+				var totalDiaNIO = _TotalFacturaNIO + _TotalCreditoNIO + ingresosNIO - comprasNIO - gastosNIO;
+				var totalDiaUSD = _TotalFactura + _TotalCredito + ingresosUSD - comprasUSD - gastosUSD;
+				TotalDiaNIO = $"C$ {totalDiaNIO:N2}";
+				TotalDiaUSD = $"$ {totalDiaUSD:N2}";
+
 				IsBusy				= false;
 				InvoicesHeight		= 24 * InvoicesUS.Count;
 				InvoicesHeight_2	= 24 * InvoicesNIO.Count;
@@ -498,6 +598,30 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 			}
 
 			printer.Append($"TOTAL:         {totalAbonosUSD:N2}");
+			printer.NewLine();
+			printer.NewLine();
+			printer.Append("-------------------------------");
+			printer.NewLine();
+
+			// Indicadores adicionales (mismo criterio que el AboutPage)
+			printer.Append($"INGRESOS:      {TotalIngresosNIO} / {TotalIngresosUSD}");
+			printer.NewLine();
+			printer.Append($"COMPRAS:       {TotalComprasNIO} / {TotalComprasUSD}");
+			printer.NewLine();
+			printer.Append($"GASTOS:        {TotalGastosNIO} / {TotalGastosUSD}");
+			printer.NewLine();
+			printer.NewLine();
+			printer.Append("-------------------------------");
+			printer.NewLine();
+			printer.Append("TOTAL DEL DIA");
+			printer.NewLine();
+			printer.Append("Contado+Abonos+Ingresos");
+			printer.NewLine();
+			printer.Append("   -Compras-Gastos");
+			printer.NewLine();
+			printer.Append($"C$: {TotalDiaNIO}");
+			printer.NewLine();
+			printer.Append($"$ : {TotalDiaUSD}");
 			printer.NewLine();
 			printer.NewLine();
 			printer.Append("-------------------------------");
