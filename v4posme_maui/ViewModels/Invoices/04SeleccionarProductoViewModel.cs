@@ -34,6 +34,9 @@ public class SeleccionarProductoViewModel : BaseViewModel
         IrDatosCreditoCommand         = new Command(OnIrDatosCredito);
         AbrirMenuPrincipalCommand     = new Command(OnAbrirMenuPrincipal);
         NuevaFacturaCommand           = new Command(OnNuevaFactura);
+        DetalleProductoCommand        = new Command<Api_AppMobileApi_GetDataDownloadItemsResponse>(OnDetalleProducto);
+        ConfirmarDetalleCommand       = new Command(OnConfirmarDetalle);
+        CancelarDetalleCommand        = new Command(OnCancelarDetalle);
     }
 
     // Opcion "Nueva factura" del menu desplegable (toolbar). Limpia el DtoInvoice y lo
@@ -359,6 +362,9 @@ public class SeleccionarProductoViewModel : BaseViewModel
     public Command SearchCommand { get; }
     public Command SearchBarCodeCommand { get; }
     public Command<Api_AppMobileApi_GetDataDownloadItemsResponse> QuitarProductoCommand { get; }
+    public Command<Api_AppMobileApi_GetDataDownloadItemsResponse> DetalleProductoCommand { get; }
+    public Command ConfirmarDetalleCommand { get; }
+    public Command CancelarDetalleCommand { get; }
 
     private bool _isPanelVisible;
     public bool IsPanelVisible
@@ -368,6 +374,152 @@ public class SeleccionarProductoViewModel : BaseViewModel
     }
 
     public Command ProductosSeleccionadosCommand { get; }
+
+    // ---- Popup de detalle: permite indicar cantidad y precio antes de agregar el producto ----
+
+    // Producto sobre el que se abrio el popup de detalle.
+    private Api_AppMobileApi_GetDataDownloadItemsResponse? _productoDetalle;
+
+    private bool _detalleVisible;
+    public bool DetalleVisible
+    {
+        get => _detalleVisible;
+        set => SetProperty(ref _detalleVisible, value);
+    }
+
+    private string _detalleNombre = string.Empty;
+    public string DetalleNombre
+    {
+        get => _detalleNombre;
+        set => SetProperty(ref _detalleNombre, value);
+    }
+
+    private decimal _detalleCantidad = decimal.One;
+    public decimal DetalleCantidad
+    {
+        get => _detalleCantidad;
+        set => SetProperty(ref _detalleCantidad, value);
+    }
+
+    private decimal _detallePrecio;
+    public decimal DetallePrecio
+    {
+        get => _detallePrecio;
+        set => SetProperty(ref _detallePrecio, value);
+    }
+
+    // Abre el popup de detalle con la cantidad en 1 y el precio publico del producto.
+    private void OnDetalleProducto(Api_AppMobileApi_GetDataDownloadItemsResponse? obj)
+    {
+        if (obj is null) return;
+
+        _productoDetalle = obj;
+        DetalleNombre    = obj.Name ?? obj.ItemNumber ?? "Producto";
+        DetalleCantidad  = decimal.One;
+        DetallePrecio    = obj.PrecioPublico;
+        DetalleVisible   = true;
+    }
+
+    private void OnCancelarDetalle()
+    {
+        DetalleVisible   = false;
+        _productoDetalle = null;
+    }
+
+    // Agrega el producto a la factura usando la cantidad y el precio indicados en el popup.
+    // Respeta el parametro MOBILE_ALLOW_REPEATED_PRODUCTS: si es "true" siempre crea una
+    // linea nueva; si es "false" acumula sobre la linea existente del mismo producto.
+    private async void OnConfirmarDetalle()
+    {
+        if (_productoDetalle is null) return;
+
+        if (DetalleCantidad <= decimal.Zero)
+        {
+            ShowToast("La cantidad debe ser mayor a cero", ToastDuration.Short, 12);
+            return;
+        }
+
+        if (DetallePrecio < decimal.Zero)
+        {
+            ShowToast("El precio no puede ser negativo", ToastDuration.Short, 12);
+            return;
+        }
+
+        var permitirRepetidos         = await _helper.GetValueParameter("MOBILE_ALLOW_REPEATED_PRODUCTS", "false");
+        var cestaArticulos            = VariablesGlobales.DtoInvoice.Items;
+        var transactionMasterDetailID = _helper.GetTimestampId();
+
+        if (permitirRepetidos == "true")
+        {
+            // Siempre se crea una linea nueva con la cantidad y precio indicados.
+            var nuevo = new Api_AppMobileApi_GetDataDownloadItemsResponse
+            {
+                TransactionMasterDetailID = transactionMasterDetailID,
+                ItemPk              = _productoDetalle.ItemPk,
+                ItemId              = _productoDetalle.ItemId,
+                BarCode             = _productoDetalle.BarCode,
+                ItemNumber          = _productoDetalle.ItemNumber,
+                Name                = _productoDetalle.Name,
+                PrecioPublico       = DetallePrecio,
+                CantidadEntradas    = _productoDetalle.CantidadEntradas,
+                CantidadSalidas     = _productoDetalle.CantidadSalidas,
+                CantidadFinal       = _productoDetalle.CantidadFinal,
+                MonedaSimbolo       = _productoDetalle.MonedaSimbolo,
+                Quantity            = DetalleCantidad,
+                MontoDescuento      = 0m,
+                PorcentajeDescuento = 0m,
+                Importe             = DetallePrecio * DetalleCantidad
+            };
+            cestaArticulos.Add(nuevo);
+        }
+        else
+        {
+            // Si ya existe el producto, se acumula la cantidad y se actualiza el precio y el
+            // importe. Si no existe, se agrega como linea nueva.
+            var find = cestaArticulos.FirstOrDefault(response => response.ItemNumber == _productoDetalle.ItemNumber);
+            if (find is not null)
+            {
+                find.Quantity      += DetalleCantidad;
+                find.PrecioPublico = DetallePrecio;
+                find.Importe       = find.PrecioPublico * find.Quantity;
+                find.MontoDescuento = find.PorcentajeDescuento > 0
+                    ? find.Importe * (find.PorcentajeDescuento / 100m)
+                    : find.MontoDescuento;
+            }
+            else
+            {
+                var nuevo = new Api_AppMobileApi_GetDataDownloadItemsResponse
+                {
+                    TransactionMasterDetailID = transactionMasterDetailID,
+                    ItemPk              = _productoDetalle.ItemPk,
+                    ItemId              = _productoDetalle.ItemId,
+                    BarCode             = _productoDetalle.BarCode,
+                    ItemNumber          = _productoDetalle.ItemNumber,
+                    Name                = _productoDetalle.Name,
+                    PrecioPublico       = DetallePrecio,
+                    CantidadEntradas    = _productoDetalle.CantidadEntradas,
+                    CantidadSalidas     = _productoDetalle.CantidadSalidas,
+                    CantidadFinal       = _productoDetalle.CantidadFinal,
+                    MonedaSimbolo       = _productoDetalle.MonedaSimbolo,
+                    Quantity            = DetalleCantidad,
+                    MontoDescuento      = 0m,
+                    PorcentajeDescuento = 0m,
+                    Importe             = DetallePrecio * DetalleCantidad
+                };
+                cestaArticulos.Add(nuevo);
+            }
+        }
+
+        VariablesGlobales.DtoInvoice.Balance = cestaArticulos.Sum(r => r.Importe) - cestaArticulos.Sum(r => r.MontoDescuento);
+        VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada = (int)cestaArticulos.Sum(r => r.Quantity);
+        ProductosSeleccionadosCantidad      = $"Enviar {VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada} Items";
+        ProductosSeleccionadosCantidadTotal = $"{VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada} Items = {VariablesGlobales.DtoInvoice.Balance}";
+
+        MostrarProductoAgregado(_productoDetalle.Name ?? _productoDetalle.ItemNumber ?? "Producto");
+
+        DetalleVisible   = false;
+        _productoDetalle = null;
+    }
 
     // Popup verde inferior que confirma visualmente que se agrego un producto a la factura.
     private bool _productoAgregadoVisible;

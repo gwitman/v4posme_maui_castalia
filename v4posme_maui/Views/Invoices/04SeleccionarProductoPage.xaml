@@ -123,6 +123,7 @@
                                                     <ColumnDefinition Width="56" />
                                                     <ColumnDefinition Width="*" />
                                                     <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
                                                 <Grid.RowDefinitions>
                                                     <RowDefinition Height="Auto" />
@@ -192,6 +193,19 @@
                                                         </Label.FormattedText>
                                                     </Label>
                                                 </StackLayout>
+
+                                                <!-- Boton de detalle: abre el popup para indicar
+                                                     cantidad y precio antes de agregar. -->
+                                                <dx:DXButton
+                                                    Grid.Column="3"
+                                                    Grid.RowSpan="2"
+                                                    Style="{StaticResource SinFondoColorRedondeado}"
+                                                    IconHeight="22"
+                                                    IconWidth="22"
+                                                    Icon="edit"
+                                                    VerticalOptions="Center"
+                                                    Command="{Binding BindingContext.DetalleProductoCommand, Source={x:Reference ProductosCollectionView}}"
+                                                    CommandParameter="{Binding .}" />
                                             </Grid>
                                         </dx:DXBorder>
                                     </SwipeView>
@@ -273,6 +287,83 @@
                                     Content="Buscar"
                                     CornerRadius="10"
                                     Command="{Binding SearchCommand}" />
+                            </StackLayout>
+                        </dx:DXBorder>
+                    </ContentView>
+
+                    <!-- Popup de detalle: cantidad y precio antes de agregar el producto -->
+                    <ContentView IsVisible="{Binding DetalleVisible}"
+                                 BackgroundColor="#80000000"
+                                 AbsoluteLayout.LayoutFlags="All"
+                                 AbsoluteLayout.LayoutBounds="0, 0, 1, 1">
+                        <dx:DXBorder
+                            VerticalOptions="Center"
+                            HorizontalOptions="Center"
+                            WidthRequest="320"
+                            Padding="24"
+                            BackgroundColor="{StaticResource White}"
+                            CornerRadius="16"
+                            BorderThickness="0">
+                            <dx:DXBorder.Shadow>
+                                <Shadow Brush="{StaticResource Gray600Brush}"
+                                        Offset="0,4"
+                                        Radius="16"
+                                        Opacity="0.3" />
+                            </dx:DXBorder.Shadow>
+                            <StackLayout Spacing="16">
+                                <Label Text="Detalle del producto"
+                                       FontAttributes="Bold"
+                                       FontSize="18"
+                                       TextColor="{StaticResource PrimaryDark}"
+                                       HorizontalOptions="Center" />
+
+                                <Label Text="{Binding DetalleNombre}"
+                                       FontSize="14"
+                                       TextColor="{StaticResource Gray600}"
+                                       HorizontalTextAlignment="Center"
+                                       LineBreakMode="TailTruncation"
+                                       MaxLines="2" />
+
+                                <StackLayout Spacing="4">
+                                    <Label Text="Cantidad"
+                                           FontSize="13"
+                                           FontAttributes="Bold"
+                                           TextColor="{StaticResource Gray600}" />
+                                    <dxe:TextEdit
+                                        Keyboard="Numeric"
+                                        PlaceholderText="Cantidad"
+                                        Text="{Binding DetalleCantidad}" />
+                                </StackLayout>
+
+                                <StackLayout Spacing="4">
+                                    <Label Text="Precio"
+                                           FontSize="13"
+                                           FontAttributes="Bold"
+                                           TextColor="{StaticResource Gray600}" />
+                                    <dxe:TextEdit
+                                        Keyboard="Numeric"
+                                        PlaceholderText="Precio"
+                                        Text="{Binding DetallePrecio}" />
+                                </StackLayout>
+
+                                <Grid ColumnSpacing="10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <dx:DXButton
+                                        Grid.Column="0"
+                                        Content="Cancelar"
+                                        CornerRadius="10"
+                                        BackgroundColor="{StaticResource Gray400}"
+                                        Command="{Binding CancelarDetalleCommand}" />
+                                    <dx:DXButton
+                                        Grid.Column="1"
+                                        Content="Agregar"
+                                        CornerRadius="10"
+                                        BackgroundColor="#1B8E3C"
+                                        Command="{Binding ConfirmarDetalleCommand}" />
+                                </Grid>
                             </StackLayout>
                         </dx:DXBorder>
                     </ContentView>
