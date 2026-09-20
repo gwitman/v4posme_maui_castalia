@@ -33,6 +33,49 @@ public class SeleccionarProductoViewModel : BaseViewModel
         IrDatosFacturaCommand         = new Command(OnIrDatosFactura);
         IrDatosCreditoCommand         = new Command(OnIrDatosCredito);
         AbrirMenuPrincipalCommand     = new Command(OnAbrirMenuPrincipal);
+        NuevaFacturaCommand           = new Command(OnNuevaFactura);
+    }
+
+    // Opcion "Nueva factura" del menu desplegable (toolbar). Limpia el DtoInvoice y lo
+    // reinicia con los valores por defecto para empezar una factura desde cero, sin
+    // arrastrar cliente, productos, moneda, credito ni comentarios de la factura anterior.
+    public Command NuevaFacturaCommand { get; }
+
+    private async void OnNuevaFactura()
+    {
+        try
+        {
+            IsBusy = true;
+
+            // Se reinicia el flag para forzar que InicializarFacturaRapidaAsync vuelva a
+            // construir un DtoInvoice limpio con los valores por defecto.
+            HelperInvoiceFlow.ReiniciarFlujo();
+
+            // Se limpia el estado actual (productos y contadores) por si la vista mantiene
+            // referencias al DTO anterior mientras se reconstruye.
+            VariablesGlobales.DtoInvoice.ClearItems();
+            VariablesGlobales.DtoInvoice.CantidadTotalSeleccionada = 0;
+            VariablesGlobales.DtoInvoice.Balance                   = decimal.Zero;
+
+            await _helperInvoiceFlow.InicializarFacturaRapidaAsync();
+
+            // Se recarga la lista de productos (sin filtro) y se refresca el resumen para
+            // que la pantalla quede como una factura nueva.
+            Search         = string.Empty;
+            IsPanelVisible = false;
+            await LoadAllProductosAsync();
+            RefrescarResumenSeleccionados();
+
+            ShowToast("Nueva factura iniciada", ToastDuration.Short, 12);
+        }
+        catch (Exception ex)
+        {
+            ShowToast($"Error al iniciar nueva factura: {ex.Message}", ToastDuration.Long, 12);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     // El icono superior izquierdo (drawer) abre el menu principal (flyout) del Shell.

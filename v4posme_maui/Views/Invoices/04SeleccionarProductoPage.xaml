@@ -24,6 +24,9 @@
     </Shell.BackButtonBehavior>
     <!-- Menu desplegable (overflow ⋮) para modificar los datos de las pantallas anteriores -->
     <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Nueva factura"
+                     Order="Secondary"
+                     Command="{Binding NuevaFacturaCommand}" />
         <ToolbarItem Text="Seleccionar cliente"
                      Order="Secondary"
                      Command="{Binding IrSeleccionClienteCommand}" />
