@@ -336,7 +336,7 @@
                         </Image>
                     </Border>
                     <Label Grid.Row="1"
-                           Text="Ingreso"
+                           Text="Ingreso Efec."
                            FontFamily="OpenSansSemibold"
                            FontSize="15"
                            TextColor="{StaticResource PrimaryDark}"
@@ -392,6 +392,54 @@
                            Margin="0,12,0,0" />
                     <Label Grid.Row="2"
                            Text="En la web"
+                           FontSize="12"
+                           TextColor="{StaticResource Tertiary}" />
+                </Grid>
+            </Border>
+
+            <!-- Salida Efectivo -->
+            <Border Grid.Row="4" Grid.Column="0"
+                    StrokeShape="RoundRectangle 14"
+                    StrokeThickness="0"
+                    BackgroundColor="{StaticResource CardColor}"
+                    Padding="0"
+                    HeightRequest="170">
+                <Border.Shadow>
+                    <Shadow Brush="{StaticResource Gray300}"
+                            Offset="0,4"
+                            Radius="12"
+                            Opacity="0.4" />
+                </Border.Shadow>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnCardTapped" CommandParameter="9" />
+                </Border.GestureRecognizers>
+                <Grid RowDefinitions="Auto,*,Auto" Padding="16,20,16,16">
+                    <Border Grid.Row="0"
+                            StrokeShape="RoundRectangle 12"
+                            StrokeThickness="0"
+                            BackgroundColor="#FDECEE"
+                            WidthRequest="48"
+                            HeightRequest="48"
+                            HorizontalOptions="Start">
+                        <Image Source="quantity"
+                               WidthRequest="24"
+                               HeightRequest="24"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center">
+                            <Image.Behaviors>
+                                <toolkit:IconTintColorBehavior TintColor="#C62828" />
+                            </Image.Behaviors>
+                        </Image>
+                    </Border>
+                    <Label Grid.Row="1"
+                           Text="Salida Efec."
+                           FontFamily="OpenSansSemibold"
+                           FontSize="15"
+                           TextColor="{StaticResource PrimaryDark}"
+                           VerticalOptions="End"
+                           Margin="0,12,0,0" />
+                    <Label Grid.Row="2"
+                           Text="En el mobile"
                            FontSize="12"
                            TextColor="{StaticResource Tertiary}" />
                 </Grid>

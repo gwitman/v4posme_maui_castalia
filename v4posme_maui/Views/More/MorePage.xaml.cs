@@ -7,6 +7,7 @@ using v4posme_maui.Services.SystemNames;
 using v4posme_maui.ViewModels.More;
 using v4posme_maui.Views.More.Gasto;
 using v4posme_maui.Views.More.CashInflow;
+using v4posme_maui.Views.More.CashOutflow;
 using v4posme_maui.Views.More.Logs;
 using v4posme_maui.Views.More.Productos;
 using v4posme_maui.Views.More.ReporteVenta;
@@ -59,6 +60,9 @@ public partial class MorePage : ContentPage
 				break;
 			case "8":
 				await AbrirReportesRemotoAsync();
+				break;
+			case "9":
+				await Navigation.PushAsync(new CashOutflowPage());
 				break;
 		}
 	}

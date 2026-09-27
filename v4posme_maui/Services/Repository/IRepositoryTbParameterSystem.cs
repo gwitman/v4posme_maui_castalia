@@ -18,4 +18,5 @@ public interface IRepositoryTbParameterSystem : IRepositoryFacade<TbParameterSys
 	Task<TbParameterSystem> PosMeFindCodigoVisita();
 	Task<TbParameterSystem> PosMeFindCodigoGasto();
 	Task<TbParameterSystem> PosMeFindCodigoCashInflow();
+	Task<TbParameterSystem> PosMeFindCodigoCashOutflow();
 }

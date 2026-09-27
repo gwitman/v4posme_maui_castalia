@@ -36,6 +36,7 @@ public class DataBase
                     new() { Name = Constantes.ParameterCodigoVisita, Description = "Número de visita", Value = "VST-0001" },
                     new() { Name = Constantes.ParameterCodigoGasto, Description = "Número de gasto", Value = "GTO-0001" },
                     new() { Name = Constantes.ParameterCodigoCashInflow, Description = "Número de ingreso", Value = "ING-0001" },
+                    new() { Name = Constantes.ParameterCodigoCashOutflow, Description = "Número de salida", Value = "SAL-0001" },
                     new() { Name = Constantes.CustomerOrderShare, Description = "Orden de clientes abonos", Value = "" },
                     new() { Name = Constantes.CustomerOrderCustomer, Description = "Orden de clientes en pantalla cliente", Value = "" },
                     new() { Name = Constantes.CustomerOrderInvoice, Description = "Orden de clientes en pantalla invoice", Value = "" },

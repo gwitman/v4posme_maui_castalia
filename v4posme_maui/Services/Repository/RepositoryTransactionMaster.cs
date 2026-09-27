@@ -156,6 +156,26 @@ public class RepositoryTbTransactionMaster(DataBase dataBase) : RepositoryFacade
             .ToListAsync();
     }
 
+    public Task<List<TbTransactionMaster>> PosMeFilterTop10CashOutflow()
+    {
+        return _dataBase.Database.Table<TbTransactionMaster>()
+            .Where(master => master.TransactionId == TypeTransaction.TransactionCashOutflow)
+            .OrderByDescending(master => master.TransactionOn)
+            .Take(10)
+            .ToListAsync();
+    }
+
+    public Task<List<TbTransactionMaster>> PosMeFilterTop10ByCodigoCashOutflow(string filter)
+    {
+        // Las salidas no tienen cliente asociado; se filtra unicamente por el codigo de transaccion.
+        return _dataBase.Database.Table<TbTransactionMaster>()
+            .Where(master => master.TransactionId == TypeTransaction.TransactionCashOutflow
+                             && master.TransactionNumber!.Contains(filter))
+            .OrderByDescending(master => master.TransactionOn)
+            .Take(10)
+            .ToListAsync();
+    }
+
     public Task<List<TbTransactionMaster>> PosMeFilterTop10ByCodigoAndNombreClienteFacturas(string filter)
     {
         var query = $"""

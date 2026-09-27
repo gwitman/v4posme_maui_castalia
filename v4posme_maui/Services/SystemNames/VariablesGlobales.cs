@@ -13,6 +13,7 @@ public static class VariablesGlobales
     public static ViewTempDtoInvoice DtoInvoice;
     public static ViewTempDtoGasto DtoGasto = new();
     public static ViewTempDtoCashInflow DtoCashInflow = new();
+    public static ViewTempDtoCashOutflow DtoCashOutflow = new();
 
     // Estado temporal del flujo de inventario (Entrada = Compras / Salida = Otras salidas).
     public static ViewTempDtoInventario DtoInventario = new();

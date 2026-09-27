@@ -12,6 +12,7 @@ using Android.Content;
 using v4posme_maui.Views.More;
 using v4posme_maui.Views.More.Gasto;
 using v4posme_maui.Views.More.CashInflow;
+using v4posme_maui.Views.More.CashOutflow;
 using v4posme_maui.Views.More.ReporteVenta;
 using v4posme_maui.Views.More.Visita;
 using v4posme_maui.Views.Inventario;
@@ -57,6 +58,8 @@ namespace v4posme_maui
             Routing.RegisterRoute(typeof(GastoComprobantePage).FullName, typeof(GastoComprobantePage));
             Routing.RegisterRoute(typeof(CashInflowPage).FullName, typeof(CashInflowPage));
             Routing.RegisterRoute(typeof(CashInflowComprobantePage).FullName, typeof(CashInflowComprobantePage));
+            Routing.RegisterRoute(typeof(CashOutflowPage).FullName, typeof(CashOutflowPage));
+            Routing.RegisterRoute(typeof(CashOutflowComprobantePage).FullName, typeof(CashOutflowComprobantePage));
             Routing.RegisterRoute(typeof(VisitaPage).FullName, typeof(VisitaPage));
             Routing.RegisterRoute(typeof(VisitaFormPage).FullName, typeof(VisitaFormPage));
             Routing.RegisterRoute(typeof(ValidarAbonoFinancieraPage).FullName, typeof(ValidarAbonoFinancieraPage));
