@@ -379,6 +379,43 @@
                                 </VerticalStackLayout>
                             </Border>
 
+                            <!-- Egresos / Salidas de efectivo -->
+                            <Border StrokeShape="RoundRectangle 12"
+                                    StrokeThickness="0"
+                                    BackgroundColor="{StaticResource CardColor}"
+                                    Padding="16">
+                                <Border.Shadow>
+                                    <Shadow Brush="{StaticResource Gray300}" Offset="0,2" Radius="8" Opacity="0.25" />
+                                </Border.Shadow>
+                                <VerticalStackLayout Spacing="8">
+                                    <Grid ColumnDefinitions="Auto,*">
+                                        <Border StrokeShape="RoundRectangle 6" StrokeThickness="0"
+                                                BackgroundColor="#FDECEE" Padding="8,4"
+                                                HorizontalOptions="Start">
+                                            <Label Text="EGRESOS"
+                                                   FontSize="13" FontFamily="OpenSansSemibold"
+                                                   TextColor="#C62828" />
+                                        </Border>
+                                    </Grid>
+                                    <Grid ColumnDefinitions="*,Auto" Padding="4,0">
+                                        <Label Grid.Column="0" Text="Córdobas" FontSize="14"
+                                               TextColor="{StaticResource Gray600}" />
+                                        <Label Grid.Column="1" Text="{Binding TotalEgresosNIO}"
+                                               FontSize="14" FontFamily="OpenSansSemibold"
+                                               TextColor="{StaticResource PrimaryDark}"
+                                               HorizontalTextAlignment="End" />
+                                    </Grid>
+                                    <Grid ColumnDefinitions="*,Auto" Padding="4,0">
+                                        <Label Grid.Column="0" Text="Dólares" FontSize="14"
+                                               TextColor="{StaticResource Gray600}" />
+                                        <Label Grid.Column="1" Text="{Binding TotalEgresosUSD}"
+                                               FontSize="14" FontFamily="OpenSansSemibold"
+                                               TextColor="{StaticResource PrimaryDark}"
+                                               HorizontalTextAlignment="End" />
+                                    </Grid>
+                                </VerticalStackLayout>
+                            </Border>
+
                             <!-- Compras / Entradas de inventario -->
                             <Border StrokeShape="RoundRectangle 12"
                                     StrokeThickness="0"

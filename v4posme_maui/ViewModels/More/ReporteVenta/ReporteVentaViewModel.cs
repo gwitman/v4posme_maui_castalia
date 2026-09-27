@@ -211,6 +211,20 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 			protected set => SetProperty(ref _totalIngresosUSD, value);
 		}
 
+		private string _totalEgresosNIO = "C$ 0";
+		public string TotalEgresosNIO
+		{
+			get => _totalEgresosNIO;
+			protected set => SetProperty(ref _totalEgresosNIO, value);
+		}
+
+		private string _totalEgresosUSD = "$ 0";
+		public string TotalEgresosUSD
+		{
+			get => _totalEgresosUSD;
+			protected set => SetProperty(ref _totalEgresosUSD, value);
+		}
+
 		private string _totalComprasNIO = "C$ 0";
 		public string TotalComprasNIO
 		{
@@ -463,6 +477,14 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 					.Where(t => t.TransactionId == TypeTransaction.TransactionCashInflow && t.CurrencyId == TypeCurrency.Dolar)
 					.Sum(t => t.Amount);
 
+				// Salidas de efectivo / egresos (usan Amount)
+				var egresosNIO = enRango
+					.Where(t => t.TransactionId == TypeTransaction.TransactionCashOutflow && t.CurrencyId == TypeCurrency.Cordoba)
+					.Sum(t => t.Amount);
+				var egresosUSD = enRango
+					.Where(t => t.TransactionId == TypeTransaction.TransactionCashOutflow && t.CurrencyId == TypeCurrency.Dolar)
+					.Sum(t => t.Amount);
+
 				// Compras / entradas de inventario (usan Amount)
 				var comprasNIO = enRango
 					.Where(t => t.TransactionId == TypeTransaction.TransactionInventarioEntrada && t.CurrencyId == TypeCurrency.Cordoba)
@@ -475,12 +497,14 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 				TotalGastosUSD   = $"$ {gastosUSD:N2}";
 				TotalIngresosNIO = $"C$ {ingresosNIO:N2}";
 				TotalIngresosUSD = $"$ {ingresosUSD:N2}";
+				TotalEgresosNIO  = $"C$ {egresosNIO:N2}";
+				TotalEgresosUSD  = $"$ {egresosUSD:N2}";
 				TotalComprasNIO  = $"C$ {comprasNIO:N2}";
 				TotalComprasUSD  = $"$ {comprasUSD:N2}";
 
-				// Total del dia = Contado + Abonos + Ingresos - Compras - Gastos.
-				var totalDiaNIO = _TotalFacturaNIO + _TotalCreditoNIO + ingresosNIO - comprasNIO - gastosNIO;
-				var totalDiaUSD = _TotalFactura + _TotalCredito + ingresosUSD - comprasUSD - gastosUSD;
+				// Total del dia = Contado + Abonos + Ingresos - Compras - Gastos - Egreso de efectivo.
+				var totalDiaNIO = _TotalFacturaNIO + _TotalCreditoNIO + ingresosNIO - comprasNIO - gastosNIO - egresosNIO;
+				var totalDiaUSD = _TotalFactura + _TotalCredito + ingresosUSD - comprasUSD - gastosUSD - egresosUSD;
 				TotalDiaNIO = $"C$ {totalDiaNIO:N2}";
 				TotalDiaUSD = $"$ {totalDiaUSD:N2}";
 
@@ -606,6 +630,8 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 			// Indicadores adicionales (mismo criterio que el AboutPage)
 			printer.Append($"INGRESOS:      {TotalIngresosNIO} / {TotalIngresosUSD}");
 			printer.NewLine();
+			printer.Append($"EGRESOS:       {TotalEgresosNIO} / {TotalEgresosUSD}");
+			printer.NewLine();
 			printer.Append($"COMPRAS:       {TotalComprasNIO} / {TotalComprasUSD}");
 			printer.NewLine();
 			printer.Append($"GASTOS:        {TotalGastosNIO} / {TotalGastosUSD}");
@@ -618,6 +644,8 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 			printer.Append("Contado+Abonos+Ingresos");
 			printer.NewLine();
 			printer.Append("   -Compras-Gastos");
+			printer.NewLine();
+			printer.Append("   -Egreso de efectivo");
 			printer.NewLine();
 			printer.Append($"C$: {TotalDiaNIO}");
 			printer.NewLine();

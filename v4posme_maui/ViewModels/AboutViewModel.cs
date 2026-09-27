@@ -189,6 +189,31 @@ namespace v4posme_maui.ViewModels
             set => SetProperty(ref _montoIngresosDolares, value);
         }
 
+        // Salidas de efectivo (Cash Outflow): disminuyen la caja.
+        private int _cantidadEgresos;
+
+        public int CantidadEgresos
+        {
+            get => _cantidadEgresos;
+            set => SetProperty(ref _cantidadEgresos, value);
+        }
+
+        private decimal _montoEgresosCordobas;
+
+        public decimal MontoEgresosCordobas
+        {
+            get => _montoEgresosCordobas;
+            set => SetProperty(ref _montoEgresosCordobas, value);
+        }
+
+        private decimal _montoEgresosDolares;
+
+        public decimal MontoEgresosDolares
+        {
+            get => _montoEgresosDolares;
+            set => SetProperty(ref _montoEgresosDolares, value);
+        }
+
         // Ingreso general = facturas de contado + abonos + ingresos de efectivo.
         private decimal _ingresoGeneralCordobas;
 
@@ -275,6 +300,8 @@ namespace v4posme_maui.ViewModels
                 var listaGastosDolares                  = new List<TbTransactionMaster>();
                 var listaIngresosCordobas               = new List<TbTransactionMaster>();
                 var listaIngresosDolares                = new List<TbTransactionMaster>();
+                var listaEgresosCordobas                = new List<TbTransactionMaster>();
+                var listaEgresosDolares                 = new List<TbTransactionMaster>();
                 var listaEntradasInventarioCordobas     = new List<TbTransactionMaster>();
                 var listaEntradasInventarioDolares      = new List<TbTransactionMaster>();
                 var listaSalidasInventarioCordobas      = new List<TbTransactionMaster>();
@@ -305,6 +332,17 @@ namespace v4posme_maui.ViewModels
                         else
                         {
                             listaIngresosDolares.Add(master);
+                        }
+                    }
+                    else if (master.TransactionId == TypeTransaction.TransactionCashOutflow)
+                    {
+                        if (master.CurrencyId == TypeCurrency.Cordoba)
+                        {
+                            listaEgresosCordobas.Add(master);
+                        }
+                        else
+                        {
+                            listaEgresosDolares.Add(master);
                         }
                     }
                     else if (master.TransactionId == TypeTransaction.TransactionShare)
@@ -412,6 +450,10 @@ namespace v4posme_maui.ViewModels
                 CantidadIngresos      = listaIngresosCordobas.Count + listaIngresosDolares.Count;
                 MontoIngresosCordobas = listaIngresosCordobas.Sum(master => master.Amount);
                 MontoIngresosDolares  = listaIngresosDolares.Sum(master => master.Amount);
+                //Salidas de efectivo (egresos)
+                CantidadEgresos      = listaEgresosCordobas.Count + listaEgresosDolares.Count;
+                MontoEgresosCordobas = listaEgresosCordobas.Sum(master => master.Amount);
+                MontoEgresosDolares  = listaEgresosDolares.Sum(master => master.Amount);
                 //Compras / entradas de inventario
                 CantidadEntradasInventario      = listaEntradasInventarioCordobas.Count + listaEntradasInventarioDolares.Count;
                 MontoEntradasInventarioCordobas = listaEntradasInventarioCordobas.Sum(master => master.Amount);
@@ -424,9 +466,9 @@ namespace v4posme_maui.ViewModels
                 IngresoGeneralCordobas = MontoFacturasContadoCordobas + MontoAbonosCordobas + MontoIngresosCordobas;
                 IngresoGeneralDolares  = MontoFacturasContadoDolares + MontoAbonosDolares + MontoIngresosDolares;
                 //Total del dia = ventas de contado + abonos + ingresos - compras (entradas de
-                //inventario) - gastos. Las salidas de inventario no afectan el total de caja.
-                TotalCordobas   = MontoFacturasContadoCordobas + MontoAbonosCordobas + MontoIngresosCordobas - MontoEntradasInventarioCordobas - MontoGastosCordobas;
-                TotalDolares    = MontoFacturasContadoDolares + MontoAbonosDolares + MontoIngresosDolares - MontoEntradasInventarioDolares - MontoGastosDolares;
+                //inventario) - gastos - salidas de efectivo. Las salidas de inventario no afectan el total de caja.
+                TotalCordobas   = MontoFacturasContadoCordobas + MontoAbonosCordobas + MontoIngresosCordobas - MontoEntradasInventarioCordobas - MontoGastosCordobas - MontoEgresosCordobas;
+                TotalDolares    = MontoFacturasContadoDolares + MontoAbonosDolares + MontoIngresosDolares - MontoEntradasInventarioDolares - MontoGastosDolares - MontoEgresosDolares;
                 IsBusy          = false;
             }
             catch (Exception e)
