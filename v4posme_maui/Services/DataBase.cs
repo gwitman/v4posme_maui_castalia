@@ -29,6 +29,7 @@ public class DataBase
                 {
                     new() { Name = Constantes.ParametroCounter, Description = "Contador Global", Value = "0" },
                     new() { Name = Constantes.ParametroLogo, Description = "Logo de la aplicación", Value = "" },
+                    new() { Name = Constantes.ParametroTema, Description = "Tema de la aplicación", Value = ThemePosMe.PosMe },
                     new() { Name = Constantes.ParametroPrinter, Description = "Impresora", Value = "Printer" },
                     new() { Name = Constantes.ParametroCodigoAbono, Description = "Número de abono", Value = "ABO-0001" },
                     new() { Name = Constantes.ParameterCodigoFactura, Description = "Número de factura", Value = "FAC-0001" },
@@ -43,6 +44,20 @@ public class DataBase
                     
                 };
                 await Database.InsertAllAsync(parametrosDefault);
+            }
+
+            // Alta del parametro de Tema para instalaciones previas que no lo tienen.
+            var temaExiste = await Database.Table<TbParameterSystem>()
+                .Where(p => p.Name == Constantes.ParametroTema)
+                .CountAsync();
+            if (temaExiste == 0)
+            {
+                await Database.InsertAsync(new TbParameterSystem
+                {
+                    Name = Constantes.ParametroTema,
+                    Description = "Tema de la aplicación",
+                    Value = ThemePosMe.PosMe
+                });
             }
         }
         catch (Exception e)

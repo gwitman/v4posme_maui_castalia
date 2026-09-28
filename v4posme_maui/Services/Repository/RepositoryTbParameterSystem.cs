@@ -12,6 +12,12 @@ public class RepositoryTbParameterSystem(DataBase dataBase) : RepositoryFacade<T
             .FirstOrDefaultAsync(system => system.Name == Constantes.ParametroLogo);
     }
 
+    public Task<TbParameterSystem> PosMeFindTema()
+    {
+        return dataBase.Database.Table<TbParameterSystem>()
+            .FirstOrDefaultAsync(system => system.Name == Constantes.ParametroTema);
+    }
+
     public Task<TbParameterSystem> PosMeFindCounter()
     {
         return dataBase.Database.Table<TbParameterSystem>()

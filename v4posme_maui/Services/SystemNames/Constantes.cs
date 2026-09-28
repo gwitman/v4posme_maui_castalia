@@ -10,6 +10,7 @@ public static class Constantes
 {
     public static readonly string ParametroCounter                  = "COUNTER";
     public static readonly string ParametroLogo                     = "LOGO";
+    public static readonly string ParametroTema                     = "THEME";
     public static readonly string ParametroAccesPoint               = "ACCESS_POINT";
     public static readonly string ParametroPrinter                  = "PRINTER";
     public static readonly string ParametroCodigoAbono              = "TRANSACTION_SHARE";

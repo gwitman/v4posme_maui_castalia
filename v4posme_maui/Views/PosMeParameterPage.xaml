@@ -101,6 +101,14 @@
                                 StartIcon="quantity"
                                 Value="{Binding Contador}"
                                 LabelText="Contador de Transacciones" />
+                            <dxe:ComboBoxEdit
+                                x:Name="ComboTema"
+                                LabelText="Tema"
+                                LabelColor="{StaticResource Primary}"
+                                IconColor="{StaticResource Primary}"
+                                StartIcon="textbox"
+                                ItemsSource="{Binding TemasDisponibles}"
+                                SelectedItem="{Binding TemaSeleccionado}" />
                             <dxe:TextEdit
                                 x:Name="TextPrinter"
                                 HasError="{Binding PrinterHasError}"

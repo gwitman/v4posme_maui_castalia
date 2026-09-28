@@ -5,6 +5,7 @@ namespace v4posme_maui.Services.Repository;
 public interface IRepositoryTbParameterSystem : IRepositoryFacade<TbParameterSystem>
 {
     Task<TbParameterSystem> PosMeFindLogo();
+    Task<TbParameterSystem> PosMeFindTema();
     Task<TbParameterSystem> PosMeFindCounter();    
     Task<TbParameterSystem> PosMeFindPrinter();
     Task<TbParameterSystem> PosMeFindCodigoAbono();

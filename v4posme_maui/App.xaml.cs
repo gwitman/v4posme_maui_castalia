@@ -1,4 +1,5 @@
-﻿using v4posme_maui.Services;
+﻿using Unity;
+using v4posme_maui.Services;
 using v4posme_maui.Services.Helpers;
 using v4posme_maui.Views;
 using v4posme_maui.Views.Abonos;
@@ -30,8 +31,9 @@ namespace v4posme_maui
             var dataBase = new DataBase();
             dataBase.Init();
             dataBase.InitDownloadTables();
-            MainPage = new LoginPage();
             UserAppTheme = AppTheme.Light;
+            AplicarTemaGuardado();
+            MainPage = new LoginPage();
         }
 
 
@@ -85,6 +87,22 @@ namespace v4posme_maui
                         Mensajes.MessagePermissionAll,
                         "OK")!;
                 }
+            }
+        }
+
+        // Carga el tema guardado en parametros y lo aplica sobre los recursos de color.
+        private async void AplicarTemaGuardado()
+        {
+            try
+            {
+                var repositoryParameter = VariablesGlobales.UnityContainer
+                    .Resolve<Services.Repository.IRepositoryTbParameterSystem>();
+                var tema = await repositoryParameter.PosMeFindTema();
+                ThemePosMe.Aplicar(tema?.Value);
+            }
+            catch
+            {
+                ThemePosMe.Aplicar(ThemePosMe.PosMe);
             }
         }
 

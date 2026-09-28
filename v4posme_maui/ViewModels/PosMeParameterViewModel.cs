@@ -17,6 +17,7 @@ public class PosMeParameterViewModel : BaseViewModel
     private TbParameterSystem _posmeFindCodigoAbono = new();
     private TbParameterSystem _posmeFindCodigFactura = new();
     private TbParameterSystem _posmeFindCodigoGasto = new();
+    private TbParameterSystem _posmeFindTema = new();
     public ICommand RefreshCommand { get; }
     public ICommand SaveCommand { get; }
 
@@ -87,6 +88,9 @@ public class PosMeParameterViewModel : BaseViewModel
                 CodigoGasto = _posmeFindCodigoGasto.Value;
             }
 
+            _posmeFindTema = await _repositoryTbParameterSystem.PosMeFindTema() ?? new TbParameterSystem();
+            TemaSeleccionado = ThemePosMe.Normalizar(_posmeFindTema.Value);
+
         });
     }
 
@@ -131,9 +135,27 @@ public class PosMeParameterViewModel : BaseViewModel
                 _repositoryTbParameterSystem.PosMeUpdate(_posmeFindCodigoAbono);
                 _posmeFindCodigoGasto.Value = CodigoGasto;
                 _repositoryTbParameterSystem.PosMeUpdate(_posmeFindCodigoGasto);
+
+                // Persistir y aplicar el tema seleccionado.
+                var temaNormalizado = ThemePosMe.Normalizar(TemaSeleccionado);
+                var temaCambio = !string.Equals(ThemePosMe.Actual, temaNormalizado,
+                    StringComparison.OrdinalIgnoreCase);
+                _posmeFindTema.Name = Constantes.ParametroTema;
+                _posmeFindTema.Description = "Tema de la aplicación";
+                _posmeFindTema.Value = temaNormalizado;
+                _repositoryTbParameterSystem.PosMeUpdate(_posmeFindTema);
+                ThemePosMe.Aplicar(temaNormalizado);
+
                 Mensaje = Mensajes.MensajeParametrosGuardar;
                 PopupBackgroundColor = Colors.Green;
                 LoadValuesDefault();
+
+                // Si cambio el tema, recrear la app para que todas las pantallas
+                // se re-rendericen con la nueva paleta de colores.
+                if (temaCambio)
+                {
+                    Application.Current!.MainPage = new Views.MainPage();
+                }
             }
             else
             {
@@ -243,5 +265,15 @@ public class PosMeParameterViewModel : BaseViewModel
     {
         get => _gastoHasError;
         set => SetProperty(ref _gastoHasError, value);
+    }
+
+    public List<string> TemasDisponibles => ThemePosMe.Disponibles;
+
+    private string _temaSeleccionado = ThemePosMe.PosMe;
+
+    public string TemaSeleccionado
+    {
+        get => _temaSeleccionado;
+        set => SetProperty(ref _temaSeleccionado, value);
     }
 }
