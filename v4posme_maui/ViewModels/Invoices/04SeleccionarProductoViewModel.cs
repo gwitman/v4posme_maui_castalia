@@ -412,7 +412,38 @@ public class SeleccionarProductoViewModel : BaseViewModel
     public decimal DetallePrecio
     {
         get => _detallePrecio;
-        set => SetProperty(ref _detallePrecio, value);
+        set
+        {
+            if (SetProperty(ref _detallePrecio, value))
+            {
+                // Al cambiar el precio se recalcula la cantidad segun el monto ingresado.
+                RecalcularCantidadDesdeMonto();
+            }
+        }
+    }
+
+    // Monto: el usuario indica cuanto desea gastar y el sistema calcula la cantidad
+    // correspondiente (Cantidad = Monto / Precio). Ej: monto 10 y precio 35 => 0.28.
+    private decimal _detalleMonto;
+    public decimal DetalleMonto
+    {
+        get => _detalleMonto;
+        set
+        {
+            if (SetProperty(ref _detalleMonto, value))
+            {
+                RecalcularCantidadDesdeMonto();
+            }
+        }
+    }
+
+    // Recalcula la cantidad a partir del monto y el precio actual.
+    private void RecalcularCantidadDesdeMonto()
+    {
+        if (_detalleMonto <= decimal.Zero || _detallePrecio <= decimal.Zero)
+            return;
+
+        DetalleCantidad = decimal.Round(_detalleMonto / _detallePrecio, 2, MidpointRounding.AwayFromZero);
     }
 
     // Abre el popup de detalle con la cantidad en 1 y el precio publico del producto.
@@ -424,6 +455,7 @@ public class SeleccionarProductoViewModel : BaseViewModel
         DetalleNombre    = obj.Name ?? obj.ItemNumber ?? "Producto";
         DetalleCantidad  = decimal.One;
         DetallePrecio    = obj.PrecioPublico;
+        DetalleMonto     = decimal.Zero;
         DetalleVisible   = true;
     }
 

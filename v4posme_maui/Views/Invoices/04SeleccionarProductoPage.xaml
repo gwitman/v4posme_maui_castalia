@@ -348,6 +348,19 @@
                                         Text="{Binding DetallePrecio}" />
                                 </StackLayout>
 
+                                <!-- Monto: al ingresar un monto (ej. 10) el sistema calcula la
+                                     cantidad correspondiente segun el precio (Cantidad = Monto / Precio). -->
+                                <StackLayout Spacing="4">
+                                    <Label Text="Monto"
+                                           FontSize="13"
+                                           FontAttributes="Bold"
+                                           TextColor="{StaticResource Gray600}" />
+                                    <dxe:TextEdit
+                                        Keyboard="Numeric"
+                                        PlaceholderText="Monto"
+                                        Text="{Binding DetalleMonto}" />
+                                </StackLayout>
+
                                 <Grid ColumnSpacing="10">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
