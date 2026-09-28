@@ -44,7 +44,8 @@
                     <Border.Shadow>
                         <Shadow Brush="Black" Offset="0,3" Radius="10" Opacity="0.25" />
                     </Border.Shadow>
-                    <Image Source="pm_png_96px.png"
+                    <Image x:Name="HeaderLogoImage"
+                           Source="pm_png_96px.png"
                            Aspect="AspectFit" />
                 </Border>
                 <VerticalStackLayout Spacing="2">
@@ -53,7 +54,8 @@
                            FontAttributes="Bold"
                            TextColor="White"
                            FontFamily="Roboto" />
-                    <Label Text="Punto de venta"
+                    <Label x:Name="HeaderCompanyNameLabel"
+                           Text="Punto de venta"
                            FontSize="13"
                            TextColor="#DCEFF7"
                            FontFamily="Roboto" />
