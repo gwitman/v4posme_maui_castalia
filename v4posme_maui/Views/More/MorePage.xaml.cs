@@ -2,6 +2,7 @@ using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Core;
 using Microsoft.Maui.Graphics;
 using Unity;
+using v4posme_maui.Services.Helpers;
 using v4posme_maui.Services.Repository;
 using v4posme_maui.Services.SystemNames;
 using v4posme_maui.ViewModels.More;
@@ -38,6 +39,14 @@ public partial class MorePage : ContentPage
 		switch (parameter)
 		{
 			case "1":
+				// Validar permiso antes de abrir el Cierre en el mobile.
+				var helperContador = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
+				var permission     = await helperContador.GetPermission(TypeMenuElementID.app_box_report_share_aspx, TypePermission.Updated, TypeImpact.All);
+				if (!permission)
+				{
+					await MostrarMensajeRojo(Mensajes.MensajeNoTienePermisoDeEdicion);
+					return;
+				}
 				await Navigation.PushAsync(new ReporteVentaPage());
 				break;
 			case "2":
