@@ -22,11 +22,21 @@ namespace v4posme_maui.Views
         {
             try
             {
-                // Nombre del comercio almacenado en tb_company (datos descargados).
+                // Nombre del comercio almacenado en tb_company (datos descargados),
+                // concatenado con el usuario logueado: "Comercio / Usuario".
                 var companyName = VariablesGlobales.TbCompany?.Name;
-                if (!string.IsNullOrWhiteSpace(companyName))
+                var userName = VariablesGlobales.User?.Nickname;
+                if (!string.IsNullOrWhiteSpace(companyName) && !string.IsNullOrWhiteSpace(userName))
+                {
+                    HeaderCompanyNameLabel.Text = $"{companyName} / {userName}";
+                }
+                else if (!string.IsNullOrWhiteSpace(companyName))
                 {
                     HeaderCompanyNameLabel.Text = companyName;
+                }
+                else if (!string.IsNullOrWhiteSpace(userName))
+                {
+                    HeaderCompanyNameLabel.Text = userName;
                 }
 
                 // Imagen configurada en la pagina de parametros (LOGO). Si no hay, se
