@@ -34,6 +34,7 @@ public static class Mensajes
     public const string MensajeDispositivoNoConectado = "No está conectado el dispositivo al celular o nombre es incorrecto";
     public const string MensajeCampoRequerido = "Todos los campos son requeridos, intente nuevamente.";
     public const string MensajeNoTienePermisoDeEdicion = "No tiene permiso para editar o guardar";
+    public const string MensajeNoTienePermisoDeVisualizar = "No tiene permiso para mostrar";
     public const string MensajeCompartirComprobante = "Compartir Comprobante de Factura";
     public const string MensajeSeleccionarMoneda = "Seleccione una moneda para continuar";
     public const string MensajeSeleccionarFrecuenciaPago = "Seleccione una frecuencia de pago";

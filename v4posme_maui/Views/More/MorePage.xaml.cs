@@ -44,7 +44,7 @@ public partial class MorePage : ContentPage
 				var permission     = await helperContador.GetPermission(TypeMenuElementID.app_box_report_share_aspx, TypePermission.Updated, TypeImpact.All);
 				if (!permission)
 				{
-					await MostrarMensajeRojo(Mensajes.MensajeNoTienePermisoDeEdicion);
+					await MostrarMensajeRojo(Mensajes.MensajeNoTienePermisoDeVisualizar);
 					return;
 				}
 				await Navigation.PushAsync(new ReporteVentaPage());
