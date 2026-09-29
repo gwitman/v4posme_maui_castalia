@@ -12,6 +12,7 @@ namespace v4posme_maui.ViewModels
         private readonly IRepositoryTbTransactionMaster _repositoryTbTransactionMaster;
         private readonly IRepositoryDocumentCreditAmortization _repositoryDocumentCreditAmortization;
         private readonly IRepositoryServerTransactionMaster _repositoryServerTransactionMaster;
+        private readonly HelperCore _helperContador;
 
         public const string ViewName = "AboutPage";
 
@@ -21,6 +22,18 @@ namespace v4posme_maui.ViewModels
             _repositoryTbTransactionMaster = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMaster>();
             _repositoryDocumentCreditAmortization = VariablesGlobales.UnityContainer.Resolve<IRepositoryDocumentCreditAmortization>();
             _repositoryServerTransactionMaster = VariablesGlobales.UnityContainer.Resolve<IRepositoryServerTransactionMaster>();
+            _helperContador = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
+        }
+
+        // Controla la visibilidad de todos los indicadores del resumen del dia.
+        // Los indicadores se ocultan si y solo si el usuario tiene activado el permiso
+        // app_inventory_item_index_aspx / Updated / All.
+        private bool _mostrarIndicadores = true;
+
+        public bool MostrarIndicadores
+        {
+            get => _mostrarIndicadores;
+            set => SetProperty(ref _mostrarIndicadores, value);
         }
 
         private decimal _totalCorodbas;
@@ -287,6 +300,9 @@ namespace v4posme_maui.ViewModels
             {
                 IsBusy                                          = true;
                 Navigation                                      = navigation;
+                // Ocultar los indicadores si el usuario tiene el permiso activado.
+                bool permission                                 = await _helperContador.GetPermission(TypeMenuElementID.core_dashboards, TypePermission.Selected, TypeImpact.None);
+                MostrarIndicadores                              = !permission;
                 var findAllDocumentCreditAmortization           = await _repositoryDocumentCreditAmortization.PosMeFindByMaxDate(DateTime.Now);
                 var findAll                                     = await _repositoryTbTransactionMaster.PosMeFindAll();
                 var findServerTransactionMasterAbonosCordoba    = await _repositoryServerTransactionMaster.PosMeFilterByCurrencyIDAndTransactionID((int)TypeCurrency.Cordoba, (int)TypeTransaction.TransactionShare);

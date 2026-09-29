@@ -21,7 +21,7 @@
                 <VerticalStackLayout Padding="16,18,16,24" Spacing="16">
 
                     <!-- Encabezado con total consolidado -->
-                    <core:DXBorder CornerRadius="20" BorderThickness="0">
+                    <core:DXBorder CornerRadius="20" BorderThickness="0" IsVisible="{Binding MostrarIndicadores}">
                         <core:DXBorder.Background>
                             <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                                 <GradientStop Color="{StaticResource PrimaryDark}" Offset="0.0" />
@@ -77,7 +77,7 @@
                     </core:DXBorder>
 
                     <!-- FACTURAS CONTADO -->
-                    <core:DXBorder CornerRadius="16" BorderThickness="0" BackgroundColor="{StaticResource White}">
+                    <core:DXBorder CornerRadius="16" BorderThickness="0" BackgroundColor="{StaticResource White}" IsVisible="{Binding MostrarIndicadores}">
                         <core:DXBorder.Shadow>
                             <Shadow Brush="{StaticResource Gray300Brush}" Offset="0,2" Radius="8" Opacity="0.3" />
                         </core:DXBorder.Shadow>
@@ -121,7 +121,7 @@
                     </core:DXBorder>
 
                     <!-- FACTURAS CREDITO -->
-                    <core:DXBorder CornerRadius="16" BorderThickness="0" BackgroundColor="{StaticResource White}">
+                    <core:DXBorder CornerRadius="16" BorderThickness="0" BackgroundColor="{StaticResource White}" IsVisible="{Binding MostrarIndicadores}">
                         <core:DXBorder.Shadow>
                             <Shadow Brush="{StaticResource Gray300Brush}" Offset="0,2" Radius="8" Opacity="0.3" />
                         </core:DXBorder.Shadow>
@@ -257,7 +257,7 @@
                     </core:DXBorder>
 
                     <!-- GASTOS -->
-                    <core:DXBorder CornerRadius="16" BorderThickness="0" BackgroundColor="{StaticResource White}">
+                    <core:DXBorder CornerRadius="16" BorderThickness="0" BackgroundColor="{StaticResource White}" IsVisible="{Binding MostrarIndicadores}">
                         <core:DXBorder.Shadow>
                             <Shadow Brush="{StaticResource Gray300Brush}" Offset="0,2" Radius="8" Opacity="0.3" />
                         </core:DXBorder.Shadow>
@@ -301,7 +301,7 @@
                     </core:DXBorder>
 
                     <!-- COMPRAS / ENTRADAS DE INVENTARIO -->
-                    <core:DXBorder CornerRadius="16" BorderThickness="0" BackgroundColor="{StaticResource White}">
+                    <core:DXBorder CornerRadius="16" BorderThickness="0" BackgroundColor="{StaticResource White}" IsVisible="{Binding MostrarIndicadores}">
                         <core:DXBorder.Shadow>
                             <Shadow Brush="{StaticResource Gray300Brush}" Offset="0,2" Radius="8" Opacity="0.3" />
                         </core:DXBorder.Shadow>
@@ -345,7 +345,7 @@
                     </core:DXBorder>
 
                     <!-- SALIDAS DE INVENTARIO -->
-                    <core:DXBorder CornerRadius="16" BorderThickness="0" BackgroundColor="{StaticResource White}">
+                    <core:DXBorder CornerRadius="16" BorderThickness="0" BackgroundColor="{StaticResource White}" IsVisible="{Binding MostrarIndicadores}">
                         <core:DXBorder.Shadow>
                             <Shadow Brush="{StaticResource Gray300Brush}" Offset="0,2" Radius="8" Opacity="0.3" />
                         </core:DXBorder.Shadow>
@@ -389,7 +389,7 @@
                     </core:DXBorder>
 
                     <!-- INGRESOS -->
-                    <core:DXBorder CornerRadius="16" BorderThickness="0" BackgroundColor="{StaticResource White}">
+                    <core:DXBorder CornerRadius="16" BorderThickness="0" BackgroundColor="{StaticResource White}" IsVisible="{Binding MostrarIndicadores}">
                         <core:DXBorder.Shadow>
                             <Shadow Brush="{StaticResource Gray300Brush}" Offset="0,2" Radius="8" Opacity="0.3" />
                         </core:DXBorder.Shadow>
@@ -433,7 +433,7 @@
                     </core:DXBorder>
 
                     <!-- SALIDA DE EFECTIVO -->
-                    <core:DXBorder CornerRadius="16" BorderThickness="0" BackgroundColor="{StaticResource White}">
+                    <core:DXBorder CornerRadius="16" BorderThickness="0" BackgroundColor="{StaticResource White}" IsVisible="{Binding MostrarIndicadores}">
                         <core:DXBorder.Shadow>
                             <Shadow Brush="{StaticResource Gray300Brush}" Offset="0,2" Radius="8" Opacity="0.3" />
                         </core:DXBorder.Shadow>
@@ -477,7 +477,7 @@
                     </core:DXBorder>
 
                     <!-- INGRESO GENERAL -->
-                    <core:DXBorder CornerRadius="16" BorderThickness="0" BackgroundColor="{StaticResource White}">
+                    <core:DXBorder CornerRadius="16" BorderThickness="0" BackgroundColor="{StaticResource White}" IsVisible="{Binding MostrarIndicadores}">
                         <core:DXBorder.Shadow>
                             <Shadow Brush="{StaticResource Gray300Brush}" Offset="0,2" Radius="8" Opacity="0.3" />
                         </core:DXBorder.Shadow>
