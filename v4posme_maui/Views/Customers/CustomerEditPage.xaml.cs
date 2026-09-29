@@ -45,6 +45,15 @@ public partial class CustomerEditPage : ContentPage
                 return;
             }
 
+            //Validar Permiso
+            bool permission = await _helperContador.GetPermission(TypeMenuElementID.app_cxc_customer, TypePermission.Updated, TypeImpact.All);
+            if (!permission)
+            {
+                TxtMensaje.Text = Mensajes.MensajeNoTienePermisoDeEdicion;
+                Popup.IsOpen = true;
+                return;
+            }
+
             var saveCustomer               = (Api_AppMobileApi_GetDataDownloadCustomerResponse)DataForm.DataObject;
             saveCustomer.Modificado        = true;
             var validateCustomerNoExist = await RepositoryTbCustomer.PosMeExisteCustomerIdentification(saveCustomer.Identification!, saveCustomer.CustomerId);
