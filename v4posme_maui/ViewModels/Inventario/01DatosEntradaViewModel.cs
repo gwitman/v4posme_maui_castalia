@@ -11,9 +11,12 @@ namespace v4posme_maui.ViewModels.Inventario;
 // navega a la seleccion de productos.
 public class DatosEntradaViewModel : BaseViewModel
 {
+    private readonly HelperCore _helperContador;
+
     public DatosEntradaViewModel()
     {
         Title                     = "Compra - Datos";
+        _helperContador           = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
         SiguienteCommand          = new Command(OnSiguiente);
         AbrirMenuPrincipalCommand = new Command(OnAbrirMenuPrincipal);
     }
@@ -55,9 +58,17 @@ public class DatosEntradaViewModel : BaseViewModel
         set => SetProperty(ref _errorComentarios, value);
     }
 
-    public void OnAppearing(INavigation navigation)
+    public async void OnAppearing(INavigation navigation)
     {
         Navigation = navigation;
+
+        // Validar permiso antes de mostrar los primeros datos a registrar.
+        var permission = await _helperContador.GetPermission(TypeMenuElementID.app_inventory_inputunpost, TypePermission.Updated, TypeImpact.All);
+        if (!permission)
+        {
+            ShowMensajePopUp(Mensajes.MensajeNoTienePermisoDeEdicion);
+            return;
+        }
 
         // Al abrir esta pantalla (primer paso del flujo) se limpia el estado de la
         // transaccion para que los campos y los productos inicien vacios y no queden
@@ -76,6 +87,14 @@ public class DatosEntradaViewModel : BaseViewModel
 
     private async void OnSiguiente()
     {
+        // Validar permiso antes de guardar/continuar la operacion.
+        var permission = await _helperContador.GetPermission(TypeMenuElementID.app_inventory_inputunpost, TypePermission.Updated, TypeImpact.All);
+        if (!permission)
+        {
+            ShowMensajePopUp(Mensajes.MensajeNoTienePermisoDeEdicion);
+            return;
+        }
+
         if (string.IsNullOrWhiteSpace(Comentarios))
         {
             ErrorComentarios = true;

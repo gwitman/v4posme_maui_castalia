@@ -1,5 +1,7 @@
 using CommunityToolkit.Maui.Core;
+using Unity;
 using v4posme_maui.Models;
+using v4posme_maui.Services.Helpers;
 using v4posme_maui.Services.SystemNames;
 
 namespace v4posme_maui.ViewModels.Inventario;
@@ -8,9 +10,12 @@ namespace v4posme_maui.ViewModels.Inventario;
 // Captura comentario (obligatorio), referencia1 y referencia2.
 public class DatosSalidaViewModel : BaseViewModel
 {
+    private readonly HelperCore _helperContador;
+
     public DatosSalidaViewModel()
     {
         Title                     = "Salida - Datos";
+        _helperContador           = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
         SiguienteCommand          = new Command(OnSiguiente);
         AbrirMenuPrincipalCommand = new Command(OnAbrirMenuPrincipal);
     }
@@ -52,9 +57,17 @@ public class DatosSalidaViewModel : BaseViewModel
         set => SetProperty(ref _errorComentarios, value);
     }
 
-    public void OnAppearing(INavigation navigation)
+    public async void OnAppearing(INavigation navigation)
     {
         Navigation = navigation;
+
+        // Validar permiso antes de mostrar los primeros datos a registrar.
+        var permission = await _helperContador.GetPermission(TypeMenuElementID.app_inventory_otheroutput, TypePermission.Updated, TypeImpact.All);
+        if (!permission)
+        {
+            ShowMensajePopUp(Mensajes.MensajeNoTienePermisoDeEdicion);
+            return;
+        }
 
         // Al abrir esta pantalla (primer paso del flujo) se limpia el estado de la
         // transaccion para que los campos y los productos inicien vacios y no queden
@@ -73,6 +86,14 @@ public class DatosSalidaViewModel : BaseViewModel
 
     private async void OnSiguiente()
     {
+        // Validar permiso antes de guardar/continuar la operacion.
+        var permission = await _helperContador.GetPermission(TypeMenuElementID.app_inventory_otheroutput, TypePermission.Updated, TypeImpact.All);
+        if (!permission)
+        {
+            ShowMensajePopUp(Mensajes.MensajeNoTienePermisoDeEdicion);
+            return;
+        }
+
         if (string.IsNullOrWhiteSpace(Comentarios))
         {
             ErrorComentarios = true;

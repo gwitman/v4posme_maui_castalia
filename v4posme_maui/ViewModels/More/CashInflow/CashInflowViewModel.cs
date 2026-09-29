@@ -86,15 +86,30 @@ public class CashInflowViewModel : BaseViewModel
         }
     }
 
-    public void OnAppearing(INavigation navigation)
+    public async void OnAppearing(INavigation navigation)
     {
         Navigation = navigation;
         IsBusy = false;
+
+        // Validar permiso antes de mostrar los primeros datos a registrar.
+        var permission = await _helperCore.GetPermission(TypeMenuElementID.app_box_inputcash, TypePermission.Updated, TypeImpact.All);
+        if (!permission)
+        {
+            ShowMensajePopUp(Mensajes.MensajeNoTienePermisoDeEdicion);
+        }
     }
 
     private async Task OnGuardarCommand()
     {
         if (IsBusy) return;
+
+        // Validar permiso antes de guardar la operacion.
+        var permission = await _helperCore.GetPermission(TypeMenuElementID.app_box_inputcash, TypePermission.Updated, TypeImpact.All);
+        if (!permission)
+        {
+            ShowMensajePopUp(Mensajes.MensajeNoTienePermisoDeEdicion);
+            return;
+        }
 
         // Validaciones antes de guardar.
         if (!decimal.TryParse(Monto, out var monto) || monto <= decimal.Zero)
