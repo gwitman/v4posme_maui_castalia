@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:inventario="clr-namespace:v4posme_maui.ViewModels.Inventario"
+             xmlns:converters="clr-namespace:v4posme_maui.Services.Converters"
+             xmlns:dxc="clr-namespace:DevExpress.Maui.Controls;assembly=DevExpress.Maui.Controls"
+             xmlns:dxcv="clr-namespace:DevExpress.Maui.CollectionView;assembly=DevExpress.Maui.CollectionView"
+             xmlns:dx="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
+             Title="{Binding Title}"
+             BackgroundColor="{StaticResource PageBackground}"
+             x:Class="v4posme_maui.Views.Inventario.VisualizarAjustePage">
+    <ContentPage.BindingContext>
+        <inventario:VisualizarAjusteViewModel />
+    </ContentPage.BindingContext>
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsVisible="{Binding AbiertoDesdeImpresiones}"
+                            IsEnabled="{Binding AbiertoDesdeImpresiones}"
+                            Command="{Binding RegresarCommand}" />
+    </Shell.BackButtonBehavior>
+    <ContentPage.ToolbarItems>
+        <ToolbarItem IconImageSource="shared" Clicked="Compartir_OnClicked" />
+        <ToolbarItem Text="Nuevo ajuste" Order="Secondary" Command="{Binding NuevaCommand}" />
+        <ToolbarItem Text="Imprimir" Order="Secondary" Command="{Binding ImprimirCommand}" />
+        <ToolbarItem Text="Eliminar" Order="Secondary" Command="{Binding EliminarCommand}" />
+    </ContentPage.ToolbarItems>
+    <ContentPage.Resources>
+        <converters:ToLowerConverter x:Key="ToLowerConverter" />
+    </ContentPage.Resources>
+    <ContentPage.Content>
+        <dxc:ShimmerView Style="{StaticResource ShimmerEffect}" IsLoading="{Binding IsBusy}">
+            <dxc:ShimmerView.Content>
+                <Grid x:Name="ShareLayout" RowDefinitions="Auto,*,Auto" BackgroundColor="{StaticResource White}">
+
+                    <!-- Encabezado compacto -->
+                    <StackLayout Grid.Row="0" Spacing="2" Padding="16,10,16,8" BackgroundColor="{StaticResource White}">
+                        <dx:DXImage Source="{Binding LogoSource}"
+                                    HeightRequest="200" WidthRequest="200"
+                                    Aspect="AspectFit"
+                                    HorizontalOptions="Center" />
+                        <Label Text="{Binding CompanyName}" FontAttributes="Bold" FontSize="15"
+                               TextColor="{StaticResource Gray900}" HorizontalTextAlignment="Center" Margin="0,2,0,0" />
+                        <dx:DXBorder HorizontalOptions="Center" Padding="12,2" CornerRadius="10" BorderThickness="0"
+                                     BackgroundColor="{StaticResource Primary}" Margin="0,2">
+                            <Label Text="AJUSTE" FontAttributes="Bold" FontSize="12" TextColor="White" />
+                        </dx:DXBorder>
+                        <Label Text="{Binding Codigo}" FontAttributes="Bold" FontSize="13"
+                               TextColor="{StaticResource PrimaryDark}" HorizontalTextAlignment="Center" />
+                        <Label Text="{Binding FechaTexto}" FontSize="11"
+                               TextColor="{StaticResource Gray400}" HorizontalTextAlignment="Center" />
+                    </StackLayout>
+
+                    <!-- Cuerpo -->
+                    <dxcv:DXCollectionView Grid.Row="1" ItemSeparatorThickness="0.5"
+                                           ItemSeparatorColor="{StaticResource SeparatorColor}"
+                                           ItemsSource="{Binding Items}">
+                        <dxcv:DXCollectionView.HeaderTemplate>
+                            <DataTemplate>
+                                <StackLayout Spacing="0">
+                                    <dx:DXBorder Margin="12,8,12,4" Padding="10,6" CornerRadius="8" BorderThickness="0"
+                                                 BackgroundColor="{StaticResource PageBackground}">
+                                        <Label Text="{Binding Comentarios}" FontSize="12"
+                                               TextColor="{StaticResource Gray600}" />
+                                    </dx:DXBorder>
+                                    <Grid Padding="14,4,14,4" ColumnSpacing="8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="44" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Label Grid.Column="0" Text="CANT" FontSize="10" FontAttributes="Bold" TextColor="{StaticResource Gray400}" />
+                                        <Label Grid.Column="1" Text="PRODUCTO" FontSize="10" FontAttributes="Bold" TextColor="{StaticResource Gray400}" />
+                                        <Label Grid.Column="2" Text="IMPORTE" FontSize="10" FontAttributes="Bold" TextColor="{StaticResource Gray400}" />
+                                    </Grid>
+                                </StackLayout>
+                            </DataTemplate>
+                        </dxcv:DXCollectionView.HeaderTemplate>
+                        <dxcv:DXCollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="14,8" ColumnSpacing="8" BackgroundColor="{StaticResource White}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="44" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <dx:DXBorder Grid.Column="0" WidthRequest="34" HeightRequest="26" CornerRadius="6"
+                                                 BackgroundColor="{StaticResource PageBackground}" BorderThickness="0"
+                                                 HorizontalOptions="Start" VerticalOptions="Center">
+                                        <Label Text="{Binding Quantity, StringFormat='{0:0.##}'}" FontAttributes="Bold" FontSize="12"
+                                               TextColor="{StaticResource Primary}" HorizontalOptions="Center" VerticalOptions="Center" />
+                                    </dx:DXBorder>
+                                    <StackLayout Grid.Column="1" Spacing="0" VerticalOptions="Center">
+                                        <Label Text="{Binding Name, Converter={StaticResource ToLowerConverter}}"
+                                               FontSize="13" TextColor="{StaticResource Gray900}"
+                                               LineBreakMode="TailTruncation" MaxLines="1" />
+                                        <Label Text="{Binding Cost, StringFormat='C$ {0:N2} c/u'}"
+                                               FontSize="11" TextColor="{StaticResource Gray400}" />
+                                    </StackLayout>
+                                    <Label Grid.Column="2" VerticalOptions="Center" FontAttributes="Bold" FontSize="13"
+                                           TextColor="{StaticResource PrimaryDark}"
+                                           Text="{Binding Importe, StringFormat='C$ {0:N2}'}" />
+                                </Grid>
+                            </DataTemplate>
+                        </dxcv:DXCollectionView.ItemTemplate>
+                    </dxcv:DXCollectionView>
+
+                    <!-- Pie de pagina compacto -->
+                    <dx:DXBorder Grid.Row="2" BackgroundColor="{StaticResource White}"
+                                 CornerRadius="18,18,0,0" BorderThickness="0" Padding="16,10">
+                        <dx:DXBorder.Shadow>
+                            <Shadow Brush="{StaticResource Gray400}" Offset="0,-2" Radius="8" Opacity="0.15" />
+                        </dx:DXBorder.Shadow>
+                        <StackLayout Spacing="4">
+                            <dx:DXBorder Padding="12,8" CornerRadius="10" BorderThickness="0"
+                                         BackgroundColor="{StaticResource Primary}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Label Grid.Column="0" Text="TOTAL" FontSize="14" FontAttributes="Bold"
+                                           TextColor="White" VerticalOptions="Center" />
+                                    <Label Grid.Column="1" FontSize="17" FontAttributes="Bold"
+                                           TextColor="White" VerticalOptions="Center"
+                                           Text="{Binding Total, StringFormat='C$ {0}'}" />
+                                </Grid>
+                            </dx:DXBorder>
+                            <Label Text="{Binding CompanyAddress}" FontSize="11"
+                                   TextColor="{StaticResource Gray500}" HorizontalTextAlignment="Center" Margin="0,2,0,0" />
+                            <Label Text="{Binding CompanyTelefono}" FontSize="11"
+                                   TextColor="{StaticResource Gray500}" HorizontalTextAlignment="Center" />
+                        </StackLayout>
+                    </dx:DXBorder>
+                </Grid>
+            </dxc:ShimmerView.Content>
+            <dxc:ShimmerView.LoadingView>
+                <ActivityIndicator IsRunning="{Binding IsBusy}" HeightRequest="50" WidthRequest="50" />
+            </dxc:ShimmerView.LoadingView>
+        </dxc:ShimmerView>
+    </ContentPage.Content>
+</ContentPage>

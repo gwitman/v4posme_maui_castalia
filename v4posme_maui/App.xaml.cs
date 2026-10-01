@@ -76,6 +76,18 @@ namespace v4posme_maui
             Routing.RegisterRoute(typeof(RevisarProductosSalidaPage).FullName, typeof(RevisarProductosSalidaPage));
             Routing.RegisterRoute(typeof(VisualizarSalidaPage).FullName, typeof(VisualizarSalidaPage));
 
+            // Inventario - Ajuste de inventario
+            Routing.RegisterRoute(typeof(DatosAjustePage).FullName, typeof(DatosAjustePage));
+            Routing.RegisterRoute(typeof(SeleccionarProductoAjustePage).FullName, typeof(SeleccionarProductoAjustePage));
+            Routing.RegisterRoute(typeof(RevisarProductosAjustePage).FullName, typeof(RevisarProductosAjustePage));
+            Routing.RegisterRoute(typeof(VisualizarAjustePage).FullName, typeof(VisualizarAjustePage));
+
+            // Inventario - Otras entradas (Invent. Entrada)
+            Routing.RegisterRoute(typeof(DatosOtraEntradaPage).FullName, typeof(DatosOtraEntradaPage));
+            Routing.RegisterRoute(typeof(SeleccionarProductoOtraEntradaPage).FullName, typeof(SeleccionarProductoOtraEntradaPage));
+            Routing.RegisterRoute(typeof(RevisarProductosOtraEntradaPage).FullName, typeof(RevisarProductosOtraEntradaPage));
+            Routing.RegisterRoute(typeof(VisualizarOtraEntradaPage).FullName, typeof(VisualizarOtraEntradaPage));
+
             var permissionsGranted = await PermissionsService.CheckAndRequestPermissionsAsync();
             while (!permissionsGranted)
             {

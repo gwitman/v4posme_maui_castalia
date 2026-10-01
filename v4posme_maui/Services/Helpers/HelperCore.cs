@@ -589,6 +589,24 @@ public class HelperCore(
         return $"SAL-{DateTime.Now:yyMMddHHmmss}";
     }
 
+    /// <summary>
+    /// Genera un codigo unico para un ajuste de inventario. Usa el prefijo "AJU" mas el
+    /// timestamp actual.
+    /// </summary>
+    public string GetCodigoAjuste()
+    {
+        return $"AJU-{DateTime.Now:yyMMddHHmmss}";
+    }
+
+    /// <summary>
+    /// Genera un codigo unico para una entrada de inventario (Otras entradas). Usa el
+    /// prefijo "OEN" mas el timestamp actual.
+    /// </summary>
+    public string GetCodigoOtraEntrada()
+    {
+        return $"OEN-{DateTime.Now:yyMMddHHmmss}";
+    }
+
     public async Task<List<Api_AppMobileApi_GetDataDownloadCustomerResponse>> ReordenarListaAbono(List<Api_AppMobileApi_GetDataDownloadCustomerResponse> listaBase)
     {
         List<Api_AppMobileApi_GetDataDownloadCustomerResponse> listaOrdenada;
