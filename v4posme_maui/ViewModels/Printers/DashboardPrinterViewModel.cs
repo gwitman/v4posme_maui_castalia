@@ -45,10 +45,16 @@ public class DashboardPrinterViewModel : BaseViewModel
         Salidas                                 = new();
         InventarioEntradas                      = new();
         InventarioSalidas                       = new();
+        InventarioAjuste                        = new();
+        InventarioOtraEntrada                   = new();
         SearchInventarioEntradasCommand         = new Command(OnSearchInventarioEntradasCommand);
         SearchInventarioSalidasCommand          = new Command(OnSearchInventarioSalidasCommand);
         SelectedInventarioEntradaCommand        = new Command<ViewTempDtoInventarioLista>(OnSelectedInventarioEntradaCommand);
         SelectedInventarioSalidaCommand         = new Command<ViewTempDtoInventarioLista>(OnSelectedInventarioSalidaCommand);
+        SearchInventarioAjusteCommand           = new Command(OnSearchInventarioAjusteCommand);
+        SelectedInventarioAjusteCommand         = new Command<ViewTempDtoInventarioLista>(OnSelectedInventarioAjusteCommand);
+        SearchInventarioOtraEntradaCommand      = new Command(OnSearchInventarioOtraEntradaCommand);
+        SelectedInventarioOtraEntradaCommand    = new Command<ViewTempDtoInventarioLista>(OnSelectedInventarioOtraEntradaCommand);
         OnBarCode                               = new Command(OnSearchBarCode);
         SearchFacturaCommand                    = new Command(OnSearchFacturaCommand);
         SelectedFacturaCommand                  = new Command<ViewTempDtoInvoice>(OnSelectedFacturaCommand);
@@ -523,10 +529,42 @@ public class DashboardPrinterViewModel : BaseViewModel
         set => SetProperty(ref _searchInventarioSalidas, value);
     }
 
+    private ObservableCollection<ViewTempDtoInventarioLista>? _inventarioAjuste;
+    public ObservableCollection<ViewTempDtoInventarioLista> InventarioAjuste
+    {
+        get => _inventarioAjuste!;
+        set => SetProperty(ref _inventarioAjuste, value);
+    }
+
+    private string _searchInventarioAjuste = string.Empty;
+    public string SearchInventarioAjuste
+    {
+        get => _searchInventarioAjuste;
+        set => SetProperty(ref _searchInventarioAjuste, value);
+    }
+
+    private ObservableCollection<ViewTempDtoInventarioLista>? _inventarioOtraEntrada;
+    public ObservableCollection<ViewTempDtoInventarioLista> InventarioOtraEntrada
+    {
+        get => _inventarioOtraEntrada!;
+        set => SetProperty(ref _inventarioOtraEntrada, value);
+    }
+
+    private string _searchInventarioOtraEntrada = string.Empty;
+    public string SearchInventarioOtraEntrada
+    {
+        get => _searchInventarioOtraEntrada;
+        set => SetProperty(ref _searchInventarioOtraEntrada, value);
+    }
+
     public Command SearchInventarioEntradasCommand { get; }
     public Command SearchInventarioSalidasCommand { get; }
     public Command SelectedInventarioEntradaCommand { get; }
     public Command SelectedInventarioSalidaCommand { get; }
+    public Command SearchInventarioAjusteCommand { get; }
+    public Command SelectedInventarioAjusteCommand { get; }
+    public Command SearchInventarioOtraEntradaCommand { get; }
+    public Command SelectedInventarioOtraEntradaCommand { get; }
 
     private async void OnSearchInventarioEntradasCommand()
     {
@@ -534,7 +572,7 @@ public class DashboardPrinterViewModel : BaseViewModel
         var filters = string.IsNullOrWhiteSpace(SearchInventarioEntradas)
             ? await _repositoryTbTransactionMaster.PosMeFilterInventarioByTransactionId((int)TypeTransaction.TransactionInventarioCompras)
             : await _repositoryTbTransactionMaster.PosMeFilterInventarioByCodigo((int)TypeTransaction.TransactionInventarioCompras, SearchInventarioEntradas);
-        await FillInventario(filters, esEntrada: true);
+        await FillInventario(filters, TypeTransaction.TransactionInventarioCompras);
         IsBusy = false;
     }
 
@@ -544,12 +582,34 @@ public class DashboardPrinterViewModel : BaseViewModel
         var filters = string.IsNullOrWhiteSpace(SearchInventarioSalidas)
             ? await _repositoryTbTransactionMaster.PosMeFilterInventarioByTransactionId((int)TypeTransaction.TransactionInventarioSalida)
             : await _repositoryTbTransactionMaster.PosMeFilterInventarioByCodigo((int)TypeTransaction.TransactionInventarioSalida, SearchInventarioSalidas);
-        await FillInventario(filters, esEntrada: false);
+        await FillInventario(filters, TypeTransaction.TransactionInventarioSalida);
         IsBusy = false;
     }
 
-    private async Task FillInventario(List<TbTransactionMaster> masters, bool esEntrada)
+    private async void OnSearchInventarioAjusteCommand()
     {
+        IsBusy = true;
+        var filters = string.IsNullOrWhiteSpace(SearchInventarioAjuste)
+            ? await _repositoryTbTransactionMaster.PosMeFilterInventarioByTransactionId((int)TypeTransaction.TransactionInventarioAjuste)
+            : await _repositoryTbTransactionMaster.PosMeFilterInventarioByCodigo((int)TypeTransaction.TransactionInventarioAjuste, SearchInventarioAjuste);
+        await FillInventario(filters, TypeTransaction.TransactionInventarioAjuste);
+        IsBusy = false;
+    }
+
+    private async void OnSearchInventarioOtraEntradaCommand()
+    {
+        IsBusy = true;
+        var filters = string.IsNullOrWhiteSpace(SearchInventarioOtraEntrada)
+            ? await _repositoryTbTransactionMaster.PosMeFilterInventarioByTransactionId((int)TypeTransaction.TransactionInventarioEntradas)
+            : await _repositoryTbTransactionMaster.PosMeFilterInventarioByCodigo((int)TypeTransaction.TransactionInventarioEntradas, SearchInventarioOtraEntrada);
+        await FillInventario(filters, TypeTransaction.TransactionInventarioEntradas);
+        IsBusy = false;
+    }
+
+    private async Task FillInventario(List<TbTransactionMaster> masters, TypeTransaction tipo)
+    {
+        // Mostrar siempre los ultimos 10 registros (la lista ya viene ordenada descendente).
+        masters = masters.Take(10).ToList();
         var buffer = new List<ViewTempDtoInventarioLista>(masters.Count);
         foreach (var master in masters)
         {
@@ -572,10 +632,21 @@ public class DashboardPrinterViewModel : BaseViewModel
 
         await MainThread.InvokeOnMainThreadAsync(() =>
         {
-            if (esEntrada)
-                InventarioEntradas = new ObservableCollection<ViewTempDtoInventarioLista>(buffer);
-            else
-                InventarioSalidas = new ObservableCollection<ViewTempDtoInventarioLista>(buffer);
+            switch (tipo)
+            {
+                case TypeTransaction.TransactionInventarioCompras:
+                    InventarioEntradas = new ObservableCollection<ViewTempDtoInventarioLista>(buffer);
+                    break;
+                case TypeTransaction.TransactionInventarioAjuste:
+                    InventarioAjuste = new ObservableCollection<ViewTempDtoInventarioLista>(buffer);
+                    break;
+                case TypeTransaction.TransactionInventarioEntradas:
+                    InventarioOtraEntrada = new ObservableCollection<ViewTempDtoInventarioLista>(buffer);
+                    break;
+                default:
+                    InventarioSalidas = new ObservableCollection<ViewTempDtoInventarioLista>(buffer);
+                    break;
+            }
         });
     }
 
@@ -587,6 +658,16 @@ public class DashboardPrinterViewModel : BaseViewModel
     private async void OnSelectedInventarioSalidaCommand(ViewTempDtoInventarioLista obj)
     {
         await AbrirInventario(obj, TypeTransaction.TransactionInventarioSalida);
+    }
+
+    private async void OnSelectedInventarioAjusteCommand(ViewTempDtoInventarioLista obj)
+    {
+        await AbrirInventario(obj, TypeTransaction.TransactionInventarioAjuste);
+    }
+
+    private async void OnSelectedInventarioOtraEntradaCommand(ViewTempDtoInventarioLista obj)
+    {
+        await AbrirInventario(obj, TypeTransaction.TransactionInventarioEntradas);
     }
 
     private async Task AbrirInventario(ViewTempDtoInventarioLista obj, TypeTransaction tipo)
@@ -626,10 +707,21 @@ public class DashboardPrinterViewModel : BaseViewModel
 
             VariablesGlobales.DtoInventario = dto;
 
-            if (tipo == TypeTransaction.TransactionInventarioCompras)
-                await Navigation!.PushAsync(new VisualizarEntradaPage());
-            else
-                await Navigation!.PushAsync(new VisualizarSalidaPage());
+            switch (tipo)
+            {
+                case TypeTransaction.TransactionInventarioCompras:
+                    await Navigation!.PushAsync(new VisualizarEntradaPage());
+                    break;
+                case TypeTransaction.TransactionInventarioAjuste:
+                    await Navigation!.PushAsync(new VisualizarAjustePage());
+                    break;
+                case TypeTransaction.TransactionInventarioEntradas:
+                    await Navigation!.PushAsync(new VisualizarOtraEntradaPage());
+                    break;
+                default:
+                    await Navigation!.PushAsync(new VisualizarSalidaPage());
+                    break;
+            }
         }
         catch (Exception e)
         {
@@ -690,12 +782,22 @@ public class DashboardPrinterViewModel : BaseViewModel
 
                 case 6:
                     var entradas = await _repositoryTbTransactionMaster.PosMeFilterInventarioByTransactionId((int)TypeTransaction.TransactionInventarioCompras);
-                    await FillInventario(entradas, esEntrada: true);
+                    await FillInventario(entradas, TypeTransaction.TransactionInventarioCompras);
                     break;
 
                 case 7:
+                    var ajustes = await _repositoryTbTransactionMaster.PosMeFilterInventarioByTransactionId((int)TypeTransaction.TransactionInventarioAjuste);
+                    await FillInventario(ajustes, TypeTransaction.TransactionInventarioAjuste);
+                    break;
+
+                case 8:
+                    var otrasEntradas = await _repositoryTbTransactionMaster.PosMeFilterInventarioByTransactionId((int)TypeTransaction.TransactionInventarioEntradas);
+                    await FillInventario(otrasEntradas, TypeTransaction.TransactionInventarioEntradas);
+                    break;
+
+                case 9:
                     var salidas = await _repositoryTbTransactionMaster.PosMeFilterInventarioByTransactionId((int)TypeTransaction.TransactionInventarioSalida);
-                    await FillInventario(salidas, esEntrada: false);
+                    await FillInventario(salidas, TypeTransaction.TransactionInventarioSalida);
                     break;
             }
         }

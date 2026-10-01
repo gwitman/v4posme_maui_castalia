@@ -653,7 +653,7 @@
                             </ScrollView>
                         </dxco:TabViewItem.Content>
                     </dxco:TabViewItem>
-                    <dxco:TabViewItem HeaderText="Invent Entradas">
+                    <dxco:TabViewItem HeaderText="Compras">
                         <dxco:TabViewItem.Content>
                             <ScrollView>
                                 <core:DXStackLayout>
@@ -715,6 +715,156 @@
                                                                Text="{Binding Comentario}" />
                                                         <core:DXButton
                                                             Command="{Binding BindingContext.SelectedInventarioEntradaCommand,Source={x:Reference InventarioEntradasCollectionView}}"
+                                                            CommandParameter="{Binding .}"
+                                                            Style="{StaticResource SinFondoColorRedondeado}"
+                                                            Grid.Row="0" Grid.Column="1" Grid.RowSpan="4"
+                                                            IconHeight="30" IconWidth="30" Icon="view_1" />
+                                                    </Grid>
+                                                </core:DXBorder>
+                                            </DataTemplate>
+                                        </CollectionView.ItemTemplate>
+                                    </CollectionView>
+                                </core:DXStackLayout>
+                            </ScrollView>
+                        </dxco:TabViewItem.Content>
+                    </dxco:TabViewItem>
+                    <dxco:TabViewItem HeaderText="Ajuste">
+                        <dxco:TabViewItem.Content>
+                            <ScrollView>
+                                <core:DXStackLayout>
+                                    <core:DXBorder
+                                        Margin="12,12,12,4"
+                                        CornerRadius="16"
+                                        BorderThickness="0"
+                                        BackgroundColor="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}">
+                                        <editors:TextEdit
+                                            Margin="6,2"
+                                            BackgroundColor="Transparent"
+                                            BorderThickness="0"
+                                            StartIcon="search"
+                                            StartIconColor="{StaticResource Primary}"
+                                            Text="{Binding SearchInventarioAjuste}"
+                                            StartIconCommand="{Binding SearchInventarioAjusteCommand}"
+                                            ReturnCommand="{Binding SearchInventarioAjusteCommand}"
+                                            PlaceholderText="Buscar por código" />
+                                    </core:DXBorder>
+                                    <CollectionView
+                                        Margin="0"
+                                        x:Name="InventarioAjusteCollectionView"
+                                        ItemsSource="{Binding InventarioAjuste}"
+                                        SelectionMode="Single">
+                                        <CollectionView.ItemTemplate>
+                                            <DataTemplate>
+                                                <core:DXBorder
+                                                    CornerRadius="16"
+                                                    BorderThickness="0"
+                                                    Margin="12,6"
+                                                    Padding="14"
+                                                    BackgroundColor="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}">
+                                                    <Grid RowSpacing="5" ColumnSpacing="5">
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="Auto" />
+                                                            <RowDefinition Height="Auto" />
+                                                            <RowDefinition Height="Auto" />
+                                                            <RowDefinition Height="Auto" />
+                                                        </Grid.RowDefinitions>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="35" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <Label Grid.Row="0" Grid.Column="0" FontAttributes="Bold"
+                                                               TextColor="{StaticResource Primary}" Text="{Binding Codigo}" />
+                                                        <Label Grid.Row="1" Grid.Column="0" FontSize="12" Opacity="0.7"
+                                                               Text="{Binding FechaTexto}" />
+                                                        <Label Grid.Row="2" Grid.Column="0">
+                                                            <Label.FormattedText>
+                                                                <FormattedString>
+                                                                    <Span Text="Productos: " />
+                                                                    <Span Text="{Binding CantidadProductos}" FontAttributes="Bold" />
+                                                                    <Span Text="   " />
+                                                                    <Span Text="{Binding CostoTotalTexto}" FontAttributes="Bold" />
+                                                                </FormattedString>
+                                                            </Label.FormattedText>
+                                                        </Label>
+                                                        <Label Grid.Row="3" Grid.Column="0" FontSize="12" Opacity="0.7"
+                                                               Text="{Binding Comentario}" />
+                                                        <core:DXButton
+                                                            Command="{Binding BindingContext.SelectedInventarioAjusteCommand,Source={x:Reference InventarioAjusteCollectionView}}"
+                                                            CommandParameter="{Binding .}"
+                                                            Style="{StaticResource SinFondoColorRedondeado}"
+                                                            Grid.Row="0" Grid.Column="1" Grid.RowSpan="4"
+                                                            IconHeight="30" IconWidth="30" Icon="view_1" />
+                                                    </Grid>
+                                                </core:DXBorder>
+                                            </DataTemplate>
+                                        </CollectionView.ItemTemplate>
+                                    </CollectionView>
+                                </core:DXStackLayout>
+                            </ScrollView>
+                        </dxco:TabViewItem.Content>
+                    </dxco:TabViewItem>
+                    <dxco:TabViewItem HeaderText="Invent Entrada">
+                        <dxco:TabViewItem.Content>
+                            <ScrollView>
+                                <core:DXStackLayout>
+                                    <core:DXBorder
+                                        Margin="12,12,12,4"
+                                        CornerRadius="16"
+                                        BorderThickness="0"
+                                        BackgroundColor="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}">
+                                        <editors:TextEdit
+                                            Margin="6,2"
+                                            BackgroundColor="Transparent"
+                                            BorderThickness="0"
+                                            StartIcon="search"
+                                            StartIconColor="{StaticResource Primary}"
+                                            Text="{Binding SearchInventarioOtraEntrada}"
+                                            StartIconCommand="{Binding SearchInventarioOtraEntradaCommand}"
+                                            ReturnCommand="{Binding SearchInventarioOtraEntradaCommand}"
+                                            PlaceholderText="Buscar por código" />
+                                    </core:DXBorder>
+                                    <CollectionView
+                                        Margin="0"
+                                        x:Name="InventarioOtraEntradaCollectionView"
+                                        ItemsSource="{Binding InventarioOtraEntrada}"
+                                        SelectionMode="Single">
+                                        <CollectionView.ItemTemplate>
+                                            <DataTemplate>
+                                                <core:DXBorder
+                                                    CornerRadius="16"
+                                                    BorderThickness="0"
+                                                    Margin="12,6"
+                                                    Padding="14"
+                                                    BackgroundColor="{AppThemeBinding Light={StaticResource CardColor}, Dark={StaticResource CardColorDark}}">
+                                                    <Grid RowSpacing="5" ColumnSpacing="5">
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="Auto" />
+                                                            <RowDefinition Height="Auto" />
+                                                            <RowDefinition Height="Auto" />
+                                                            <RowDefinition Height="Auto" />
+                                                        </Grid.RowDefinitions>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="35" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <Label Grid.Row="0" Grid.Column="0" FontAttributes="Bold"
+                                                               TextColor="{StaticResource Primary}" Text="{Binding Codigo}" />
+                                                        <Label Grid.Row="1" Grid.Column="0" FontSize="12" Opacity="0.7"
+                                                               Text="{Binding FechaTexto}" />
+                                                        <Label Grid.Row="2" Grid.Column="0">
+                                                            <Label.FormattedText>
+                                                                <FormattedString>
+                                                                    <Span Text="Productos: " />
+                                                                    <Span Text="{Binding CantidadProductos}" FontAttributes="Bold" />
+                                                                    <Span Text="   " />
+                                                                    <Span Text="{Binding CostoTotalTexto}" FontAttributes="Bold" />
+                                                                </FormattedString>
+                                                            </Label.FormattedText>
+                                                        </Label>
+                                                        <Label Grid.Row="3" Grid.Column="0" FontSize="12" Opacity="0.7"
+                                                               Text="{Binding Comentario}" />
+                                                        <core:DXButton
+                                                            Command="{Binding BindingContext.SelectedInventarioOtraEntradaCommand,Source={x:Reference InventarioOtraEntradaCollectionView}}"
                                                             CommandParameter="{Binding .}"
                                                             Style="{StaticResource SinFondoColorRedondeado}"
                                                             Grid.Row="0" Grid.Column="1" Grid.RowSpan="4"
