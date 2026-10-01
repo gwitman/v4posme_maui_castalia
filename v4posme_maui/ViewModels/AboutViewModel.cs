@@ -294,6 +294,56 @@ namespace v4posme_maui.ViewModels
             set => SetProperty(ref _montoSalidasInventarioDolares, value);
         }
 
+        // Ajuste de inventario.
+        private int _cantidadAjusteInventario;
+
+        public int CantidadAjusteInventario
+        {
+            get => _cantidadAjusteInventario;
+            set => SetProperty(ref _cantidadAjusteInventario, value);
+        }
+
+        private decimal _montoAjusteInventarioCordobas;
+
+        public decimal MontoAjusteInventarioCordobas
+        {
+            get => _montoAjusteInventarioCordobas;
+            set => SetProperty(ref _montoAjusteInventarioCordobas, value);
+        }
+
+        private decimal _montoAjusteInventarioDolares;
+
+        public decimal MontoAjusteInventarioDolares
+        {
+            get => _montoAjusteInventarioDolares;
+            set => SetProperty(ref _montoAjusteInventarioDolares, value);
+        }
+
+        // Otras entradas de inventario (aumentan existencia).
+        private int _cantidadOtraEntradaInventario;
+
+        public int CantidadOtraEntradaInventario
+        {
+            get => _cantidadOtraEntradaInventario;
+            set => SetProperty(ref _cantidadOtraEntradaInventario, value);
+        }
+
+        private decimal _montoOtraEntradaInventarioCordobas;
+
+        public decimal MontoOtraEntradaInventarioCordobas
+        {
+            get => _montoOtraEntradaInventarioCordobas;
+            set => SetProperty(ref _montoOtraEntradaInventarioCordobas, value);
+        }
+
+        private decimal _montoOtraEntradaInventarioDolares;
+
+        public decimal MontoOtraEntradaInventarioDolares
+        {
+            get => _montoOtraEntradaInventarioDolares;
+            set => SetProperty(ref _montoOtraEntradaInventarioDolares, value);
+        }
+
         public async void OnAppearing(INavigation navigation)
         {
             try
@@ -322,6 +372,10 @@ namespace v4posme_maui.ViewModels
                 var listaEntradasInventarioDolares      = new List<TbTransactionMaster>();
                 var listaSalidasInventarioCordobas      = new List<TbTransactionMaster>();
                 var listaSalidasInventarioDolares       = new List<TbTransactionMaster>();
+                var listaAjusteInventarioCordobas       = new List<TbTransactionMaster>();
+                var listaAjusteInventarioDolares        = new List<TbTransactionMaster>();
+                var listaOtraEntradaInventarioCordobas  = new List<TbTransactionMaster>();
+                var listaOtraEntradaInventarioDolares   = new List<TbTransactionMaster>();
                 
                 
 
@@ -394,6 +448,30 @@ namespace v4posme_maui.ViewModels
                         else
                         {
                             listaSalidasInventarioDolares.Add(master);
+                        }
+                    }
+                    else if (master.TransactionId == TypeTransaction.TransactionInventarioAjuste)
+                    {
+                        // Ajuste de inventario.
+                        if (master.CurrencyId == TypeCurrency.Cordoba)
+                        {
+                            listaAjusteInventarioCordobas.Add(master);
+                        }
+                        else
+                        {
+                            listaAjusteInventarioDolares.Add(master);
+                        }
+                    }
+                    else if (master.TransactionId == TypeTransaction.TransactionInventarioEntradas)
+                    {
+                        // Otras entradas de inventario (aumentan existencia).
+                        if (master.CurrencyId == TypeCurrency.Cordoba)
+                        {
+                            listaOtraEntradaInventarioCordobas.Add(master);
+                        }
+                        else
+                        {
+                            listaOtraEntradaInventarioDolares.Add(master);
                         }
                     }
                     else if (master.TransactionId == TypeTransaction.TransactionInvoiceBilling  && master.StatusID == (int)TypeStatusBilling.Apply  && master.RegisterLocal == 1 )
@@ -478,6 +556,16 @@ namespace v4posme_maui.ViewModels
                 CantidadSalidasInventario       = listaSalidasInventarioCordobas.Count + listaSalidasInventarioDolares.Count;
                 MontoSalidasInventarioCordobas  = listaSalidasInventarioCordobas.Sum(master => master.Amount);
                 MontoSalidasInventarioDolares   = listaSalidasInventarioDolares.Sum(master => master.Amount);
+
+                //Ajuste de inventario
+                CantidadAjusteInventario        = listaAjusteInventarioCordobas.Count + listaAjusteInventarioDolares.Count;
+                MontoAjusteInventarioCordobas   = listaAjusteInventarioCordobas.Sum(master => master.Amount);
+                MontoAjusteInventarioDolares    = listaAjusteInventarioDolares.Sum(master => master.Amount);
+
+                //Otras entradas de inventario
+                CantidadOtraEntradaInventario       = listaOtraEntradaInventarioCordobas.Count + listaOtraEntradaInventarioDolares.Count;
+                MontoOtraEntradaInventarioCordobas  = listaOtraEntradaInventarioCordobas.Sum(master => master.Amount);
+                MontoOtraEntradaInventarioDolares   = listaOtraEntradaInventarioDolares.Sum(master => master.Amount);
                 //Ingreso general = facturas de contado + abonos + ingresos de efectivo
                 IngresoGeneralCordobas = MontoFacturasContadoCordobas + MontoAbonosCordobas + MontoIngresosCordobas;
                 IngresoGeneralDolares  = MontoFacturasContadoDolares + MontoAbonosDolares + MontoIngresosDolares;

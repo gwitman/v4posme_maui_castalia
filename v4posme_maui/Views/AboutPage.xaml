@@ -388,6 +388,94 @@
                         </Grid>
                     </core:DXBorder>
 
+                    <!-- OTRAS ENTRADAS DE INVENTARIO -->
+                    <core:DXBorder CornerRadius="16" BorderThickness="0" BackgroundColor="{StaticResource White}" IsVisible="{Binding MostrarIndicadores}">
+                        <core:DXBorder.Shadow>
+                            <Shadow Brush="{StaticResource Gray300Brush}" Offset="0,2" Radius="8" Opacity="0.3" />
+                        </core:DXBorder.Shadow>
+                        <Grid ColumnSpacing="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="5" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <BoxView Grid.Column="0" Color="#00838F" VerticalOptions="Fill" />
+                            <Grid Grid.Column="1" Padding="16,14" ColumnSpacing="14">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="52" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <core:DXBorder Grid.Column="0"
+                                               WidthRequest="48" HeightRequest="48"
+                                               CornerRadius="12"
+                                               BorderThickness="0"
+                                               BackgroundColor="#E0F3F5"
+                                               VerticalOptions="Center">
+                                    <Image Source="package_item" WidthRequest="26" HeightRequest="26"
+                                           HorizontalOptions="Center" VerticalOptions="Center" />
+                                </core:DXBorder>
+                                <VerticalStackLayout Grid.Column="1" Spacing="1">
+                                    <Label Text="Otras entradas de inventario" FontSize="13" TextColor="{StaticResource Gray500}" />
+                                    <Label Text="{Binding CantidadOtraEntradaInventario}" FontSize="26" FontAttributes="Bold"
+                                           TextColor="{StaticResource PrimaryDark}" />
+                                    <Label Margin="0,4,0,0" FontSize="12" TextColor="#00838F">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="C$ " FontAttributes="Bold" />
+                                                <Span Text="{Binding MontoOtraEntradaInventarioCordobas, StringFormat='{0:N2}'}" FontAttributes="Bold" />
+                                                <Span Text="   ·   $ " FontAttributes="Bold" />
+                                                <Span Text="{Binding MontoOtraEntradaInventarioDolares, StringFormat='{0:N2}'}" FontAttributes="Bold" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Grid>
+                    </core:DXBorder>
+
+                    <!-- AJUSTE DE INVENTARIO -->
+                    <core:DXBorder CornerRadius="16" BorderThickness="0" BackgroundColor="{StaticResource White}" IsVisible="{Binding MostrarIndicadores}">
+                        <core:DXBorder.Shadow>
+                            <Shadow Brush="{StaticResource Gray300Brush}" Offset="0,2" Radius="8" Opacity="0.3" />
+                        </core:DXBorder.Shadow>
+                        <Grid ColumnSpacing="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="5" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <BoxView Grid.Column="0" Color="#5D4037" VerticalOptions="Fill" />
+                            <Grid Grid.Column="1" Padding="16,14" ColumnSpacing="14">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="52" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <core:DXBorder Grid.Column="0"
+                                               WidthRequest="48" HeightRequest="48"
+                                               CornerRadius="12"
+                                               BorderThickness="0"
+                                               BackgroundColor="#EFE7E3"
+                                               VerticalOptions="Center">
+                                    <Image Source="package_item" WidthRequest="26" HeightRequest="26"
+                                           HorizontalOptions="Center" VerticalOptions="Center" />
+                                </core:DXBorder>
+                                <VerticalStackLayout Grid.Column="1" Spacing="1">
+                                    <Label Text="Ajuste de inventario" FontSize="13" TextColor="{StaticResource Gray500}" />
+                                    <Label Text="{Binding CantidadAjusteInventario}" FontSize="26" FontAttributes="Bold"
+                                           TextColor="{StaticResource PrimaryDark}" />
+                                    <Label Margin="0,4,0,0" FontSize="12" TextColor="#5D4037">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="C$ " FontAttributes="Bold" />
+                                                <Span Text="{Binding MontoAjusteInventarioCordobas, StringFormat='{0:N2}'}" FontAttributes="Bold" />
+                                                <Span Text="   ·   $ " FontAttributes="Bold" />
+                                                <Span Text="{Binding MontoAjusteInventarioDolares, StringFormat='{0:N2}'}" FontAttributes="Bold" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Grid>
+                    </core:DXBorder>
+
                     <!-- INGRESOS -->
                     <core:DXBorder CornerRadius="16" BorderThickness="0" BackgroundColor="{StaticResource White}" IsVisible="{Binding MostrarIndicadores}">
                         <core:DXBorder.Shadow>
