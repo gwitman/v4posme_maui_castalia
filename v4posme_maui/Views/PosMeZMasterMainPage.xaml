@@ -161,7 +161,7 @@
 
     </FlyoutItem>
 
-    <FlyoutItem Title="Invent. Entrada" Icon="products.svg">
+    <FlyoutItem Title="Invent. Compras" Icon="products.svg">
         <ShellContent Title="Entrada" Icon="products.svg"
                       Route="InventEntrada"
                       ContentTemplate="{DataTemplate inventario:DatosEntradaPage}" />

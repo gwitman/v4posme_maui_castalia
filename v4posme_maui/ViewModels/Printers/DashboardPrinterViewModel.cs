@@ -532,8 +532,8 @@ public class DashboardPrinterViewModel : BaseViewModel
     {
         IsBusy = true;
         var filters = string.IsNullOrWhiteSpace(SearchInventarioEntradas)
-            ? await _repositoryTbTransactionMaster.PosMeFilterInventarioByTransactionId((int)TypeTransaction.TransactionInventarioEntrada)
-            : await _repositoryTbTransactionMaster.PosMeFilterInventarioByCodigo((int)TypeTransaction.TransactionInventarioEntrada, SearchInventarioEntradas);
+            ? await _repositoryTbTransactionMaster.PosMeFilterInventarioByTransactionId((int)TypeTransaction.TransactionInventarioCompras)
+            : await _repositoryTbTransactionMaster.PosMeFilterInventarioByCodigo((int)TypeTransaction.TransactionInventarioCompras, SearchInventarioEntradas);
         await FillInventario(filters, esEntrada: true);
         IsBusy = false;
     }
@@ -581,7 +581,7 @@ public class DashboardPrinterViewModel : BaseViewModel
 
     private async void OnSelectedInventarioEntradaCommand(ViewTempDtoInventarioLista obj)
     {
-        await AbrirInventario(obj, TypeTransaction.TransactionInventarioEntrada);
+        await AbrirInventario(obj, TypeTransaction.TransactionInventarioCompras);
     }
 
     private async void OnSelectedInventarioSalidaCommand(ViewTempDtoInventarioLista obj)
@@ -626,7 +626,7 @@ public class DashboardPrinterViewModel : BaseViewModel
 
             VariablesGlobales.DtoInventario = dto;
 
-            if (tipo == TypeTransaction.TransactionInventarioEntrada)
+            if (tipo == TypeTransaction.TransactionInventarioCompras)
                 await Navigation!.PushAsync(new VisualizarEntradaPage());
             else
                 await Navigation!.PushAsync(new VisualizarSalidaPage());
@@ -689,7 +689,7 @@ public class DashboardPrinterViewModel : BaseViewModel
                     break;
 
                 case 6:
-                    var entradas = await _repositoryTbTransactionMaster.PosMeFilterInventarioByTransactionId((int)TypeTransaction.TransactionInventarioEntrada);
+                    var entradas = await _repositoryTbTransactionMaster.PosMeFilterInventarioByTransactionId((int)TypeTransaction.TransactionInventarioCompras);
                     await FillInventario(entradas, esEntrada: true);
                     break;
 

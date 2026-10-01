@@ -487,10 +487,10 @@ namespace v4posme_maui.ViewModels.More.ReporteVenta
 
 				// Compras / entradas de inventario (usan Amount)
 				var comprasNIO = enRango
-					.Where(t => t.TransactionId == TypeTransaction.TransactionInventarioEntrada && t.CurrencyId == TypeCurrency.Cordoba)
+					.Where(t => t.TransactionId == TypeTransaction.TransactionInventarioCompras && t.CurrencyId == TypeCurrency.Cordoba)
 					.Sum(t => t.Amount);
 				var comprasUSD = enRango
-					.Where(t => t.TransactionId == TypeTransaction.TransactionInventarioEntrada && t.CurrencyId == TypeCurrency.Dolar)
+					.Where(t => t.TransactionId == TypeTransaction.TransactionInventarioCompras && t.CurrencyId == TypeCurrency.Dolar)
 					.Sum(t => t.Amount);
 
 				TotalGastosNIO   = $"C$ {gastosNIO:N2}";

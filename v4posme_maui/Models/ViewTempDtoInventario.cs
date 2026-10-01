@@ -16,7 +16,7 @@ public class ViewTempDtoInventario
 
     // Tipo de transaccion en curso (Entrada o Salida). Determina el comportamiento y las
     // consultas en la base de datos.
-    public TypeTransaction TransactionId { get; set; } = TypeTransaction.TransactionInventarioEntrada;
+    public TypeTransaction TransactionId { get; set; } = TypeTransaction.TransactionInventarioCompras;
 
     public string? Comentarios { get; set; } = string.Empty;
 

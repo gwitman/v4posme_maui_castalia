@@ -10,7 +10,7 @@ public class VisualizarEntradaViewModel : VisualizarInventarioBaseViewModel
         Title = "Compra Registrada";
     }
 
-    protected override TypeTransaction TipoTransaccion => TypeTransaction.TransactionInventarioEntrada;
+    protected override TypeTransaction TipoTransaccion => TypeTransaction.TransactionInventarioCompras;
     protected override bool EsEntrada => true;
 
     protected override string RutaNuevo => "InventEntrada";

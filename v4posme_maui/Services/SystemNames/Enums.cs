@@ -17,9 +17,13 @@ namespace v4posme_maui.Services.SystemNames
         // Salida de efectivo (Cash Outflow): registra una salida general en el mobile.
         TransactionCashOutflow = 30,
         // Compras: aumenta la existencia de los productos (entrada de inventario).
-        TransactionInventarioEntrada = 21,
+        TransactionInventarioCompras = 21,
         // Otras salidas: disminuye la existencia de los productos (salida de inventario).
-        TransactionInventarioSalida = 8
+        TransactionInventarioSalida = 8,
+        // Otras entradas: aumenta la existencia de los productos (entrada de inventario).
+        TransactionInventarioEntradas = 12,
+        // Ajuste de inventario
+        TransactionInventarioAjuste = 33
     }
 
     public enum TypeQueryMedical
@@ -97,14 +101,16 @@ namespace v4posme_maui.Services.SystemNames
         core_dashboards                             = 8,
         app_cxc_customer                            = 62,
         app_inventory_inputunpost                   = 90,
+        app_inventory_otherinput                    = 56,
         app_inventory_otheroutput                   = 57,
         app_inventory_item_index_aspx               = 55,
+        app_inventory_ajuste                        = 161,
         app_invoice_billing_index                   = 77,
         app_cxp_expenses                            = 203,
         app_box_share                               = 93,
         app_box_inputcash                           = 139,
         app_box_outcash                             = 140,
-        app_box_report_share_aspx                   = 116,
+        app_box_report_share_aspx                   = 116,        
         core_inventory_clear_item_on_upload_data    = 285,
         core_billing_invoice_type_restaurant        = 286
         

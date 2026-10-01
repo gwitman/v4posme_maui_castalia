@@ -13,7 +13,7 @@ public class RevisarProductosEntradaViewModel : RevisarProductosInventarioBaseVi
     public override bool PermiteEditarCosto => true;
 
     protected override Services.SystemNames.TypeTransaction TipoTransaccion
-        => Services.SystemNames.TypeTransaction.TransactionInventarioEntrada;
+        => Services.SystemNames.TypeTransaction.TransactionInventarioCompras;
     protected override bool EsEntrada => true;
     protected override string GenerarCodigo() => Helper.GetCodigoEntrada();
 

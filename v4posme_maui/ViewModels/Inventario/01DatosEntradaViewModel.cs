@@ -75,7 +75,7 @@ public class DatosEntradaViewModel : BaseViewModel
         // precargados de un flujo anterior.
         VariablesGlobales.DtoInventario = new ViewTempDtoInventario
         {
-            TransactionId = TypeTransaction.TransactionInventarioEntrada
+            TransactionId = TypeTransaction.TransactionInventarioCompras
         };
 
         Comentarios = string.Empty;
@@ -102,7 +102,7 @@ public class DatosEntradaViewModel : BaseViewModel
             return;
         }
 
-        VariablesGlobales.DtoInventario.TransactionId = TypeTransaction.TransactionInventarioEntrada;
+        VariablesGlobales.DtoInventario.TransactionId = TypeTransaction.TransactionInventarioCompras;
         VariablesGlobales.DtoInventario.Comentarios   = Comentarios;
         VariablesGlobales.DtoInventario.Referencia1   = Referencia1;
         VariablesGlobales.DtoInventario.Referencia2   = Referencia2;

@@ -372,7 +372,7 @@ namespace v4posme_maui.ViewModels
                             listaAbonosDolares.Add(master);
                         }
                     }
-                    else if (master.TransactionId == TypeTransaction.TransactionInventarioEntrada)
+                    else if (master.TransactionId == TypeTransaction.TransactionInventarioCompras)
                     {
                         // Compras / entradas de inventario (aumentan existencia).
                         if (master.CurrencyId == TypeCurrency.Cordoba)
