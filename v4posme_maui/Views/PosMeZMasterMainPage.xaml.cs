@@ -15,10 +15,20 @@ namespace v4posme_maui.Views
                 Debug.WriteLine($"Current tab: {current}");
             };
 
+            // Refrescar el encabezado cada vez que se abre el menu lateral, de modo que
+            // tras descargar datos se muestre el comercio/usuario y el logo actualizados.
+            PropertyChanged += (_, e) =>
+            {
+                if (e.PropertyName == nameof(FlyoutIsPresented) && FlyoutIsPresented)
+                {
+                    LoadHeaderInfo();
+                }
+            };
+
             LoadHeaderInfo();
         }
 
-        private async void LoadHeaderInfo()
+        public async void LoadHeaderInfo()
         {
             try
             {
