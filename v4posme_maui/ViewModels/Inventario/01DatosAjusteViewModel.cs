@@ -61,12 +61,13 @@ public class DatosAjusteViewModel : BaseViewModel
     public async void OnAppearing(INavigation navigation)
     {
         Navigation = navigation;
+        IsBusy     = false;
 
         // Validar permiso antes de mostrar los primeros datos a registrar.
         var permission = await _helperContador.GetPermission(TypeMenuElementID.app_inventory_ajuste, TypePermission.Updated, TypeImpact.All);
         if (!permission)
         {
-            ShowMensajePopUp(Mensajes.MensajeNoTienePermisoDeEdicion);
+            ShowToast(Mensajes.MensajeNoTienePermisoDeEdicion, ToastDuration.Long, 14);
             return;
         }
 
@@ -91,7 +92,7 @@ public class DatosAjusteViewModel : BaseViewModel
         var permission = await _helperContador.GetPermission(TypeMenuElementID.app_inventory_ajuste, TypePermission.Updated, TypeImpact.All);
         if (!permission)
         {
-            ShowMensajePopUp(Mensajes.MensajeNoTienePermisoDeEdicion);
+            ShowToast(Mensajes.MensajeNoTienePermisoDeEdicion, ToastDuration.Long, 14);
             return;
         }
 
