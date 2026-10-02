@@ -14,4 +14,6 @@ public class VisualizarOtraEntradaViewModel : VisualizarInventarioBaseViewModel
     protected override bool EsEntrada => true;
 
     protected override string RutaNuevo => "InventOtraEntrada";
+
+    protected override string EtiquetaDocumento => "ENTRADA";
 }

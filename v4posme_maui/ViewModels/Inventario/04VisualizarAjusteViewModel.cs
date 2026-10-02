@@ -14,4 +14,6 @@ public class VisualizarAjusteViewModel : VisualizarInventarioBaseViewModel
     protected override bool EsEntrada => true;
 
     protected override string RutaNuevo => "InventAjuste";
+
+    protected override string EtiquetaDocumento => "AJUSTE";
 }

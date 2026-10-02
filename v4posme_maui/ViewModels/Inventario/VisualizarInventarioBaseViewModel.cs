@@ -75,6 +75,11 @@ public abstract class VisualizarInventarioBaseViewModel : BaseViewModel
     // Ruta (flyout) del primer paso del flujo para iniciar una nueva transaccion.
     protected abstract string RutaNuevo { get; }
 
+    // Etiqueta del documento usada en el encabezado, impresion y al compartir
+    // (COMPRA / SALIDA / AJUSTE / ENTRADA). Por defecto se deriva de EsEntrada para no
+    // romper los flujos existentes, pero cada flujo puede sobreescribirla.
+    protected virtual string EtiquetaDocumento => EsEntrada ? "COMPRA" : "SALIDA";
+
     public Command NuevaCommand { get; }
     public Command ImprimirCommand { get; }
     public Command CompartirCommand { get; }
@@ -231,7 +236,7 @@ public abstract class VisualizarInventarioBaseViewModel : BaseViewModel
             await PrinterInventarioFormatHelper.PrintFormat(
                 printer,
                 VariablesGlobales.DtoInventario,
-                EsEntrada ? "COMPRA" : "SALIDA",
+                EtiquetaDocumento,
                 VariablesGlobales.TbCompany?.Name ?? string.Empty,
                 VariablesGlobales.User!.Nickname!);
 
@@ -256,5 +261,5 @@ public abstract class VisualizarInventarioBaseViewModel : BaseViewModel
     }
 
     // Titulo usado por la pagina al compartir la imagen.
-    public string TituloCompartir => EsEntrada ? "Compartir Compra" : "Compartir Salida";
+    public string TituloCompartir => $"Compartir {EtiquetaDocumento}";
 }
