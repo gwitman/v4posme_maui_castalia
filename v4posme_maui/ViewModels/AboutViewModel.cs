@@ -409,11 +409,13 @@ namespace v4posme_maui.ViewModels
         {
             try
             {
+                HelperLogs.Log($"AboutViewModel.OnAppearing: inicio (CompanyKey={VariablesGlobales.CompanyKey}, Usuario={VariablesGlobales.User?.Nickname})", "Info");
                 IsBusy                                          = true;
                 Navigation                                      = navigation;
                 // Ocultar los indicadores si el usuario tiene el permiso activado.
                 bool permission                                 = await _helperContador.GetPermission(TypeMenuElementID.core_dashboards, TypePermission.Selected, TypeImpact.None);
                 MostrarIndicadores                              = !permission;
+                HelperLogs.Log($"AboutViewModel.OnAppearing: MostrarIndicadores={MostrarIndicadores}", "Info");
                 await CargarComboCompanias();
                 var findAllDocumentCreditAmortization           = await _repositoryDocumentCreditAmortization.PosMeFindByMaxDate(DateTime.Now);
                 var findAll                                     = await _repositoryTbTransactionMaster.PosMeFindAll();
@@ -635,11 +637,14 @@ namespace v4posme_maui.ViewModels
                 //inventario) - gastos - salidas de efectivo. Las salidas de inventario no afectan el total de caja.
                 TotalCordobas   = MontoFacturasContadoCordobas + MontoAbonosCordobas + MontoIngresosCordobas - MontoEntradasInventarioCordobas - MontoGastosCordobas - MontoEgresosCordobas;
                 TotalDolares    = MontoFacturasContadoDolares + MontoAbonosDolares + MontoIngresosDolares - MontoEntradasInventarioDolares - MontoGastosDolares - MontoEgresosDolares;
+                HelperLogs.Log($"AboutViewModel.OnAppearing: totales calculados (TotalCordobas={TotalCordobas}, TotalDolares={TotalDolares}, IngresoGeneralCordobas={IngresoGeneralCordobas}, IngresoGeneralDolares={IngresoGeneralDolares})", "Info");
                 IsBusy          = false;
+                HelperLogs.Log("AboutViewModel.OnAppearing: fin exitoso", "Info");
             }
             catch (Exception e)
             {
                 HelperLogs.Log(e);
+                HelperLogs.Log("AboutViewModel.OnAppearing: excepcion durante la carga del dashboard", "Error");
                 ShowToast(e.Message,ToastDuration.Long, 14);
             }
         }
@@ -654,14 +659,23 @@ namespace v4posme_maui.ViewModels
         {
             try
             {
+                HelperLogs.Log("AboutViewModel.CargarComboCompanias: inicio", "Info");
                 _cargandoCombo = true;
                 CompaniasDisponibles.Clear();
                 _companias.Clear();
                 MostrarComboCompanias = false;
 
                 var parametro = await _repositoryParameters.PosMeFindByKey(Constantes.AppMobileSwitchCompany);
-                if (parametro is null || string.IsNullOrWhiteSpace(parametro.Value) || parametro.Value.Trim() == "|")
+                if (parametro is null)
                 {
+                    HelperLogs.Log($"AboutViewModel.CargarComboCompanias: parametro '{Constantes.AppMobileSwitchCompany}' no existe, combo oculto", "Warning");
+                    return;
+                }
+
+                HelperLogs.Log($"AboutViewModel.CargarComboCompanias: valor del parametro = '{parametro.Value}'", "Info");
+                if (string.IsNullOrWhiteSpace(parametro.Value) || parametro.Value.Trim() == "|")
+                {
+                    HelperLogs.Log("AboutViewModel.CargarComboCompanias: parametro vacio o '|', combo oculto", "Warning");
                     return;
                 }
 
@@ -674,6 +688,7 @@ namespace v4posme_maui.ViewModels
                 catch (Exception ex)
                 {
                     HelperLogs.Log(ex);
+                    HelperLogs.Log("AboutViewModel.CargarComboCompanias: JSON invalido en el parametro, combo oculto", "Error");
                     return;
                 }
 
@@ -682,8 +697,10 @@ namespace v4posme_maui.ViewModels
                                      && !string.IsNullOrWhiteSpace(opcion.CompanyUrl))
                     .ToList();
 
+                HelperLogs.Log($"AboutViewModel.CargarComboCompanias: companias validas encontradas = {validas.Count}", "Info");
                 if (validas.Count == 0)
                 {
+                    HelperLogs.Log("AboutViewModel.CargarComboCompanias: sin companias validas, combo oculto", "Warning");
                     return;
                 }
 
@@ -691,6 +708,7 @@ namespace v4posme_maui.ViewModels
                 {
                     _companias.Add(opcion);
                     CompaniasDisponibles.Add(opcion.CompanyName!);
+                    HelperLogs.Log($"AboutViewModel.CargarComboCompanias: opcion agregada (Name={opcion.CompanyName}, Url={opcion.CompanyUrl})", "Info");
                 }
 
                 // Seleccionar la compania actual (por URL base) si esta en la lista.
@@ -698,16 +716,20 @@ namespace v4posme_maui.ViewModels
                 var seleccion = validas.FirstOrDefault(opcion =>
                     string.Equals(opcion.CompanyUrl, companiaActual, StringComparison.OrdinalIgnoreCase));
                 CompaniaSeleccionada = (seleccion ?? validas.First()).CompanyName;
+                HelperLogs.Log($"AboutViewModel.CargarComboCompanias: seleccion inicial = '{CompaniaSeleccionada}'", "Info");
 
                 // Habilitar el combo solo si no hay transacciones pendientes.
                 var contador = await _helperContador.GetCounter();
                 ComboCompaniasHabilitado = contador == 0;
+                HelperLogs.Log($"AboutViewModel.CargarComboCompanias: contador transacciones={contador}, ComboCompaniasHabilitado={ComboCompaniasHabilitado}", "Info");
 
                 MostrarComboCompanias = true;
+                HelperLogs.Log("AboutViewModel.CargarComboCompanias: fin exitoso, combo visible", "Info");
             }
             catch (Exception e)
             {
                 HelperLogs.Log(e);
+                HelperLogs.Log("AboutViewModel.CargarComboCompanias: excepcion, combo oculto", "Error");
                 MostrarComboCompanias = false;
             }
             finally
@@ -721,8 +743,10 @@ namespace v4posme_maui.ViewModels
         // informacion. Solo si todo sale bien se actualiza el estado y el encabezado.
         public async Task OnCompaniaSeleccionadaCambio(string nuevaCompania)
         {
+            HelperLogs.Log($"AboutViewModel.OnCompaniaSeleccionadaCambio: inicio (seleccion='{nuevaCompania}', _cargandoCombo={_cargandoCombo})", "Info");
             if (_cargandoCombo || string.IsNullOrWhiteSpace(nuevaCompania))
             {
+                HelperLogs.Log("AboutViewModel.OnCompaniaSeleccionadaCambio: ignorado (cargando combo o seleccion vacia)", "Info");
                 return;
             }
 
@@ -731,19 +755,25 @@ namespace v4posme_maui.ViewModels
                 string.Equals(c.CompanyName, nuevaCompania, StringComparison.OrdinalIgnoreCase));
             if (compania is null || string.IsNullOrWhiteSpace(compania.CompanyUrl))
             {
+                HelperLogs.Log($"AboutViewModel.OnCompaniaSeleccionadaCambio: no se pudo resolver la compania '{nuevaCompania}'", "Warning");
                 return;
             }
+
+            HelperLogs.Log($"AboutViewModel.OnCompaniaSeleccionadaCambio: compania resuelta (Name={compania.CompanyName}, Url={compania.CompanyUrl})", "Info");
 
             // Si la seleccion es la compania actual, no hacer nada.
             if (string.Equals(compania.CompanyUrl, VariablesGlobales.CompanyKey, StringComparison.OrdinalIgnoreCase))
             {
+                HelperLogs.Log("AboutViewModel.OnCompaniaSeleccionadaCambio: la seleccion es la compania actual, no se hace nada", "Info");
                 return;
             }
 
             // Validar nuevamente el contador antes de permitir el cambio.
             var contador = await _helperContador.GetCounter();
+            HelperLogs.Log($"AboutViewModel.OnCompaniaSeleccionadaCambio: contador transacciones={contador}", "Info");
             if (contador != 0)
             {
+                HelperLogs.Log("AboutViewModel.OnCompaniaSeleccionadaCambio: cambio bloqueado por transacciones pendientes", "Warning");
                 ComboCompaniasHabilitado = false;
                 ShowToast(Mensajes.MensajeDownloadCantidadTransacciones, ToastDuration.Long, 14);
                 await RestaurarSeleccionActual();
@@ -752,10 +782,12 @@ namespace v4posme_maui.ViewModels
 
             if (Navigation is null)
             {
+                HelperLogs.Log("AboutViewModel.OnCompaniaSeleccionadaCambio: Navigation es null, abortando", "Warning");
                 return;
             }
 
             // Pedir usuario y contrasena mediante una pagina modal dedicada.
+            HelperLogs.Log("AboutViewModel.OnCompaniaSeleccionadaCambio: mostrando dialogo de credenciales", "Info");
             var loginPage = new SwitchCompanyLoginPage(compania.CompanyName!);
             await Navigation.PushModalAsync(loginPage);
             var credenciales = await loginPage.WaitForResultAsync();
@@ -764,10 +796,12 @@ namespace v4posme_maui.ViewModels
                 || string.IsNullOrWhiteSpace(credenciales.Usuario)
                 || string.IsNullOrWhiteSpace(credenciales.Clave))
             {
+                HelperLogs.Log($"AboutViewModel.OnCompaniaSeleccionadaCambio: dialogo cancelado o credenciales vacias (Aceptado={credenciales.Aceptado}, Usuario={credenciales.Usuario})", "Info");
                 await RestaurarSeleccionActual();
                 return;
             }
 
+            HelperLogs.Log($"AboutViewModel.OnCompaniaSeleccionadaCambio: credenciales ingresadas (Usuario={credenciales.Usuario}), iniciando cambio de compania", "Info");
             await CambiarCompania(compania, credenciales.Usuario, credenciales.Clave);
         }
 
@@ -777,16 +811,22 @@ namespace v4posme_maui.ViewModels
             var companyKeyAnterior  = VariablesGlobales.CompanyKey;
             var usuarioAnterior     = VariablesGlobales.User;
 
+            HelperLogs.Log($"AboutViewModel.CambiarCompania: inicio (destino Name={compania.CompanyName}, Url={compania.CompanyUrl}, Usuario={usuario})", "Info");
+            HelperLogs.Log($"AboutViewModel.CambiarCompania: estado anterior (CompanyKeyAnterior={companyKeyAnterior}, UsuarioAnterior={usuarioAnterior?.Nickname})", "Info");
+            HelperLogs.DumpObject("SwitchCompany", "compania", compania);
+
             try
             {
                 await Navigation!.PushModalAsync(new LoadingPage());
 
                 // La URL base de la compania se usa tal cual para construir las peticiones.
                 VariablesGlobales.CompanyKey = compania.CompanyUrl;
+                HelperLogs.Log($"AboutViewModel.CambiarCompania: CompanyKey actualizado a '{VariablesGlobales.CompanyKey}', ejecutando login", "Info");
 
                 var usuarioServidor = await _restApiCoreAcount.LoginMobile(usuario, clave);
                 if (usuarioServidor is null)
                 {
+                    HelperLogs.Log("AboutViewModel.CambiarCompania: login fallido (credenciales invalidas), revirtiendo estado", "Warning");
                     await Navigation.PopModalAsync();
                     ShowToast(Mensajes.MensajeCredencialesInvalida, ToastDuration.Long, 14);
                     RevertirEstado(companyKeyAnterior, usuarioAnterior);
@@ -794,16 +834,20 @@ namespace v4posme_maui.ViewModels
                     return;
                 }
 
+                HelperLogs.Log($"AboutViewModel.CambiarCompania: login exitoso (UserId={usuarioServidor.UserId}, Nickname={usuarioServidor.Nickname})", "Info");
                 usuarioServidor.Company     = compania.CompanyUrl;
                 usuarioServidor.Remember    = true;
                 VariablesGlobales.User      = usuarioServidor;
 
                 // Descargar y guardar la informacion de la nueva compania.
+                HelperLogs.Log("AboutViewModel.CambiarCompania: iniciando descarga de datos (GetDataDownload)", "Info");
                 var restApiAppMobile = new RestApiAppMobileApi();
                 var resultado = await restApiAppMobile.GetDataDownload(false);
+                HelperLogs.Log($"AboutViewModel.CambiarCompania: resultado descarga (Error={resultado.Error}, Description={resultado.Description})", "Info");
                 if (resultado.Error)
                 {
                     // Si falla la descarga NO se actualiza: revertir estado.
+                    HelperLogs.Log("AboutViewModel.CambiarCompania: descarga con error, revirtiendo estado", "Warning");
                     await Navigation.PopModalAsync();
                     ShowToast(resultado.Description, ToastDuration.Long, 14);
                     RevertirEstado(companyKeyAnterior, usuarioAnterior);
@@ -813,16 +857,19 @@ namespace v4posme_maui.ViewModels
 
                 // Descarga correcta: persistir el usuario (recordado) para que el login
                 // quede con la ultima compania seleccionada.
+                HelperLogs.Log("AboutViewModel.CambiarCompania: descarga exitosa, persistiendo usuario recordado", "Info");
                 await _repositoryTbUser.PosMeOnRemember();
                 var usuarioLocal = await _repositoryTbUser.PosMeFindUserByNicknameAndPassword(
                     usuarioServidor.Nickname!, usuarioServidor.Password!);
                 if (usuarioLocal is null)
                 {
+                    HelperLogs.Log("AboutViewModel.CambiarCompania: usuario no existe localmente, insertando", "Info");
                     usuarioServidor.Remember = true;
                     await _repositoryTbUser.PosMeInsert(usuarioServidor);
                 }
                 else
                 {
+                    HelperLogs.Log($"AboutViewModel.CambiarCompania: usuario existe localmente (UserId={usuarioLocal.UserId}), actualizando compania", "Info");
                     usuarioLocal.Remember = true;
                     usuarioLocal.Company = compania.CompanyUrl;
                     await _repositoryTbUser.PosMeUpdate(usuarioLocal);
@@ -830,6 +877,7 @@ namespace v4posme_maui.ViewModels
 
                 VariablesGlobales.TbCompany = await VariablesGlobales.UnityContainer
                     .Resolve<IRepositoryTbCompany>().PosMeFindFirst();
+                HelperLogs.Log($"AboutViewModel.CambiarCompania: TbCompany actualizado (Name={VariablesGlobales.TbCompany?.Name})", "Info");
 
                 await Navigation.PopModalAsync();
                 ShowToast(Mensajes.MensajeDownloadSuccess, ToastDuration.Long, 14);
@@ -837,14 +885,17 @@ namespace v4posme_maui.ViewModels
                 // Actualizar el encabezado del menu lateral y recargar indicadores.
                 if (Current!.MainPage is MainPage mainPage)
                 {
+                    HelperLogs.Log("AboutViewModel.CambiarCompania: actualizando encabezado del menu lateral", "Info");
                     mainPage.LoadHeaderInfo();
                 }
 
+                HelperLogs.Log("AboutViewModel.CambiarCompania: fin exitoso, recargando dashboard", "Info");
                 OnAppearing(Navigation);
             }
             catch (Exception e)
             {
                 HelperLogs.Log(e);
+                HelperLogs.Log("AboutViewModel.CambiarCompania: excepcion durante el cambio de compania, revirtiendo estado", "Error");
                 try { await Navigation!.PopModalAsync(); } catch { /* ignore */ }
                 ShowToast(Mensajes.MensajeDownloadError, ToastDuration.Long, 14);
                 RevertirEstado(companyKeyAnterior, usuarioAnterior);
@@ -854,6 +905,7 @@ namespace v4posme_maui.ViewModels
 
         private static void RevertirEstado(string? companyKeyAnterior, Api_CoreAccount_LoginMobileObjUserResponse? usuarioAnterior)
         {
+            HelperLogs.Log($"AboutViewModel.RevertirEstado: restaurando (CompanyKey={companyKeyAnterior}, Usuario={usuarioAnterior?.Nickname})", "Info");
             VariablesGlobales.CompanyKey = companyKeyAnterior;
             VariablesGlobales.User = usuarioAnterior;
         }
@@ -867,6 +919,7 @@ namespace v4posme_maui.ViewModels
             var seleccion = _companias.FirstOrDefault(c =>
                 string.Equals(c.CompanyUrl, companiaActual, StringComparison.OrdinalIgnoreCase));
             CompaniaSeleccionada = seleccion?.CompanyName ?? CompaniasDisponibles.FirstOrDefault();
+            HelperLogs.Log($"AboutViewModel.RestaurarSeleccionActual: seleccion restaurada a '{CompaniaSeleccionada}' (CompanyKey actual={companiaActual})", "Info");
             _cargandoCombo = false;
             await Task.CompletedTask;
         }
