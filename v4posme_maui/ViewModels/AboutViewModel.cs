@@ -61,8 +61,18 @@ namespace v4posme_maui.ViewModels
         public bool ComboCompaniasHabilitado
         {
             get => _comboCompaniasHabilitado;
-            set => SetProperty(ref _comboCompaniasHabilitado, value);
+            set
+            {
+                if (SetProperty(ref _comboCompaniasHabilitado, value))
+                {
+                    OnPropertyChanged(nameof(ComboCompaniasBloqueado));
+                }
+            }
         }
+
+        // Inverso de ComboCompaniasHabilitado: true cuando hay transacciones pendientes
+        // y por tanto no se permite cambiar de compania.
+        public bool ComboCompaniasBloqueado => !_comboCompaniasHabilitado;
 
         // Compania actualmente seleccionada en el combo.
         private string? _companiaSeleccionada;
@@ -745,34 +755,27 @@ namespace v4posme_maui.ViewModels
                 return;
             }
 
-            // Pedir usuario y contrasena.
-            var page = (Page)Navigation.NavigationStack.LastOrDefault()!;
-            var usuario = await page.DisplayPromptAsync("Cambiar de compañía",
-                $"Ingrese su usuario para la compañía \"{compania.CompanyName}\"",
-                "Aceptar", "Cancelar", placeholder: "Usuario");
-            if (string.IsNullOrWhiteSpace(usuario))
+            // Pedir usuario y contrasena mediante una pagina modal dedicada.
+            var loginPage = new SwitchCompanyLoginPage(compania.CompanyName!);
+            await Navigation.PushModalAsync(loginPage);
+            var credenciales = await loginPage.WaitForResultAsync();
+
+            if (!credenciales.Aceptado
+                || string.IsNullOrWhiteSpace(credenciales.Usuario)
+                || string.IsNullOrWhiteSpace(credenciales.Clave))
             {
                 await RestaurarSeleccionActual();
                 return;
             }
 
-            var clave = await page.DisplayPromptAsync("Cambiar de compañía",
-                "Ingrese su contraseña",
-                "Aceptar", "Cancelar", placeholder: "Contraseña");
-            if (string.IsNullOrWhiteSpace(clave))
-            {
-                await RestaurarSeleccionActual();
-                return;
-            }
-
-            await CambiarCompania(compania, usuario, clave);
+            await CambiarCompania(compania, credenciales.Usuario, credenciales.Clave);
         }
 
         private async Task CambiarCompania(DtoSwitchCompany compania, string usuario, string clave)
         {
             // Conservar el estado anterior para poder revertir si la descarga falla.
-            var companyKeyAnterior = VariablesGlobales.CompanyKey;
-            var usuarioAnterior = VariablesGlobales.User;
+            var companyKeyAnterior  = VariablesGlobales.CompanyKey;
+            var usuarioAnterior     = VariablesGlobales.User;
 
             try
             {
@@ -791,9 +794,9 @@ namespace v4posme_maui.ViewModels
                     return;
                 }
 
-                usuarioServidor.Company = compania.CompanyUrl;
-                usuarioServidor.Remember = true;
-                VariablesGlobales.User = usuarioServidor;
+                usuarioServidor.Company     = compania.CompanyUrl;
+                usuarioServidor.Remember    = true;
+                VariablesGlobales.User      = usuarioServidor;
 
                 // Descargar y guardar la informacion de la nueva compania.
                 var restApiAppMobile = new RestApiAppMobileApi();

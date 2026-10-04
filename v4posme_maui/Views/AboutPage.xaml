@@ -615,20 +615,82 @@
                         <core:DXBorder.Shadow>
                             <Shadow Brush="{StaticResource Gray300Brush}" Offset="0,2" Radius="8" Opacity="0.3" />
                         </core:DXBorder.Shadow>
-                        <VerticalStackLayout Padding="16,14" Spacing="8">
-                            <Label Text="Compañía" FontSize="13" TextColor="{StaticResource Gray500}" />
-                            <dxe:ComboBoxEdit
-                                x:Name="ComboCompanias"
-                                PickerShowMode="Popup"
-                                BoxMode="Outlined"
-                                StartIcon="basic_home.svg"
-                                IsEnabled="{Binding ComboCompaniasHabilitado}"
-                                ItemsSource="{Binding CompaniasDisponibles}"
-                                SelectedItem="{Binding CompaniaSeleccionada}"
-                                SelectionChanged="ComboCompanias_SelectionChanged" />
-                            <Label Text="Al cambiar de compañía se descargará nuevamente la información."
-                                   FontSize="11" TextColor="{StaticResource Gray400}" />
-                        </VerticalStackLayout>
+                        <Grid ColumnSpacing="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="5" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <BoxView Grid.Column="0" Color="{StaticResource PrimaryDark}" VerticalOptions="Fill" />
+                            <VerticalStackLayout Grid.Column="1" Padding="16,16" Spacing="14">
+
+                                <!-- Encabezado de la tarjeta -->
+                                <Grid ColumnSpacing="14">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="52" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <core:DXBorder Grid.Column="0"
+                                                   WidthRequest="48" HeightRequest="48"
+                                                   CornerRadius="12"
+                                                   BorderThickness="0"
+                                                   BackgroundColor="#E5F1F6"
+                                                   VerticalOptions="Center">
+                                        <Image Source="basic_home.svg" WidthRequest="26" HeightRequest="26"
+                                               HorizontalOptions="Center" VerticalOptions="Center" />
+                                    </core:DXBorder>
+                                    <VerticalStackLayout Grid.Column="1" Spacing="1" VerticalOptions="Center">
+                                        <Label Text="Compañía activa" FontSize="15" FontAttributes="Bold"
+                                               TextColor="{StaticResource PrimaryDark}" />
+                                        <Label Text="Selecciona para cambiar y sincronizar los datos."
+                                               FontSize="11" TextColor="{StaticResource Gray500}" />
+                                    </VerticalStackLayout>
+                                </Grid>
+
+                                <!-- Selector de compañía -->
+                                <dxe:ComboBoxEdit
+                                    x:Name="ComboCompanias"
+                                    PickerShowMode="Popup"
+                                    BoxMode="Outlined"
+                                    LabelText="Compañía"
+                                    LabelColor="{StaticResource Primary}"
+                                    BorderColor="{StaticResource Gray300}"
+                                    FocusedBorderColor="{StaticResource Primary}"
+                                    CornerRadius="12"
+                                    IsEnabled="{Binding ComboCompaniasHabilitado}"
+                                    ItemsSource="{Binding CompaniasDisponibles}"
+                                    SelectedItem="{Binding CompaniaSeleccionada}"
+                                    SelectionChanged="ComboCompanias_SelectionChanged" />
+
+                                <!-- Nota informativa -->
+                                <Grid ColumnSpacing="8" IsVisible="{Binding ComboCompaniasHabilitado}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Label Grid.Column="0" Text="ⓘ" FontSize="12" TextColor="{StaticResource Primary}"
+                                           VerticalOptions="Start" />
+                                    <Label Grid.Column="1"
+                                           Text="Al cambiar de compañía se descargará nuevamente toda la información."
+                                           FontSize="11" TextColor="{StaticResource Gray400}" />
+                                </Grid>
+
+                                <!-- Aviso cuando el combo esta bloqueado por transacciones pendientes -->
+                                <core:DXBorder CornerRadius="10" BorderThickness="0" BackgroundColor="#FDF4E3"
+                                               IsVisible="{Binding ComboCompaniasBloqueado}">
+                                    <Grid Padding="12,10" ColumnSpacing="8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Label Grid.Column="0" Text="⚠" FontSize="14" TextColor="#EF6C00"
+                                               VerticalOptions="Start" />
+                                        <Label Grid.Column="1"
+                                               Text="Tiene transacciones pendientes por subir. Suba la información antes de cambiar de compañía."
+                                               FontSize="11" TextColor="#8A5A00" />
+                                    </Grid>
+                                </core:DXBorder>
+                            </VerticalStackLayout>
+                        </Grid>
                     </core:DXBorder>
 
                 </VerticalStackLayout>

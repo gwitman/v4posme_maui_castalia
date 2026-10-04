@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:dxe="clr-namespace:DevExpress.Maui.Editors;assembly=DevExpress.Maui.Editors"
+             xmlns:dx="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
+             ios:Page.UseSafeArea="true"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             BackgroundColor="#99000000"
+             x:Class="v4posme_maui.Views.SwitchCompanyLoginPage">
+
+    <Grid Padding="24" VerticalOptions="Center">
+        <dx:DXBorder CornerRadius="22"
+                     BorderThickness="0"
+                     BackgroundColor="{StaticResource White}"
+                     Padding="0">
+            <dx:DXBorder.Shadow>
+                <Shadow Brush="Black" Offset="0,6" Radius="20" Opacity="0.3" />
+            </dx:DXBorder.Shadow>
+
+            <VerticalStackLayout Spacing="0">
+
+                <!-- Encabezado con degradado -->
+                <Grid HeightRequest="110">
+                    <Grid.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <GradientStop Color="{StaticResource PrimaryDark}" Offset="0.0" />
+                            <GradientStop Color="{StaticResource Primary}" Offset="1.0" />
+                        </LinearGradientBrush>
+                    </Grid.Background>
+                    <VerticalStackLayout Padding="22,0" Spacing="2" VerticalOptions="Center">
+                        <Label Text="Cambiar de compañía"
+                               FontSize="19"
+                               FontAttributes="Bold"
+                               TextColor="White" />
+                        <Label x:Name="SubtituloLabel"
+                               Text="Ingresa tus credenciales para continuar"
+                               FontSize="12"
+                               TextColor="#DCEFF7" />
+                    </VerticalStackLayout>
+                </Grid>
+
+                <!-- Formulario -->
+                <VerticalStackLayout Padding="22,20,22,22" Spacing="16">
+
+                    <dxe:TextEdit x:Name="TextUsuario"
+                                  LabelText="Usuario"
+                                  BoxMode="Outlined"
+                                  CornerRadius="12"
+                                  LabelColor="{StaticResource Primary}"
+                                  IconColor="{StaticResource Primary}"
+                                  FocusedBorderColor="{StaticResource Primary}"
+                                  StartIcon="user.svg" />
+
+                    <dxe:PasswordEdit x:Name="TextClave"
+                                      LabelText="Contraseña"
+                                      BoxMode="Outlined"
+                                      CornerRadius="12"
+                                      LabelColor="{StaticResource Primary}"
+                                      IconColor="{StaticResource Primary}"
+                                      FocusedBorderColor="{StaticResource Primary}"
+                                      StartIcon="password.svg" />
+
+                    <Label x:Name="ErrorLabel"
+                           IsVisible="False"
+                           Text=""
+                           FontSize="12"
+                           TextColor="{StaticResource Red}" />
+
+                    <Grid ColumnSpacing="12" Margin="0,4,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <dx:DXButton Grid.Column="0"
+                                     Content="Cancelar"
+                                     BackgroundColor="{StaticResource Gray200}"
+                                     TextColor="{StaticResource Gray600}"
+                                     CornerRadius="14"
+                                     HeightRequest="48"
+                                     Clicked="OnCancelarClicked" />
+
+                        <dx:DXButton Grid.Column="1"
+                                     Content="Aceptar"
+                                     BackgroundColor="{StaticResource Primary}"
+                                     TextColor="{StaticResource White}"
+                                     CornerRadius="14"
+                                     HeightRequest="48"
+                                     Clicked="OnAceptarClicked" />
+                    </Grid>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </dx:DXBorder>
+    </Grid>
+</ContentPage>
