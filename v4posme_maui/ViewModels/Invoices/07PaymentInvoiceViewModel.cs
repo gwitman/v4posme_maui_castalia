@@ -62,12 +62,14 @@ public class PaymentInvoiceViewModel : BaseViewModel
         return ChkCheque || ChkCredito || ChkDebito || ChkEfectivo || ChkMonedero || ChkOtros || ChkRegistrar;
     }
 
+    private const string Screen = "PaymentInvoice(07)";
+
     private async void OnAplicarPagoCommand()
     {
-        HelperLogs.Log("OnAplicarPagoCommand: inicio", "Info");
+        HelperLogs.Trace(Screen, "OnAplicarPagoCommand", "inicio");
         if (!ValidarSeleccionPago())
         {
-            HelperLogs.Log("OnAplicarPagoCommand: no se seleccionó tipo de pago", "Warning");
+            HelperLogs.Trace(Screen, "OnAplicarPagoCommand", "no se seleccionó tipo de pago", "Warning");
             ShowToast(Mensajes.MensajeSeleccionarTipoPago, ToastDuration.Long, 12);
             return;
         }
@@ -76,25 +78,78 @@ public class PaymentInvoiceViewModel : BaseViewModel
         {
             IsBusy          = true;
             var dtoInvoice  = VariablesGlobales.DtoInvoice;
-            var codigo      = "";
 
-            HelperLogs.Log("OnAplicarPagoCommand: obteniendo código de factura", "Info");
+            // Rastrear estado del DTO antes de usarlo para detectar la referencia null exacta
+            HelperLogs.Trace(Screen, "OnAplicarPagoCommand", "validando estado del DtoInvoice y dependencias globales");
+            HelperLogs.TraceValue(Screen, "VariablesGlobales.DtoInvoice", dtoInvoice);
+            HelperLogs.TraceValue(Screen, "VariablesGlobales.User", VariablesGlobales.User);
+            HelperLogs.TraceValue(Screen, "DtoInvoice.CustomerResponse", dtoInvoice?.CustomerResponse);
+            HelperLogs.TraceValue(Screen, "DtoInvoice.TipoDocumento", dtoInvoice?.TipoDocumento);
+            HelperLogs.TraceValue(Screen, "DtoInvoice.Currency", dtoInvoice?.Currency);
+            HelperLogs.TraceValue(Screen, "DtoInvoice.PeriodPay", dtoInvoice?.PeriodPay);
+            HelperLogs.TraceValue(Screen, "DtoInvoice.Mesa", dtoInvoice?.Mesa);
+            HelperLogs.TraceValue(Screen, "DtoInvoice.Items", dtoInvoice?.Items);
+            HelperLogs.TraceValue(Screen, "DtoInvoice.TipoDocumento.Key", dtoInvoice?.TipoDocumento?.Key);
+            HelperLogs.TraceValue(Screen, "DtoInvoice.CustomerResponse.EntityId", dtoInvoice?.CustomerResponse?.EntityId);
+            HelperLogs.TraceValue(Screen, "DtoInvoice.CustomerResponse.Identification", dtoInvoice?.CustomerResponse?.Identification);
+            HelperLogs.TraceValue(Screen, "DtoInvoice.Currency.Key", dtoInvoice?.Currency?.Key);
+            HelperLogs.TraceValue(Screen, "DtoInvoice.PeriodPay.Key", dtoInvoice?.PeriodPay?.Key);
+            HelperLogs.TraceValue(Screen, "DtoInvoice.Mesa.Key", dtoInvoice?.Mesa?.Key);
+
+            // Validaciones explicitas para evitar NullReferenceException silencioso
+            if (dtoInvoice is null)
+                throw new InvalidOperationException("VariablesGlobales.DtoInvoice es null. No hay factura activa en memoria.");
+            if (VariablesGlobales.User is null)
+                throw new InvalidOperationException("VariablesGlobales.User es null. No hay sesión de usuario activa.");
+            if (dtoInvoice.CustomerResponse is null)
+                throw new InvalidOperationException("DtoInvoice.CustomerResponse es null. No se seleccionó cliente.");
+            if (dtoInvoice.TipoDocumento is null)
+                throw new InvalidOperationException("DtoInvoice.TipoDocumento es null. No se definió el tipo de documento.");
+            if (dtoInvoice.Currency is null)
+                throw new InvalidOperationException("DtoInvoice.Currency es null. No se definió la moneda.");
+            if (dtoInvoice.Items is null || dtoInvoice.Items.Count == 0)
+                throw new InvalidOperationException("DtoInvoice.Items está vacío. No hay productos en la factura.");
+
+            // En facturas de contado la pantalla de crédito (3/6) se omite y PeriodPay
+            // queda null. Se aplica un valor por defecto en lugar de reventar con NullReference.
+            if (dtoInvoice.PeriodPay is null)
+            {
+                HelperLogs.Trace(Screen, "OnAplicarPagoCommand", "PeriodPay era null (factura de contado). Aplicando valor por defecto Mensual", "Warning");
+                dtoInvoice.PeriodPay = new DtoCatalogItem((int)TypePeriodPay.Mensual, "Mensual", "M");
+            }
+
+            // Mesa puede quedar null si no se usa el módulo de restaurante. Se aplica un valor neutro.
+            if (dtoInvoice.Mesa is null)
+            {
+                HelperLogs.Trace(Screen, "OnAplicarPagoCommand", "Mesa era null. Aplicando valor por defecto (0)", "Warning");
+                dtoInvoice.Mesa = new DtoCatalogItem(0, "Seleccione", "Seleccione");
+            }
+
+            var codigo = "";
+            HelperLogs.Trace(Screen, "OnAplicarPagoCommand", $"obteniendo código de factura (TransactionMasterId={dtoInvoice.TransactionMasterId})");
             if (dtoInvoice.TransactionMasterId <= 0 )
                 codigo = await _helper.GetCodigoFactura();
             else
                 codigo = dtoInvoice.Codigo;
+            HelperLogs.TraceValue(Screen, "codigo", codigo);
 
             //Eliminar el registro en caso de ser edicion
             if(dtoInvoice.TransactionMasterId > 0)
             {
-                HelperLogs.Log($"OnAplicarPagoCommand: edición, eliminando factura anterior (TransactionMasterId={dtoInvoice.TransactionMasterId})", "Info");
+                HelperLogs.Trace(Screen, "OnAplicarPagoCommand", $"edición: eliminando factura anterior (TransactionMasterId={dtoInvoice.TransactionMasterId})");
                 var invoiceOld          = await _repositoryTbTransactionMaster.PosMeFindByTransactionId(dtoInvoice.TransactionMasterId);
+                HelperLogs.TraceValue(Screen, "invoiceOld", invoiceOld);
                 var invoiceDetailOld    = await _repositoryTbTransactionMasterDetail.PosMeItemByTransactionId(dtoInvoice.TransactionMasterId);
-                foreach (var invoiceDetailOld_i in invoiceDetailOld)
+                HelperLogs.Trace(Screen, "OnAplicarPagoCommand", $"detalles anteriores a eliminar: {invoiceDetailOld?.Count ?? 0}");
+                if (invoiceDetailOld is not null)
                 {
-                    await _repositoryTbTransactionMasterDetail.PosMeDelete(invoiceDetailOld_i);
+                    foreach (var invoiceDetailOld_i in invoiceDetailOld)
+                    {
+                        await _repositoryTbTransactionMasterDetail.PosMeDelete(invoiceDetailOld_i);
+                    }
                 }
-                await _repositoryTbTransactionMaster.PosMeDelete(invoiceOld);
+                if (invoiceOld is not null)
+                    await _repositoryTbTransactionMaster.PosMeDelete(invoiceOld);
             }
 
             VariablesGlobales.DtoInvoice.Codigo         = codigo;
@@ -103,18 +158,13 @@ public class PaymentInvoiceViewModel : BaseViewModel
             VariablesGlobales.DtoInvoice.TransactionOn  = DateTime.Now;
 
             //Obtener el estado de la factura
-            HelperLogs.Log("OnAplicarPagoCommand: validando permiso para determinar estado de la factura", "Info");
+            HelperLogs.Trace(Screen, "OnAplicarPagoCommand", "validando permiso para determinar estado de la factura");
             int statusID            = 0;
             bool permission = await _helper.GetPermission(TypeMenuElementID.core_billing_invoice_type_restaurant, TypePermission.Updated, TypeImpact.All);
-            if (!permission)
-            {
-                statusID = (int)TypeStatusBilling.Apply;
-            }
-            else {
-                statusID = (int)TypeStatusBilling.Register;
-            }
+            statusID = !permission ? (int)TypeStatusBilling.Apply : (int)TypeStatusBilling.Register;
+            HelperLogs.Trace(Screen, "OnAplicarPagoCommand", $"permission={permission}, statusID={statusID}");
 
-            HelperLogs.Log("OnAplicarPagoCommand: construyendo transacción maestra", "Info");
+            HelperLogs.Trace(Screen, "OnAplicarPagoCommand", "construyendo transacción maestra");
             var transactionMaster   = new TbTransactionMaster
             {
                 TransactionId       = TypeTransaction.TransactionInvoiceBilling,
@@ -147,14 +197,26 @@ public class PaymentInvoiceViewModel : BaseViewModel
             transactionMaster.Amount    = dtoInvoice.Balance + dtoInvoice.Items.Sum(P => P.MontoDescuento);
             transactionMaster.Discount  = dtoInvoice.Items.Sum(P => P.MontoDescuento);
             var listMasterDetail        = new List<TbTransactionMasterDetail>();
-            HelperLogs.Log("OnAplicarPagoCommand: insertando transacción maestra", "Info");
+            HelperLogs.Trace(Screen, "OnAplicarPagoCommand", $"insertando transacción maestra (Amount={transactionMaster.Amount}, codigo={codigo})");
             await _repositoryTbTransactionMaster.PosMeInsert(transactionMaster);
             var transactionMasterId     = transactionMaster.TransactionMasterId;
+            HelperLogs.Trace(Screen, "OnAplicarPagoCommand", $"transacción maestra insertada (TransactionMasterId={transactionMasterId})");
 
-            HelperLogs.Log($"OnAplicarPagoCommand: construyendo detalle de {dtoInvoice.Items.Count} items", "Info");
+            HelperLogs.Trace(Screen, "OnAplicarPagoCommand", $"construyendo detalle de {dtoInvoice.Items.Count} items");
             foreach (var item in dtoInvoice.Items)
             {
+                HelperLogs.TraceValue(Screen, "item", item);
+                HelperLogs.TraceValue(Screen, "item.ItemNumber", item?.ItemNumber);
+                if (item is null)
+                    throw new InvalidOperationException("Un item del detalle de la factura es null.");
+                if (string.IsNullOrEmpty(item.ItemNumber))
+                    throw new InvalidOperationException($"item.ItemNumber es null/vacío (ItemId={item.ItemId}).");
+
                 var findPrecioOriginal = await _repositoryItems.PosMeFindByItemNumber(item.ItemNumber!);
+                HelperLogs.TraceValue(Screen, $"findPrecioOriginal({item.ItemNumber})", findPrecioOriginal);
+                if (findPrecioOriginal is null)
+                    throw new InvalidOperationException($"No se encontró el producto con ItemNumber={item.ItemNumber} para obtener el precio original.");
+
                 var detail = new TbTransactionMasterDetail
                 {
                     Quantity            = item.Quantity,
@@ -174,22 +236,25 @@ public class PaymentInvoiceViewModel : BaseViewModel
                 listMasterDetail.Add(detail);
             }
 
-            HelperLogs.Log("OnAplicarPagoCommand: insertando detalle de la factura y actualizando contador", "Info");
+            HelperLogs.Trace(Screen, "OnAplicarPagoCommand", $"insertando {listMasterDetail.Count} detalles de la factura");
             await _repositoryTbTransactionMasterDetail.PosMeInsertAll(listMasterDetail);
+            HelperLogs.Trace(Screen, "OnAplicarPagoCommand", "actualizando contador (PlusCounter)");
             await _helper.PlusCounter();
             VariablesGlobales.EnableBackButton              = false;
             VariablesGlobales.DtoInvoice.TipoPayment        = TypePayment;
             VariablesGlobales.DtoInvoice.TransactionMaster  = transactionMaster;
 
             //Pasar a otra ventana
-            HelperLogs.Log("OnAplicarPagoCommand: proceso finalizado con éxito, navegando a impresión", "Info");
-            await Navigation!.PushAsync(new PrinterInvoicePage());
+            HelperLogs.Trace(Screen, "OnAplicarPagoCommand", "proceso finalizado con éxito, navegando a impresión");
+            if (Navigation is null)
+                throw new InvalidOperationException("Navigation es null. No se puede navegar a la pantalla de impresión.");
+            await Navigation.PushAsync(new PrinterInvoicePage());
             IsBusy = false;
         }
         catch (Exception ex)
         {
+            HelperLogs.Trace(Screen, "OnAplicarPagoCommand", $"EXCEPCIÓN: {ex.GetType().Name} - {ex.Message}", "Error");
             HelperLogs.Log(ex);
-            HelperLogs.Log("OnAplicarPagoCommand: excepción durante el proceso de pago", "Error");
             ShowMensajePopUp(ex.Message);
             IsBusy = false;
         }

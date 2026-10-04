@@ -100,12 +100,16 @@ public class GastoViewModel : BaseViewModel
         }
     }
 
+    private const string Screen = "Gasto";
+
     private async Task OnGuardarCommand()
     {
+        HelperLogs.Trace(Screen, "OnGuardarCommand", "inicio");
         if (IsBusy) return;
 
         // Validar permiso antes de guardar la operacion.
         var permission = await _helperCore.GetPermission(TypeMenuElementID.app_cxp_expenses, TypePermission.Updated, TypeImpact.All);
+        HelperLogs.Trace(Screen, "OnGuardarCommand", $"permiso de edición = {permission}");
         if (!permission)
         {
             ShowMensajePopUp(Mensajes.MensajeNoTienePermisoDeEdicion);
@@ -115,18 +119,21 @@ public class GastoViewModel : BaseViewModel
         // Validaciones antes de guardar.
         if (!decimal.TryParse(Monto, out var monto) || monto <= decimal.Zero)
         {
+            HelperLogs.Trace(Screen, "OnGuardarCommand", $"monto inválido: '{Monto}'", "Warning");
             ShowMensajePopUp("Ingrese un monto valido mayor a cero.");
             return;
         }
 
         if (string.IsNullOrWhiteSpace(Comentario))
         {
+            HelperLogs.Trace(Screen, "OnGuardarCommand", "comentario vacío", "Warning");
             ShowMensajePopUp("Ingrese un comentario para el gasto.");
             return;
         }
 
         if (MonedaSeleccionada is null)
         {
+            HelperLogs.Trace(Screen, "OnGuardarCommand", "MonedaSeleccionada es null", "Warning");
             ShowMensajePopUp("Seleccione una moneda.");
             return;
         }
@@ -134,7 +141,10 @@ public class GastoViewModel : BaseViewModel
         IsBusy = true;
         try
         {
+            HelperLogs.TraceValue(Screen, "VariablesGlobales.User", VariablesGlobales.User);
+            HelperLogs.Trace(Screen, "OnGuardarCommand", $"monto={monto}, moneda={MonedaSeleccionada.Name}");
             var codigo = await _helperCore.GetCodigoGasto();
+            HelperLogs.TraceValue(Screen, "codigo", codigo);
 
             var transactionMaster = new TbTransactionMaster
             {
@@ -156,7 +166,9 @@ public class GastoViewModel : BaseViewModel
                 RegisterLocal       = 1
             };
 
+            HelperLogs.Trace(Screen, "OnGuardarCommand", "insertando transacción maestra");
             await _repositoryTbTransactionMaster.PosMeInsert(transactionMaster);
+            HelperLogs.Trace(Screen, "OnGuardarCommand", $"insertada (TransactionMasterId={transactionMaster.TransactionMasterId}), actualizando contador");
             await _helperCore.PlusCounter();
 
             // Se prepara el estado del comprobante para la pantalla de resultado.
@@ -173,10 +185,12 @@ public class GastoViewModel : BaseViewModel
                 Referencia2   = Referencia2
             };
 
+            HelperLogs.Trace(Screen, "OnGuardarCommand", "éxito, navegando al comprobante");
             await Navigation!.PushAsync(new GastoComprobantePage());
         }
         catch (Exception ex)
         {
+            HelperLogs.Trace(Screen, "OnGuardarCommand", $"EXCEPCIÓN: {ex.GetType().Name} - {ex.Message}", "Error");
             HelperLogs.Log(ex);
             ShowMensajePopUp(ex.Message);
         }

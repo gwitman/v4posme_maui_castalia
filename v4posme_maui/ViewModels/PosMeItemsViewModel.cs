@@ -80,11 +80,16 @@ namespace v4posme_maui.ViewModels
             LoadItems();
         }
 
+        private const string Screen = "Productos";
+
         private async void LoadItems()
         {
             IsBusy = true;
+            HelperLogs.Trace(Screen, "LoadItems", $"inicio (Search='{Search}')");
             await Task.Run(async () =>
             {
+              try
+              {
                 // Se cargan TODOS los productos de una sola vez (sin paginacion ni take/top).
                 List<Api_AppMobileApi_GetDataDownloadItemsResponse> allItems;
                 if (string.IsNullOrWhiteSpace(Search))
@@ -113,7 +118,15 @@ namespace v4posme_maui.ViewModels
                 // Mantiene sincronizada la lista usada para navegar entre productos
                 // (anterior/siguiente) desde las pantallas de detalle y edicion.
                 VariablesGlobales.ItemsNavegacion = Items.ToList();
+                HelperLogs.Trace(Screen, "LoadItems", $"cargados {allItems.Count} productos");
                 IsBusy = false;
+              }
+              catch (Exception ex)
+              {
+                HelperLogs.Trace(Screen, "LoadItems", $"EXCEPCIÓN: {ex.GetType().Name} - {ex.Message}", "Error");
+                HelperLogs.Log(ex);
+                IsBusy = false;
+              }
             });
         }
         

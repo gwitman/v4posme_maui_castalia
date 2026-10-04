@@ -202,11 +202,14 @@ public abstract class VisualizarInventarioBaseViewModel : BaseViewModel
             if (master is not null)
                 await RepositoryMaster.PosMeDelete(master);
 
+            HelperLogs.Trace($"Inventario({TipoTransaccion})", "OnEliminar", $"registro {masterId} eliminado correctamente");
             ShowMensajePopUp("Registro eliminado correctamente", Colors.Green);
             OnNueva();
         }
         catch (Exception e)
         {
+            HelperLogs.Trace($"Inventario({TipoTransaccion})", "OnEliminar", $"EXCEPCIÓN: {e.GetType().Name} - {e.Message}", "Error");
+            HelperLogs.Log(e);
             ShowToast(e.Message, ToastDuration.Long, 13);
         }
         finally

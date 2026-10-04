@@ -27,6 +27,27 @@ public static class HelperLogs
         Write(severity, message);
     }
 
+    /// <summary>
+    /// Registra un mensaje con contexto de pantalla/metodo (traza de seguimiento).
+    /// Ejemplo de salida: [PaymentInvoice] -> OnAplicarPagoCommand :: inicio
+    /// </summary>
+    public static void Trace(string screen, string step, string? detail = null, string severity = "Info")
+    {
+        var message = string.IsNullOrWhiteSpace(detail)
+            ? $"[{screen}] -> {step}"
+            : $"[{screen}] -> {step} :: {detail}";
+        Write(severity, message);
+    }
+
+    /// <summary>
+    /// Registra el estado de un valor (null / no null) para rastrear referencias nulas.
+    /// </summary>
+    public static void TraceValue(string screen, string field, object? value, string severity = "Info")
+    {
+        var estado = value is null ? "NULL" : "OK";
+        Write(severity, $"[{screen}] :: {field} = {estado} ({(value is null ? "sin valor" : value.ToString())})");
+    }
+
     private static void Write(string severity, string logs)
     {
         try

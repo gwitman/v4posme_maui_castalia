@@ -133,13 +133,17 @@ public class PosMeCustomerViewModel : BaseViewModel
         return true;
     }
     
+    private const string Screen = "Clientes";
+
     public async void SavePositionCustomer(DropItemEventArgs e)
     {
+        HelperLogs.Trace(Screen, "SavePositionCustomer", "inicio reordenamiento");
         try
         {
             IsBusy = true;
             if (e.DragItem is not Api_AppMobileApi_GetDataDownloadCustomerResponse customer || e.DropItemHandle < 0)
             {
+                HelperLogs.Trace(Screen, "SavePositionCustomer", "DragItem inválido o DropItemHandle < 0, se cancela", "Warning");
                 return;
             }
 
@@ -196,13 +200,15 @@ public class PosMeCustomerViewModel : BaseViewModel
 
 
             //Actualizar las posiciones en las tablas
+            HelperLogs.Trace(Screen, "SavePositionCustomer", $"actualizando {customerList.Count} clientes y parámetro de orden");
             parameter.Value = JsonConvert.SerializeObject(currentPositions);
             await _customerRepositoryTbCustomer.PosMeUpdateAll(customerList);
             await _repositoryTbParameterSystem.PosMeUpdate(parameter);
-            
+            HelperLogs.Trace(Screen, "SavePositionCustomer", "reordenamiento guardado con éxito");
         }
         catch (Exception ex)
         {
+            HelperLogs.Trace(Screen, "SavePositionCustomer", $"EXCEPCIÓN: {ex.GetType().Name} - {ex.Message}", "Error");
             HelperLogs.Log(ex);
             Debug.WriteLine(ex.StackTrace);
             ShowMensajePopUp(ex.Message);

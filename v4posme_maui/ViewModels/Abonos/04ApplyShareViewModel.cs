@@ -53,19 +53,34 @@ public class AplicarAbonoViewModel : BaseViewModel, IQueryAttributable
 		return !Validate();
 	}
 
+	private const string Screen = "AplicarAbono(4/5)";
+
 	private async void OnAplicarAbono(object obj)
 	{
+		HelperLogs.Trace(Screen, "OnAplicarAbono", "inicio");
 		if (Validate())
 		{
+			HelperLogs.Trace(Screen, "OnAplicarAbono", "validación fallida, se cancela", "Warning");
 			return;
 		}
 
 		try
 		{
 			IsBusy = true;
+			HelperLogs.TraceValue(Screen, "DocumentCreditResponse", DocumentCreditResponse);
+			HelperLogs.TraceValue(Screen, "DocumentCreditResponse.DocumentNumber", DocumentCreditResponse?.DocumentNumber);
+			HelperLogs.TraceValue(Screen, "DocumentCreditAmortizationResponse", DocumentCreditAmortizationResponse);
+			HelperLogs.TraceValue(Screen, "DocumentCreditAmortizationResponse.CustomerNumber", DocumentCreditAmortizationResponse?.CustomerNumber);
+
+			HelperLogs.Trace(Screen, "OnAplicarAbono", "obteniendo código de abono");
 			var codigoAbono		= await _helper.GetCodigoAbono();
+			HelperLogs.TraceValue(Screen, "codigoAbono", codigoAbono);
 			//Obtener Cliente
+			HelperLogs.Trace(Screen, "OnAplicarAbono", $"buscando cliente (CustomerNumber={DocumentCreditAmortizationResponse?.CustomerNumber})");
 			_customerResponse	= await _repositoryTbCustomer.PosMeFindCustomer(DocumentCreditAmortizationResponse.CustomerNumber!);
+			HelperLogs.TraceValue(Screen, "_customerResponse", _customerResponse);
+			if (_customerResponse is null)
+				throw new InvalidOperationException($"No se encontró el cliente con CustomerNumber={DocumentCreditAmortizationResponse?.CustomerNumber}.");
 
 			//para mostrar los saldo final e inicial
 			var mostrarPrintSinSaldos	= await _helper.GetValueParameter("CXC_SHOW_BALANCE_IN_SHARE_MOBILE","false");
@@ -93,7 +108,9 @@ public class AplicarAbonoViewModel : BaseViewModel, IQueryAttributable
 			);
 
             //Aplicar Abono
+            HelperLogs.Trace(Screen, "OnAplicarAbono", $"aplicando abono (EntityId={_customerResponse.EntityId}, Documento={DocumentCreditResponse.DocumentNumber}, Monto={Monto})");
             string reference						= await HelperCustomerCreditDocumentAmortization.ApplyShare(_customerResponse.EntityId, DocumentCreditResponse.DocumentNumber!, Monto);			
+            HelperLogs.TraceValue(Screen, "reference", reference);
 			var documentosConRemanentes				= await _repositoryDocumentCreditAmortization.PosMeFilterByDocumentNumber(DocumentCreditAmortizationResponse.DocumentNumber!);
 			var documentCrediAmortizationHastaHoy	= documentosConRemanentes.Where(dc => dc.DateApply.Date <= DateTime.Now.Date).ToList();
 			var montoMora							= documentCrediAmortizationHastaHoy.Where(dc => dc.Remaining > 0).Sum(dc => dc.Remaining);
@@ -139,9 +156,11 @@ public class AplicarAbonoViewModel : BaseViewModel, IQueryAttributable
 				Reference4             = DocumentCreditResponse.DocumentNumber ?? "",
 				CuotasPendientes       = VariablesGlobales.DtoAplicarAbono.CuotasPendientes
 			};
+			HelperLogs.Trace(Screen, "OnAplicarAbono", $"insertando transacción de abono (codigo={codigoAbono}, Monto={Monto})");
 			var taskTransactionMaster	= _repositoryTransactionMaster.PosMeInsert(transactionMaster);
 			var taskPlus				= _helper.PlusCounter();
 			await Task.WhenAll([taskPlus, taskTransactionMaster]);
+			HelperLogs.Trace(Screen, "OnAplicarAbono", $"abono insertado, tipo impresión={typePrinterShare}, mostrarSaldos={mostrarPrintSinSaldos}");
 
 			if (typePrinterShare=="FINANCIAL")
 			{
@@ -156,12 +175,16 @@ public class AplicarAbonoViewModel : BaseViewModel, IQueryAttributable
 				await NavigationService.NavigateToAsync<ValidarAbonoHideSaldoViewModel>();
 			}
 			
+			HelperLogs.Trace(Screen, "OnAplicarAbono", "éxito, navegando al comprobante");
 			IsBusy = false;
 		}
 		catch (Exception e)
 		{
+			HelperLogs.Trace(Screen, "OnAplicarAbono", $"EXCEPCIÓN: {e.GetType().Name} - {e.Message}", "Error");
 			HelperLogs.Log(e);
 			Debug.WriteLine(e);
+			ShowMensajePopUp(e.Message);
+			IsBusy = false;
 		}
 	}
 

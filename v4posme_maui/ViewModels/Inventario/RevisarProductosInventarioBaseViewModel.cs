@@ -92,12 +92,17 @@ public abstract class RevisarProductosInventarioBaseViewModel : BaseViewModel
         await NavigationService.GoBackAsync();
     }
 
+    // Nombre de pantalla para los logs. Incluye el tipo de transacción (Ajuste/Entrada/Salida/Compra).
+    private string Screen => $"Inventario({TipoTransaccion})";
+
     private async void OnConfirmar()
     {
+        HelperLogs.Trace(Screen, "OnConfirmar", "inicio");
         RecalcularTotales();
 
         if (ProductosSeleccionados.Count == 0 || ProductosSeleccionados.Any(p => p.Quantity <= 0))
         {
+            HelperLogs.Trace(Screen, "OnConfirmar", $"validación fallida: {ProductosSeleccionados.Count} productos, hay cantidades <= 0", "Warning");
             ShowToast("Las cantidades deben ser mayores a cero", ToastDuration.Long, 12);
             return;
         }
@@ -108,12 +113,16 @@ public abstract class RevisarProductosInventarioBaseViewModel : BaseViewModel
 
             // Persistir la transaccion AQUI (una sola vez, al confirmar). La pantalla de
             // visualizacion solo mostrara el registro ya guardado.
+            HelperLogs.Trace(Screen, "OnConfirmar", $"guardando transacción con {ProductosSeleccionados.Count} productos");
             await GuardarAsync();
 
+            HelperLogs.Trace(Screen, "OnConfirmar", "guardado con éxito, navegando a visualización");
             await NavegarAVisualizacionAsync();
         }
         catch (Exception ex)
         {
+            HelperLogs.Trace(Screen, "OnConfirmar", $"EXCEPCIÓN: {ex.GetType().Name} - {ex.Message}", "Error");
+            HelperLogs.Log(ex);
             ShowToast($"Error al confirmar: {ex.Message}", ToastDuration.Long, 12);
         }
         finally
@@ -125,7 +134,15 @@ public abstract class RevisarProductosInventarioBaseViewModel : BaseViewModel
     private async Task GuardarAsync()
     {
         var dto           = VariablesGlobales.DtoInventario;
+        HelperLogs.TraceValue(Screen, "VariablesGlobales.DtoInventario", dto);
+        HelperLogs.TraceValue(Screen, "VariablesGlobales.User", VariablesGlobales.User);
+        if (dto is null)
+            throw new InvalidOperationException("VariablesGlobales.DtoInventario es null. No hay transacción de inventario activa.");
+        if (VariablesGlobales.User is null)
+            throw new InvalidOperationException("VariablesGlobales.User es null. No hay sesión de usuario activa.");
+
         var codigo        = GenerarCodigo();
+        HelperLogs.TraceValue(Screen, "codigo", codigo);
         dto.Codigo        = codigo;
         dto.TransactionOn = DateTime.Now;
 
@@ -148,8 +165,10 @@ public abstract class RevisarProductosInventarioBaseViewModel : BaseViewModel
             RegisterLocal     = 1
         };
 
+        HelperLogs.Trace(Screen, "GuardarAsync", $"insertando transacción maestra (codigo={codigo}, Amount={master.Amount})");
         await RepositoryMaster.PosMeInsert(master);
         var masterId = master.TransactionMasterId;
+        HelperLogs.Trace(Screen, "GuardarAsync", $"maestra insertada (TransactionMasterId={masterId}), construyendo {dto.Items.Count} detalles");
 
         var detalles = new List<TbTransactionMasterDetail>();
         foreach (var item in dto.Items)
@@ -173,12 +192,14 @@ public abstract class RevisarProductosInventarioBaseViewModel : BaseViewModel
             await AjustarCantidadProductoAsync(item);
         }
 
+        HelperLogs.Trace(Screen, "GuardarAsync", $"insertando {detalles.Count} detalles y actualizando contador");
         await RepositoryMasterDetail.PosMeInsertAll(detalles);
         await Helper.PlusCounter();
 
         dto.TransactionMasterId     = masterId;
         dto.TransactionMaster       = master;
         dto.AbiertoDesdeImpresiones = false;
+        HelperLogs.Trace(Screen, "GuardarAsync", "finalizado");
     }
 
     // Ajusta CantidadEntradas / CantidadSalidas del producto y recalcula CantidadFinal.

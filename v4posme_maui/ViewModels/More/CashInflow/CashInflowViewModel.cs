@@ -99,12 +99,16 @@ public class CashInflowViewModel : BaseViewModel
         }
     }
 
+    private const string Screen = "CashInflow(Ingreso)";
+
     private async Task OnGuardarCommand()
     {
+        HelperLogs.Trace(Screen, "OnGuardarCommand", "inicio");
         if (IsBusy) return;
 
         // Validar permiso antes de guardar la operacion.
         var permission = await _helperCore.GetPermission(TypeMenuElementID.app_box_inputcash, TypePermission.Updated, TypeImpact.All);
+        HelperLogs.Trace(Screen, "OnGuardarCommand", $"permiso de edición = {permission}");
         if (!permission)
         {
             ShowMensajePopUp(Mensajes.MensajeNoTienePermisoDeEdicion);
@@ -114,6 +118,7 @@ public class CashInflowViewModel : BaseViewModel
         // Validaciones antes de guardar.
         if (!decimal.TryParse(Monto, out var monto) || monto <= decimal.Zero)
         {
+            HelperLogs.Trace(Screen, "OnGuardarCommand", $"monto inválido: '{Monto}'", "Warning");
             ShowMensajePopUp("Ingrese un monto valido mayor a cero.");
             return;
         }
@@ -121,12 +126,14 @@ public class CashInflowViewModel : BaseViewModel
         // El comentario es obligatorio para el ingreso.
         if (string.IsNullOrWhiteSpace(Comentario))
         {
+            HelperLogs.Trace(Screen, "OnGuardarCommand", "comentario vacío", "Warning");
             ShowMensajePopUp("El comentario es obligatorio para el ingreso.");
             return;
         }
 
         if (MonedaSeleccionada is null)
         {
+            HelperLogs.Trace(Screen, "OnGuardarCommand", "MonedaSeleccionada es null", "Warning");
             ShowMensajePopUp("Seleccione una moneda.");
             return;
         }
@@ -134,7 +141,10 @@ public class CashInflowViewModel : BaseViewModel
         IsBusy = true;
         try
         {
+            HelperLogs.TraceValue(Screen, "VariablesGlobales.User", VariablesGlobales.User);
+            HelperLogs.Trace(Screen, "OnGuardarCommand", $"monto={monto}, moneda={MonedaSeleccionada.Name}");
             var codigo = await _helperCore.GetCodigoCashInflow();
+            HelperLogs.TraceValue(Screen, "codigo", codigo);
 
             var transactionMaster = new TbTransactionMaster
             {
@@ -156,7 +166,9 @@ public class CashInflowViewModel : BaseViewModel
                 RegisterLocal       = 1
             };
 
+            HelperLogs.Trace(Screen, "OnGuardarCommand", "insertando transacción maestra");
             await _repositoryTbTransactionMaster.PosMeInsert(transactionMaster);
+            HelperLogs.Trace(Screen, "OnGuardarCommand", $"insertada (TransactionMasterId={transactionMaster.TransactionMasterId}), actualizando contador");
             await _helperCore.PlusCounter();
 
             // Se prepara el estado del comprobante para la pantalla de resultado.
@@ -173,10 +185,12 @@ public class CashInflowViewModel : BaseViewModel
                 Referencia2   = Referencia2
             };
 
+            HelperLogs.Trace(Screen, "OnGuardarCommand", "éxito, navegando al comprobante");
             await Navigation!.PushAsync(new CashInflowComprobantePage());
         }
         catch (Exception ex)
         {
+            HelperLogs.Trace(Screen, "OnGuardarCommand", $"EXCEPCIÓN: {ex.GetType().Name} - {ex.Message}", "Error");
             HelperLogs.Log(ex);
             ShowMensajePopUp(ex.Message);
         }
