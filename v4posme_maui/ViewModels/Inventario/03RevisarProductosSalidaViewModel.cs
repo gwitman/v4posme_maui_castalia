@@ -16,6 +16,7 @@ public class RevisarProductosSalidaViewModel : RevisarProductosInventarioBaseVie
     protected override Services.SystemNames.TypeTransaction TipoTransaccion
         => Services.SystemNames.TypeTransaction.TransactionInventarioSalida;
     protected override bool EsEntrada => false;
+    protected override string EtiquetaLog => "Salida";
     protected override string GenerarCodigo() => Helper.GetCodigoSalida();
 
     protected override Task NavegarAVisualizacionAsync()

@@ -92,8 +92,12 @@ public abstract class RevisarProductosInventarioBaseViewModel : BaseViewModel
         await NavigationService.GoBackAsync();
     }
 
+    // Etiqueta legible del flujo usada en los logs (Compra / Otra Entrada / Salida / Ajuste).
+    // Cada flujo la sobreescribe; por defecto se deriva del tipo de transacción.
+    protected virtual string EtiquetaLog => TipoTransaccion.ToString();
+
     // Nombre de pantalla para los logs. Incluye el tipo de transacción (Ajuste/Entrada/Salida/Compra).
-    private string Screen => $"Inventario({TipoTransaccion})";
+    private string Screen => $"Inventario-{EtiquetaLog}";
 
     private async void OnConfirmar()
     {

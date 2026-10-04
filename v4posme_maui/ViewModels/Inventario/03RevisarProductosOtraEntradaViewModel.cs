@@ -15,6 +15,7 @@ public class RevisarProductosOtraEntradaViewModel : RevisarProductosInventarioBa
     protected override Services.SystemNames.TypeTransaction TipoTransaccion
         => Services.SystemNames.TypeTransaction.TransactionInventarioEntradas;
     protected override bool EsEntrada => true;
+    protected override string EtiquetaLog => "OtraEntrada";
     protected override string GenerarCodigo() => Helper.GetCodigoOtraEntrada();
 
     protected override Task NavegarAVisualizacionAsync()

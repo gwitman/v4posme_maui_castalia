@@ -15,6 +15,7 @@ public class RevisarProductosAjusteViewModel : RevisarProductosInventarioBaseVie
     protected override Services.SystemNames.TypeTransaction TipoTransaccion
         => Services.SystemNames.TypeTransaction.TransactionInventarioAjuste;
     protected override bool EsEntrada => true;
+    protected override string EtiquetaLog => "Ajuste";
     protected override string GenerarCodigo() => Helper.GetCodigoAjuste();
 
     protected override Task NavegarAVisualizacionAsync()
