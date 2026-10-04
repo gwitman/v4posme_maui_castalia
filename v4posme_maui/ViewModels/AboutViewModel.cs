@@ -1,9 +1,15 @@
-﻿using CommunityToolkit.Maui.Core;
+﻿using System.Collections.ObjectModel;
+using CommunityToolkit.Maui.Core;
+using Newtonsoft.Json;
 using v4posme_maui.Models;
+using v4posme_maui.Services;
+using v4posme_maui.Services.Api;
 using v4posme_maui.Services.Helpers;
 using v4posme_maui.Services.Repository;
 using v4posme_maui.Services.SystemNames;
+using v4posme_maui.Views;
 using Unity;
+using static Microsoft.Maui.Controls.Application;
 
 namespace v4posme_maui.ViewModels
 {
@@ -12,7 +18,10 @@ namespace v4posme_maui.ViewModels
         private readonly IRepositoryTbTransactionMaster _repositoryTbTransactionMaster;
         private readonly IRepositoryDocumentCreditAmortization _repositoryDocumentCreditAmortization;
         private readonly IRepositoryServerTransactionMaster _repositoryServerTransactionMaster;
+        private readonly IRepositoryParameters _repositoryParameters;
+        private readonly IRepositoryTbUser _repositoryTbUser;
         private readonly HelperCore _helperContador;
+        private readonly RestApiCoreAcount _restApiCoreAcount = new();
 
         public const string ViewName = "AboutPage";
 
@@ -22,8 +31,50 @@ namespace v4posme_maui.ViewModels
             _repositoryTbTransactionMaster = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMaster>();
             _repositoryDocumentCreditAmortization = VariablesGlobales.UnityContainer.Resolve<IRepositoryDocumentCreditAmortization>();
             _repositoryServerTransactionMaster = VariablesGlobales.UnityContainer.Resolve<IRepositoryServerTransactionMaster>();
+            _repositoryParameters = VariablesGlobales.UnityContainer.Resolve<IRepositoryParameters>();
+            _repositoryTbUser = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbUser>();
             _helperContador = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
         }
+
+        // ===== Cambio de compania (parametro APP_MOBILE_SWITCH_COMPANY) =====
+
+        // Lista de companias disponibles extraidas del parametro (JSON con companyName/companyUrl).
+        // En el combo se muestran los nombres (companyName).
+        public ObservableCollection<string> CompaniasDisponibles { get; } = new();
+
+        // Mapa nombre -> url para resolver la URL base al cambiar de compania.
+        private readonly List<DtoSwitchCompany> _companias = new();
+
+        // Controla la visibilidad del combo. Solo se muestra si el parametro existe
+        // y contiene al menos una opcion valida.
+        private bool _mostrarComboCompanias;
+
+        public bool MostrarComboCompanias
+        {
+            get => _mostrarComboCompanias;
+            set => SetProperty(ref _mostrarComboCompanias, value);
+        }
+
+        // El combo solo se puede cambiar cuando el contador de transacciones es 0.
+        private bool _comboCompaniasHabilitado;
+
+        public bool ComboCompaniasHabilitado
+        {
+            get => _comboCompaniasHabilitado;
+            set => SetProperty(ref _comboCompaniasHabilitado, value);
+        }
+
+        // Compania actualmente seleccionada en el combo.
+        private string? _companiaSeleccionada;
+
+        public string? CompaniaSeleccionada
+        {
+            get => _companiaSeleccionada;
+            set => SetProperty(ref _companiaSeleccionada, value);
+        }
+
+        // Evita que el cambio inicial (al cargar la lista) dispare el flujo de cambio.
+        private bool _cargandoCombo;
 
         // Controla la visibilidad de todos los indicadores del resumen del dia.
         // Los indicadores se ocultan si y solo si el usuario tiene activado el permiso
@@ -353,6 +404,7 @@ namespace v4posme_maui.ViewModels
                 // Ocultar los indicadores si el usuario tiene el permiso activado.
                 bool permission                                 = await _helperContador.GetPermission(TypeMenuElementID.core_dashboards, TypePermission.Selected, TypeImpact.None);
                 MostrarIndicadores                              = !permission;
+                await CargarComboCompanias();
                 var findAllDocumentCreditAmortization           = await _repositoryDocumentCreditAmortization.PosMeFindByMaxDate(DateTime.Now);
                 var findAll                                     = await _repositoryTbTransactionMaster.PosMeFindAll();
                 var findServerTransactionMasterAbonosCordoba    = await _repositoryServerTransactionMaster.PosMeFilterByCurrencyIDAndTransactionID((int)TypeCurrency.Cordoba, (int)TypeTransaction.TransactionShare);
@@ -580,6 +632,240 @@ namespace v4posme_maui.ViewModels
                 HelperLogs.Log(e);
                 ShowToast(e.Message,ToastDuration.Long, 14);
             }
+        }
+
+        // Carga la lista de companias desde el parametro APP_MOBILE_SWITCH_COMPANY.
+        // Reglas:
+        //  - Si el parametro no existe -> no mostrar el combo.
+        //  - Si existe pero su valor es vacio o solo "|" -> no mostrar el combo.
+        //  - Si tiene valores -> split por "|" y mostrar las opciones.
+        //  - El combo se habilita solo cuando el contador de transacciones es 0.
+        private async Task CargarComboCompanias()
+        {
+            try
+            {
+                _cargandoCombo = true;
+                CompaniasDisponibles.Clear();
+                _companias.Clear();
+                MostrarComboCompanias = false;
+
+                var parametro = await _repositoryParameters.PosMeFindByKey(Constantes.AppMobileSwitchCompany);
+                if (parametro is null || string.IsNullOrWhiteSpace(parametro.Value) || parametro.Value.Trim() == "|")
+                {
+                    return;
+                }
+
+                // El valor es un arreglo JSON de { companyName, companyUrl }.
+                List<DtoSwitchCompany>? opciones;
+                try
+                {
+                    opciones = JsonConvert.DeserializeObject<List<DtoSwitchCompany>>(parametro.Value);
+                }
+                catch (Exception ex)
+                {
+                    HelperLogs.Log(ex);
+                    return;
+                }
+
+                var validas = (opciones ?? new List<DtoSwitchCompany>())
+                    .Where(opcion => !string.IsNullOrWhiteSpace(opcion.CompanyName)
+                                     && !string.IsNullOrWhiteSpace(opcion.CompanyUrl))
+                    .ToList();
+
+                if (validas.Count == 0)
+                {
+                    return;
+                }
+
+                foreach (var opcion in validas)
+                {
+                    _companias.Add(opcion);
+                    CompaniasDisponibles.Add(opcion.CompanyName!);
+                }
+
+                // Seleccionar la compania actual (por URL base) si esta en la lista.
+                var companiaActual = VariablesGlobales.CompanyKey;
+                var seleccion = validas.FirstOrDefault(opcion =>
+                    string.Equals(opcion.CompanyUrl, companiaActual, StringComparison.OrdinalIgnoreCase));
+                CompaniaSeleccionada = (seleccion ?? validas.First()).CompanyName;
+
+                // Habilitar el combo solo si no hay transacciones pendientes.
+                var contador = await _helperContador.GetCounter();
+                ComboCompaniasHabilitado = contador == 0;
+
+                MostrarComboCompanias = true;
+            }
+            catch (Exception e)
+            {
+                HelperLogs.Log(e);
+                MostrarComboCompanias = false;
+            }
+            finally
+            {
+                _cargandoCombo = false;
+            }
+        }
+
+        // Invocado desde la vista cuando el usuario cambia la seleccion del combo.
+        // Pide credenciales, hace login contra la nueva compania, descarga y guarda la
+        // informacion. Solo si todo sale bien se actualiza el estado y el encabezado.
+        public async Task OnCompaniaSeleccionadaCambio(string nuevaCompania)
+        {
+            if (_cargandoCombo || string.IsNullOrWhiteSpace(nuevaCompania))
+            {
+                return;
+            }
+
+            // Resolver la compania (nombre + url) a partir del nombre seleccionado.
+            var compania = _companias.FirstOrDefault(c =>
+                string.Equals(c.CompanyName, nuevaCompania, StringComparison.OrdinalIgnoreCase));
+            if (compania is null || string.IsNullOrWhiteSpace(compania.CompanyUrl))
+            {
+                return;
+            }
+
+            // Si la seleccion es la compania actual, no hacer nada.
+            if (string.Equals(compania.CompanyUrl, VariablesGlobales.CompanyKey, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            // Validar nuevamente el contador antes de permitir el cambio.
+            var contador = await _helperContador.GetCounter();
+            if (contador != 0)
+            {
+                ComboCompaniasHabilitado = false;
+                ShowToast(Mensajes.MensajeDownloadCantidadTransacciones, ToastDuration.Long, 14);
+                await RestaurarSeleccionActual();
+                return;
+            }
+
+            if (Navigation is null)
+            {
+                return;
+            }
+
+            // Pedir usuario y contrasena.
+            var page = (Page)Navigation.NavigationStack.LastOrDefault()!;
+            var usuario = await page.DisplayPromptAsync("Cambiar de compañía",
+                $"Ingrese su usuario para la compañía \"{compania.CompanyName}\"",
+                "Aceptar", "Cancelar", placeholder: "Usuario");
+            if (string.IsNullOrWhiteSpace(usuario))
+            {
+                await RestaurarSeleccionActual();
+                return;
+            }
+
+            var clave = await page.DisplayPromptAsync("Cambiar de compañía",
+                "Ingrese su contraseña",
+                "Aceptar", "Cancelar", placeholder: "Contraseña");
+            if (string.IsNullOrWhiteSpace(clave))
+            {
+                await RestaurarSeleccionActual();
+                return;
+            }
+
+            await CambiarCompania(compania, usuario, clave);
+        }
+
+        private async Task CambiarCompania(DtoSwitchCompany compania, string usuario, string clave)
+        {
+            // Conservar el estado anterior para poder revertir si la descarga falla.
+            var companyKeyAnterior = VariablesGlobales.CompanyKey;
+            var usuarioAnterior = VariablesGlobales.User;
+
+            try
+            {
+                await Navigation!.PushModalAsync(new LoadingPage());
+
+                // La URL base de la compania se usa tal cual para construir las peticiones.
+                VariablesGlobales.CompanyKey = compania.CompanyUrl;
+
+                var usuarioServidor = await _restApiCoreAcount.LoginMobile(usuario, clave);
+                if (usuarioServidor is null)
+                {
+                    await Navigation.PopModalAsync();
+                    ShowToast(Mensajes.MensajeCredencialesInvalida, ToastDuration.Long, 14);
+                    RevertirEstado(companyKeyAnterior, usuarioAnterior);
+                    await RestaurarSeleccionActual();
+                    return;
+                }
+
+                usuarioServidor.Company = compania.CompanyUrl;
+                usuarioServidor.Remember = true;
+                VariablesGlobales.User = usuarioServidor;
+
+                // Descargar y guardar la informacion de la nueva compania.
+                var restApiAppMobile = new RestApiAppMobileApi();
+                var resultado = await restApiAppMobile.GetDataDownload(false);
+                if (resultado.Error)
+                {
+                    // Si falla la descarga NO se actualiza: revertir estado.
+                    await Navigation.PopModalAsync();
+                    ShowToast(resultado.Description, ToastDuration.Long, 14);
+                    RevertirEstado(companyKeyAnterior, usuarioAnterior);
+                    await RestaurarSeleccionActual();
+                    return;
+                }
+
+                // Descarga correcta: persistir el usuario (recordado) para que el login
+                // quede con la ultima compania seleccionada.
+                await _repositoryTbUser.PosMeOnRemember();
+                var usuarioLocal = await _repositoryTbUser.PosMeFindUserByNicknameAndPassword(
+                    usuarioServidor.Nickname!, usuarioServidor.Password!);
+                if (usuarioLocal is null)
+                {
+                    usuarioServidor.Remember = true;
+                    await _repositoryTbUser.PosMeInsert(usuarioServidor);
+                }
+                else
+                {
+                    usuarioLocal.Remember = true;
+                    usuarioLocal.Company = compania.CompanyUrl;
+                    await _repositoryTbUser.PosMeUpdate(usuarioLocal);
+                }
+
+                VariablesGlobales.TbCompany = await VariablesGlobales.UnityContainer
+                    .Resolve<IRepositoryTbCompany>().PosMeFindFirst();
+
+                await Navigation.PopModalAsync();
+                ShowToast(Mensajes.MensajeDownloadSuccess, ToastDuration.Long, 14);
+
+                // Actualizar el encabezado del menu lateral y recargar indicadores.
+                if (Current!.MainPage is MainPage mainPage)
+                {
+                    mainPage.LoadHeaderInfo();
+                }
+
+                OnAppearing(Navigation);
+            }
+            catch (Exception e)
+            {
+                HelperLogs.Log(e);
+                try { await Navigation!.PopModalAsync(); } catch { /* ignore */ }
+                ShowToast(Mensajes.MensajeDownloadError, ToastDuration.Long, 14);
+                RevertirEstado(companyKeyAnterior, usuarioAnterior);
+                await RestaurarSeleccionActual();
+            }
+        }
+
+        private static void RevertirEstado(string? companyKeyAnterior, Api_CoreAccount_LoginMobileObjUserResponse? usuarioAnterior)
+        {
+            VariablesGlobales.CompanyKey = companyKeyAnterior;
+            VariablesGlobales.User = usuarioAnterior;
+        }
+
+        // Restaura visualmente la seleccion del combo a la compania actual sin disparar
+        // nuevamente el flujo de cambio.
+        private async Task RestaurarSeleccionActual()
+        {
+            _cargandoCombo = true;
+            var companiaActual = VariablesGlobales.CompanyKey;
+            var seleccion = _companias.FirstOrDefault(c =>
+                string.Equals(c.CompanyUrl, companiaActual, StringComparison.OrdinalIgnoreCase));
+            CompaniaSeleccionada = seleccion?.CompanyName ?? CompaniasDisponibles.FirstOrDefault();
+            _cargandoCombo = false;
+            await Task.CompletedTask;
         }
     }
 }

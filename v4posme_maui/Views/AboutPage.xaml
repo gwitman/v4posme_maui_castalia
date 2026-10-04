@@ -5,6 +5,7 @@
              xmlns:viewModels="clr-namespace:v4posme_maui.ViewModels"
              xmlns:controls="clr-namespace:DevExpress.Maui.Controls;assembly=DevExpress.Maui.Controls"
              xmlns:core="clr-namespace:DevExpress.Maui.Core;assembly=DevExpress.Maui.Core"
+             xmlns:dxe="clr-namespace:DevExpress.Maui.Editors;assembly=DevExpress.Maui.Editors"
              xmlns:converters="clr-namespace:v4posme_maui.Services.Converters"
              ios:Page.UseSafeArea="true"
              BackgroundColor="{StaticResource PageBackground}"
@@ -606,6 +607,28 @@
                                 </VerticalStackLayout>
                             </Grid>
                         </Grid>
+                    </core:DXBorder>
+
+                    <!-- CAMBIO DE COMPAÑIA (parametro APP_MOBILE_SWITCH_COMPANY) -->
+                    <core:DXBorder CornerRadius="16" BorderThickness="0" BackgroundColor="{StaticResource White}"
+                                   IsVisible="{Binding MostrarComboCompanias}">
+                        <core:DXBorder.Shadow>
+                            <Shadow Brush="{StaticResource Gray300Brush}" Offset="0,2" Radius="8" Opacity="0.3" />
+                        </core:DXBorder.Shadow>
+                        <VerticalStackLayout Padding="16,14" Spacing="8">
+                            <Label Text="Compañía" FontSize="13" TextColor="{StaticResource Gray500}" />
+                            <dxe:ComboBoxEdit
+                                x:Name="ComboCompanias"
+                                PickerShowMode="Popup"
+                                BoxMode="Outlined"
+                                StartIcon="basic_home.svg"
+                                IsEnabled="{Binding ComboCompaniasHabilitado}"
+                                ItemsSource="{Binding CompaniasDisponibles}"
+                                SelectedItem="{Binding CompaniaSeleccionada}"
+                                SelectionChanged="ComboCompanias_SelectionChanged" />
+                            <Label Text="Al cambiar de compañía se descargará nuevamente la información."
+                                   FontSize="11" TextColor="{StaticResource Gray400}" />
+                        </VerticalStackLayout>
                     </core:DXBorder>
 
                 </VerticalStackLayout>

@@ -1,5 +1,4 @@
 ﻿using v4posme_maui.ViewModels;
-using SelectionChangedEventArgs = DevExpress.Maui.Charts.SelectionChangedEventArgs;
 
 namespace v4posme_maui.Views
 {
@@ -17,9 +16,14 @@ namespace v4posme_maui.Views
             ((AboutViewModel)BindingContext).OnAppearing(Navigation);
         }
 
-        private void ChartView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void ComboCompanias_SelectionChanged(object? sender, EventArgs e)
         {
-            
+            if (ComboCompanias.SelectedItem is not string nuevaCompania)
+            {
+                return;
+            }
+
+            await ((AboutViewModel)BindingContext).OnCompaniaSeleccionadaCambio(nuevaCompania);
         }
     }
 }

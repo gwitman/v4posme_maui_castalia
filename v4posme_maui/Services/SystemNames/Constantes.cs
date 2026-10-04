@@ -55,4 +55,5 @@ public static class Constantes
     public const string ParametrUrlShareViewError	= "No se pudo encontrar el parametro de la url";
     public const string CatalogName_MESAS                          = "CATALOGO DE MESAS";
     public const string InvoiceInMobileFieldCommentRequired        = "INVOICE_IN_MOBILE_FIELD_COMMENT_REQUERIED";
+    public const string AppMobileSwitchCompany                     = "APP_MOBILE_SWITCH_COMPANY";
 }
