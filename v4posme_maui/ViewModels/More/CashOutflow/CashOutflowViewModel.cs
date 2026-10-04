@@ -166,6 +166,7 @@ public class CashOutflowViewModel : BaseViewModel
                 RegisterLocal       = 1
             };
 
+            HelperLogs.DumpObject(Screen, "transactionMaster", transactionMaster);
             HelperLogs.Trace(Screen, "OnGuardarCommand", "insertando transacción maestra");
             await _repositoryTbTransactionMaster.PosMeInsert(transactionMaster);
             HelperLogs.Trace(Screen, "OnGuardarCommand", $"insertada (TransactionMasterId={transactionMaster.TransactionMasterId}), actualizando contador");

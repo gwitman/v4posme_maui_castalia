@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Reflection;
 using Unity;
 using v4posme_maui.Services.Repository;
 using v4posme_maui.Services.SystemNames;
@@ -46,6 +47,49 @@ public static class HelperLogs
     {
         var estado = value is null ? "NULL" : "OK";
         Write(severity, $"[{screen}] :: {field} = {estado} ({(value is null ? "sin valor" : value.ToString())})");
+    }
+
+    /// <summary>
+    /// Recorre por reflexión todas las propiedades públicas de un objeto y registra, campo por
+    /// campo, si su valor es NULL o cuál es su valor. Pensado para TbTransactionMaster y
+    /// TbTransactionMasterDetail: permite ver exactamente qué campo quedó null antes de insertar.
+    /// </summary>
+    public static void DumpObject(string screen, string objectName, object? instance, string severity = "Info")
+    {
+        if (instance is null)
+        {
+            Write(severity, $"[{screen}] :: {objectName} = NULL (la instancia completa es null)");
+            return;
+        }
+
+        try
+        {
+            var type = instance.GetType();
+            Write(severity, $"[{screen}] :: DUMP {objectName} ({type.Name}) ---");
+            foreach (var prop in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            {
+                if (!prop.CanRead) continue;
+                object? value;
+                try
+                {
+                    value = prop.GetValue(instance);
+                }
+                catch (Exception exProp)
+                {
+                    Write(severity, $"[{screen}] :: {objectName}.{prop.Name} = ERROR al leer ({exProp.Message})");
+                    continue;
+                }
+
+                var estado = value is null ? "NULL" : "OK";
+                var texto  = value is null ? "sin valor" : value.ToString();
+                Write(severity, $"[{screen}] :: {objectName}.{prop.Name} = {estado} ({texto})");
+            }
+            Write(severity, $"[{screen}] :: FIN DUMP {objectName} ---");
+        }
+        catch (Exception e)
+        {
+            Debug.WriteLine($"HelperLogs.DumpObject error: {e.Message}");
+        }
     }
 
     private static void Write(string severity, string logs)

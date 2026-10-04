@@ -143,6 +143,7 @@ namespace v4posme_maui.ViewModels.More.Visita
 					CustomerIdentification  = _customerResponse.Identification!
                 };
 
+				HelperLogs.DumpObject("Visita", "transactionMaster", transactionMaster);
 				var taskTransactionMaster   = _repositoryTransactionMaster.PosMeInsert(transactionMaster);
 				var taskPlus                = _helper.PlusCounter();
 				await Task.WhenAll([taskPlus, taskTransactionMaster]);

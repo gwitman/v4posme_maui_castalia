@@ -169,6 +169,7 @@ public abstract class RevisarProductosInventarioBaseViewModel : BaseViewModel
             RegisterLocal     = 1
         };
 
+        HelperLogs.DumpObject(Screen, "master", master);
         HelperLogs.Trace(Screen, "GuardarAsync", $"insertando transacción maestra (codigo={codigo}, Amount={master.Amount})");
         await RepositoryMaster.PosMeInsert(master);
         var masterId = master.TransactionMasterId;
@@ -177,7 +178,7 @@ public abstract class RevisarProductosInventarioBaseViewModel : BaseViewModel
         var detalles = new List<TbTransactionMasterDetail>();
         foreach (var item in dto.Items)
         {
-            detalles.Add(new TbTransactionMasterDetail
+            var detalle = new TbTransactionMasterDetail
             {
                 TransactionMasterId = masterId,
                 Componentid         = (int)TypeComponent.Itme,
@@ -191,7 +192,9 @@ public abstract class RevisarProductosInventarioBaseViewModel : BaseViewModel
                 Tax1                = decimal.Zero,
                 ItemBarCode         = item.BarCode,
                 RegisterLocal       = 1
-            });
+            };
+            HelperLogs.DumpObject(Screen, $"detalle(ItemId={item.ItemId})", detalle);
+            detalles.Add(detalle);
 
             await AjustarCantidadProductoAsync(item);
         }

@@ -196,6 +196,7 @@ public class PaymentInvoiceViewModel : BaseViewModel
             transactionMaster.SubAmount = dtoInvoice.Balance + dtoInvoice.Items.Sum(P => P.MontoDescuento);
             transactionMaster.Amount    = dtoInvoice.Balance + dtoInvoice.Items.Sum(P => P.MontoDescuento);
             transactionMaster.Discount  = dtoInvoice.Items.Sum(P => P.MontoDescuento);
+            HelperLogs.DumpObject(Screen, "transactionMaster", transactionMaster);
             var listMasterDetail        = new List<TbTransactionMasterDetail>();
             HelperLogs.Trace(Screen, "OnAplicarPagoCommand", $"insertando transacción maestra (Amount={transactionMaster.Amount}, codigo={codigo})");
             await _repositoryTbTransactionMaster.PosMeInsert(transactionMaster);
@@ -233,6 +234,7 @@ public class PaymentInvoiceViewModel : BaseViewModel
                     RegisterLocal       = 1
                 };
                 detail.Amount = detail.SubAmount;
+                HelperLogs.DumpObject(Screen, $"detail(ItemNumber={item.ItemNumber})", detail);
                 listMasterDetail.Add(detail);
             }
 
@@ -473,6 +475,7 @@ public class PaymentInvoiceViewModel : BaseViewModel
             Amount      = Monto,
             CurrencyId  = (TypeCurrency)VariablesGlobales.DtoInvoice.Currency!.Key
         };
+        HelperLogs.DumpObject(Screen, "tm(Pagadito)", tm);
         var response    = await realizarPago.GenerarUrl(uid!.Value!, awk!.Value!,urlCommerce,
             operationRequest!.Value!,operationExec!.Value!,VariablesGlobales.DtoInvoice.Items.ToList(), tm);
         IsBusy          = false;

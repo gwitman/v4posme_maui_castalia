@@ -187,6 +187,7 @@ namespace v4posme_maui.ViewModels
 				Amount		= MontoSeleccionado * VariablesGlobales.TipoCambio,
 				CurrencyId	= TypeCurrency.Cordoba
 			};
+			HelperLogs.DumpObject("Login(Pagadito)", "tm", tm);
 
 			try
 			{

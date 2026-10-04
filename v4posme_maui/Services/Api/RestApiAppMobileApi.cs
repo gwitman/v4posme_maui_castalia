@@ -201,6 +201,7 @@ public class RestApiAppMobileApi
                             objTransactionMasterTemp.ReferenceClientName    = objI.tm_referenceClientName!;    
                             objTransactionMasterTemp.SubAmount              = objI.tm_Amount;
                             objTransactionMasterTemp.MesaName               = objI.tm_mesaName!;
+                            HelperLogs.DumpObject("Sync-Download", $"objTransactionMasterTemp(Number={objI.tm_transactionMasterMobileNumber})", objTransactionMasterTemp);
                             await _repositoryTbTransactionMaster.PosMeInsert(objTransactionMasterTemp);
                             var transactionMasterId                         = objTransactionMasterTemp.TransactionMasterId;
                             foreach (var objII in objListTransactionMasterAll)
@@ -219,6 +220,7 @@ public class RestApiAppMobileApi
                                 objTransactionMasterDetailTemp.PorcentajeDescuento          = objII.tmd_porcentaje_descuento;
                                 objTransactionMasterDetailTemp.MontoDescuento               = objII.tmd_monto_descuento;
                                 objTransactionMasterDetailTemp.ReferenciaProducto           = objII.tmd_referencia_producto ?? string.Empty;
+                                HelperLogs.DumpObject("Sync-Download", $"objTransactionMasterDetailTemp(ComponentItemId={objII.tmd_componentItemID})", objTransactionMasterDetailTemp);
                                 objListTransactionMasterDetailNew.Add(objTransactionMasterDetailTemp);
                             }
                             

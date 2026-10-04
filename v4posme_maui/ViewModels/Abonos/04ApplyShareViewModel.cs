@@ -156,6 +156,7 @@ public class AplicarAbonoViewModel : BaseViewModel, IQueryAttributable
 				Reference4             = DocumentCreditResponse.DocumentNumber ?? "",
 				CuotasPendientes       = VariablesGlobales.DtoAplicarAbono.CuotasPendientes
 			};
+			HelperLogs.DumpObject(Screen, "transactionMaster", transactionMaster);
 			HelperLogs.Trace(Screen, "OnAplicarAbono", $"insertando transacción de abono (codigo={codigoAbono}, Monto={Monto})");
 			var taskTransactionMaster	= _repositoryTransactionMaster.PosMeInsert(transactionMaster);
 			var taskPlus				= _helper.PlusCounter();
