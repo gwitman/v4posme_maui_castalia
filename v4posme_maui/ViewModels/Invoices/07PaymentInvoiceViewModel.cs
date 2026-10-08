@@ -135,6 +135,16 @@ public class PaymentInvoiceViewModel : BaseViewModel
                     IsBusy = false;
                     return;
                 }
+
+                // En modo restaurante solo se permite el tipo de pago Registrar.
+                // Efectivo, Pagadito (crédito/débito), monedero, cheque u otros no se permiten.
+                if (TypePayment != TypePayment.Registrar)
+                {
+                    HelperLogs.Trace(Screen, "OnAplicarPagoCommand", $"modo restaurante: tipo de pago no permitido ({TypePayment})", "Warning");
+                    ShowToast(Mensajes.MensajeRestauranteSoloRegistrar, ToastDuration.Long, 12);
+                    IsBusy = false;
+                    return;
+                }
             }
             else if (dtoInvoice.Mesa is null)
             {

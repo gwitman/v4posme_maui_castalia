@@ -46,6 +46,7 @@ public static class Mensajes
     public const string MensajeSeleccionarTipoPago = "Debe seleccionar un tipo de pago para continuar";
     public const string MensajeSeleccionarProductos = "Seleccione productos para continuar";
     public const string MensajeSeleccionarMesa = "Debe seleccionar una zona/mesa para continuar";
+    public const string MensajeRestauranteSoloRegistrar = "En modo restaurante solo se permite el tipo de pago Registrar";
     public const string MonedaCordoba = "NIO";
     public const string MonedaDolar = "USD";
     public const string AuthTokenError = "No fue posible generar el token";
