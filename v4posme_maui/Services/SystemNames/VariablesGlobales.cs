@@ -58,6 +58,12 @@ public static class VariablesGlobales
     // pantalla debe mostrar la lista en lugar de saltar automaticamente a 4/6.
     public static bool InvoiceSeleccionandoCliente { get; set; }
 
+    // Indica que el flujo de facturacion se abrio en modo edicion desde el voucher
+    // (icono Editar). En ese caso la pantalla 2/6 (y 3/6) debe avanzar hacia adelante
+    // al flujo normal (datos credito -> seleccion de producto) en lugar de hacer pop,
+    // porque no existe una pantalla 4/6 previa en el stack a la cual regresar.
+    public static bool InvoiceEditando { get; set; }
+
     // Cliente generico por defecto para facturacion rapida.
     public const string ClienteGenericoNumberDefault = "CLI00000000";
 

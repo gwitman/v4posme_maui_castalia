@@ -309,6 +309,11 @@ public class SeleccionarProductoViewModel : BaseViewModel
     {
         Navigation = navigation;
 
+        // Al llegar a la pantalla de seleccion de producto (4/6) finaliza el avance del
+        // modo edicion. A partir de aqui el flujo opera como facturacion rapida: el menu
+        // desplegable navega a 2/6 y 3/6, y esas pantallas regresan mediante pop.
+        VariablesGlobales.InvoiceEditando = false;
+
         // Facturacion rapida: si se llega a esta pantalla con el flujo sin inicializar
         // (por ejemplo, tras dar "Nueva factura" o desde el boton Facturar de la barra
         // inferior), se cargan los datos iniciales por defecto de la factura.

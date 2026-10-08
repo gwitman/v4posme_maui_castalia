@@ -64,6 +64,13 @@ public class PrinterInvoiceViewModel : BaseViewModel
                 throw new Exception(Mensajes.EditarFacturaNoPermitido);
             }
 
+            // Se marca el modo edicion para que la pantalla 2/6 avance hacia adelante
+            // (3/6 -> 4/6) en lugar de hacer pop al voucher.
+            VariablesGlobales.InvoiceEditando = true;
+            // Se marca el flujo como ya inicializado para que al llegar a la pantalla 4/6
+            // NO se reinicialice el DtoInvoice (que ya trae la factura y sus productos
+            // cargados desde el voucher). De lo contrario se perderia lo que se edita.
+            VariablesGlobales.InvoiceFlowInicializado = true;
             await NavigationService.NavigateToAsync<DataInvoicesViewModel>(VariablesGlobales.DtoInvoice.CustomerResponse!.CustomerNumber!);            
             IsBusy = false;
 
