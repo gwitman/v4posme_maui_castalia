@@ -118,8 +118,25 @@ public class PaymentInvoiceViewModel : BaseViewModel
                 dtoInvoice.PeriodPay = new DtoCatalogItem((int)TypePeriodPay.Mensual, "Mensual", "M");
             }
 
-            // Mesa puede quedar null si no se usa el módulo de restaurante. Se aplica un valor neutro.
-            if (dtoInvoice.Mesa is null)
+            //Obtener el estado de la factura (permission=true => modo restaurante)
+            HelperLogs.Trace(Screen, "OnAplicarPagoCommand", "validando permiso para determinar estado de la factura");
+            bool permission = await _helper.GetPermission(TypeMenuElementID.core_billing_invoice_type_restaurant, TypePermission.Updated, TypeImpact.All);
+            int statusID = !permission ? (int)TypeStatusBilling.Apply : (int)TypeStatusBilling.Register;
+            HelperLogs.Trace(Screen, "OnAplicarPagoCommand", $"permission={permission}, statusID={statusID}");
+
+            // En modo restaurante (permission=true) es obligatorio seleccionar una zona/mesa válida.
+            // Fuera de restaurante, Mesa puede quedar null y se aplica un valor neutro.
+            if (permission)
+            {
+                if (dtoInvoice.Mesa is null || dtoInvoice.Mesa.Key <= 0)
+                {
+                    HelperLogs.Trace(Screen, "OnAplicarPagoCommand", "modo restaurante: no se seleccionó zona/mesa", "Warning");
+                    ShowToast(Mensajes.MensajeSeleccionarMesa, ToastDuration.Long, 12);
+                    IsBusy = false;
+                    return;
+                }
+            }
+            else if (dtoInvoice.Mesa is null)
             {
                 HelperLogs.Trace(Screen, "OnAplicarPagoCommand", "Mesa era null. Aplicando valor por defecto (0)", "Warning");
                 dtoInvoice.Mesa = new DtoCatalogItem(0, "Seleccione", "Seleccione");
@@ -156,13 +173,6 @@ public class PaymentInvoiceViewModel : BaseViewModel
             VariablesGlobales.DtoInvoice.Monto          = Monto;
             VariablesGlobales.DtoInvoice.Cambio         = Cambio;
             VariablesGlobales.DtoInvoice.TransactionOn  = DateTime.Now;
-
-            //Obtener el estado de la factura
-            HelperLogs.Trace(Screen, "OnAplicarPagoCommand", "validando permiso para determinar estado de la factura");
-            int statusID            = 0;
-            bool permission = await _helper.GetPermission(TypeMenuElementID.core_billing_invoice_type_restaurant, TypePermission.Updated, TypeImpact.All);
-            statusID = !permission ? (int)TypeStatusBilling.Apply : (int)TypeStatusBilling.Register;
-            HelperLogs.Trace(Screen, "OnAplicarPagoCommand", $"permission={permission}, statusID={statusID}");
 
             HelperLogs.Trace(Screen, "OnAplicarPagoCommand", "construyendo transacción maestra");
             var transactionMaster   = new TbTransactionMaster
