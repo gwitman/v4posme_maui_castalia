@@ -277,6 +277,14 @@ public class PrinterInvoiceViewModel : BaseViewModel
     public string NombreCliente => VariablesGlobales.DtoInvoice.NombreCompleto!;
     public string CodigoVendedor => VariablesGlobales.User!.Nickname!;
 
+    public string EstadoFactura => VariablesGlobales.DtoInvoice.TransactionMaster.StatusID switch
+    {
+        (int)TypeStatusBilling.Register => "Registrada",
+        (int)TypeStatusBilling.Apply    => "Aplicada",
+        (int)TypeStatusBilling.Anulada  => "Anulada",
+        _                               => "Desconocido"
+    };
+
     private Api_AppMobileApi_GetDataDownloadParametersResponse? _companyTelefono;
 
     public Api_AppMobileApi_GetDataDownloadParametersResponse? CompanyTelefono
