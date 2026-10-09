@@ -60,6 +60,67 @@ public class HelperCore(
         return companyUrl.Trim('/');
     }
 
+    // Divide la URL completa de la compañia en tres partes usando "public" como ancla fija.
+    // La compañia es siempre el segmento inmediatamente anterior a "/public/".
+    // No depende de la cantidad de segmentos ni de longitudes fijas.
+    // Ejemplo: "https://posme.net/v4posme/demo/public/"
+    //   -> Prefix  = "https://posme.net/v4posme/"
+    //      Company = "demo"
+    //      Suffix  = "public/"
+    public (string Prefix, string Company, string Suffix) SplitCompanyUrl(string? companyUrl)
+    {
+        if (string.IsNullOrWhiteSpace(companyUrl))
+            return (string.Empty, string.Empty, string.Empty);
+
+        const string ancla = "public";
+        var valor = companyUrl.Trim();
+
+        // Buscar el ancla "public" como segmento (entre barras o al final).
+        var indicePublic = valor.IndexOf("/" + ancla, StringComparison.OrdinalIgnoreCase);
+        if (indicePublic < 0)
+        {
+            // No se encontro el ancla: devolver todo como compañia para edicion manual.
+            return (string.Empty, valor, string.Empty);
+        }
+
+        // Sufijo: desde "public" en adelante (sin la barra separadora inicial).
+        var suffix = valor.Substring(indicePublic + 1);
+
+        // Parte previa a "/public": termina con "<prefijo>/<company>".
+        var previa = valor.Substring(0, indicePublic);
+
+        // La compañia es el ultimo segmento de la parte previa.
+        var ultimaBarra = previa.LastIndexOf('/');
+        if (ultimaBarra < 0)
+        {
+            // No hay prefijo, "previa" es la compañia completa.
+            return (string.Empty, previa, suffix);
+        }
+
+        var prefix = previa.Substring(0, ultimaBarra + 1); // conserva la barra final
+        var company = previa.Substring(ultimaBarra + 1);
+
+        return (prefix, company, suffix);
+    }
+
+    // Recompone la URL completa a partir de las tres partes.
+    public string BuildCompanyUrl(string? prefix, string? company, string? suffix)
+    {
+        var p = (prefix ?? string.Empty).Trim();
+        var c = (company ?? string.Empty).Trim().Trim('/');
+        var s = (suffix ?? string.Empty).Trim();
+
+        // Garantizar separador entre prefijo y compañia.
+        if (!string.IsNullOrEmpty(p) && !p.EndsWith('/'))
+            p += "/";
+
+        // Garantizar separador entre compañia y sufijo.
+        if (!string.IsNullOrEmpty(s) && !s.StartsWith('/'))
+            s = "/" + s;
+
+        return $"{p}{c}{s}";
+    }
+
     public async Task<int> GetCounter()
     {
         var find = await repositoryParameters.PosMeFindCounter();

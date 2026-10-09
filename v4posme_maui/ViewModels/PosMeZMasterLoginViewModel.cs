@@ -72,10 +72,85 @@ namespace v4posme_maui.ViewModels
 			set => SetProperty(ref this._password, value);
 		}
 
+		private bool _actualizandoPartes;
+
+		// Company sigue siendo el unico string que se guarda y envia a la API.
 		public string? Company
 		{
 			get => _company;
-			set => SetProperty(ref _company, value);
+			set
+			{
+				if (SetProperty(ref _company, value))
+				{
+					SincronizarPartesDesdeCompany();
+				}
+			}
+		}
+
+		private string _companyPrefix = string.Empty;
+		private string _companyName = string.Empty;
+		private string _companySuffix = string.Empty;
+
+		// Servidor + ruta de la aplicacion (ej: https://posme.net/v4posme/)
+		public string CompanyPrefix
+		{
+			get => _companyPrefix;
+			set
+			{
+				if (SetProperty(ref _companyPrefix, value))
+				{
+					RecomponerCompany();
+				}
+			}
+		}
+
+		// Nombre de la compañia (ej: demo)
+		public string CompanyName
+		{
+			get => _companyName;
+			set
+			{
+				if (SetProperty(ref _companyName, value))
+				{
+					RecomponerCompany();
+				}
+			}
+		}
+
+		// Sufijo fijo (ej: public/)
+		public string CompanySuffix
+		{
+			get => _companySuffix;
+			set
+			{
+				if (SetProperty(ref _companySuffix, value))
+				{
+					RecomponerCompany();
+				}
+			}
+		}
+
+		// Descompone Company en las tres partes visibles usando "public" como ancla.
+		private void SincronizarPartesDesdeCompany()
+		{
+			if (_actualizandoPartes) return;
+			_actualizandoPartes = true;
+			var (prefix, company, suffix) = helperCore.SplitCompanyUrl(_company);
+			CompanyPrefix = prefix;
+			CompanyName = company;
+			CompanySuffix = suffix;
+			_actualizandoPartes = false;
+		}
+
+		// Recompone Company a partir de las tres partes editadas en la UI.
+		private void RecomponerCompany()
+		{
+			if (_actualizandoPartes) return;
+			_actualizandoPartes = true;
+			_company = helperCore.BuildCompanyUrl(_companyPrefix, _companyName, _companySuffix);
+			OnPropertyChanged(nameof(Company));
+			LoginCommand.ChangeCanExecute();
+			_actualizandoPartes = false;
 		}
 
 		public bool Remember
@@ -331,7 +406,18 @@ namespace v4posme_maui.ViewModels
 		{
 			Navigation	= navigation;
 			var findUserRemember = await _repositoryTbUser.PosmeFindUserRemember();
-			if (findUserRemember is null) return;
+			if (findUserRemember is null)
+			{
+				// Sin usuario recordado: prellenar prefijo y sufijo por defecto
+				// para que el operador solo tenga que escribir el nombre de la compañia.
+				if (string.IsNullOrWhiteSpace(CompanyPrefix) && string.IsNullOrWhiteSpace(CompanySuffix))
+				{
+					var (prefix, _, suffix) = helperCore.SplitCompanyUrl(Constantes.UrlBasePosme);
+					CompanyPrefix = prefix;
+					CompanySuffix = suffix;
+				}
+				return;
+			}
 			UserName	= findUserRemember.Nickname!;
 			Password	= findUserRemember.Password!;
 			Company		= findUserRemember.Company!;

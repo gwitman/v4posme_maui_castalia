@@ -148,11 +148,23 @@
                         Command="{Binding RealizarPagoCommand}" />
 
                     <dxe:TextEdit
-                        x:Name="TxtCompany"
-                        Text="{Binding Company}"
-                        LabelText="Compañía"
+                        x:Name="TxtServer"
+                        Text="{Binding CompanyPrefix}"
+                        LabelText="Servidor"
                         BoxMode="Outlined"
                         Margin="0,6,0,0" />
+
+                    <dxe:TextEdit
+                        x:Name="TxtCompany"
+                        Text="{Binding CompanyName}"
+                        LabelText="Compañía"
+                        BoxMode="Outlined" />
+
+                    <dxe:TextEdit
+                        x:Name="TxtSuffix"
+                        Text="{Binding CompanySuffix}"
+                        LabelText="Prefijo"
+                        BoxMode="Outlined" />
 
                     <Label HorizontalTextAlignment="Center"
                            FontSize="12"
