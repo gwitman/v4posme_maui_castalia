@@ -27,7 +27,6 @@ namespace v4posme_maui.ViewModels
 		private string? _password;
 		private bool _opcionPagar;
 		private string? _company;
-		private bool _popupShow;
 		private bool _remember;
 		
         private readonly RestApiCoreAcount _restServiceUser												= new();
@@ -50,7 +49,6 @@ namespace v4posme_maui.ViewModels
 		{
 			_repositoryTbUser		= VariablesGlobales.UnityContainer.Resolve<IRepositoryTbUser>();
 			LoginCommand			= new Command(OnLoginClicked, ValidateLogin);
-			MensajeCommand			= new Command(OnMensaje, ValidateError);
 			PropertyChanged			+= (_, _) => LoginCommand.ChangeCanExecute();
 			_repositoryTbCompany	= VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCompany>();
 			RealizarPagoCommand		= new Command(OnRealizarPagoCommand);
@@ -60,14 +58,7 @@ namespace v4posme_maui.ViewModels
 		}
 		
 		public Command LoginCommand { get; }
-		private Command MensajeCommand { get; }
 
-
-		public bool PopupShow
-		{
-			get => _popupShow;
-			set => SetProperty(ref _popupShow, value);
-		}
 
 		public string? UserName
 		{
@@ -143,30 +134,25 @@ namespace v4posme_maui.ViewModels
 				var response = await _restServiceUser.LoginMobile(UserName!, Password!);
 				if (response is null)
 				{
-					Mensaje		= Mensajes.MensajeCredencialesInvalida;
-					PopupShow	= true;
+					ShowMensajePopUp(Mensajes.MensajeCredencialesInvalida);
 					await Navigation.PopModalAsync();
 					return;
 				}
 
-				PopupShow = false;
+				PopUpShow = false;
 			}
 			else
 			{
 				if (await _repositoryTbUser.PosMeRowCount() <= 0)
 				{
-					Mensaje		= Mensajes.MensajeSinDatosTabla;
-					MensajeCommand.Execute(null);
-					PopupShow	= true;
+					ShowMensajePopUp(Mensajes.MensajeSinDatosTabla);
 					await Navigation.PopModalAsync();
 					return;
 				}
 
 				if (findUserRemember is null)
 				{
-					Mensaje		= Mensajes.MensajeCredencialesInvalida;
-					MensajeCommand.Execute(null);
-					PopupShow	= true;
+					ShowMensajePopUp(Mensajes.MensajeCredencialesInvalida);
 					await Navigation.PopModalAsync();
 					return;
 				}
@@ -205,8 +191,7 @@ namespace v4posme_maui.ViewModels
 			{
 				HelperLogs.Log(e);
 				Debug.WriteLine(e.Message);
-				Mensaje		= Mensajes.MensajeCredencialesInvalida;
-				PopupShow	= true;
+				ShowMensajePopUp(Mensajes.MensajeCredencialesInvalida);
 			}
 
 			await Navigation.PopModalAsync();
@@ -233,14 +218,13 @@ namespace v4posme_maui.ViewModels
                     if (VariablesGlobales.User is null)
 					{
 						ShowMensajePopUp(Mensajes.MensajeCredencialesInvalida);
-						PopupShow = true;
 						await Navigation.PopModalAsync();
 						return;
 					}
 
 					VariablesGlobales.User.Company	= Company;
 					VariablesGlobales.User.Remember = true;
-					PopupShow						= false;
+					PopUpShow						= false;
 
 					//Validar que ya aya un usuario anterior
 					if (counterUser > 0)
@@ -255,7 +239,6 @@ namespace v4posme_maui.ViewModels
 						{
 							await Navigation.PopModalAsync();
 							ShowMensajePopUp(Mensajes.UsuarioNoPermitido);
-							PopupShow = true;
 							return;
 						}
 
@@ -306,9 +289,8 @@ namespace v4posme_maui.ViewModels
 				{
 					if (counterUser <= 0)
 					{
-						ShowMensajePopUp(Mensajes.MensajeSinDatosTabla);
-						PopupShow = true;
 						await Navigation.PopModalAsync();
+						ShowMensajePopUp(Mensajes.MensajeSinDatosTabla);
 						return;
 					}
 					var findUserRemember = await _repositoryTbUser.PosMeFindUserByNicknameAndPassword(UserName!, Password!);
@@ -316,7 +298,6 @@ namespace v4posme_maui.ViewModels
 					{
 						await Navigation.PopModalAsync();
 						ShowMensajePopUp(Mensajes.MensajeCredencialesInvalida);
-						PopupShow = true;
 						return;
 					}
 
@@ -334,15 +315,6 @@ namespace v4posme_maui.ViewModels
 				HelperLogs.Log(e);
 				ShowMensajePopUp(e.Message);
 			}
-		}
-
-		private void OnMensaje()
-		{
-		}
-
-		private bool ValidateError()
-		{
-			return PopupShow;
 		}
 
 		private bool ValidateLogin()

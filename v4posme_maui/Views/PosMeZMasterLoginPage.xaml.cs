@@ -23,6 +23,7 @@ namespace v4posme_maui.Views
         private void ClosePopup_Clicked(object sender, EventArgs e)
         {
             Popup.IsOpen = false;
+            ((PosMeZMasterLoginViewModel)BindingContext).PopUpShow = false;
         }
     }
 }

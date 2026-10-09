@@ -26,9 +26,12 @@ namespace v4posme_maui.ViewModels
 
         protected void ShowMensajePopUp(string mensaje, Color? color=null)
         {
-            Mensaje = mensaje;
-            PopupBackgroundColor = color ?? Colors.Red;
-            PopUpShow = true;
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                Mensaje = mensaje;
+                PopupBackgroundColor = color ?? Colors.Red;
+                PopUpShow = true;
+            });
         }
         public bool IsBusy
         {

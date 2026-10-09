@@ -15,27 +15,29 @@
         <local:PosMeZMasterLoginViewModel />
     </ContentPage.BindingContext>
 
-    <dxco:DXPopup x:Name="Popup"
-                  IsOpen="{Binding PopupShow}"
-                  AllowScrim="True"
-                  BackgroundColor="{StaticResource Red}"
-                  VerticalAlignment="Bottom"
-                  ScrimColor="#b3adb9ce">
-        <StackLayout WidthRequest="260" Padding="4">
-            <Label Text="{Binding Mensaje}"
-                   FontAttributes="Bold"
-                   FontSize="15"
-                   TextColor="{StaticResource White}"
-                   Margin="20,20" />
-            <Button Text="Aceptar"
-                    Clicked="ClosePopup_Clicked"
-                    BackgroundColor="{StaticResource Gray600}"
-                    FontSize="18"
-                    TextColor="White" />
-        </StackLayout>
-    </dxco:DXPopup>
-
     <Grid RowDefinitions="Auto,*">
+
+        <dxco:DXPopup x:Name="Popup"
+                      Grid.Row="0"
+                      Grid.RowSpan="2"
+                      IsOpen="{Binding PopUpShow}"
+                      AllowScrim="True"
+                      BackgroundColor="{Binding PopupBackgroundColor}"
+                      VerticalAlignment="Bottom"
+                      ScrimColor="#b3adb9ce">
+            <StackLayout WidthRequest="260" Padding="4">
+                <Label Text="{Binding Mensaje}"
+                       FontAttributes="Bold"
+                       FontSize="15"
+                       TextColor="{StaticResource White}"
+                       Margin="20,20" />
+                <Button Text="Aceptar"
+                        Clicked="ClosePopup_Clicked"
+                        BackgroundColor="{StaticResource Gray600}"
+                        FontSize="18"
+                        TextColor="White" />
+            </StackLayout>
+        </dxco:DXPopup>
 
         <!-- Encabezado con degradado y logo -->
         <Grid Grid.Row="0" HeightRequest="240">
