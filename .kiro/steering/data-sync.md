@@ -70,7 +70,7 @@ decisiones:
 | 3 | Menú → Descargar datos | `ViewModels/PosMeDownloadViewModel.cs` (`OnDownloadClicked`) | No | Sí | contador ≠ 0 → `GetDataDownload(true)`; contador == 0 → `GetDataDownload(false)`. Requiere switch activo + red. |
 | 4 | Menú → Subir datos | `ViewModels/Upload/UploadViewModel.cs` (`OnUploadCommand`) | Sí | No | contador == 0 → no sube. Si ok, borra items/clientes/transacciones locales y `ZeroCounter`. Requiere switch activo + red. |
 | 5 | Cambio de compañía (AboutPage) | `ViewModels/AboutViewModel.cs` (`CambiarCompania`) | No | Sí | Combo solo habilitado si contador == 0. Cambia `CompanyKey` → `LoginMobile` → `GetDataDownload(false)`. Si falla, revierte `CompanyKey` y usuario. |
-| 6 | Fin de factura (subida opcional) | `ViewModels/Invoices/08PrinterInvoiceViewModel.cs` (`OnSubirCommand`) | Sí | Sí (solo si la subida fue exitosa) | Solo si parámetro `MOBILE_UPLOAD_AFTER_INVOICE == true`. `SendDataAsync` → **si subida OK**: borra locales + `ZeroCounter` → luego `GetDataDownload(true/false)` según contador. **Si la subida falla (error o respuesta nula): NO se descarga.** |
+| 6 | Fin de factura (subida opcional) | `ViewModels/Invoices/08PrinterInvoiceViewModel.cs` (`OnSubirCommand`) | Sí | Sí (solo si la subida fue exitosa) | Solo si parámetro `MOBILE_UPLOAD_AFTER_INVOICE == true`. `SendDataAsync` → **si subida OK**: borra locales + `ZeroCounter` → luego `GetDataDownload(true/false)` según contador. **Si la subida falla (error o respuesta nula): NO se descarga.** Muestra indicador de espera (`ShimmerView` + `ActivityIndicator` + `LoadingMessage`) ligado a `IsBusy`, y bloquea reentrada mientras corre. |
 
 ## Resumen por dirección
 
@@ -87,6 +87,22 @@ GPS y navegar al `MainPage`, se consulta el contador de transacciones:
   inmediata), para que el usuario entre con los datos frescos del servidor.
 - **contador != 0** → no se descarga, para no perder los movimientos locales
   pendientes de subir.
+
+## Indicador de espera durante la sincronización (#6)
+
+La ventana 8 de la factura (`08PrinterInvoicePage.xaml`) muestra un
+`ShimmerView` con `IsLoading="{Binding IsBusy}"` y, en su `LoadingView`, un
+`ActivityIndicator` más un `Label` ligado a `LoadingMessage`. Durante
+`OnSubirCommand`:
+
+- Al iniciar: `IsBusy = true` y `LoadingMessage = "Subiendo datos..."`.
+- Antes de descargar: `LoadingMessage = "Descargando datos..."`.
+- Al terminar: `LoadingMessage = ""` e `IsBusy = false`.
+- Guard de reentrada: si `IsBusy` ya está activo, el comando se ignora (evita
+  disparar subidas/descargas en paralelo por doble toque).
+
+Mensajes en `Services/SystemNames/Mensajes.cs`: `MensajeSubiendoDatos`,
+`MensajeDescargandoDatos`.
 
 ## Parámetros de servidor relevantes
 

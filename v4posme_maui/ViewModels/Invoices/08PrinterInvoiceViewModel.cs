@@ -198,11 +198,18 @@ public class PrinterInvoiceViewModel : BaseViewModel
 
     private async void OnSubirCommand()
     {
+        // Evitar reentrada: si ya hay una operacion en curso, ignorar nuevos toques.
+        if (IsBusy)
+        {
+            return;
+        }
+
         var uploadAfterInvoiceValue = await _helperCore.GetValueParameter("MOBILE_UPLOAD_AFTER_INVOICE", "false");
         var uploadAfterInvoice      = bool.TryParse(uploadAfterInvoiceValue, out var parsedValue) && parsedValue;
         if (uploadAfterInvoice )
         {
-            IsBusy = true;
+            IsBusy         = true;
+            LoadingMessage = Mensajes.MensajeSubiendoDatos;
 
             // Subir datos
             var response    = await _restApiDownload.SendDataAsync();
@@ -228,6 +235,7 @@ public class PrinterInvoiceViewModel : BaseViewModel
                     await _helperCore.ZeroCounter();
 
                     // Descargar datos (solo si la subida fue exitosa)
+                    LoadingMessage = Mensajes.MensajeDescargandoDatos;
                     var counter = await _helperCore.GetCounter();
                     if (counter != 0)
                         await _restApiDownload.GetDataDownload(true);
@@ -241,13 +249,24 @@ public class PrinterInvoiceViewModel : BaseViewModel
                 ShowMensajePopUp(Mensajes.MensajeUploadError, Colors.Red);
             }
 
+            LoadingMessage = string.Empty;
             IsBusy = false;
         }
 
         // Navegar a página 1 (selección de cliente)
         OnAplicarOtroCommand();
     }
-    
+
+    private string _loadingMessage = string.Empty;
+
+    // Texto que se muestra bajo el indicador de espera mientras corre la
+    // subida/descarga de datos (ej. "Subiendo datos...", "Descargando datos...").
+    public string LoadingMessage
+    {
+        get => _loadingMessage;
+        private set => SetProperty(ref _loadingMessage, value);
+    }
+
     private TbTransactionMaster _transactionMaster;
 
     public TbTransactionMaster TransactionMaster

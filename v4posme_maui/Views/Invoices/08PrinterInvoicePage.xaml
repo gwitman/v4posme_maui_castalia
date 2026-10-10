@@ -311,9 +311,17 @@
                 </ScrollView>
             </controls:ShimmerView.Content>
             <controls:ShimmerView.LoadingView>
-                <ActivityIndicator IsRunning="{Binding IsBusy}"
-                                   HeightRequest="50"
-                                   WidthRequest="50" />
+                <VerticalStackLayout HorizontalOptions="Center"
+                                     VerticalOptions="Center"
+                                     Spacing="12">
+                    <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                       HorizontalOptions="Center"
+                                       HeightRequest="50"
+                                       WidthRequest="50" />
+                    <Label Text="{Binding LoadingMessage}"
+                           HorizontalTextAlignment="Center"
+                           FontAttributes="Bold" />
+                </VerticalStackLayout>
             </controls:ShimmerView.LoadingView>
         </controls:ShimmerView>
     </ContentPage.Content>
