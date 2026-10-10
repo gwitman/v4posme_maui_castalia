@@ -211,10 +211,13 @@ public class PrinterInvoiceViewModel : BaseViewModel
             {
                 if (apiResponse.Error)
                 {
+                    // La subida fallo: NO se descarga.
                     ShowMensajePopUp($"{Mensajes.MensajeUploadError} {apiResponse.Message}", Colors.Red);
                 }
                 else
                 {
+                    // Subida exitosa: limpiar local, reiniciar contador y recien
+                    // entonces proceder con la descarga.
                     Mensaje              = Mensajes.MensajeUploadSuccess;
                     PopupBackgroundColor = Colors.Green;
                     PopUpShow            = true;
@@ -223,19 +226,20 @@ public class PrinterInvoiceViewModel : BaseViewModel
                     await _repositoryTbTransactionMaster.PosMeDeleteAll();
                     await _repositoryTbTransactionMasterDetail.PosMeDeleteAll();
                     await _helperCore.ZeroCounter();
+
+                    // Descargar datos (solo si la subida fue exitosa)
+                    var counter = await _helperCore.GetCounter();
+                    if (counter != 0)
+                        await _restApiDownload.GetDataDownload(true);
+                    else
+                        await _restApiDownload.GetDataDownload(false);
                 }
             }
             else
             {
+                // Respuesta nula: la subida fallo, NO se descarga.
                 ShowMensajePopUp(Mensajes.MensajeUploadError, Colors.Red);
             }
-
-            // Descargar datos
-            var counter = await _helperCore.GetCounter();
-            if (counter != 0)
-                await _restApiDownload.GetDataDownload(true);
-            else
-                await _restApiDownload.GetDataDownload(false);
 
             IsBusy = false;
         }
