@@ -20,6 +20,7 @@ namespace v4posme_maui.ViewModels
         private readonly IRepositoryServerTransactionMaster _repositoryServerTransactionMaster;
         private readonly IRepositoryParameters _repositoryParameters;
         private readonly IRepositoryTbUser _repositoryTbUser;
+        private readonly IRepositoryTbIndicator _repositoryTbIndicator;
         private readonly HelperCore _helperContador;
         private readonly RestApiCoreAcount _restApiCoreAcount = new();
 
@@ -33,7 +34,22 @@ namespace v4posme_maui.ViewModels
             _repositoryServerTransactionMaster = VariablesGlobales.UnityContainer.Resolve<IRepositoryServerTransactionMaster>();
             _repositoryParameters = VariablesGlobales.UnityContainer.Resolve<IRepositoryParameters>();
             _repositoryTbUser = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbUser>();
+            _repositoryTbIndicator = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbIndicator>();
             _helperContador = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
+        }
+
+        // Lista de indicadores (ej. meta de venta) descargados del servidor y
+        // mostrados en una tarjeta del dashboard, ordenados por su campo Order.
+        public ObservableCollection<ViewTempDtoIndicator> Indicadores { get; } = new();
+
+        // Controla la visibilidad de la tarjeta de indicadores. Solo se muestra
+        // cuando hay al menos un indicador cargado.
+        private bool _mostrarTarjetaIndicadores;
+
+        public bool MostrarTarjetaIndicadores
+        {
+            get => _mostrarTarjetaIndicadores;
+            set => SetProperty(ref _mostrarTarjetaIndicadores, value);
         }
 
         // ===== Cambio de compania (parametro APP_MOBILE_SWITCH_COMPANY) =====
@@ -638,6 +654,10 @@ namespace v4posme_maui.ViewModels
                 TotalCordobas   = MontoFacturasContadoCordobas + MontoAbonosCordobas + MontoIngresosCordobas - MontoEntradasInventarioCordobas - MontoGastosCordobas - MontoEgresosCordobas;
                 TotalDolares    = MontoFacturasContadoDolares + MontoAbonosDolares + MontoIngresosDolares - MontoEntradasInventarioDolares - MontoGastosDolares - MontoEgresosDolares;
                 HelperLogs.Log($"AboutViewModel.OnAppearing: totales calculados (TotalCordobas={TotalCordobas}, TotalDolares={TotalDolares}, IngresoGeneralCordobas={IngresoGeneralCordobas}, IngresoGeneralDolares={IngresoGeneralDolares})", "Info");
+
+                //Cargar indicadores (ej. meta de venta) ordenados por Order
+                await CargarIndicadores();
+
                 IsBusy          = false;
                 HelperLogs.Log("AboutViewModel.OnAppearing: fin exitoso", "Info");
             }
@@ -646,6 +666,44 @@ namespace v4posme_maui.ViewModels
                 HelperLogs.Log(e);
                 HelperLogs.Log("AboutViewModel.OnAppearing: excepcion durante la carga del dashboard", "Error");
                 ShowToast(e.Message,ToastDuration.Long, 14);
+            }
+        }
+
+        // Carga los indicadores descargados en SQLite y los expone a la vista,
+        // ordenados por su campo Order. La tarjeta solo se muestra si hay datos.
+        private async Task CargarIndicadores()
+        {
+            try
+            {
+                HelperLogs.Log("AboutViewModel.CargarIndicadores: inicio", "Info");
+                Indicadores.Clear();
+
+                var lista = await _repositoryTbIndicator.PosMeFindAll();
+                var ordenados = (lista ?? new List<Api_AppMobileApi_GetDataDownloadIndicatorResponse>())
+                    .OrderBy(indicator => indicator.Order)
+                    .ToList();
+
+                foreach (var indicator in ordenados)
+                {
+                    Indicadores.Add(new ViewTempDtoIndicator
+                    {
+                        Name       = indicator.Name,
+                        SystemName = indicator.SystemName,
+                        Value      = indicator.Value,
+                        Order      = indicator.Order,
+                        Prefix     = indicator.Prefix,
+                        Posfix     = indicator.Posfix
+                    });
+                }
+
+                MostrarTarjetaIndicadores = Indicadores.Count > 0;
+                HelperLogs.Log($"AboutViewModel.CargarIndicadores: indicadores cargados = {Indicadores.Count}", "Info");
+            }
+            catch (Exception e)
+            {
+                HelperLogs.Log(e);
+                HelperLogs.Log("AboutViewModel.CargarIndicadores: excepcion, tarjeta oculta", "Error");
+                MostrarTarjetaIndicadores = false;
             }
         }
 

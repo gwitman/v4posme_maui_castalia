@@ -22,6 +22,25 @@ public class Api_AppMobileApi_GetDataDownloadResponse
     public List<Api_AppMobileApi_GetDataDownloadDocumentCreditAmortizationResponse> ListDocumentCreditAmortization { get; set; } = [];
     public List<Api_AppMobileApi_GetDataDownloadServerTransactionMasterResponse> ListServerTransactionMaster { get; set; } = [];
     public List<Api_AppMobileApi_GetDataDownloadTransactionMasterRegisterResponse> ListTransactionMasterRegister { get; set; } = [];
+    public List<Api_AppMobileApi_GetDataDownloadIndicatorResponse> ListIndicator { get; set; } = [];
+}
+
+[SQLite.Table("tb_indicator")]
+public class Api_AppMobileApi_GetDataDownloadIndicatorResponse
+{
+    [PrimaryKey, AutoIncrement] public int IndicatorPk { get; set; }
+
+    [DataMember(Name = "name")] public string? Name { get; set; }
+
+    [DataMember(Name = "systemName")] public string? SystemName { get; set; }
+
+    [DataMember(Name = "value")] public decimal Value { get; set; }
+
+    [DataMember(Name = "order")] public int Order { get; set; }
+
+    [DataMember(Name = "prefix")] public string? Prefix { get; set; }
+
+    [DataMember(Name = "posfix")] public string? Posfix { get; set; }
 }
 
 [SQLite.Table("tb_server_transaction_master")]

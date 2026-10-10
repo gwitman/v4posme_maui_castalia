@@ -28,6 +28,7 @@ public class RestApiAppMobileApi
     private readonly IRepositoryServerTransactionMaster _repositoryServerTransactionMasterDetail    = VariablesGlobales.UnityContainer.Resolve<IRepositoryServerTransactionMaster>();
     private readonly IRepositoryTbParameterSystem _parameterSystem                                  = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbParameterSystem>();
     private readonly IRepositoryTbCatalogItem _repositoryCatalogItem                                = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCatalogItem>();
+    private readonly IRepositoryTbIndicator _repositoryIndicator                                    = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbIndicator>();
     
     public async Task<DtoMenssage> GetDataDownload(bool onlyQuantityNew)
     {
@@ -145,6 +146,7 @@ public class RestApiAppMobileApi
                 var serverTransactionMasterAll          = _repositoryServerTransactionMasterDetail.PosMeDeleteAll();
                 var menuElementDeleteAll                = _repositoryTbMenuElement.PosMeDeleteAll();
                 var catalogItemAll                      = _repositoryCatalogItem.PosMeDeleteAll();
+                var indicatorDeleteAll                  = _repositoryIndicator.PosMeDeleteAll();
                 
                 await Task.WhenAll([
                     customerDeleteAll, 
@@ -157,7 +159,8 @@ public class RestApiAppMobileApi
                     transactionMasterDetailAll,
                     serverTransactionMasterAll,
                     menuElementDeleteAll,
-                    catalogItemAll
+                    catalogItemAll,
+                    indicatorDeleteAll
                 ]);
                 HelperLogs.Log("GetDataDownload: datos locales eliminados correctamente", "Info");
 
@@ -239,6 +242,7 @@ public class RestApiAppMobileApi
                 var taskServerTransactionMaster     = _repositoryServerTransactionMasterDetail!.PosMeInsertAll(apiResponse.ListServerTransactionMaster);
                 var taskMenuElement                 = _repositoryTbMenuElement!.PosMeInsertAll(apiResponse.ListMenuElement);
                 var taskCatalogItem                 = _repositoryCatalogItem!.PosMeInsertAll(apiResponse.ListCatalogItem);                
+                var taskIndicator                   = _repositoryIndicator!.PosMeInsertAll(apiResponse.ListIndicator);
                 var taskTransactionMasterDetail     = _repositoryTbTransactionMasterDetail.PosMeInsertAll(objListTransactionMasterDetailNew);
 
                 await Task.WhenAll([
@@ -251,6 +255,7 @@ public class RestApiAppMobileApi
                     taskServerTransactionMaster,
                     taskMenuElement,
                     taskCatalogItem,
+                    taskIndicator,
                     taskTransactionMasterDetail
                 ]);
                 HelperLogs.Log("GetDataDownload: nuevos movimientos insertados correctamente", "Info");
