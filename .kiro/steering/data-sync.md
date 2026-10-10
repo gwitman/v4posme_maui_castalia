@@ -31,9 +31,14 @@ con `VariablesGlobales.CompanyKey`.
 
 ## Comportamiento de `GetDataDownload(onlyQuantityNew)`
 
-- `onlyQuantityNew == true` (descarga "suave"): **no borra nada**. Solo inserta
-  items nuevos y actualiza cantidades de items existentes. Se usa cuando hay
-  transacciones locales pendientes (contador ≠ 0) para no perder trabajo.
+- `onlyQuantityNew == true` (descarga "suave"): **no borra datos de trabajo
+  local** (clientes, transacciones, créditos, etc.). Solo inserta items nuevos y
+  actualiza cantidades de items existentes. Se usa cuando hay transacciones
+  locales pendientes (contador ≠ 0) para no perder trabajo. **Excepción:** la
+  tabla de permisos `TbMenuElement` SÍ se limpia (`PosMeDeleteAll`) y se
+  reinserta (`PosMeInsertAll(apiResponse.ListMenuElement)`) también en esta
+  rama, para que los cambios de permisos del servidor se reflejen aunque existan
+  movimientos locales pendientes.
 - `onlyQuantityNew == false` (descarga "dura"): **borra TODO lo local**
   (clientes, items, créditos, amortizaciones, parámetros, compañía,
   transacciones master/detail, server transactions, menú, catálogos,

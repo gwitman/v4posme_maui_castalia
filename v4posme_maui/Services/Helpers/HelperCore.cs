@@ -18,7 +18,7 @@ public class HelperCore(
 
     public async Task<bool> GetPermission(TypeMenuElementID menuElementID, TypePermission typePermission, TypeImpact impact)
     {
-        var findMenuElement = await _reporitoryTbMenuElement.PosMeFindById((int)menuElementID);
+        var findMenuElement     = await _reporitoryTbMenuElement.PosMeFindById((int)menuElementID);
         if (findMenuElement is null)
             return false;
 

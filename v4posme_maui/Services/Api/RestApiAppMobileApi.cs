@@ -82,6 +82,15 @@ public class RestApiAppMobileApi
             if (onlyQuantityNew == true)
             {
                 HelperLogs.Log("GetDataDownload: procesando solo cantidades nuevas de items", "Info");
+
+                // Aunque la descarga sea "suave" (no se tocan clientes, transacciones, etc.
+                // para no perder trabajo local), los permisos del menu SI deben refrescarse
+                // siempre. De lo contrario, cambios de permisos hechos en el servidor no se
+                // reflejan en el dispositivo mientras existan transacciones locales pendientes.
+                HelperLogs.Log("GetDataDownload: refrescando TbMenuElement (permisos) en descarga suave", "Info");
+                await _repositoryTbMenuElement.PosMeDeleteAll();
+                await _repositoryTbMenuElement.PosMeInsertAll(apiResponse.ListMenuElement);
+
                 bool changeInItems                                                  = false;
                 List<Api_AppMobileApi_GetDataDownloadItemsResponse> objListItemNew  = new List<Api_AppMobileApi_GetDataDownloadItemsResponse>();
                 foreach (var item_ in apiResponse.ListItem)
