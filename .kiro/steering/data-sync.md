@@ -104,6 +104,22 @@ La ventana 8 de la factura (`08PrinterInvoicePage.xaml`) muestra un
 Mensajes en `Services/SystemNames/Mensajes.cs`: `MensajeSubiendoDatos`,
 `MensajeDescargandoDatos`.
 
+### Botón "Subir Datos" y confirmación (#6)
+
+- La acción de subir ya **no** está en la toolbar; es un `Button` dentro de la
+  página (`08PrinterInvoicePage.xaml`) con color propio (`#E67E22`, naranja) y
+  texto blanco, para diferenciarlo visualmente del resto.
+- El botón abre un popup de confirmación personalizado con estilo de marca
+  (`DXPopup` de DevExpress, `x:Name="ConfirmarSubidaPopup"`), **no** el
+  `DisplayAlert` nativo. El popup tiene bordes redondeados, ícono circular,
+  título en color `Primary`, mensaje y dos botones (Cancelar / Subir).
+- Flujo: el botón ejecuta `MostrarConfirmacionSubidaCommand` → abre el popup
+  (`MostrarConfirmacionSubida = true`). En el code-behind,
+  `CancelarSubida_Clicked` cierra el popup sin hacer nada;
+  `ConfirmarSubida_Clicked` cierra el popup y ejecuta `SubirCommand`.
+- `OnSubirCommand` ya **no** muestra diálogo propio; la confirmación es
+  responsabilidad del popup. Mantiene el guard de reentrada por `IsBusy`.
+
 ## Parámetros de servidor relevantes
 
 - `MOBILE_UPLOAD_AFTER_INVOICE` — habilita subida/descarga automática al cerrar

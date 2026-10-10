@@ -30,6 +30,18 @@ public partial class PrinterInvoicePage : ContentPage
         return true;
     }
 
+    private void CancelarSubida_Clicked(object? sender, EventArgs e)
+    {
+        ((PrinterInvoiceViewModel)BindingContext).MostrarConfirmacionSubida = false;
+    }
+
+    private void ConfirmarSubida_Clicked(object? sender, EventArgs e)
+    {
+        var vm = (PrinterInvoiceViewModel)BindingContext;
+        vm.MostrarConfirmacionSubida = false;
+        vm.SubirCommand.Execute(null);
+    }
+
     private async void MenuItem_OnClicked(object? sender, EventArgs e)
     {
         try

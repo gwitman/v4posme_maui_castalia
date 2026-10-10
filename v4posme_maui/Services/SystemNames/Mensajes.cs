@@ -19,6 +19,10 @@ public static class Mensajes
     public const string MensajeUploadSuccess = "Se han subido los datos de forma correcta al servidor.";
     public const string MensajeSubiendoDatos = "Subiendo datos, por favor espere...";
     public const string MensajeDescargandoDatos = "Descargando datos, por favor espere...";
+    public const string TituloConfirmarSubida = "Confirmar subida de datos";
+    public const string MensajeConfirmarSubida = "Se subirán los datos al servidor y luego se descargará la información actualizada. ¿Desea continuar?";
+    public const string BotonSubir = "Subir";
+    public const string BotonCancelar = "Cancelar";
     public const string MensajeParametrosGuardar = "Se han guardado los parametros de forma correcta";
     public const string MensajeDocumentCreditCustomerVacio = "No hay datos de facturación con el cliente seleccionado.";
     public const string MensajeDocumentCreditAmortizationVacio = "No hay datos de detalle para abono de factura con el documento seleccionado";

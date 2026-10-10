@@ -42,6 +42,7 @@ public class PrinterInvoiceViewModel : BaseViewModel
         AnularFacturaCommand = new Command(OnAnularFacturaCommand);
         EditFacturaCommand   = new Command(OnEditarFacturaCommand);
         SubirCommand         = new Command(OnSubirCommand);
+        MostrarConfirmacionSubidaCommand = new Command(() => MostrarConfirmacionSubida = true);
     }
 
     private async void OnEditarFacturaCommand()
@@ -266,6 +267,18 @@ public class PrinterInvoiceViewModel : BaseViewModel
         get => _loadingMessage;
         private set => SetProperty(ref _loadingMessage, value);
     }
+
+    private bool _mostrarConfirmacionSubida;
+
+    // Controla la visibilidad del popup de confirmacion de subida (DXPopup).
+    public bool MostrarConfirmacionSubida
+    {
+        get => _mostrarConfirmacionSubida;
+        set => SetProperty(ref _mostrarConfirmacionSubida, value);
+    }
+
+    // Abre el popup de confirmacion (lo invoca el boton "Subir Datos").
+    public Command MostrarConfirmacionSubidaCommand { get; }
 
     private TbTransactionMaster _transactionMaster;
 

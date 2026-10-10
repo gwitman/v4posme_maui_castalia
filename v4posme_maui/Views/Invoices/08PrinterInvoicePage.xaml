@@ -24,11 +24,11 @@
         <ToolbarItem IconImageSource="shared" Clicked="MenuItem_OnClicked" />
         <ToolbarItem Text="Imprimir" Order="Secondary" x:Name="ItemPrint" Command="{Binding PrintCommand}" />
         <ToolbarItem Text="Nueva Factura" Order="Secondary" Command="{Binding AplicarOtroCommand}" />
-        <ToolbarItem Text="Subir" Order="Secondary" Command="{Binding SubirCommand}" />
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
         <controls:ShimmerView Style="{StaticResource ShimmerEffect}" IsLoading="{Binding IsBusy}">
             <controls:ShimmerView.Content>
+                <Grid>
                 <ScrollView>
                     <VerticalStackLayout>
                     <dx:DXStackLayout
@@ -304,11 +304,78 @@
                             HorizontalOptions="Center"
                             Text="{Binding CompanyTelefono.Value}" />
 
+                        <Button Text="Subir Datos"
+                                Command="{Binding MostrarConfirmacionSubidaCommand}"
+                                BackgroundColor="#E67E22"
+                                TextColor="White"
+                                FontAttributes="Bold"
+                                CornerRadius="8"
+                                HeightRequest="48"
+                                Margin="20,20,20,10" />
 
                         
                     </dx:DXStackLayout>
                     </VerticalStackLayout>
                 </ScrollView>
+
+                <!-- Popup de confirmacion de subida (estilo de marca posMe) -->
+                <controls:DXPopup x:Name="ConfirmarSubidaPopup"
+                                  AllowScrim="True"
+                                  BackgroundColor="White"
+                                  VerticalAlignment="Center"
+                                  HorizontalAlignment="Center"
+                                  CornerRadius="20"
+                                  ScrimColor="#99000000"
+                                  IsOpen="{Binding MostrarConfirmacionSubida}">
+                    <dx:DXStackLayout WidthRequest="300"
+                                      Padding="24"
+                                      ItemSpacing="14">
+                        <dx:DXBorder HeightRequest="56"
+                                     WidthRequest="56"
+                                     CornerRadius="28"
+                                     HorizontalOptions="Center"
+                                     BackgroundColor="#FDF0E3">
+                            <Label Text="&#x2191;"
+                                   FontSize="28"
+                                   FontAttributes="Bold"
+                                   TextColor="#E67E22"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center" />
+                        </dx:DXBorder>
+                        <Label Text="Confirmar subida de datos"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource Primary}"
+                               HorizontalTextAlignment="Center" />
+                        <Label Text="Se subirán los datos al servidor y luego se descargará la información actualizada. ¿Desea continuar?"
+                               FontSize="14"
+                               TextColor="{StaticResource Gray600}"
+                               HorizontalTextAlignment="Center" />
+                        <Grid ColumnSpacing="12"
+                              Margin="0,6,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0"
+                                    Text="Cancelar"
+                                    Clicked="CancelarSubida_Clicked"
+                                    BackgroundColor="{StaticResource Gray200}"
+                                    TextColor="{StaticResource Gray900}"
+                                    CornerRadius="12"
+                                    HeightRequest="46" />
+                            <Button Grid.Column="1"
+                                    Text="Subir"
+                                    Clicked="ConfirmarSubida_Clicked"
+                                    BackgroundColor="#E67E22"
+                                    TextColor="White"
+                                    FontAttributes="Bold"
+                                    CornerRadius="12"
+                                    HeightRequest="46" />
+                        </Grid>
+                    </dx:DXStackLayout>
+                </controls:DXPopup>
+                </Grid>
             </controls:ShimmerView.Content>
             <controls:ShimmerView.LoadingView>
                 <VerticalStackLayout HorizontalOptions="Center"
