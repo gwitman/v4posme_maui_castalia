@@ -30,6 +30,7 @@ namespace v4posme_maui.ViewModels
 		private bool _remember;
 		
         private readonly RestApiCoreAcount _restServiceUser												= new();
+        private readonly RestApiAppMobileApi _restApiAppMobileApi										= new();
         private readonly IRepositoryParameters _repositoryParameters									= VariablesGlobales.UnityContainer.Resolve<IRepositoryParameters>();
         private readonly IRepositoryTbCustomer _repositoryTbCustomer									= VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCustomer>();
 		private readonly IRepositoryTbMenuElement _repositoryTbMenuElement								= VariablesGlobales.UnityContainer.Resolve<IRepositoryTbMenuElement>();
@@ -380,6 +381,15 @@ namespace v4posme_maui.ViewModels
                     VariablesGlobales.TbCompany = await _repositoryTbCompany.PosMeFindFirst();
                 }
 
+
+				//Si tras el login el contador de transacciones queda en 0,
+				//descargar datos inmediatamente (descarga dura). Si hay movimientos
+				//locales pendientes (contador != 0) no se descarga para no perderlos.
+				var counterLogin = await helperCore.GetCounter();
+				if (counterLogin == 0 && Connectivity.Current.NetworkAccess != NetworkAccess.None)
+				{
+					await _restApiAppMobileApi.GetDataDownload(false);
+				}
 
 				App.StartGpsService();
 				Current!.MainPage			= new MainPage();

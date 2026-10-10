@@ -65,8 +65,8 @@ decisiones:
 
 | # | Lugar | Archivo | Sube | Descarga | Notas |
 |---|-------|---------|------|----------|-------|
-| 1 | Login **sin** recordar | `ViewModels/PosMeZMasterLoginViewModel.cs` (`OnLoginClicked`, `Remember == false`) | No | No | Solo valida credenciales contra SQLite local. No hay red para datos. |
-| 2 | Login **con** recordar | `ViewModels/PosMeZMasterLoginViewModel.cs` (`OnLoginClicked`, `Remember == true`) | No | No | Llama `LoginMobile` (auth). Si el usuario es distinto y contador == 0, borra todo lo local y reinicia contador. **No** descarga automáticamente. |
+| 1 | Login **sin** recordar | `ViewModels/PosMeZMasterLoginViewModel.cs` (`OnLoginClicked`, `Remember == false`) | No | Sí (condicional) | Valida credenciales contra SQLite local. Tras autenticar, si contador == 0 y hay red → `GetDataDownload(false)` (descarga inmediata). |
+| 2 | Login **con** recordar | `ViewModels/PosMeZMasterLoginViewModel.cs` (`OnLoginClicked`, `Remember == true`) | No | Sí (condicional) | Llama `LoginMobile` (auth). Si el usuario es distinto y contador == 0, borra todo lo local y reinicia contador. Tras autenticar, si contador == 0 y hay red → `GetDataDownload(false)` (descarga inmediata). |
 | 3 | Menú → Descargar datos | `ViewModels/PosMeDownloadViewModel.cs` (`OnDownloadClicked`) | No | Sí | contador ≠ 0 → `GetDataDownload(true)`; contador == 0 → `GetDataDownload(false)`. Requiere switch activo + red. |
 | 4 | Menú → Subir datos | `ViewModels/Upload/UploadViewModel.cs` (`OnUploadCommand`) | Sí | No | contador == 0 → no sube. Si ok, borra items/clientes/transacciones locales y `ZeroCounter`. Requiere switch activo + red. |
 | 5 | Cambio de compañía (AboutPage) | `ViewModels/AboutViewModel.cs` (`CambiarCompania`) | No | Sí | Combo solo habilitado si contador == 0. Cambia `CompanyKey` → `LoginMobile` → `GetDataDownload(false)`. Si falla, revierte `CompanyKey` y usuario. |
@@ -75,9 +75,18 @@ decisiones:
 ## Resumen por dirección
 
 - **Suben datos:** Menú Upload (#4), fin de factura condicional (#6).
-- **Descargan datos:** Menú Download (#3), cambio de compañía (#5), fin de
-  factura condicional (#6).
-- **Solo autentican (sin sincronizar):** Login con/sin recordar (#1, #2).
+- **Descargan datos:** Login con/sin recordar si contador == 0 (#1, #2), Menú
+  Download (#3), cambio de compañía (#5), fin de factura condicional (#6).
+
+## Descarga automática tras login (#1, #2)
+
+Al finalizar cualquier login (con o sin recordar), antes de iniciar el servicio
+GPS y navegar al `MainPage`, se consulta el contador de transacciones:
+
+- **contador == 0 y hay red** → `GetDataDownload(false)` (descarga dura
+  inmediata), para que el usuario entre con los datos frescos del servidor.
+- **contador != 0** → no se descarga, para no perder los movimientos locales
+  pendientes de subir.
 
 ## Parámetros de servidor relevantes
 
