@@ -42,6 +42,14 @@ public partial class PrinterInvoicePage : ContentPage
         vm.SubirCommand.Execute(null);
     }
 
+    private void CerrarResultado_Clicked(object? sender, EventArgs e)
+    {
+        var vm = (PrinterInvoiceViewModel)BindingContext;
+        vm.MostrarResultado = false;
+        // Al cerrar el aviso de resultado, reiniciar el flujo hacia la pagina 1.
+        vm.AplicarOtroCommand.Execute(null);
+    }
+
     private async void MenuItem_OnClicked(object? sender, EventArgs e)
     {
         try

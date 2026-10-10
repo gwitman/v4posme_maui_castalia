@@ -70,7 +70,7 @@ decisiones:
 | 3 | Menú → Descargar datos | `ViewModels/PosMeDownloadViewModel.cs` (`OnDownloadClicked`) | No | Sí | contador ≠ 0 → `GetDataDownload(true)`; contador == 0 → `GetDataDownload(false)`. Requiere switch activo + red. |
 | 4 | Menú → Subir datos | `ViewModels/Upload/UploadViewModel.cs` (`OnUploadCommand`) | Sí | No | contador == 0 → no sube. Si ok, borra items/clientes/transacciones locales y `ZeroCounter`. Requiere switch activo + red. |
 | 5 | Cambio de compañía (AboutPage) | `ViewModels/AboutViewModel.cs` (`CambiarCompania`) | No | Sí | Combo solo habilitado si contador == 0. Cambia `CompanyKey` → `LoginMobile` → `GetDataDownload(false)`. Si falla, revierte `CompanyKey` y usuario. |
-| 6 | Fin de factura (subida opcional) | `ViewModels/Invoices/08PrinterInvoiceViewModel.cs` (`OnSubirCommand`) | Sí | Sí (solo si la subida fue exitosa) | Solo si parámetro `MOBILE_UPLOAD_AFTER_INVOICE == true`. `SendDataAsync` → **si subida OK**: borra locales + `ZeroCounter` → luego `GetDataDownload(true/false)` según contador. **Si la subida falla (error o respuesta nula): NO se descarga.** Muestra indicador de espera (`ShimmerView` + `ActivityIndicator` + `LoadingMessage`) ligado a `IsBusy`, y bloquea reentrada mientras corre. |
+| 6 | Fin de factura (subida opcional) | `ViewModels/Invoices/08PrinterInvoiceViewModel.cs` (`OnSubirCommand`) | Sí | Sí (solo si la subida fue exitosa) | Solo si parámetro `MOBILE_UPLOAD_AFTER_INVOICE == true`. `SendDataAsync` → **si subida OK**: borra locales + `ZeroCounter` → luego `GetDataDownload(true/false)` según contador. **Si la subida falla (error o respuesta nula): NO se descarga.** **Si el parámetro está en `false` o no existe: no sube nada y muestra un `DisplayAlert` bloqueante (`TituloUploadNoAutomatico` / `MensajeUploadNoAutomatico`) avisando que debe subir los datos de forma manual, antes de navegar fuera.** Muestra indicador de espera (`ShimmerView` + `ActivityIndicator` + `LoadingMessage`) ligado a `IsBusy`, y bloquea reentrada mientras corre. |
 
 ## Resumen por dirección
 
@@ -119,6 +119,24 @@ Mensajes en `Services/SystemNames/Mensajes.cs`: `MensajeSubiendoDatos`,
   `ConfirmarSubida_Clicked` cierra el popup y ejecuta `SubirCommand`.
 - `OnSubirCommand` ya **no** muestra diálogo propio; la confirmación es
   responsabilidad del popup. Mantiene el guard de reentrada por `IsBusy`.
+
+### Popup de resultado con estilo (#6)
+
+- Todos los avisos de resultado (éxito de subida/descarga, error de subida, y el
+  aviso de "subida no automática" cuando el parámetro está en `false`/no existe)
+  se muestran con un `DXPopup` personalizado (`x:Name="ResultadoPopup"`) con
+  estilo de marca: ícono circular con color de acento, título en `Primary`,
+  mensaje y botón "Aceptar".
+- Propiedades en el VM: `MostrarResultado`, `ResultadoTitulo`,
+  `ResultadoMensaje`, `ResultadoIcono`, `ResultadoColor` y `ResultadoColorSuave`
+  (fondo claro del ícono). El helper `MostrarResultadoPopup(...)` las setea.
+  Íconos: éxito `✓` (verde), error `✕` (rojo), aviso `!` (naranja `#E67E22`).
+- La navegación a la página 1 (`AplicarOtroCommand`) ocurre **al cerrar** el
+  popup de resultado (`CerrarResultado_Clicked`), no antes, para que el usuario
+  alcance a verlo. Si el parámetro está activo pero no se muestra popup, el
+  cierre controla la navegación.
+- Títulos/mensajes en `Mensajes.cs`: `TituloUploadSuccess`, `TituloUploadError`,
+  `TituloUploadNoAutomatico`, `MensajeUploadNoAutomatico`, etc.
 
 ## Parámetros de servidor relevantes
 

@@ -220,15 +220,12 @@ public class PrinterInvoiceViewModel : BaseViewModel
                 if (apiResponse.Error)
                 {
                     // La subida fallo: NO se descarga.
-                    ShowMensajePopUp($"{Mensajes.MensajeUploadError} {apiResponse.Message}", Colors.Red);
+                    MostrarResultadoPopup(Mensajes.TituloUploadError, $"{Mensajes.MensajeUploadError} {apiResponse.Message}", Colors.Red, IconoError);
                 }
                 else
                 {
                     // Subida exitosa: limpiar local, reiniciar contador y recien
                     // entonces proceder con la descarga.
-                    Mensaje              = Mensajes.MensajeUploadSuccess;
-                    PopupBackgroundColor = Colors.Green;
-                    PopUpShow            = true;
                     await _repositoryItems.PosMeDeleteAll();
                     await _repositoryTbCustomer.PosMeDeleteAll();
                     await _repositoryTbTransactionMaster.PosMeDeleteAll();
@@ -242,21 +239,33 @@ public class PrinterInvoiceViewModel : BaseViewModel
                         await _restApiDownload.GetDataDownload(true);
                     else
                         await _restApiDownload.GetDataDownload(false);
+
+                    MostrarResultadoPopup(Mensajes.TituloUploadSuccess, Mensajes.MensajeUploadSuccess, Colors.Green, IconoExito);
                 }
             }
             else
             {
                 // Respuesta nula: la subida fallo, NO se descarga.
-                ShowMensajePopUp(Mensajes.MensajeUploadError, Colors.Red);
+                MostrarResultadoPopup(Mensajes.TituloUploadError, Mensajes.MensajeUploadError, Colors.Red, IconoError);
             }
 
             LoadingMessage = string.Empty;
             IsBusy = false;
+            // La navegacion a la pagina 1 ocurre al cerrar el popup de resultado
+            // (CerrarResultado_Clicked), para que el usuario alcance a verlo.
         }
-
-        // Navegar a página 1 (selección de cliente)
-        OnAplicarOtroCommand();
+        else
+        {
+            // Parametro desactivado o inexistente: no se sube nada automaticamente.
+            // Avisar con popup de marca; la navegacion ocurre al cerrarlo.
+            MostrarResultadoPopup(Mensajes.TituloUploadNoAutomatico, Mensajes.MensajeUploadNoAutomatico, Color.FromArgb("#E67E22"), IconoAviso);
+        }
     }
+
+    // Iconos (simbolos unicode) usados en el popup de resultado.
+    private const string IconoExito = "\u2713"; // check
+    private const string IconoError = "\u2715"; // x
+    private const string IconoAviso = "!";
 
     private string _loadingMessage = string.Empty;
 
@@ -279,6 +288,71 @@ public class PrinterInvoiceViewModel : BaseViewModel
 
     // Abre el popup de confirmacion (lo invoca el boton "Subir Datos").
     public Command MostrarConfirmacionSubidaCommand { get; }
+
+    // ===== Popup de resultado (exito / error / aviso) con estilo de marca =====
+
+    private bool _mostrarResultado;
+
+    public bool MostrarResultado
+    {
+        get => _mostrarResultado;
+        set => SetProperty(ref _mostrarResultado, value);
+    }
+
+    private string _resultadoTitulo = string.Empty;
+
+    public string ResultadoTitulo
+    {
+        get => _resultadoTitulo;
+        private set => SetProperty(ref _resultadoTitulo, value);
+    }
+
+    private string _resultadoMensaje = string.Empty;
+
+    public string ResultadoMensaje
+    {
+        get => _resultadoMensaje;
+        private set => SetProperty(ref _resultadoMensaje, value);
+    }
+
+    private string _resultadoIcono = string.Empty;
+
+    public string ResultadoIcono
+    {
+        get => _resultadoIcono;
+        private set => SetProperty(ref _resultadoIcono, value);
+    }
+
+    private Color _resultadoColor = Colors.Green;
+
+    // Color de acento (icono y boton Aceptar).
+    public Color ResultadoColor
+    {
+        get => _resultadoColor;
+        private set
+        {
+            if (SetProperty(ref _resultadoColor, value))
+            {
+                OnPropertyChanged(nameof(ResultadoColorSuave));
+            }
+        }
+    }
+
+    // Version clara del color de acento para el fondo del circulo del icono.
+    public Color ResultadoColorSuave => _resultadoColor.WithAlpha(0.15f);
+
+    // Muestra el popup de resultado con estilo de marca.
+    private void MostrarResultadoPopup(string titulo, string mensaje, Color color, string icono)
+    {
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            ResultadoTitulo  = titulo;
+            ResultadoMensaje = mensaje;
+            ResultadoColor   = color;
+            ResultadoIcono   = icono;
+            MostrarResultado = true;
+        });
+    }
 
     private TbTransactionMaster _transactionMaster;
 

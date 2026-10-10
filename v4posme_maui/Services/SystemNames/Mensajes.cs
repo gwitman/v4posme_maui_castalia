@@ -19,6 +19,11 @@ public static class Mensajes
     public const string MensajeUploadSuccess = "Se han subido los datos de forma correcta al servidor.";
     public const string MensajeSubiendoDatos = "Subiendo datos, por favor espere...";
     public const string MensajeDescargandoDatos = "Descargando datos, por favor espere...";
+    public const string MensajeUploadNoAutomatico = "No se pueden subir los datos. Debe subir los datos de forma manual.";
+    public const string TituloUploadNoAutomatico = "Subida de datos";
+    public const string TituloUploadSuccess = "Operación exitosa";
+    public const string TituloUploadError = "Error al subir";
+    public const string BotonAceptar = "Aceptar";
     public const string TituloConfirmarSubida = "Confirmar subida de datos";
     public const string MensajeConfirmarSubida = "Se subirán los datos al servidor y luego se descargará la información actualizada. ¿Desea continuar?";
     public const string BotonSubir = "Subir";

@@ -375,6 +375,50 @@
                         </Grid>
                     </dx:DXStackLayout>
                 </controls:DXPopup>
+
+                <!-- Popup de resultado (exito / error / aviso) con estilo de marca -->
+                <controls:DXPopup x:Name="ResultadoPopup"
+                                  AllowScrim="True"
+                                  BackgroundColor="White"
+                                  VerticalAlignment="Center"
+                                  HorizontalAlignment="Center"
+                                  CornerRadius="20"
+                                  ScrimColor="#99000000"
+                                  IsOpen="{Binding MostrarResultado}">
+                    <dx:DXStackLayout WidthRequest="300"
+                                      Padding="24"
+                                      ItemSpacing="14">
+                        <dx:DXBorder HeightRequest="56"
+                                     WidthRequest="56"
+                                     CornerRadius="28"
+                                     HorizontalOptions="Center"
+                                     BackgroundColor="{Binding ResultadoColorSuave}">
+                            <Label Text="{Binding ResultadoIcono}"
+                                   FontSize="28"
+                                   FontAttributes="Bold"
+                                   TextColor="{Binding ResultadoColor}"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center" />
+                        </dx:DXBorder>
+                        <Label Text="{Binding ResultadoTitulo}"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource Primary}"
+                               HorizontalTextAlignment="Center" />
+                        <Label Text="{Binding ResultadoMensaje}"
+                               FontSize="14"
+                               TextColor="{StaticResource Gray600}"
+                               HorizontalTextAlignment="Center" />
+                        <Button Text="Aceptar"
+                                Clicked="CerrarResultado_Clicked"
+                                BackgroundColor="{Binding ResultadoColor}"
+                                TextColor="White"
+                                FontAttributes="Bold"
+                                CornerRadius="12"
+                                HeightRequest="46"
+                                Margin="0,6,0,0" />
+                    </dx:DXStackLayout>
+                </controls:DXPopup>
                 </Grid>
             </controls:ShimmerView.Content>
             <controls:ShimmerView.LoadingView>
