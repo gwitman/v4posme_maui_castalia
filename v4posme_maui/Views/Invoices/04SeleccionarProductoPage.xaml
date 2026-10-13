@@ -61,7 +61,6 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="44" />
-                                <ColumnDefinition Width="44" />
                             </Grid.ColumnDefinitions>
                             <dxe:TextEdit
                                 Grid.Column="0"
@@ -69,16 +68,10 @@
                                 PlaceholderText="Buscar producto..."
                                 ReturnType="Search"
                                 ReturnCommand="{Binding SearchCommand}"
+                                EndIconCommand="{Binding SearchCommand}"
                                 Text="{Binding Search}" />
                             <dx:DXButton
                                 Grid.Column="1"
-                                Style="{StaticResource SinFondoColorRedondeado}"
-                                IconHeight="24"
-                                IconWidth="24"
-                                Command="{Binding SearchCommand}"
-                                Icon="search" />
-                            <dx:DXButton
-                                Grid.Column="2"
                                 Style="{StaticResource SinFondoColorRedondeado}"
                                 IconHeight="24"
                                 IconWidth="24"
@@ -256,42 +249,6 @@
                             </Grid>
                         </dx:DXBorder>
                     </Grid>
-
-                    <!-- Popup de búsqueda -->
-                    <ContentView IsVisible="{Binding IsPanelVisible}"
-                                 BackgroundColor="#80000000"
-                                 AbsoluteLayout.LayoutFlags="All"
-                                 AbsoluteLayout.LayoutBounds="0, 0, 1, 1">
-                        <dx:DXBorder
-                            VerticalOptions="Center"
-                            HorizontalOptions="Center"
-                            WidthRequest="300"
-                            Padding="24"
-                            BackgroundColor="{StaticResource White}"
-                            CornerRadius="16"
-                            BorderThickness="0">
-                            <dx:DXBorder.Shadow>
-                                <Shadow Brush="{StaticResource Gray600Brush}"
-                                        Offset="0,4"
-                                        Radius="16"
-                                        Opacity="0.3" />
-                            </dx:DXBorder.Shadow>
-                            <StackLayout Spacing="16">
-                                <Label Text="Buscar producto"
-                                       FontAttributes="Bold"
-                                       FontSize="18"
-                                       TextColor="{StaticResource PrimaryDark}"
-                                       HorizontalOptions="Center" />
-                                <dxe:TextEdit
-                                    PlaceholderText="Nombre, código o barcode..."
-                                    Text="{Binding Search}" />
-                                <dx:DXButton
-                                    Content="Buscar"
-                                    CornerRadius="10"
-                                    Command="{Binding SearchCommand}" />
-                            </StackLayout>
-                        </dx:DXBorder>
-                    </ContentView>
 
                     <!-- Popup de detalle: cantidad y precio antes de agregar el producto -->
                     <ContentView IsVisible="{Binding DetalleVisible}"

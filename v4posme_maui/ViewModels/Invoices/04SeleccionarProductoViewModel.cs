@@ -156,15 +156,10 @@ public class SeleccionarProductoViewModel : BaseViewModel
 
     private async void OnSearch()
     {
-        // La lupa y el Enter del teclado ejecutan la busqueda directamente,
-        // sin abrir el popup. Si el popup estaba abierto se cierra.
-        IsPanelVisible = false;
-
-        if (string.IsNullOrWhiteSpace(Search))
-        {
-            return;
-        }
-
+        // La lupa y el Enter del teclado ejecutan la busqueda directamente.
+        // Si el texto de busqueda esta vacio se muestran todos los productos;
+        // de lo contrario se filtra por el texto ingresado (LoadAllProductosAsync
+        // ya contempla ambos casos segun el valor de Search).
         await LoadAllProductosAsync();
     }
 
