@@ -221,7 +221,7 @@
                             IsVisible="{Binding EsVistaRestaurante}"
                             ItemsSource="{Binding Productos}"
                             Orientation="Vertical"
-                            ItemSpanCount="2"
+                            ItemSpanCount="{Binding ColumnasRestaurante}"
                             ItemSeparatorThickness="0">
                             <dxcv:DXCollectionView.ItemTemplate>
                                 <DataTemplate>

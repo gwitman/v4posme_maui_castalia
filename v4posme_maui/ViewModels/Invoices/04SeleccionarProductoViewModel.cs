@@ -321,6 +321,14 @@ public class SeleccionarProductoViewModel : BaseViewModel
         var formShowInvoice = await _helper.GetValueParameterTrim("APP_MOBILE_FORM_SHOW_INVOICE", "default");
         EsVistaRestaurante  = string.Equals(formShowInvoice?.Trim(), "restaurant", StringComparison.OrdinalIgnoreCase);
 
+        // Cantidad de columnas de la vista restaurante. Parametro de servidor
+        // APP_MOBILE_FORM_SHOW_INVOICE_COLUMN (por defecto "2"). Se valida que sea un
+        // numero >= 1; cualquier valor invalido o fuera de rango cae a 2 columnas.
+        var columnasValor = await _helper.GetValueParameterTrim("APP_MOBILE_FORM_SHOW_INVOICE_COLUMN", "2");
+        ColumnasRestaurante = int.TryParse(columnasValor?.Trim(), out var columnas) && columnas >= 1
+            ? columnas
+            : 2;
+
         // Al llegar a la pantalla de seleccion de producto (4/6) finaliza el avance del
         // modo edicion. A partir de aqui el flujo opera como facturacion rapida: el menu
         // desplegable navega a 2/6 y 3/6, y esas pantallas regresan mediante pop.
@@ -379,6 +387,15 @@ public class SeleccionarProductoViewModel : BaseViewModel
 
     // Inverso de EsVistaRestaurante, para enlazar la visibilidad de la vista clasica.
     public bool EsVistaClasica => !_esVistaRestaurante;
+
+    // Cantidad de columnas de la vista restaurante (parametro APP_MOBILE_FORM_SHOW_INVOICE_COLUMN).
+    // Por defecto 2. Se enlaza al ItemSpanCount del DXCollectionView de tarjetas.
+    private int _columnasRestaurante = 2;
+    public int ColumnasRestaurante
+    {
+        get => _columnasRestaurante;
+        set => SetProperty(ref _columnasRestaurante, value);
+    }
 
     private string _productosSeleccionadosCantidadTotal = "Items";
     public string ProductosSeleccionadosCantidadTotal
