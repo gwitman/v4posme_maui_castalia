@@ -202,6 +202,29 @@ public class HelperCore(
         return valueDefault;
     }
 
+    // Variante tolerante a espacios en el nombre del parametro: busca por nombre y, si
+    // no encuentra, intenta nuevamente comparando los nombres sin espacios al inicio/fin.
+    // Util cuando el catalogo del servidor trae nombres con espacios sobrantes.
+    public async Task<string> GetValueParameterTrim(string name, string valueDefault)
+    {
+        var buscado = name?.Trim() ?? string.Empty;
+
+        var parametro = await _repositoryParametersWeb.PosMeFindByKey(buscado);
+        if (parametro is null)
+        {
+            var todos = await _repositoryParametersWeb.PosMeFindAll();
+            parametro = todos.FirstOrDefault(p =>
+                string.Equals(p.Name?.Trim(), buscado, StringComparison.OrdinalIgnoreCase));
+        }
+
+        if (parametro is not null && !string.IsNullOrEmpty(parametro.Value))
+        {
+            return parametro.Value;
+        }
+
+        return valueDefault;
+    }
+
     public async Task<string> GetCodigoFactura()
     {
         var find    = await repositoryParameters.PosMeFindCodigoFactura();

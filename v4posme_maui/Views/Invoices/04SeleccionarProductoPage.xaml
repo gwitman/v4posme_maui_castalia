@@ -39,6 +39,7 @@
     </ContentPage.ToolbarItems>
     <ContentPage.Resources>
         <converters:ToLowerConverter x:Key="ToLowerConverter" />
+        <converters:ItemImageConverter x:Key="ItemImageConverter" />
     </ContentPage.Resources>
     <ContentPage.Content>
         <dxc:ShimmerView Style="{StaticResource ShimmerEffect}"
@@ -79,10 +80,12 @@
                                 Icon="barcode_scaner" />
                         </Grid>
 
-                        <!-- Lista de productos -->
+                        <!-- Lista de productos (vista clasica, una columna). Se muestra cuando
+                             APP_MOBILE_FORM_SHOW_INVOICE no es "restaurant". -->
                         <dxcv:DXCollectionView
                             Grid.Row="1"
                             x:Name="ProductosCollectionView"
+                            IsVisible="{Binding EsVistaClasica}"
                             ItemsSource="{Binding Productos}"
                             ItemSeparatorThickness="0">
                             <dxcv:DXCollectionView.ItemTemplate>
@@ -204,6 +207,127 @@
                                             </Grid>
                                         </dx:DXBorder>
                                     </SwipeView>
+                                </DataTemplate>
+                            </dxcv:DXCollectionView.ItemTemplate>
+                        </dxcv:DXCollectionView>
+
+                        <!-- Lista de productos (vista restaurante, dos columnas de tarjetas con
+                             imagen). Se muestra cuando APP_MOBILE_FORM_SHOW_INVOICE == "restaurant".
+                             Reutiliza los mismos comandos (AnadirProducto, QuitarProductoCommand,
+                             DetalleProductoCommand) para no cambiar la funcionalidad. -->
+                        <dxcv:DXCollectionView
+                            Grid.Row="1"
+                            x:Name="ProductosRestauranteView"
+                            IsVisible="{Binding EsVistaRestaurante}"
+                            ItemsSource="{Binding Productos}"
+                            Orientation="Vertical"
+                            ItemSpanCount="2"
+                            ItemSeparatorThickness="0">
+                            <dxcv:DXCollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <dx:DXBorder
+                                        Margin="8,8"
+                                        Padding="0"
+                                        CornerRadius="16"
+                                        BorderThickness="0"
+                                        BackgroundColor="{StaticResource White}">
+                                        <dx:DXBorder.Shadow>
+                                            <Shadow Brush="{StaticResource Gray300Brush}"
+                                                    Offset="0,2"
+                                                    Radius="8"
+                                                    Opacity="0.35" />
+                                        </dx:DXBorder.Shadow>
+                                        <dx:DXBorder.GestureRecognizers>
+                                            <TapGestureRecognizer
+                                                Command="{Binding BindingContext.AnadirProducto, Source={x:Reference ProductosRestauranteView}}"
+                                                CommandParameter="{Binding .}" />
+                                        </dx:DXBorder.GestureRecognizers>
+                                        <Grid RowSpacing="0">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="120" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+
+                                            <!-- Imagen del producto (desde el servidor).
+                                                 Mientras carga o si falla, se ve la imagen por defecto
+                                                 que esta debajo (icono de producto). -->
+                                            <dx:DXBorder
+                                                Grid.Row="0"
+                                                CornerRadius="16,16,0,0"
+                                                BorderThickness="0"
+                                                BackgroundColor="{StaticResource PageBackground}"
+                                                IsClippedToBounds="True">
+                                                <Grid>
+                                                    <!-- Imagen por defecto (icono) de fondo -->
+                                                    <dx:DXImage
+                                                        Source="product_item"
+                                                        WidthRequest="48"
+                                                        HeightRequest="48"
+                                                        TintColor="{StaticResource Primary}"
+                                                        HorizontalOptions="Center"
+                                                        VerticalOptions="Center" />
+                                                    <!-- Imagen real del producto; si el converter devuelve
+                                                         null queda transparente y se ve el icono de fondo. -->
+                                                    <Image
+                                                        Aspect="AspectFill"
+                                                        Source="{Binding ItemId, Converter={StaticResource ItemImageConverter}}" />
+                                                </Grid>
+                                            </dx:DXBorder>
+
+                                            <!-- Boton de detalle (editar cantidad/precio) sobre la imagen -->
+                                            <dx:DXBorder
+                                                Grid.Row="0"
+                                                WidthRequest="34"
+                                                HeightRequest="34"
+                                                CornerRadius="17"
+                                                BorderThickness="0"
+                                                BackgroundColor="#E6FFFFFF"
+                                                Margin="0,8,8,0"
+                                                HorizontalOptions="End"
+                                                VerticalOptions="Start">
+                                                <dx:DXButton
+                                                    Style="{StaticResource SinFondoColorRedondeado}"
+                                                    IconHeight="18"
+                                                    IconWidth="18"
+                                                    Icon="edit"
+                                                    HorizontalOptions="Center"
+                                                    VerticalOptions="Center"
+                                                    Command="{Binding BindingContext.DetalleProductoCommand, Source={x:Reference ProductosRestauranteView}}"
+                                                    CommandParameter="{Binding .}" />
+                                            </dx:DXBorder>
+
+                                            <!-- Datos del producto -->
+                                            <StackLayout Grid.Row="1"
+                                                         Padding="12,10"
+                                                         Spacing="4">
+                                                <Label
+                                                    Text="{Binding Name, Converter={StaticResource ToLowerConverter}}"
+                                                    FontSize="14"
+                                                    FontFamily="OpenSansRegular"
+                                                    LineBreakMode="TailTruncation"
+                                                    MaxLines="2" />
+                                                <Label
+                                                    Text="{Binding ItemNumber}"
+                                                    FontSize="11"
+                                                    TextColor="{StaticResource Gray400}" />
+                                                <Label
+                                                    FontSize="16"
+                                                    FontAttributes="Bold"
+                                                    TextColor="{StaticResource Primary}">
+                                                    <Label.FormattedText>
+                                                        <FormattedString>
+                                                            <Span Text="{Binding MonedaSimbolo}"
+                                                                  FontSize="12"
+                                                                  FontAttributes="None"
+                                                                  TextColor="{StaticResource Gray400}" />
+                                                            <Span Text=" " />
+                                                            <Span Text="{Binding PrecioPublico, StringFormat='{0:N2}'}" />
+                                                        </FormattedString>
+                                                    </Label.FormattedText>
+                                                </Label>
+                                            </StackLayout>
+                                        </Grid>
+                                    </dx:DXBorder>
                                 </DataTemplate>
                             </dxcv:DXCollectionView.ItemTemplate>
                         </dxcv:DXCollectionView>

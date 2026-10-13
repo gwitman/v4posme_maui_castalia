@@ -313,6 +313,14 @@ public class SeleccionarProductoViewModel : BaseViewModel
     {
         Navigation = navigation;
 
+        // Parametro de servidor APP_MOBILE_FORM_SHOW_INVOICE: controla el diseno de la
+        // lista de productos. Por defecto ("default") se usa la lista clasica de una
+        // columna. Si el valor es "restaurant" se muestra una vista tipo restaurante:
+        // dos columnas de tarjetas con la imagen de cada producto. Toda la funcionalidad
+        // (agregar, quitar, detalle, buscar) es identica en ambos disenos.
+        var formShowInvoice = await _helper.GetValueParameterTrim("APP_MOBILE_FORM_SHOW_INVOICE", "default");
+        EsVistaRestaurante  = string.Equals(formShowInvoice?.Trim(), "restaurant", StringComparison.OrdinalIgnoreCase);
+
         // Al llegar a la pantalla de seleccion de producto (4/6) finaliza el avance del
         // modo edicion. A partir de aqui el flujo opera como facturacion rapida: el menu
         // desplegable navega a 2/6 y 3/6, y esas pantallas regresan mediante pop.
@@ -352,6 +360,25 @@ public class SeleccionarProductoViewModel : BaseViewModel
     }
 
     public DXObservableCollection<Api_AppMobileApi_GetDataDownloadItemsResponse> Productos { get; }
+
+    // Diseno de la lista de productos segun el parametro APP_MOBILE_FORM_SHOW_INVOICE.
+    // true  => vista tipo "restaurante" (dos columnas de tarjetas con imagen).
+    // false => vista clasica de una columna (por defecto).
+    private bool _esVistaRestaurante;
+    public bool EsVistaRestaurante
+    {
+        get => _esVistaRestaurante;
+        set
+        {
+            if (SetProperty(ref _esVistaRestaurante, value))
+            {
+                OnPropertyChanged(nameof(EsVistaClasica));
+            }
+        }
+    }
+
+    // Inverso de EsVistaRestaurante, para enlazar la visibilidad de la vista clasica.
+    public bool EsVistaClasica => !_esVistaRestaurante;
 
     private string _productosSeleccionadosCantidadTotal = "Items";
     public string ProductosSeleccionadosCantidadTotal
