@@ -296,7 +296,7 @@ public class DashboardPrinterViewModel : BaseViewModel
             VariablesGlobales.DtoInvoice.Currency           = new DtoCatalogItem((int)VariablesGlobales.DtoInvoice.TransactionMaster.CurrencyId, VariablesGlobales.DtoInvoice.TransactionMaster.CurrencyId.ToString(), VariablesGlobales.DtoInvoice.TransactionMaster.CurrencyId.ToString());
             VariablesGlobales.DtoInvoice.TipoDocumento      = new DtoCatalogItem((int)VariablesGlobales.DtoInvoice.TransactionMaster.TransactionCausalId, VariablesGlobales.DtoInvoice.TransactionMaster.TransactionCausalId.ToString(), VariablesGlobales.DtoInvoice.TransactionMaster.TransactionCausalId.ToString());
             VariablesGlobales.DtoInvoice.PeriodPay          = new DtoCatalogItem((int)VariablesGlobales.DtoInvoice.TransactionMaster.PeriodPay, VariablesGlobales.DtoInvoice.TransactionMaster.PeriodPay.ToString(), VariablesGlobales.DtoInvoice.TransactionMaster.PeriodPay.ToString());
-            VariablesGlobales.DtoInvoice.Mesa               = new DtoCatalogItem((int)VariablesGlobales.DtoInvoice.TransactionMaster.MesaID, VariablesGlobales.DtoInvoice.TransactionMaster.MesaID.ToString(), VariablesGlobales.DtoInvoice.TransactionMaster.MesaID.ToString());
+            VariablesGlobales.DtoInvoice.Mesa               = new DtoCatalogItem((int)VariablesGlobales.DtoInvoice.TransactionMaster.MesaID, VariablesGlobales.DtoInvoice.TransactionMaster.MesaName, VariablesGlobales.DtoInvoice.TransactionMaster.MesaName);
             VariablesGlobales.DtoInvoice.Balance            = VariablesGlobales.DtoInvoice.TransactionMaster.SubAmount - VariablesGlobales.DtoInvoice.TransactionMaster.Discount;
             VariablesGlobales.DtoInvoice.ClearItems();
 
