@@ -125,6 +125,15 @@ public class SeleccionarProductoViewModel : BaseViewModel
 
     private async void OnRevisarProductos(object obj)
     {
+        // No se permite avanzar si no se ha seleccionado un cliente
+        // (EntityId debe ser mayor que 0).
+        var entityId = VariablesGlobales.DtoInvoice.CustomerResponse?.EntityId ?? 0;
+        if (entityId <= 0)
+        {
+            ShowToast(Mensajes.MensajeSeleccionarCliente, ToastDuration.Long, 12);
+            return;
+        }
+
         if (VariablesGlobales.DtoInvoice.Items.Count <= 0)
         {
             ShowToast(Mensajes.MensajeSeleccionarProductos, ToastDuration.Long, 12);

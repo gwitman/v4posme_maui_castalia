@@ -24,7 +24,10 @@ public static class PrinterInvoiceFormatHelper
         string printerQRUrl,
         string printerReferencia,
         string userNickname,
-        HelperCore helperCore)
+        HelperCore helperCore,
+        bool mostrarZona = false,
+        string nombreZona = "",
+        string etiquetaZona = "Zona")
     {
         if (!string.IsNullOrWhiteSpace(logo.Value))
         {
@@ -53,6 +56,11 @@ public static class PrinterInvoiceFormatHelper
                              """;
         printer.NewLine();
         printer.Append(detalleHeader);
+        // En modo restaurante se imprime la zona (mesa) con el rótulo configurable.
+        if (mostrarZona && !string.IsNullOrWhiteSpace(nombreZona))
+        {
+            printer.Append($"{etiquetaZona.ToUpper().PadRight(13)}:{nombreZona}");
+        }
         printer.NewLine();
 
         bool showReferencia = printerReferencia.Trim().Equals("true", StringComparison.OrdinalIgnoreCase);
@@ -114,7 +122,10 @@ public static class PrinterInvoiceFormatHelper
         string printerQRUrl,
         string printerReferencia,
         string userNickname,
-        HelperCore helperCore)
+        HelperCore helperCore,
+        bool mostrarZona = false,
+        string nombreZona = "",
+        string etiquetaZona = "Zona")
     {
         string ocultarRucRaw = await helperCore.GetValueParameter("MOBILE_IN_PRINTER_INVOICE_OCULTAR_RUC", "false");
         bool ocultarRuc      = ocultarRucRaw.Trim().Equals("true", StringComparison.OrdinalIgnoreCase);
@@ -155,6 +166,11 @@ public static class PrinterInvoiceFormatHelper
                              """;
         printer.NewLine();
         printer.Append(detalleHeader);
+        // En modo restaurante se imprime la zona (mesa) con el rótulo configurable.
+        if (mostrarZona && !string.IsNullOrWhiteSpace(nombreZona))
+        {
+            printer.Append($"{etiquetaZona.ToUpper().PadRight(9)}:{nombreZona}");
+        }
         //printer.NewLine();
 
         bool showReferencia = printerReferencia.Trim().Equals("true", StringComparison.OrdinalIgnoreCase);

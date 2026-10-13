@@ -28,6 +28,15 @@ public class RevisarProductosSeleccionadosViewModel : BaseViewModel
 
     private async void OnPagoCommand()
     {
+        // No se permite avanzar al pago si no se ha seleccionado un cliente
+        // (EntityId debe ser mayor que 0).
+        var entityId = VariablesGlobales.DtoInvoice.CustomerResponse?.EntityId ?? 0;
+        if (entityId <= 0)
+        {
+            ShowToast(Mensajes.MensajeSeleccionarCliente, ToastDuration.Long, 12);
+            return;
+        }
+
         IsBusy = true;
         await NavigationService.NavigateToAsync<PaymentInvoiceViewModel>();
         IsBusy = false;

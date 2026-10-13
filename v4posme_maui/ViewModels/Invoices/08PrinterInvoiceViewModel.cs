@@ -148,7 +148,10 @@ public class PrinterInvoiceViewModel : BaseViewModel
                     printerQRUrl,
                     printerReferencia,
                     VariablesGlobales.User!.Nickname!,
-                    _helperCore
+                    _helperCore,
+                    MostrarZona,
+                    NombreZona,
+                    EtiquetaZona
                 );
             }
             if (printerFormat.Trim().Equals("loto", StringComparison.OrdinalIgnoreCase))
@@ -166,7 +169,10 @@ public class PrinterInvoiceViewModel : BaseViewModel
                     printerQRUrl,
                     printerReferencia,
                     VariablesGlobales.User!.Nickname!,
-                    _helperCore
+                    _helperCore,
+                    MostrarZona,
+                    NombreZona,
+                    EtiquetaZona
                 );
             }
 
@@ -442,6 +448,42 @@ public class PrinterInvoiceViewModel : BaseViewModel
         set => SetProperty(ref _showReferencia, value);
     }
 
+    private bool _mostrarZona;
+
+    // Indica si se debe mostrar/imprimir la zona (mesa). Solo true en modo restaurante
+    // (permiso core_billing_invoice_type_restaurant).
+    public bool MostrarZona
+    {
+        get => _mostrarZona;
+        set => SetProperty(ref _mostrarZona, value);
+    }
+
+    // Nombre de la zona (mesa) a mostrar. Se toma de DtoInvoice.Mesa y, si no, del
+    // TransactionMaster. En restaurante el campo "mesa" se rotula y se imprime como "Zona".
+    public string NombreZona => VariablesGlobales.DtoInvoice.Mesa?.Name
+                                ?? VariablesGlobales.DtoInvoice.TransactionMaster?.MesaName
+                                ?? string.Empty;
+
+    private string _etiquetaZona = "Zona";
+
+    // Rótulo configurable para la zona (mesa). Se carga del parámetro
+    // APP_MOBILE_LABEL_ZONA_INVOICE y por defecto es "Zona". Se usa tanto en las
+    // pantallas de visualización/voucher como en la impresión.
+    public string EtiquetaZona
+    {
+        get => _etiquetaZona;
+        set
+        {
+            if (SetProperty(ref _etiquetaZona, value))
+            {
+                OnPropertyChanged(nameof(EtiquetaZonaLabel));
+            }
+        }
+    }
+
+    // Versión con dos puntos para mostrar en las pantallas (ej. "Zona:").
+    public string EtiquetaZonaLabel => $"{EtiquetaZona}:";
+
     private ImageSource? _qrImageSource;
 
     public ImageSource? QrImageSource
@@ -486,7 +528,14 @@ public class PrinterInvoiceViewModel : BaseViewModel
             }
 
             string printerRef   = await _helperCore.GetValueParameter("PRINTER_REFERENCE_INVOICE_MOBILE", "false");
-            ShowReferencia      = printerRef.Trim().Equals("true", StringComparison.OrdinalIgnoreCase);            
+            ShowReferencia      = printerRef.Trim().Equals("true", StringComparison.OrdinalIgnoreCase);
+
+            // Modo restaurante: solo en ese caso se muestra/imprime la zona (mesa).
+            MostrarZona         = await _helperCore.GetPermission(TypeMenuElementID.core_billing_invoice_type_restaurant, TypePermission.Updated, TypeImpact.All);
+            // Rótulo configurable de la zona (por defecto "Zona").
+            EtiquetaZona        = await _helperCore.GetValueParameter("APP_MOBILE_LABEL_ZONA_INVOICE", "Zona");
+            OnPropertyChanged(nameof(NombreZona));
+
             IsBusy              = false;
         }
         catch (Exception e)

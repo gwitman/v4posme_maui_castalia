@@ -115,6 +115,7 @@
                                         <RowDefinition Height="Auto" />
                                         <RowDefinition Height="Auto" />
                                         <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
                                     </Grid.RowDefinitions>
                                     <Label Grid.Row="0" Grid.Column="0" Text="Vendedor:" FontAttributes="Bold" />
                                     <Label Grid.Row="0" Grid.Column="1" Text="{Binding CodigoVendedor}" />
@@ -126,12 +127,14 @@
                                     <Label Grid.Row="3" Grid.Column="1" Text="{Binding SimboloMoneda}" />
                                     <Label Grid.Row="4" Grid.Column="0" Text="Estado:" FontAttributes="Bold" />
                                     <Label Grid.Row="4" Grid.Column="1" Text="{Binding EstadoFactura}" />
-                                    <Label Grid.Row="5" Grid.Column="0" Text="Cliente:" FontAttributes="Bold" />
-                                    <Label Grid.Row="6"
+                                    <Label Grid.Row="5" Grid.Column="0" Text="{Binding EtiquetaZonaLabel}" FontAttributes="Bold" IsVisible="{Binding MostrarZona}" />
+                                    <Label Grid.Row="5" Grid.Column="1" Text="{Binding NombreZona}" IsVisible="{Binding MostrarZona}" />
+                                    <Label Grid.Row="6" Grid.Column="0" Text="Cliente:" FontAttributes="Bold" />
+                                    <Label Grid.Row="7"
                                            Grid.Column="0"
                                            Grid.ColumnSpan="2"
                                            Text="{Binding NombreCliente}" />
-                                    <Label Grid.Row="7"
+                                    <Label Grid.Row="8"
                                            Grid.ColumnSpan="2"
                                            Grid.Column="0"
                                            Text="{Binding DtoInvoice.Comentarios}" />
