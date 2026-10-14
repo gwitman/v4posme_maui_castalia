@@ -139,6 +139,18 @@ public class SeleccionarProductoViewModel : BaseViewModel
             ShowToast(Mensajes.MensajeSeleccionarProductos, ToastDuration.Long, 12);
             return;
         }
+
+        // En modo restaurante es obligatorio seleccionar una zona/mesa antes de avanzar.
+        // Se valida aqui (y no solo en la pantalla de pago 7/6) para no obligar al usuario
+        // a retroceder luego. La mesa se elige en la pantalla 2/6 (Datos de facturacion);
+        // Mesa null o con Key <= 0 ("Seleccione") significa que no se ha seleccionado.
+        if (_esModoRestaurante &&
+            (VariablesGlobales.DtoInvoice.Mesa is null || VariablesGlobales.DtoInvoice.Mesa.Key <= 0))
+        {
+            ShowToast(Mensajes.MensajeSeleccionarMesa, ToastDuration.Long, 12);
+            return;
+        }
+
         try
         {
             IsBusy = true;
@@ -329,6 +341,15 @@ public class SeleccionarProductoViewModel : BaseViewModel
             ? columnas
             : 2;
 
+        // Permiso que determina el modo restaurante (igual que en la pantalla de pago 7/6).
+        // Solo cuando este permiso esta activo la zona/mesa es obligatoria. Se guarda para
+        // validar en OnRevisarProductos antes de avanzar y evitar que el usuario tenga que
+        // retroceder luego a la pantalla 2/6 a seleccionar la mesa.
+        _esModoRestaurante = await _helper.GetPermission(
+            TypeMenuElementID.core_billing_invoice_type_restaurant,
+            TypePermission.Updated,
+            TypeImpact.All);
+
         // Al llegar a la pantalla de seleccion de producto (4/6) finaliza el avance del
         // modo edicion. A partir de aqui el flujo opera como facturacion rapida: el menu
         // desplegable navega a 2/6 y 3/6, y esas pantallas regresan mediante pop.
@@ -373,6 +394,11 @@ public class SeleccionarProductoViewModel : BaseViewModel
     // true  => vista tipo "restaurante" (dos columnas de tarjetas con imagen).
     // false => vista clasica de una columna (por defecto).
     private bool _esVistaRestaurante;
+
+    // Modo restaurante segun el permiso core_billing_invoice_type_restaurant (igual criterio
+    // que la pantalla de pago 7/6). Cuando es true, la zona/mesa es obligatoria antes de avanzar.
+    private bool _esModoRestaurante;
+
     public bool EsVistaRestaurante
     {
         get => _esVistaRestaurante;
