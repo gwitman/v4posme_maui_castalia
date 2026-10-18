@@ -30,6 +30,7 @@
     <ContentPage.Content>
         <dxc:ShimmerView Style="{StaticResource ShimmerEffect}" IsLoading="{Binding IsBusy}">
             <dxc:ShimmerView.Content>
+              <Grid>
                 <Grid x:Name="ShareLayout" RowDefinitions="Auto,*,Auto" BackgroundColor="{StaticResource White}">
 
                     <!-- Encabezado compacto -->
@@ -129,9 +130,85 @@
                                    TextColor="{StaticResource Gray500}" HorizontalTextAlignment="Center" Margin="0,2,0,0" />
                             <Label Text="{Binding CompanyTelefono}" FontSize="11"
                                    TextColor="{StaticResource Gray500}" HorizontalTextAlignment="Center" />
+                            <Button Text="Subir Datos"
+                                    Command="{Binding Sync.MostrarConfirmacionSubidaCommand}"
+                                    BackgroundColor="#E67E22"
+                                    TextColor="White"
+                                    FontAttributes="Bold"
+                                    CornerRadius="8"
+                                    HeightRequest="48"
+                                    Margin="0,10,0,0" />
                         </StackLayout>
                     </dx:DXBorder>
                 </Grid>
+
+                <!-- Popup de confirmacion de subida (estilo de marca posMe) -->
+                <dxc:DXPopup x:Name="ConfirmarSubidaPopup"
+                             AllowScrim="True"
+                             BackgroundColor="White"
+                             VerticalAlignment="Center"
+                             HorizontalAlignment="Center"
+                             CornerRadius="20"
+                             ScrimColor="#99000000"
+                             IsOpen="{Binding Sync.MostrarConfirmacionSubida}">
+                    <dx:DXStackLayout WidthRequest="300" Padding="24" ItemSpacing="14">
+                        <dx:DXBorder HeightRequest="56" WidthRequest="56" CornerRadius="28"
+                                     HorizontalOptions="Center" BackgroundColor="#FDF0E3">
+                            <Label Text="&#x2191;" FontSize="28" FontAttributes="Bold" TextColor="#E67E22"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </dx:DXBorder>
+                        <Label Text="Confirmar subida de datos" FontSize="18" FontAttributes="Bold"
+                               TextColor="{StaticResource Primary}" HorizontalTextAlignment="Center" />
+                        <Label Text="Se subirán los datos al servidor y luego se descargará la información actualizada. ¿Desea continuar?"
+                               FontSize="14" TextColor="{StaticResource Gray600}" HorizontalTextAlignment="Center" />
+                        <Grid ColumnSpacing="12" Margin="0,6,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0" Text="Cancelar" Clicked="CancelarSubida_Clicked"
+                                    BackgroundColor="{StaticResource Gray200}" TextColor="{StaticResource Gray900}"
+                                    CornerRadius="12" HeightRequest="46" />
+                            <Button Grid.Column="1" Text="Subir" Clicked="ConfirmarSubida_Clicked"
+                                    BackgroundColor="#E67E22" TextColor="White" FontAttributes="Bold"
+                                    CornerRadius="12" HeightRequest="46" />
+                        </Grid>
+                    </dx:DXStackLayout>
+                </dxc:DXPopup>
+
+                <!-- Popup de resultado (exito / error / aviso) con estilo de marca -->
+                <dxc:DXPopup x:Name="ResultadoPopup"
+                             AllowScrim="True"
+                             BackgroundColor="White"
+                             VerticalAlignment="Center"
+                             HorizontalAlignment="Center"
+                             CornerRadius="20"
+                             ScrimColor="#99000000"
+                             IsOpen="{Binding Sync.MostrarResultado}">
+                    <dx:DXStackLayout WidthRequest="300" Padding="24" ItemSpacing="14">
+                        <dx:DXBorder HeightRequest="56" WidthRequest="56" CornerRadius="28"
+                                     HorizontalOptions="Center" BackgroundColor="{Binding Sync.ResultadoColorSuave}">
+                            <Label Text="{Binding Sync.ResultadoIcono}" FontSize="28" FontAttributes="Bold"
+                                   TextColor="{Binding Sync.ResultadoColor}" HorizontalOptions="Center" VerticalOptions="Center" />
+                        </dx:DXBorder>
+                        <Label Text="{Binding Sync.ResultadoTitulo}" FontSize="18" FontAttributes="Bold"
+                               TextColor="{StaticResource Primary}" HorizontalTextAlignment="Center" />
+                        <Label Text="{Binding Sync.ResultadoMensaje}" FontSize="14"
+                               TextColor="{StaticResource Gray600}" HorizontalTextAlignment="Center" />
+                        <Button Text="Aceptar" Clicked="CerrarResultado_Clicked"
+                                BackgroundColor="{Binding Sync.ResultadoColor}" TextColor="White" FontAttributes="Bold"
+                                CornerRadius="12" HeightRequest="46" Margin="0,6,0,0" />
+                    </dx:DXStackLayout>
+                </dxc:DXPopup>
+
+                <!-- Overlay de espera durante la subida/descarga (Sync) -->
+                <Grid IsVisible="{Binding Sync.IsBusy}" BackgroundColor="#80000000">
+                    <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="12">
+                        <ActivityIndicator IsRunning="{Binding Sync.IsBusy}" HorizontalOptions="Center" HeightRequest="50" WidthRequest="50" Color="White" />
+                        <Label Text="{Binding Sync.LoadingMessage}" HorizontalTextAlignment="Center" FontAttributes="Bold" TextColor="White" />
+                    </VerticalStackLayout>
+                </Grid>
+              </Grid>
             </dxc:ShimmerView.Content>
             <dxc:ShimmerView.LoadingView>
                 <ActivityIndicator IsRunning="{Binding IsBusy}" HeightRequest="50" WidthRequest="50" />

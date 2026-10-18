@@ -92,4 +92,19 @@ public partial class ValidarAbonoPage : ContentPage
     {
         Popup.IsOpen = false;
     }
+
+    private void CancelarSubida_Clicked(object? sender, EventArgs e)
+    {
+        ((ValidarAbonoViewModel)BindingContext).Sync.CancelarConfirmacion();
+    }
+
+    private void ConfirmarSubida_Clicked(object? sender, EventArgs e)
+    {
+        ((ValidarAbonoViewModel)BindingContext).Sync.ConfirmarSubida();
+    }
+
+    private void CerrarResultado_Clicked(object? sender, EventArgs e)
+    {
+        ((ValidarAbonoViewModel)BindingContext).Sync.CerrarResultado();
+    }
 }

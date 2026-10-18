@@ -33,6 +33,10 @@ public class CashOutflowComprobanteViewModel : BaseViewModel
         CancelarEliminarCommand   = new Command(() => ConfirmarEliminarPopUpShow = false);
     }
 
+    // Flujo reutilizable del boton "Subir Datos" (sube y luego descarga, gobernado por el
+    // parametro MOBILE_UPLOAD_AFTER_INVOICE). Mismo comportamiento que la ventana 8 de factura.
+    public HelperUploadDownload Sync { get; } = new();
+
     public ICommand ImprimirCommand { get; }
     public ICommand CompartirCommand { get; }
     public ICommand NuevaSalidaCommand { get; }

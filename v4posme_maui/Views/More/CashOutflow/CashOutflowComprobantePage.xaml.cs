@@ -55,6 +55,21 @@ public partial class CashOutflowComprobantePage : ContentPage
         _viewModel.PopUpShow = false;
     }
 
+    private void CancelarSubida_Clicked(object? sender, EventArgs e)
+    {
+        _viewModel.Sync.CancelarConfirmacion();
+    }
+
+    private void ConfirmarSubida_Clicked(object? sender, EventArgs e)
+    {
+        _viewModel.Sync.ConfirmarSubida();
+    }
+
+    private void CerrarResultado_Clicked(object? sender, EventArgs e)
+    {
+        _viewModel.Sync.CerrarResultado();
+    }
+
     private async void OnCompartirSolicitado(object? sender, EventArgs e)
     {
         try

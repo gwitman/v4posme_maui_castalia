@@ -38,6 +38,10 @@ public class ValidarAbonoFinancieraViewModel : BaseViewModel
         ListaCuotasAplicadas                    = new();
     }
 
+    // Flujo reutilizable del boton "Subir Datos" (sube y luego descarga, gobernado por el
+    // parametro MOBILE_UPLOAD_AFTER_INVOICE). Mismo comportamiento que la ventana 8 de factura.
+    public HelperUploadDownload Sync { get; } = new();
+
     public ObservableCollection<Api_AppMobileApi_GetDataDownloadDocumentCreditAmortizationResponse> ListaCuotasAplicadas
     {
         get;

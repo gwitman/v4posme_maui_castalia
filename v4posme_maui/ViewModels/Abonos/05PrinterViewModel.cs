@@ -29,6 +29,10 @@ public class ValidarAbonoViewModel : BaseViewModel
         AnularCommand                   = new Command(OnAnularCommand);
     }
 
+    // Flujo reutilizable del boton "Subir Datos" (sube y luego descarga, gobernado por el
+    // parametro MOBILE_UPLOAD_AFTER_INVOICE). Mismo comportamiento que la ventana 8 de factura.
+    public HelperUploadDownload Sync { get; } = new();
+
     private async void OnAnularCommand()
     {
         IsBusy = true;

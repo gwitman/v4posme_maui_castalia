@@ -76,12 +76,41 @@ decisiones:
 | 4 | Menú → Subir datos | `ViewModels/Upload/UploadViewModel.cs` (`OnUploadCommand`) | Sí | No | contador == 0 → no sube. Si ok, borra items/clientes/transacciones locales y `ZeroCounter`. Requiere switch activo + red. |
 | 5 | Cambio de compañía (AboutPage) | `ViewModels/AboutViewModel.cs` (`CambiarCompania`) | No | Sí | Combo solo habilitado si contador == 0. Cambia `CompanyKey` → `LoginMobile` → `GetDataDownload(false)`. Si falla, revierte `CompanyKey` y usuario. |
 | 6 | Fin de factura (subida opcional) | `ViewModels/Invoices/08PrinterInvoiceViewModel.cs` (`OnSubirCommand`) | Sí | Sí (solo si la subida fue exitosa) | Solo si parámetro `MOBILE_UPLOAD_AFTER_INVOICE == true`. `SendDataAsync` → **si subida OK**: borra locales + `ZeroCounter` → luego `GetDataDownload(true/false)` según contador. **Si la subida falla (error o respuesta nula): NO se descarga.** **Si el parámetro está en `false` o no existe: no sube nada y muestra un `DisplayAlert` bloqueante (`TituloUploadNoAutomatico` / `MensajeUploadNoAutomatico`) avisando que debe subir los datos de forma manual, antes de navegar fuera.** Muestra indicador de espera (`ShimmerView` + `ActivityIndicator` + `LoadingMessage`) ligado a `IsBusy`, y bloquea reentrada mientras corre. |
+| 7 | Botón "Subir Datos" en comprobantes de compra/ajuste/entrada/salida de inventario, gasto, salida y ingreso de efectivo, y abono (normal y financiera) | Inventario: `ViewModels/Inventario/VisualizarInventarioBaseViewModel.cs` (propiedad `Sync`, compartida por las 4 pantallas `04Visualizar*`). Efectivo/Gasto: `ViewModels/More/CashOutflow/CashOutflowComprobanteViewModel.cs`, `ViewModels/More/CashInflow/CashInflowComprobanteViewModel.cs`, `ViewModels/More/Gasto/GastoComprobanteViewModel.cs`. Abono: `ViewModels/Abonos/05PrinterViewModel.cs` (`ValidarAbonoViewModel`) y `ViewModels/Abonos/07PrinterViewModel.cs` (`ValidarAbonoFinancieraViewModel`) (propiedad `Sync`) | Sí | Sí (solo si la subida fue exitosa) | Reutiliza el helper `Services/Helpers/HelperUploadDownload.cs`, que replica exactamente la lógica de #6. Mismo gobierno por `MOBILE_UPLOAD_AFTER_INVOICE`, mismos popups de confirmación y resultado, mismo overlay de espera (`Sync.IsBusy` + `Sync.LoadingMessage`) y mismo guard de reentrada. |
+
+## Flujo reutilizable "Subir Datos" (#7)
+
+**`Services/Helpers/HelperUploadDownload.cs`** encapsula el flujo del botón
+"Subir Datos" para que varias pantallas lo compartan sin duplicar lógica. Es un
+objeto observable (`INotifyPropertyChanged`) que expone:
+
+- Comandos: `MostrarConfirmacionSubidaCommand` (abre el popup de confirmación) y
+  `SubirCommand` (ejecuta subida→descarga).
+- Métodos para el code-behind: `CancelarConfirmacion()`, `ConfirmarSubida()`,
+  `CerrarResultado()`.
+- Estado de popups/overlay: `MostrarConfirmacionSubida`, `MostrarResultado`,
+  `ResultadoTitulo/Mensaje/Icono/Color/ColorSuave`, `IsBusy`, `LoadingMessage`.
+
+`OnSubirCommand` es idéntico a #6: gobernado por `MOBILE_UPLOAD_AFTER_INVOICE`,
+`SendDataAsync` → si OK borra items/clientes/transacciones locales + `ZeroCounter`
+→ `GetDataDownload(true/false)` según contador; si falla (error o respuesta nula)
+NO descarga; si el parámetro está en `false`/no existe muestra el aviso de subida
+no automática. Cada ViewModel lo expone como propiedad `public HelperUploadDownload Sync { get; }`.
+La navegación tras cerrar el popup de resultado la decide cada pantalla; hoy solo
+se cierra el popup (el usuario ya quedó con los datos frescos).
+
+> **IMPORTANTE (regla de mantenimiento):** cualquier cambio a
+> `HelperUploadDownload` afecta a las 9 pantallas de #7 (4 de inventario, 3 de
+> efectivo/gasto y 2 de abono) además de mantener paridad con #6; actualizar
+> este archivo ante cualquier cambio.
 
 ## Resumen por dirección
 
-- **Suben datos:** Menú Upload (#4), fin de factura condicional (#6).
+- **Suben datos:** Menú Upload (#4), fin de factura condicional (#6), botón
+  "Subir Datos" en comprobantes de inventario/efectivo/gasto (#7).
 - **Descargan datos:** Login con/sin recordar si contador == 0 (#1, #2), Menú
-  Download (#3), cambio de compañía (#5), fin de factura condicional (#6).
+  Download (#3), cambio de compañía (#5), fin de factura condicional (#6), botón
+  "Subir Datos" en comprobantes (#7, solo si la subida fue exitosa).
 
 ## Descarga automática tras login (#1, #2)
 

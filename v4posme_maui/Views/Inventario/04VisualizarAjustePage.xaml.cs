@@ -24,6 +24,24 @@ public partial class VisualizarAjustePage : ContentPage
         await CompartirImagenAsync();
     }
 
+    private void CancelarSubida_Clicked(object? sender, EventArgs e)
+    {
+        if (BindingContext is VisualizarAjusteViewModel vm)
+            vm.Sync.CancelarConfirmacion();
+    }
+
+    private void ConfirmarSubida_Clicked(object? sender, EventArgs e)
+    {
+        if (BindingContext is VisualizarAjusteViewModel vm)
+            vm.Sync.ConfirmarSubida();
+    }
+
+    private void CerrarResultado_Clicked(object? sender, EventArgs e)
+    {
+        if (BindingContext is VisualizarAjusteViewModel vm)
+            vm.Sync.CerrarResultado();
+    }
+
     protected override void OnAppearing()
     {
         base.OnAppearing();

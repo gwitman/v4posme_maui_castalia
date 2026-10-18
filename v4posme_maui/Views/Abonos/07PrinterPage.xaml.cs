@@ -105,4 +105,19 @@ public partial class ValidarAbonoFinancieraPage : ContentPage
     {
         Popup.IsOpen = false;
     }
+
+    private void CancelarSubida_Clicked(object? sender, EventArgs e)
+    {
+        _viewModel.Sync.CancelarConfirmacion();
+    }
+
+    private void ConfirmarSubida_Clicked(object? sender, EventArgs e)
+    {
+        _viewModel.Sync.ConfirmarSubida();
+    }
+
+    private void CerrarResultado_Clicked(object? sender, EventArgs e)
+    {
+        _viewModel.Sync.CerrarResultado();
+    }
 }
