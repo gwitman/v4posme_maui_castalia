@@ -178,3 +178,9 @@ Mensajes en `Services/SystemNames/Mensajes.cs`: `MensajeSubiendoDatos`,
   una factura (#6).
 - `APP_MOBILE_SWITCH_COMPANY` — JSON con las compañías disponibles para el combo
   de cambio de compañía (#5).
+- `CXC_SHOW_GENERAL_BALANCE_IN_SHARE_MOBILE` — por defecto `false`. En el flujo
+  de abono (`ViewModels/Abonos/04ApplyShareViewModel.cs` → `LoadInvoices`)
+  controla el saldo mostrado en el comprobante: `false` = saldo de la factura /
+  documento seleccionado (`DocumentCreditResponse.Remaining`); `true` = saldo
+  GENERAL del cliente (suma de `Remaining` de todos sus documentos de crédito en
+  la misma moneda, vía `PosMeFindByEntityId`).

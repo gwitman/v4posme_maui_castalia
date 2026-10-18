@@ -328,7 +328,24 @@ public class AplicarAbonoViewModel : BaseViewModel, IQueryAttributable
 		DocumentCreditAmortizationResponse	= await _repositoryDocumentCreditAmortization.PosMeFindByDocumentNumber(parameter);
 		CurrencyId		= DocumentCreditResponse.CurrencyId;
 		CurrencyName	= DocumentCreditResponse.CurrencyName!;
-		SaldoInicial	= DocumentCreditResponse.Remaining;
+
+		// Parametro CXC_SHOW_GENERAL_BALANCE_IN_SHARE_MOBILE (por defecto "false").
+		// - false: el saldo mostrado es el de la factura/documento seleccionado
+		//   (DocumentCreditResponse.Remaining), comportamiento historico.
+		// - true: el saldo mostrado es el GENERAL del cliente, es decir la suma de los
+		//   remanentes de todos sus documentos de credito en la misma moneda.
+		var mostrarSaldoGeneral = await _helper.GetValueParameter("CXC_SHOW_GENERAL_BALANCE_IN_SHARE_MOBILE", "false");
+		if (string.Equals(mostrarSaldoGeneral?.Trim(), "true", StringComparison.OrdinalIgnoreCase))
+		{
+			var documentosCliente = await _repositoryDocumentCredit.PosMeFindByEntityId(DocumentCreditResponse.EntityId);
+			SaldoInicial = documentosCliente
+				.Where(d => d.CurrencyId == DocumentCreditResponse.CurrencyId)
+				.Sum(d => d.Remaining);
+		}
+		else
+		{
+			SaldoInicial = DocumentCreditResponse.Remaining;
+		}
 		IsBusy			= false;
 	}
 
