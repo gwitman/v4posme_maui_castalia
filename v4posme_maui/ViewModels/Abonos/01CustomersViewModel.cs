@@ -17,6 +17,7 @@ public class AbonosViewModel : BaseViewModel
 {
     private readonly IRepositoryTbCustomer _customerRepositoryTbCustomer;
     private readonly IRepositoryDocumentCredit _repositoryDocumentCredit;
+    private readonly IRepositoryDocumentCreditAmortization _repositoryDocumentCreditAmortization;
     private readonly IRepositoryTbParameterSystem _repositoryTbParameterSystem;
     private readonly HelperCore _helperCore;
 
@@ -25,6 +26,7 @@ public class AbonosViewModel : BaseViewModel
         Title = "Selección de cliente 1/5";
         _customerRepositoryTbCustomer   = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCustomer>();
         _repositoryDocumentCredit       = VariablesGlobales.UnityContainer.Resolve<IRepositoryDocumentCredit>();
+        _repositoryDocumentCreditAmortization = VariablesGlobales.UnityContainer.Resolve<IRepositoryDocumentCreditAmortization>();
         _repositoryTbParameterSystem    = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbParameterSystem>();
         _helperCore                     = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
         _customers                      = new();
@@ -138,6 +140,17 @@ public class AbonosViewModel : BaseViewModel
             }*/
 
             
+            // Se calcula el saldo de cada cliente como la suma de los remanentes
+            // de todas sus amortizaciones (document_credit_amortization).
+            var saldosPorCliente = await _repositoryDocumentCreditAmortization.PosMeSumRemainingByCustomer();
+            foreach (var cliente in allCustomers)
+            {
+                cliente.Remaining = cliente.CustomerNumber is not null
+                                    && saldosPorCliente.TryGetValue(cliente.CustomerNumber, out var saldo)
+                    ? saldo
+                    : decimal.Zero;
+            }
+
             //8. Agregar a la lista principal
             Customers = new DXObservableCollection<Api_AppMobileApi_GetDataDownloadCustomerResponse>(allCustomers);
 
