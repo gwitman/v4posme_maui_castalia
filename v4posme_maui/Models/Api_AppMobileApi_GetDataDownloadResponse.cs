@@ -385,6 +385,16 @@ public class Api_AppMobileApi_GetDataDownloadItemsResponse : BindableBase
         get => GetValue<decimal>();
         set => SetValue(value);
     }
+
+    // Existencia actual calculada en tiempo de ejecucion. Se usa para mostrar como
+    // referencia en flujos donde "Quantity" se reutiliza como campo editable (p.ej.
+    // ajuste de inventario), por lo que no debe depender de Quantity al momento de mostrar.
+    [NotMapped]
+    public decimal CantidadExistencia
+    {
+        get => GetValue<decimal>();
+        set => SetValue(value);
+    }
 }
 
 [SQLite.Table("tb_parameters")]

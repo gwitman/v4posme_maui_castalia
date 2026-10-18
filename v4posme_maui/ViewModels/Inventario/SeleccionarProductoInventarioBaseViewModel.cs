@@ -19,6 +19,7 @@ namespace v4posme_maui.ViewModels.Inventario;
 public abstract class SeleccionarProductoInventarioBaseViewModel : BaseViewModel
 {
     protected readonly IRepositoryItems RepositoryItems;
+    protected readonly IRepositoryTbTransactionMasterDetail RepositoryTransactionMasterDetail;
     protected readonly HelperCore Helper;
 
     // Buffer en memoria de lo capturado en linea por ItemNumber (objeto completo del item).
@@ -28,9 +29,10 @@ public abstract class SeleccionarProductoInventarioBaseViewModel : BaseViewModel
 
     protected SeleccionarProductoInventarioBaseViewModel()
     {
-        Productos                     = new();
-        RepositoryItems               = VariablesGlobales.UnityContainer.Resolve<IRepositoryItems>();
-        Helper                        = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
+        Productos                         = new();
+        RepositoryItems                   = VariablesGlobales.UnityContainer.Resolve<IRepositoryItems>();
+        RepositoryTransactionMasterDetail = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbTransactionMasterDetail>();
+        Helper                            = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
         SearchCommand                 = new Command(OnSearch);
         SearchBarCodeCommand          = new Command(OnSearchBarCode);
         ProductosSeleccionadosCommand = new Command(OnAvanzar);
@@ -133,6 +135,17 @@ public abstract class SeleccionarProductoInventarioBaseViewModel : BaseViewModel
             {
                 item.Name          = item.Name?.ToLower();
                 item.MonedaSimbolo = "C$";
+
+                // Existencia actual (valor derivado) calculada ANTES de reutilizar Quantity
+                // como campo editable del ajuste. Formula:
+                // (Quantity + Entradas) - (Salidas + Facturadas locales pendientes).
+                var detallesFacturados = await RepositoryTransactionMasterDetail
+                    .PosMeByTransactionIDAndItemID((int)TypeTransaction.TransactionInvoiceBilling, item.ItemId);
+                decimal cantidadFacturadas = detallesFacturados is null
+                    ? 0
+                    : Convert.ToDecimal(detallesFacturados.Where(p => p.RegisterLocal == 1).Sum(p => p.Quantity));
+                item.CantidadExistencia = (item.Quantity + item.CantidadEntradas)
+                                          - (item.CantidadSalidas + cantidadFacturadas);
 
                 // Conservar lo capturado en memoria (persiste entre busquedas).
                 if (!string.IsNullOrEmpty(item.ItemNumber) &&
