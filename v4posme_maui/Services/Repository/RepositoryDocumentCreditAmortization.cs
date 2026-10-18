@@ -83,4 +83,24 @@ public class RepositoryDocumentCreditAmortization(DataBase dataBase) : Repositor
             .Where(response => response.DateApply <= date)
             .ToListAsync();
     }
+
+    public async Task<Dictionary<string, decimal>> PosMeSumRemainingByCustomer()
+    {
+        const string query = """
+                             select CustomerNumber, sum(Remaining) as Remaining
+                             from document_credit_amortization
+                             where Remaining > 0 and CustomerNumber is not null
+                             group by CustomerNumber
+                             """;
+        var rows = await _dataBase.Database.QueryAsync<SumRemainingByCustomerRow>(query);
+        return rows
+            .Where(row => !string.IsNullOrEmpty(row.CustomerNumber))
+            .ToDictionary(row => row.CustomerNumber!, row => row.Remaining);
+    }
+
+    private class SumRemainingByCustomerRow
+    {
+        public string? CustomerNumber { get; set; }
+        public decimal Remaining { get; set; }
+    }
 } 

@@ -16,6 +16,7 @@ public class PosMeCustomerViewModel : BaseViewModel
 {
     private readonly IRepositoryTbCustomer _customerRepositoryTbCustomer;
     private readonly IRepositoryTbParameterSystem _repositoryTbParameterSystem;
+    private readonly IRepositoryDocumentCreditAmortization _repositoryDocumentCreditAmortization;
     private readonly HelperCore _helperCore;
     
 
@@ -23,6 +24,7 @@ public class PosMeCustomerViewModel : BaseViewModel
     {
         _customerRepositoryTbCustomer   = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCustomer>();
         _repositoryTbParameterSystem    = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbParameterSystem>();
+        _repositoryDocumentCreditAmortization = VariablesGlobales.UnityContainer.Resolve<IRepositoryDocumentCreditAmortization>();
         _helperCore                     = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
         Customers                       = new DXObservableCollection<Api_AppMobileApi_GetDataDownloadCustomerResponse>();
         SearchCommand                   = new Command(OnSearchCommand);
@@ -114,6 +116,17 @@ public class PosMeCustomerViewModel : BaseViewModel
             else
             {
                 allCustomers = await _customerRepositoryTbCustomer.PosMeFilterBySearchAll(Search);
+            }
+
+            // Se calcula el saldo de cada cliente como la suma de los remanentes
+            // de todas sus amortizaciones (document_credit_amortization).
+            var saldosPorCliente = await _repositoryDocumentCreditAmortization.PosMeSumRemainingByCustomer();
+            foreach (var cliente in allCustomers)
+            {
+                cliente.Remaining = cliente.CustomerNumber is not null
+                                    && saldosPorCliente.TryGetValue(cliente.CustomerNumber, out var saldo)
+                    ? saldo
+                    : decimal.Zero;
             }
 
             // Se reemplaza el contenido completo de la lista de una sola vez.

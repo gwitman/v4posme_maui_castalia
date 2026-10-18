@@ -13,4 +13,5 @@ public interface IRepositoryDocumentCreditAmortization : IRepositoryFacade<Api_A
 	Task<List<Api_AppMobileApi_GetDataDownloadDocumentCreditAmortizationResponse>> PosMeFindByDate(DateTime startDate, DateTime endDate);
 	Task<List<Api_AppMobileApi_GetDataDownloadDocumentCreditAmortizationResponse>> PosMeFindByMaxDate(DateTime date);
 	Task<List<Api_AppMobileApi_GetDataDownloadDocumentCreditAmortizationResponse>> PosMeFilterByDocumentNumberAll(string document);
+	Task<Dictionary<string, decimal>> PosMeSumRemainingByCustomer();
 }
