@@ -407,6 +407,25 @@
                                        LineBreakMode="TailTruncation"
                                        MaxLines="2" />
 
+                                <!-- Costo del producto (solo lectura). Visible unicamente si el
+                                     parametro INVOICE_SHOW_COST_IN_MOBILE esta en "true". Se pinta
+                                     con un color distinto (naranja) para diferenciarlo de los campos
+                                     editables. -->
+                                <StackLayout Spacing="4"
+                                             IsVisible="{Binding MostrarCosto}">
+                                    <Label Text="Costo"
+                                           FontSize="13"
+                                           FontAttributes="Bold"
+                                           TextColor="#E67E22" />
+                                    <dxe:TextEdit
+                                        IsReadOnly="True"
+                                        Keyboard="Numeric"
+                                        TextColor="#E67E22"
+                                        TextFontAttributes="Bold"
+                                        BackgroundColor="#FDF2E4"
+                                        Text="{Binding DetalleCosto, StringFormat='{0:N2}'}" />
+                                </StackLayout>
+
                                 <StackLayout Spacing="4">
                                     <Label Text="Cantidad"
                                            FontSize="13"

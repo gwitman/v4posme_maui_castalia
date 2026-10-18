@@ -350,6 +350,12 @@ public class SeleccionarProductoViewModel : BaseViewModel
             TypePermission.Updated,
             TypeImpact.All);
 
+        // Parametro de servidor INVOICE_SHOW_COST_IN_MOBILE: controla si en el popup de
+        // detalle del producto se muestra (solo lectura) el costo del producto. Por
+        // defecto "false": no se muestra el costo. Solo cuando viene "true" se muestra.
+        var mostrarCostoParam = await _helper.GetValueParameter("INVOICE_SHOW_COST_IN_MOBILE", "false");
+        MostrarCosto = string.Equals(mostrarCostoParam?.Trim(), "true", StringComparison.OrdinalIgnoreCase);
+
         // Al llegar a la pantalla de seleccion de producto (4/6) finaliza el avance del
         // modo edicion. A partir de aqui el flujo opera como facturacion rapida: el menu
         // desplegable navega a 2/6 y 3/6, y esas pantallas regresan mediante pop.
@@ -480,6 +486,23 @@ public class SeleccionarProductoViewModel : BaseViewModel
         set => SetProperty(ref _detalleNombre, value);
     }
 
+    // Controla si se muestra el costo (solo lectura) en el popup de detalle.
+    // Se activa con el parametro de servidor INVOICE_SHOW_COST_IN_MOBILE (por defecto false).
+    private bool _mostrarCosto;
+    public bool MostrarCosto
+    {
+        get => _mostrarCosto;
+        set => SetProperty(ref _mostrarCosto, value);
+    }
+
+    // Costo del producto mostrado en el popup de detalle (solo lectura).
+    private decimal _detalleCosto;
+    public decimal DetalleCosto
+    {
+        get => _detalleCosto;
+        set => SetProperty(ref _detalleCosto, value);
+    }
+
     private decimal _detalleCantidad = decimal.One;
     public decimal DetalleCantidad
     {
@@ -534,6 +557,7 @@ public class SeleccionarProductoViewModel : BaseViewModel
         DetalleNombre    = obj.Name ?? obj.ItemNumber ?? "Producto";
         DetalleCantidad  = decimal.One;
         DetallePrecio    = obj.PrecioPublico;
+        DetalleCosto     = obj.Cost;
         DetalleMonto     = decimal.Zero;
         DetalleVisible   = true;
     }
