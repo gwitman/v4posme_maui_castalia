@@ -18,6 +18,7 @@ public class PosMeParameterViewModel : BaseViewModel
     private TbParameterSystem _posmeFindCodigFactura = new();
     private TbParameterSystem _posmeFindCodigoGasto = new();
     private TbParameterSystem _posmeFindTema = new();
+    private TbParameterSystem _posmeFindUserAgent = new();
     public ICommand RefreshCommand { get; }
     public ICommand SaveCommand { get; }
 
@@ -91,6 +92,11 @@ public class PosMeParameterViewModel : BaseViewModel
             _posmeFindTema = await _repositoryTbParameterSystem.PosMeFindTema() ?? new TbParameterSystem();
             TemaSeleccionado = ThemePosMe.Normalizar(_posmeFindTema.Value);
 
+            _posmeFindUserAgent = await _repositoryTbParameterSystem.PosMeFindUserAgent() ?? new TbParameterSystem();
+            UserAgent = string.IsNullOrWhiteSpace(_posmeFindUserAgent.Value)
+                ? Constantes.DefaultUserAgent
+                : _posmeFindUserAgent.Value!;
+
         });
     }
 
@@ -145,6 +151,23 @@ public class PosMeParameterViewModel : BaseViewModel
                 _posmeFindTema.Value = temaNormalizado;
                 _repositoryTbParameterSystem.PosMeUpdate(_posmeFindTema);
                 ThemePosMe.Aplicar(temaNormalizado);
+
+                // Persistir el User-Agent usado en las llamadas a la API. Si el
+                // parametro aun no existe (ParameterId == 0), se inserta; de lo
+                // contrario se actualiza.
+                _posmeFindUserAgent.Name = Constantes.ParametroUserAgent;
+                _posmeFindUserAgent.Description = "User-Agent para las llamadas a la API";
+                _posmeFindUserAgent.Value = string.IsNullOrWhiteSpace(UserAgent)
+                    ? Constantes.DefaultUserAgent
+                    : UserAgent;
+                if (_posmeFindUserAgent.ParameterId == 0)
+                {
+                    _repositoryTbParameterSystem.PosMeInsert(_posmeFindUserAgent);
+                }
+                else
+                {
+                    _repositoryTbParameterSystem.PosMeUpdate(_posmeFindUserAgent);
+                }
 
                 Mensaje = Mensajes.MensajeParametrosGuardar;
                 PopupBackgroundColor = Colors.Green;
@@ -265,6 +288,14 @@ public class PosMeParameterViewModel : BaseViewModel
     {
         get => _gastoHasError;
         set => SetProperty(ref _gastoHasError, value);
+    }
+
+    private string? _userAgent;
+
+    public string? UserAgent
+    {
+        get => _userAgent;
+        set => SetProperty(ref _userAgent, value);
     }
 
     public List<string> TemasDisponibles => ThemePosMe.Disponibles;

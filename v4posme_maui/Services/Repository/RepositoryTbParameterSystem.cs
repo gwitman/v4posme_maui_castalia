@@ -18,6 +18,12 @@ public class RepositoryTbParameterSystem(DataBase dataBase) : RepositoryFacade<T
             .FirstOrDefaultAsync(system => system.Name == Constantes.ParametroTema);
     }
 
+    public Task<TbParameterSystem> PosMeFindUserAgent()
+    {
+        return dataBase.Database.Table<TbParameterSystem>()
+            .FirstOrDefaultAsync(system => system.Name == Constantes.ParametroUserAgent);
+    }
+
     public Task<TbParameterSystem> PosMeFindCounter()
     {
         return dataBase.Database.Table<TbParameterSystem>()

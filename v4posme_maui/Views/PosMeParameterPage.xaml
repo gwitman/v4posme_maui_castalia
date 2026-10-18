@@ -145,6 +145,12 @@
                                 StartIcon="textbox"
                                 Text="{Binding CodigoGasto}"
                                 LabelText="Código de Gasto" />
+                            <dxe:TextEdit
+                                x:Name="TextUserAgent"
+                                IconColor="#006E98"
+                                StartIcon="textbox"
+                                Text="{Binding UserAgent}"
+                                LabelText="User-Agent" />
                         </dx:DXStackLayout>
                     </dx:DXBorder>
 

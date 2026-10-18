@@ -20,6 +20,8 @@ public static class Constantes
 	public const string ParameterCodigoGasto                        = "TRANSACTION_EXPENSE";
 	public const string ParameterCodigoCashInflow                   = "TRANSACTION_CASH_INFLOW";
 	public const string ParameterCodigoCashOutflow                  = "TRANSACTION_CASH_OUTFLOW";
+	public const string ParametroUserAgent                          = "USER_AGENT";
+	public const string DefaultUserAgent                            = "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36";
 	public const string CustomerOrderShare                          = "CUSTOMER_ORDER_SHARE";
 	public const string CustomerOrderCustomer                       = "CUSTOMER_ORDER_CUSTOMER";
 	public const string CustomerOrderInvoice						= "CUSTOMER_ORDER_INVOICE";

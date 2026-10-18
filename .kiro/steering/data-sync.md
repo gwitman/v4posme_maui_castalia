@@ -184,3 +184,13 @@ Mensajes en `Services/SystemNames/Mensajes.cs`: `MensajeSubiendoDatos`,
   documento seleccionado (`DocumentCreditResponse.Remaining`); `true` = saldo
   GENERAL del cliente (suma de `Remaining` de todos sus documentos de crédito en
   la misma moneda, vía `PosMeFindByEntityId`).
+- `USER_AGENT` — valor del header `User-Agent` que se envía en **todas** las
+  llamadas HTTP de login, descarga y subida. Se configura en la pantalla
+  Parámetros (`Views/PosMeParameterPage.xaml`, campo "User-Agent"). Si el
+  parámetro no existe o está vacío, se usa `Constantes.DefaultUserAgent` (un
+  valor tipo navegador). La resolución y aplicación del header está centralizada
+  en `Services/Helpers/HelperUserAgent.cs`
+  (`GetUserAgentAsync` / `ApplyUserAgentAsync`), y se aplica en:
+  `RestApiCoreAcount.LoginMobile`, `RestApiAppMobileApi.GetDataDownload`,
+  `RestApiAppMobileApi.SendDataAsync` y en la descarga/subida de imágenes de
+  items (`RestApiItemImage.GetImageAsync` / `UploadImageAsync`).

@@ -42,6 +42,7 @@ public class RestApiItemImage
             {
                 Content = new FormUrlEncodedContent(nvc)
             };
+            await HelperUserAgent.ApplyUserAgentAsync(req);
 
             var response = await _httpClient.SendAsync(req);
             if (!response.IsSuccessStatusCode)
@@ -126,6 +127,7 @@ public class RestApiItemImage
             {
                 Content = content
             };
+            await HelperUserAgent.ApplyUserAgentAsync(req);
 
             var response = await _httpClient.SendAsync(req);
             if (!response.IsSuccessStatusCode)

@@ -6,6 +6,7 @@ public interface IRepositoryTbParameterSystem : IRepositoryFacade<TbParameterSys
 {
     Task<TbParameterSystem> PosMeFindLogo();
     Task<TbParameterSystem> PosMeFindTema();
+    Task<TbParameterSystem> PosMeFindUserAgent();
     Task<TbParameterSystem> PosMeFindCounter();    
     Task<TbParameterSystem> PosMeFindPrinter();
     Task<TbParameterSystem> PosMeFindCodigoAbono();

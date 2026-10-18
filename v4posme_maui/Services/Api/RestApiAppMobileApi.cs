@@ -57,24 +57,28 @@ public class RestApiAppMobileApi
             {
                 Content = new FormUrlEncodedContent(nvc)
             };
+            await HelperUserAgent.ApplyUserAgentAsync(req);
 
             //validar repuesta
             HelperLogs.Log("GetDataDownload: enviando petición HTTP al servidor", "Info");
             var response    = await _httpClient.SendAsync(req);
             if (!response.IsSuccessStatusCode) {
-                HelperLogs.Log($"GetDataDownload: respuesta HTTP no exitosa ({(int)response.StatusCode})", "Error");
+                string messageLog   = $"GetDataDownload: respuesta HTTP no exitosa ({(int)response.StatusCode})";
+                HelperLogs.Log(messageLog, "Error");
                 mensaje.Error       = true;
-                mensaje.Description = Mensajes.MensajeDownloadError;
+                mensaje.Description = messageLog;
                 return mensaje;
             };
 
             HelperLogs.Log("GetDataDownload: leyendo y deserializando respuesta", "Info");
             var responseBody    = await response.Content.ReadAsStringAsync();
+            HelperJson.ValidarJsonOrThrow(responseBody);
             var apiResponse     = JsonConvert.DeserializeObject<Api_AppMobileApi_GetDataDownloadResponse>(responseBody);
             if (apiResponse is null || apiResponse.Error) {
-                HelperLogs.Log("GetDataDownload: apiResponse nulo o con error", "Error");
+                string messageLog2  = "GetDataDownload: apiResponse nulo o con error";
+                HelperLogs.Log(messageLog2, "Error");
                 mensaje.Error       = true;
-                mensaje.Description = Mensajes.MensajeDownloadError;
+                mensaje.Description = messageLog2;
                 return mensaje;
             };
 
@@ -341,15 +345,24 @@ public class RestApiAppMobileApi
             {
                 Content = content
             };
+            await HelperUserAgent.ApplyUserAgentAsync(req);
             HelperLogs.Log("SendDataAsync: enviando datos al servidor", "Info");
             var response        = await _httpClient.SendAsync(req);
             if (!response.IsSuccessStatusCode)
             {
-                HelperLogs.Log($"SendDataAsync: respuesta HTTP no exitosa ({(int)response.StatusCode})", "Error");
-                return "{'Error': 'false'; 'Message': 'error'}";
+                string meesageLog = $"SendDataAsync: respuesta HTTP no exitosa ({(int)response.StatusCode})";
+                HelperLogs.Log(meesageLog, "Error");
+                // Serializa un objeto anónimo a formato JSON válido
+                return System.Text.Json.JsonSerializer.Serialize(new
+                {
+                    Error   = meesageLog,
+                    Message = "error"
+                });
+
             }
             HelperLogs.Log("SendDataAsync: datos enviados, leyendo respuesta del servidor", "Info");
             var responseBody    = await response.Content.ReadAsStringAsync();
+            HelperJson.ValidarJsonOrThrow(responseBody);
             HelperLogs.Log("SendDataAsync: proceso finalizado con éxito", "Info");
             return responseBody;
         }
