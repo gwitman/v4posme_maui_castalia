@@ -54,7 +54,7 @@ public class TbTransactionMaster
     [DataMember(Name = "MesaName")] public string MesaName { get; set; } = string.Empty;
     [DataMember(Name = "StatusID")] public int StatusID { get; set; } = 1;
 
-    public string? Reference4 { get; set; }
+    [DataMember(Name = "referencie4")] public string? Reference4 { get; set; }
     public int CuotasPendientes { get; set; }
     public int RegisterLocal { get; set; } = 0;
 }

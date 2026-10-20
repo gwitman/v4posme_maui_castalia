@@ -298,13 +298,26 @@
                                 </Label.FormattedText>
                             </Label>
                             <Label
+                                FontSize="18"
                                 HorizontalOptions="End"
                                 IsVisible="{Binding MostrarSaldo}">
                                 <Label.FormattedText>
                                     <FormattedString>
-                                        <Span Text="Saldo: " FontAttributes="Bold" TextColor="{StaticResource Primary}" />
+                                        <Span Text="Saldo Anterior: " FontAttributes="Bold" TextColor="{StaticResource Primary}" />
                                         <Span Text="{Binding Moneda}" FontAttributes="Bold" TextColor="{StaticResource Primary}" />
-                                        <Span Text="{Binding Saldo}" FontAttributes="Bold" TextColor="{StaticResource Primary}" />
+                                        <Span Text="{Binding SaldoAnterior}" FontAttributes="Bold" TextColor="{StaticResource Primary}" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                            <Label
+                                FontSize="18"
+                                HorizontalOptions="End"
+                                IsVisible="{Binding MostrarSaldo}">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="Saldo Nuevo: " FontAttributes="Bold" TextColor="{StaticResource Primary}" />
+                                        <Span Text="{Binding Moneda}" FontAttributes="Bold" TextColor="{StaticResource Primary}" />
+                                        <Span Text="{Binding SaldoNuevo}" FontAttributes="Bold" TextColor="{StaticResource Primary}" />
                                     </FormattedString>
                                 </Label.FormattedText>
                             </Label>

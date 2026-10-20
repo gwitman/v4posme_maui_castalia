@@ -394,10 +394,15 @@ public class PrinterInvoiceViewModel : BaseViewModel
     public string Monto => VariablesGlobales.DtoInvoice.Monto.ToString("N2");
     public string Cambio => VariablesGlobales.DtoInvoice.Cambio.ToString("N2");
 
-    // Saldo total del cliente (solo facturas de crédito). Se guarda en Reference3 de la
-    // transacción maestra durante el pago (07). Si no es crédito o no hay valor, queda vacío.
+    // Saldos del cliente (solo facturas de crédito). Se guardan durante el pago (07):
+    //  - Reference4 = SALDO ANTERIOR (remanente antes de esta factura).
+    //  - Reference3 = SALDO NUEVO (saldo anterior + total de esta factura).
+    // Si no es crédito o no hay valor, quedan vacíos.
     public bool MostrarSaldo => !string.IsNullOrWhiteSpace(VariablesGlobales.DtoInvoice.TransactionMaster?.Reference3);
-    public string Saldo => VariablesGlobales.DtoInvoice.TransactionMaster?.Reference3 ?? string.Empty;
+    public string SaldoAnterior => VariablesGlobales.DtoInvoice.TransactionMaster?.Reference4 ?? string.Empty;
+    public string SaldoNuevo => VariablesGlobales.DtoInvoice.TransactionMaster?.Reference3 ?? string.Empty;
+    // Alias conservado por compatibilidad (saldo nuevo).
+    public string Saldo => SaldoNuevo;
     public Command PrintCommand { get; }
     public Command AplicarOtroCommand { get; }
     public Command SubirCommand { get; }

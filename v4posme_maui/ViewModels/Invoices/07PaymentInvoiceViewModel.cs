@@ -218,20 +218,23 @@ public class PaymentInvoiceViewModel : BaseViewModel
             transactionMaster.Amount    = dtoInvoice.Balance + dtoInvoice.Items.Sum(P => P.MontoDescuento);
             transactionMaster.Discount  = dtoInvoice.Items.Sum(P => P.MontoDescuento);
 
-            // Cuando la factura es de CREDITO, se guarda en Reference3 el SALDO total del
-            // cliente: el total de esta factura + el remanente de todas sus facturas de
-            // credito pendientes en la misma moneda. Este valor se imprime en el voucher.
-            // (Reference3 no se usa en el flujo de facturacion, por eso se reutiliza aqui.)
+            // Cuando la factura es de CREDITO, se guardan dos saldos del cliente:
+            //  - Reference4 = SALDO ANTERIOR: remanente de todas sus facturas de credito
+            //    pendientes en la misma moneda ANTES de esta factura.
+            //  - Reference3 = SALDO NUEVO: el saldo anterior + el total de esta factura.
+            // Ambos valores se imprimen/muestran en el voucher. (Reference3/Reference4 no se
+            // usan en el flujo de facturacion, por eso se reutilizan aqui.)
             if (dtoInvoice.TipoDocumento!.Key == (int)TypeTransactionCausal.Credito)
             {
-                HelperLogs.Trace(Screen, "OnAplicarPagoCommand", "factura de crédito: calculando saldo total del cliente para Reference3");
+                HelperLogs.Trace(Screen, "OnAplicarPagoCommand", "factura de crédito: calculando saldo anterior y nuevo del cliente");
                 var documentosCliente = await _repositoryDocumentCredit.PosMeFindByEntityId(dtoInvoice.CustomerResponse!.EntityId);
-                var remanenteCliente  = documentosCliente
+                var saldoAnterior     = documentosCliente
                     .Where(d => d.CurrencyId == (int)dtoInvoice.Currency!.Key)
                     .Sum(d => d.Remaining);
-                var saldoTotal        = transactionMaster.Amount + remanenteCliente;
-                transactionMaster.Reference3 = saldoTotal.ToString("N2");
-                HelperLogs.Trace(Screen, "OnAplicarPagoCommand", $"saldo total crédito={saldoTotal} (factura={transactionMaster.Amount} + remanente={remanenteCliente})");
+                var saldoNuevo        = transactionMaster.Amount + saldoAnterior;
+                transactionMaster.Reference4 = saldoAnterior.ToString("N2");
+                transactionMaster.Reference3 = saldoNuevo.ToString("N2");
+                HelperLogs.Trace(Screen, "OnAplicarPagoCommand", $"saldo anterior={saldoAnterior}, saldo nuevo={saldoNuevo} (factura={transactionMaster.Amount})");
             }
 
             HelperLogs.DumpObject(Screen, "transactionMaster", transactionMaster);

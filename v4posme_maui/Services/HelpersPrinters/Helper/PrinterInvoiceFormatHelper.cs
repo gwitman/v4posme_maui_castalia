@@ -89,11 +89,16 @@ public static class PrinterInvoiceFormatHelper
         printer.Append($"{"TOTAL:".PadRight(labelWidth)}{(dtoInvoice.TransactionMaster.SubAmount - dtoInvoice.TransactionMaster.Discount).ToString("N2").PadLeft(valueWidth)}");
         printer.Append($"{"RECIBIDO:".PadRight(labelWidth)}{dtoInvoice.Monto.ToString("N2").PadLeft(valueWidth)}");
         printer.Append($"{"CAMBIO:".PadRight(labelWidth)}{dtoInvoice.Cambio.ToString("N2").PadLeft(valueWidth)}");
-        // En facturas de crédito se imprime el SALDO total del cliente (guardado en
-        // Reference3 de la transacción maestra durante el pago).
+        // En facturas de crédito se imprimen los saldos del cliente guardados en la
+        // transacción maestra durante el pago: Reference4 = SALDO ANTERIOR (remanente antes
+        // de esta factura) y Reference3 = SALDO NUEVO (saldo anterior + total de la factura).
+        if (!string.IsNullOrWhiteSpace(dtoInvoice.TransactionMaster?.Reference4))
+        {
+            printer.Append($"{"S.ANTERIOR:".PadRight(labelWidth)}{dtoInvoice.TransactionMaster.Reference4.PadLeft(valueWidth)}");
+        }
         if (!string.IsNullOrWhiteSpace(dtoInvoice.TransactionMaster?.Reference3))
         {
-            printer.Append($"{"SALDO:".PadRight(labelWidth)}{dtoInvoice.TransactionMaster.Reference3.PadLeft(valueWidth)}");
+            printer.Append($"{"S.NUEVO:".PadRight(labelWidth)}{dtoInvoice.TransactionMaster.Reference3.PadLeft(valueWidth)}");
         }
         printer.NewLine();
         printer.AlignCenter();
