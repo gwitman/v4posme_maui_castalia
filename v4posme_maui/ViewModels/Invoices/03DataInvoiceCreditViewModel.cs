@@ -43,19 +43,9 @@ public class DataInvoiceCreditViewModel : BaseViewModel, IQueryAttributable
         Item.FixedExpenses  = FixedExpenses;
         Item.PeriodPay      = SelectedPeriodPay;
 
-        if (VariablesGlobales.InvoiceEditando)
-        {
-            // Modo edicion: se avanza hacia adelante a la pantalla de seleccion de
-            // producto (4/6) en lugar de hacer pop, porque no existe una 4/6 previa en el
-            // stack. El flag se limpia al llegar a la 4/6 (OnAppearing).
-            await NavigationService.NavigateToAsync<SeleccionarProductoViewModel>();
-            IsBusy = false;
-            return;
-        }
-
-        // Facturacion rapida: se regresa mediante pop a la pantalla de seleccion de
-        // producto (4/6) conservando los productos y sin apilar una nueva instancia.
-        await NavigationService.GoBackAsync();
+        // Flujo secuencial: al dar "Seleccionar Productos" SIEMPRE se avanza a la pantalla
+        // de seleccion de producto (4/6).
+        await NavigationService.NavigateToAsync<SeleccionarProductoViewModel>();
         IsBusy              = false;
     }
 

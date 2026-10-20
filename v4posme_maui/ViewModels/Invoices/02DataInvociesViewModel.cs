@@ -80,21 +80,11 @@ public class DataInvoicesViewModel : BaseViewModel, IQueryAttributable
         Item.ReferenceClientName    = ReferenceClientName;
         Item.Mesa                   = SelectedMesa;
 
-        if (VariablesGlobales.InvoiceEditando)
-        {
-            // Modo edicion: no existe una pantalla 4/6 previa en el stack. Se avanza hacia
-            // adelante al flujo normal (datos credito 3/6 -> seleccion de producto 4/6).
-            var customerNumber = VariablesGlobales.DtoInvoice.CustomerResponse?.CustomerNumber
-                                 ?? VariablesGlobales.DtoInvoice.CustomerNumber;
-            await NavigationService.NavigateToAsync<DataInvoiceCreditViewModel>(customerNumber!);
-            IsBusy = false;
-            return;
-        }
-
-        // Facturacion rapida: al guardar los datos de facturacion se regresa mediante pop
-        // a la pantalla de seleccion de producto (4/6) conservando los productos y sin
-        // apilar una nueva instancia.
-        await NavigationService.GoBackAsync();
+        // Flujo secuencial: al dar "Mas opciones" SIEMPRE se avanza a la pantalla de datos
+        // de credito (3/6).
+        var customerNumber = VariablesGlobales.DtoInvoice.CustomerResponse?.CustomerNumber
+                             ?? VariablesGlobales.DtoInvoice.CustomerNumber;
+        await NavigationService.NavigateToAsync<DataInvoiceCreditViewModel>(customerNumber!);
         IsBusy = false;
     }
 

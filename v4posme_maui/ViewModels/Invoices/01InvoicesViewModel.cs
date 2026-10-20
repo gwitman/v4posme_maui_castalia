@@ -93,9 +93,10 @@ public class InvoicesViewModel : BaseViewModel
 
         IsBusy = true;
 
-        // Se conserva el DtoInvoice actual (incluyendo los productos ya seleccionados) y
-        // solo se actualizan los datos del cliente. Luego se regresa a la pantalla de
-        // seleccion de producto (4/6).
+        // Flujo secuencial: tras seleccionar el cliente SIEMPRE se avanza a la pantalla de
+        // datos de facturacion (2/6). Se asegura que el DtoInvoice este inicializado y se
+        // actualizan los datos del cliente seleccionado.
+        await _helperInvoiceFlow.InicializarFacturaRapidaAsync();
         var dto                 = VariablesGlobales.DtoInvoice;
         dto.CustomerResponse    = item;
         dto.CustomerNumber      = item.CustomerNumber;
@@ -103,9 +104,8 @@ public class InvoicesViewModel : BaseViewModel
         dto.LastName            = item.LastName;
         dto.Balance             = item.Balance;
 
-        // Se regresa a la pantalla de seleccion de producto (4/6) haciendo pop del stack
-        // para conservar la instancia existente en lugar de apilar una nueva.
-        await NavigationService.GoBackAsync();
+        // Se navega hacia adelante a la pantalla de datos de facturacion (2/6).
+        await NavigationService.NavigateToAsync<DataInvoicesViewModel>(item.CustomerNumber!);
         IsBusy = false;
     }
 
@@ -295,30 +295,10 @@ public class InvoicesViewModel : BaseViewModel
         {
             Navigation              = navigation;
 
-            // Facturacion rapida: al entrar a la pestaña Factura desde la barra inferior
-            // siempre se salta directo a la pantalla de seleccion de producto (4/6).
-            // La lista de clientes solo se muestra cuando se abre explicitamente desde el
-            // menu desplegable de la pantalla 4/6 para cambiar el cliente
-            // (InvoiceSeleccionandoCliente == true).
-            //
-            // Nota: no se usa InvoiceFlowInicializado para decidir la navegacion porque ese
-            // flag solo se reinicia al completar/imprimir una factura. Si el usuario abandona
-            // el flujo sin terminarlo, el flag quedaba en true y al volver a entrar mostraba
-            // la lista de clientes en lugar de los productos (bug intermitente). El flag se
-            // sigue usando dentro de InicializarFacturaRapidaAsync para conservar los
-            // productos ya seleccionados y no re-inicializar el DtoInvoice.
-            if (!VariablesGlobales.InvoiceSeleccionandoCliente)
-            {
-                IsBusy = true;
-                await _helperInvoiceFlow.InicializarFacturaRapidaAsync();
-                // Se navega (push) a la seleccion de producto (4/6). El bloqueo del boton
-                // atras en esa pantalla se maneja en SeleccionarProductoPage para evitar
-                // que se regrese a la lista de clientes.
-                await NavigationService.NavigateToAsync<SeleccionarProductoViewModel>();
-                IsBusy = false;
-                return;
-            }
-
+            // Flujo secuencial: la pantalla de seleccion de cliente (1/6) es el inicio del
+            // flujo. Al entrar a la pestaña Factura SIEMPRE se muestra la lista de clientes;
+            // al seleccionar un cliente se avanza a datos de facturacion (2/6), luego a
+            // datos de credito (3/6) y finalmente a seleccion de producto (4/6).
             VariablesGlobales.InvoiceSeleccionandoCliente = false;
 
             var valueTop            = await _helper.GetValueParameter("MOBILE_SHOW_TOP_CUSTOMER", "10");
