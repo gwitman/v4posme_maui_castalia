@@ -326,6 +326,17 @@
                                     </FormattedString>
                                 </Label.FormattedText>
                             </Label>
+                            <Label
+                                HorizontalOptions="End"
+                                IsVisible="{Binding MostrarSaldo}">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="Saldo: " FontAttributes="Bold" TextColor="{StaticResource Primary}" />
+                                        <Span Text="{Binding Moneda}" FontAttributes="Bold" TextColor="{StaticResource Primary}" />
+                                        <Span Text="{Binding Saldo}" FontAttributes="Bold" TextColor="{StaticResource Primary}" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
                         </dx:DXStackLayout>
                         <Label
                             HorizontalTextAlignment="Center"

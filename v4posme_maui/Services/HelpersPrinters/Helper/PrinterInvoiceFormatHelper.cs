@@ -89,6 +89,12 @@ public static class PrinterInvoiceFormatHelper
         printer.Append($"{"TOTAL:".PadRight(labelWidth)}{(dtoInvoice.TransactionMaster.SubAmount - dtoInvoice.TransactionMaster.Discount).ToString("N2").PadLeft(valueWidth)}");
         printer.Append($"{"RECIBIDO:".PadRight(labelWidth)}{dtoInvoice.Monto.ToString("N2").PadLeft(valueWidth)}");
         printer.Append($"{"CAMBIO:".PadRight(labelWidth)}{dtoInvoice.Cambio.ToString("N2").PadLeft(valueWidth)}");
+        // En facturas de crédito se imprime el SALDO total del cliente (guardado en
+        // Reference3 de la transacción maestra durante el pago).
+        if (!string.IsNullOrWhiteSpace(dtoInvoice.TransactionMaster?.Reference3))
+        {
+            printer.Append($"{"SALDO:".PadRight(labelWidth)}{dtoInvoice.TransactionMaster.Reference3.PadLeft(valueWidth)}");
+        }
         printer.NewLine();
         printer.AlignCenter();
 
