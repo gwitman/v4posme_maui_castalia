@@ -337,7 +337,8 @@ public class AplicarAbonoViewModel : BaseViewModel, IQueryAttributable
 		var mostrarSaldoGeneral = await _helper.GetValueParameter("CXC_SHOW_GENERAL_BALANCE_IN_SHARE_MOBILE", "false");
 		if (string.Equals(mostrarSaldoGeneral?.Trim(), "true", StringComparison.OrdinalIgnoreCase))
 		{
-			var documentosCliente = await _repositoryDocumentCredit.PosMeFindByEntityId(DocumentCreditResponse.EntityId);
+			// Se usan TODOS los documentos del cliente (sin limite de 10) para que el saldo general sea el real.
+			var documentosCliente = await _repositoryDocumentCredit.PosMeFindAllByEntityId(DocumentCreditResponse.EntityId);
 			SaldoInicial = documentosCliente
 				.Where(d => d.CurrencyId == DocumentCreditResponse.CurrencyId)
 				.Sum(d => d.Remaining);
