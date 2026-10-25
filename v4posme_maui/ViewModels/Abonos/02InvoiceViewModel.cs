@@ -77,7 +77,8 @@ public class CustomerDetailInvoiceViewModel : BaseViewModel, IQueryAttributable
     private async Task LoadInvoices(string? param)
     {
         Invoices.Clear();
-        var invoicesEntityId = await _repositoryDocumentCredit.PosMeFindByEntityId(Convert.ToInt32(param));
+        // En Abonos se deben mostrar todas las facturas del cliente (sin limite de 10).
+        var invoicesEntityId = await _repositoryDocumentCredit.PosMeFindAllByEntityId(Convert.ToInt32(param));
         if (invoicesEntityId.Count == 0)
         {
             return;

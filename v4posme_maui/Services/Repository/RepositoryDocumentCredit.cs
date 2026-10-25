@@ -12,6 +12,16 @@ public class RepositoryDocumentCredit(DataBase dataBase) : RepositoryFacade<Api_
             .ToListAsync();
     }
 
+    // Devuelve todas las facturas con saldo del cliente, sin el limite de 10 de
+    // PosMeFindByEntityId. Se usa solo en la pantalla de Abonos 2/5 (seleccion de
+    // factura), donde el usuario necesita ver todas las facturas para abonar.
+    public async Task<List<Api_AppMobileApi_GetDataDownloadDocumentCreditResponse>> PosMeFindAllByEntityId(int entityId)
+    {
+        return await dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadDocumentCreditResponse>()
+            .Where(response => response.EntityId == entityId && response.Balance > decimal.Zero)
+            .ToListAsync();
+    }
+
     public async Task<List<Api_AppMobileApi_GetDataDownloadDocumentCreditResponse>> PosMeFilterDocumentNumber(string filter)
     {
         return await dataBase.Database.Table<Api_AppMobileApi_GetDataDownloadDocumentCreditResponse>()
