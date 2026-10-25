@@ -401,3 +401,4 @@ FodyWeavers.xsd
 /v4posme_maui.Tests/
 .kiro/specs/
 CLAUDE.md
+.kiro/steering/data-sync.md
