@@ -477,7 +477,7 @@ public class PrinterInvoiceViewModel : BaseViewModel
     private string _etiquetaZona = "Zona";
 
     // Rótulo configurable para la zona (mesa). Se carga del parámetro
-    // APP_MOBILE_LABEL_ZONA_INVOICE y por defecto es "Zona". Se usa tanto en las
+    // APP_MOBILE_LABEL_ZONE_INVOICE y por defecto es "Zona". Se usa tanto en las
     // pantallas de visualización/voucher como en la impresión.
     public string EtiquetaZona
     {
@@ -543,7 +543,8 @@ public class PrinterInvoiceViewModel : BaseViewModel
             // Modo restaurante: solo en ese caso se muestra/imprime la zona (mesa).
             MostrarZona         = await _helperCore.GetPermission(TypeMenuElementID.core_billing_invoice_type_restaurant, TypePermission.Updated, TypeImpact.All);
             // Rótulo configurable de la zona (por defecto "Zona").
-            EtiquetaZona        = await _helperCore.GetValueParameter("APP_MOBILE_LABEL_ZONA_INVOICE", "Zona");
+            // Mismo parámetro que la pantalla 2 (antes leía "APP_MOBILE_LABEL_ZONA_INVOICE", que no existe).
+            EtiquetaZona        = await _helperCore.GetValueParameterTrim(Constantes.AppMobileLabelZoneInvoice, Mensajes.EtiquetaZonaFactura);
             OnPropertyChanged(nameof(NombreZona));
 
             IsBusy              = false;
