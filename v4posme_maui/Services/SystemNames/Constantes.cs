@@ -61,4 +61,7 @@ public static class Constantes
     public const string AppMobileSwitchCompany                     = "APP_MOBILE_SWITCH_COMPANY";
     // true = muestra el boton "Cargar solicitud" en la pantalla 2 de factura (requiere internet)
     public const string InvoiceMobileShowLoadOrder                 = "INVOICE_MOBILE_SHOW_LOAD_ORDER";
+    // Rotulos de la pantalla 2 de factura; espejo de getBahavioDB labelCommentInvoiceV2Ext / labelZoneInvoiceV2Ext de la web
+    public const string AppMobileLabelCommentInvoice               = "APP_MOBILE_LABEL_COMMENT_INVOICE";
+    public const string AppMobileLabelZoneInvoice                  = "APP_MOBILE_LABEL_ZONE_INVOICE";
 }

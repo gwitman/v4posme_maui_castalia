@@ -57,6 +57,10 @@ public class DataInvoicesViewModel : BaseViewModel, IQueryAttributable
         // "Cargar solicitud" solo se muestra si el servidor lo habilita (por defecto oculto).
         var mostrarSolicitud    = await _helperCore.GetValueParameter(Constantes.InvoiceMobileShowLoadOrder, "false");
         MostrarCargarSolicitud  = mostrarSolicitud.Trim().ToLower() == "true";
+
+        // Rótulos iguales a la web (parámetros copiados de tb_company_page_setting por script SQL).
+        EtiquetaComentario      = await _helperCore.GetValueParameterTrim(Constantes.AppMobileLabelCommentInvoice, Mensajes.EtiquetaComentarioFactura);
+        EtiquetaZona            = await _helperCore.GetValueParameterTrim(Constantes.AppMobileLabelZoneInvoice, Mensajes.EtiquetaZonaFactura);
     }
 
     // Copia lo capturado en pantalla al DTO de la factura (se usa al avanzar y al cargar una solicitud).
@@ -352,6 +356,21 @@ public class DataInvoicesViewModel : BaseViewModel, IQueryAttributable
     public Command AbrirCargarSolicitudCommand { get; }
     public Command CancelarCargarSolicitudCommand { get; }
     public Command CargarSolicitudCommand { get; }
+
+    // Rótulos configurables (mismos que la web)
+    private string _etiquetaComentario = Mensajes.EtiquetaComentarioFactura;
+    public string EtiquetaComentario
+    {
+        get => _etiquetaComentario;
+        set => SetProperty(ref _etiquetaComentario, value);
+    }
+
+    private string _etiquetaZona = Mensajes.EtiquetaZonaFactura;
+    public string EtiquetaZona
+    {
+        get => _etiquetaZona;
+        set => SetProperty(ref _etiquetaZona, value);
+    }
 
     private bool _mostrarCargarSolicitud;
     public bool MostrarCargarSolicitud

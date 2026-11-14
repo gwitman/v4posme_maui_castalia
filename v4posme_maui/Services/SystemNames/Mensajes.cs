@@ -89,6 +89,10 @@ public static class Mensajes
     public const string MensajeDescuentoFueraDeRango = "El porcentaje de descuento debe estar entre 0 y 100.";
     public const string MensajeDescuentoSuperaPrecio = "El descuento no puede superar el precio total del producto. Se ajustó al máximo permitido.";
     public const string MensajeReferenciaTruncada = "La referencia fue truncada a 255 caracteres.";
+    // Rótulos por defecto de la pantalla 2 de factura (mismos que la web ext_6_0_2)
+    public const string EtiquetaComentarioFactura = "Comentario";
+    public const string EtiquetaZonaFactura = "Zona";
+
     // Cargar solicitud (pantalla 2 de factura)
     public const string TituloCargarSolicitud = "Cargar solicitud";
     public const string MensajeCargarSolicitudIngreseNumero = "Ingrese el número de la solicitud.";
