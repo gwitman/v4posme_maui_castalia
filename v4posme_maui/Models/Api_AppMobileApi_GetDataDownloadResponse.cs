@@ -23,6 +23,24 @@ public class Api_AppMobileApi_GetDataDownloadResponse
     public List<Api_AppMobileApi_GetDataDownloadServerTransactionMasterResponse> ListServerTransactionMaster { get; set; } = [];
     public List<Api_AppMobileApi_GetDataDownloadTransactionMasterRegisterResponse> ListTransactionMasterRegister { get; set; } = [];
     public List<Api_AppMobileApi_GetDataDownloadIndicatorResponse> ListIndicator { get; set; } = [];
+    // Catalogo de zonas (txtZoneID de la factura web). Servidores anteriores no lo envian: queda vacio.
+    public List<Api_AppMobileApi_GetDataDownloadZoneResponse> ListZone { get; set; } = [];
+}
+
+// Zona / tipo de venta (tb_catalog_item del catalogo tb_transaction_master_info_billing.zoneID),
+// se descarga para que la factura funcione sin conexion.
+[SQLite.Table("tb_zone")]
+public class Api_AppMobileApi_GetDataDownloadZoneResponse
+{
+    [PrimaryKey, AutoIncrement] public int ZonePk { get; set; }
+
+    [DataMember(Name = "catalogItemID")] public int CatalogItemID { get; set; }
+
+    [DataMember(Name = "name")] public string? Name { get; set; }
+
+    [DataMember(Name = "display")] public string? Display { get; set; }
+
+    [DataMember(Name = "sequence")] public int Sequence { get; set; }
 }
 
 [SQLite.Table("tb_indicator")]

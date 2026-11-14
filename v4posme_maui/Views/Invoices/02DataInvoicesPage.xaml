@@ -17,6 +17,7 @@
             Style="{StaticResource ShimmerEffect}"
             IsLoading="{Binding IsBusy}">
             <controls:ShimmerView.Content>
+                <Grid>
                 <ScrollView BackgroundColor="{AppThemeBinding Light={StaticResource PageBackground}, Dark={StaticResource PageBackgroundDark}}">
                     <StackLayout Padding="0,0,0,20">
                         <dx:DXBorder BackgroundColor="{StaticResource Primary}"
@@ -54,7 +55,22 @@
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
+                                <!-- Cargar solicitud: visible solo si INVOICE_MOBILE_SHOW_LOAD_ORDER = true (requiere internet) -->
+                                <Button
+                                    Grid.Row="10"
+                                    Text="Cargar solicitud"
+                                    IsVisible="{Binding MostrarCargarSolicitud}"
+                                    Command="{Binding AbrirCargarSolicitudCommand}"
+                                    BackgroundColor="#E67E22"
+                                    TextColor="White"
+                                    FontAttributes="Bold"
+                                    CornerRadius="12"
+                                    HeightRequest="46" />
                                 <dxe:TextEdit
                                     Grid.Row="0"
                                     x:Name="TxtCustomer"
@@ -91,9 +107,28 @@
                                     StartIcon="identificacion"
                                     Text="{Binding ReferenceClientName}"
                                     LabelText="Cliente Referente" />
-                                
-                                <dxe:ComboBoxEdit
+
+                                <dxe:TextEdit
                                     Grid.Row="4"
+                                    IconColor="{StaticResource Primary}"
+                                    x:Name="TxtReferenceClientIdentifier"
+                                    StartIcon="identificacion"
+                                    MaxCharacterCount="50"
+                                    Text="{Binding ReferenceClientIdentifier}"
+                                    LabelText="Cédula" />
+
+                                <dxe:TextEdit
+                                    Grid.Row="5"
+                                    IconColor="{StaticResource Primary}"
+                                    x:Name="TxtNumberPhone"
+                                    StartIcon="identificacion"
+                                    Keyboard="Telephone"
+                                    MaxCharacterCount="250"
+                                    Text="{Binding NumberPhone}"
+                                    LabelText="Teléfono" />
+
+                                <dxe:ComboBoxEdit
+                                    Grid.Row="6"
                                     SelectedItem="{Binding SelectedCurrency}"
                                     HasError="{Binding ErrorCurrency}"
                                     IsLabelFloating="True"
@@ -102,7 +137,7 @@
                                     ItemsSource="{Binding Currencies}" />
 
                                 <dxe:ComboBoxEdit
-                                    Grid.Row="5"
+                                    Grid.Row="7"
                                     SelectedItem="{Binding SelectedTipoDocumento}"
                                     HasError="{Binding ErrorTipoDocumento}"
                                     StartIcon="identificacion"
@@ -111,22 +146,94 @@
                                     ItemsSource="{Binding TipoDocumentos}" />
 
                                 <dxe:ComboBoxEdit
-                                    Grid.Row="6"
+                                    Grid.Row="8"
                                     SelectedItem="{Binding SelectedMesa}"
                                     HasError="{Binding ErrorMesa}"
                                     IsLabelFloating="True"
                                     StartIcon="price"
-                                    LabelText="Zona"
+                                    LabelText="Mesa"
                                     ItemsSource="{Binding Mesas}" />
-                                
+
+                                <dxe:ComboBoxEdit
+                                    Grid.Row="9"
+                                    SelectedItem="{Binding SelectedZona}"
+                                    IsLabelFloating="True"
+                                    StartIcon="price"
+                                    LabelText="Zona / Tipo de venta"
+                                    ItemsSource="{Binding Zonas}" />
+
                                 <dx:DXButton
-                                    Grid.Row="7"
+                                    Grid.Row="11"
                                     Content="Más opciones"
                                     Command="{Binding SeleccionarInvoiceCreditCommand}" />
                             </Grid>
                         </dx:DXBorder>
                     </StackLayout>
                 </ScrollView>
+                <!-- Popup "Cargar solicitud" (estilo de marca posMe, igual que 08PrinterInvoicePage) -->
+                <controls:DXPopup x:Name="CargarSolicitudPopup"
+                                  AllowScrim="True"
+                                  BackgroundColor="White"
+                                  VerticalAlignment="Center"
+                                  HorizontalAlignment="Center"
+                                  CornerRadius="20"
+                                  ScrimColor="#99000000"
+                                  IsOpen="{Binding MostrarPopupCargarSolicitud, Mode=TwoWay}">
+                    <dx:DXStackLayout WidthRequest="300"
+                                      Padding="24"
+                                      ItemSpacing="14">
+                        <dx:DXBorder HeightRequest="56"
+                                     WidthRequest="56"
+                                     CornerRadius="28"
+                                     HorizontalOptions="Center"
+                                     BackgroundColor="#FDF0E3">
+                            <Label Text="&#x2193;"
+                                   FontSize="28"
+                                   FontAttributes="Bold"
+                                   TextColor="#E67E22"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center" />
+                        </dx:DXBorder>
+                        <Label Text="Cargar solicitud"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource Primary}"
+                               HorizontalTextAlignment="Center" />
+                        <dxe:TextEdit Text="{Binding NumeroSolicitud}"
+                                      LabelText="Número de solicitud" />
+                        <ActivityIndicator IsRunning="{Binding CargandoSolicitud}"
+                                           IsVisible="{Binding CargandoSolicitud}"
+                                           HeightRequest="32"
+                                           WidthRequest="32" />
+                        <Label Text="{Binding MensajeSolicitud}"
+                               FontSize="14"
+                               TextColor="{StaticResource Gray600}"
+                               HorizontalTextAlignment="Center" />
+                        <Grid ColumnSpacing="12"
+                              Margin="0,6,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0"
+                                    Text="Cancelar"
+                                    Command="{Binding CancelarCargarSolicitudCommand}"
+                                    BackgroundColor="{StaticResource Gray200}"
+                                    TextColor="{StaticResource Gray900}"
+                                    CornerRadius="12"
+                                    HeightRequest="46" />
+                            <Button Grid.Column="1"
+                                    Text="Cargar"
+                                    Command="{Binding CargarSolicitudCommand}"
+                                    BackgroundColor="#E67E22"
+                                    TextColor="White"
+                                    FontAttributes="Bold"
+                                    CornerRadius="12"
+                                    HeightRequest="46" />
+                        </Grid>
+                    </dx:DXStackLayout>
+                </controls:DXPopup>
+                </Grid>
             </controls:ShimmerView.Content>
             <controls:ShimmerView.LoadingView>
                 <ActivityIndicator IsRunning="{Binding IsBusy}"

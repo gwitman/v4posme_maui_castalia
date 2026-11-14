@@ -89,4 +89,13 @@ public static class Mensajes
     public const string MensajeDescuentoFueraDeRango = "El porcentaje de descuento debe estar entre 0 y 100.";
     public const string MensajeDescuentoSuperaPrecio = "El descuento no puede superar el precio total del producto. Se ajustó al máximo permitido.";
     public const string MensajeReferenciaTruncada = "La referencia fue truncada a 255 caracteres.";
+    // Cargar solicitud (pantalla 2 de factura)
+    public const string TituloCargarSolicitud = "Cargar solicitud";
+    public const string MensajeCargarSolicitudIngreseNumero = "Ingrese el número de la solicitud.";
+    public const string MensajeCargarSolicitudSinConexion = "No hay conexión a internet. Revise su conexión (datos móviles o WiFi) e intente nuevamente; para cargar una solicitud se necesita internet.";
+    public const string MensajeCargarSolicitudCargando = "Cargando solicitud...";
+    public const string MensajeCargarSolicitudError = "No fue posible cargar la solicitud. Revise su conexión a internet e intente nuevamente.";
+    public const string MensajeCargarSolicitudOk = "Solicitud {0} cargada: {1} producto(s) agregado(s).";
+    public const string MensajeCargarSolicitudSinProductos = "La solicitud {0} no tiene productos.";
+    public const string MensajeCargarSolicitudProductosNoEncontrados = "Productos de la solicitud no encontrados en el celular (descargue datos): {0}";
 }

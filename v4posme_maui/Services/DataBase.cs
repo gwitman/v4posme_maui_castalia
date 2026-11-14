@@ -79,6 +79,7 @@ public class DataBase
             await Database.CreateTableAsync<Api_AppMobileApi_GetDataDownloadDocumentCreditAmortizationResponse>();
             await Database.CreateTableAsync<Api_AppMobileApi_GetDataDownloadServerTransactionMasterResponse>();            
             await Database.CreateTableAsync<Api_AppMobileApi_GetDataDownloadIndicatorResponse>();
+            await Database.CreateTableAsync<Api_AppMobileApi_GetDataDownloadZoneResponse>();
             await Database.CreateTableAsync<TbTransactionMaster>();
             await Database.CreateTableAsync<TbTransactionMasterDetail>();
             await Database.CreateTableAsync<TbCompany>();            

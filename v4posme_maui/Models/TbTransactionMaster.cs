@@ -52,6 +52,13 @@ public class TbTransactionMaster
     [DataMember(Name = "ReferenceClientName")] public string ReferenceClientName { get; set; } = string.Empty;
     [DataMember(Name = "MesaID")] public int MesaID { get; set; } = 1;
     [DataMember(Name = "MesaName")] public string MesaName { get; set; } = string.Empty;
+    // Datos adicionales de facturacion (equivalentes a la factura web). Opcionales:
+    // si van vacios / 0 el servidor conserva su comportamiento anterior.
+    [DataMember(Name = "NumberPhone")] public string NumberPhone { get; set; } = string.Empty;                              // tb_transaction_master.numberPhone
+    [DataMember(Name = "ReferenceClientIdentifier")] public string ReferenceClientIdentifier { get; set; } = string.Empty;  // tb_transaction_master_info.referenceClientIdentifier
+    [DataMember(Name = "ReferenceInvoice")] public string ReferenceInvoice { get; set; } = string.Empty;                    // tb_transaction_master.reference3 (Reference3 movil ya se usa para saldo nuevo)
+    [DataMember(Name = "ZoneID")] public int ZoneID { get; set; } = 0;                                                      // tb_transaction_master_info.zoneID
+    [DataMember(Name = "ZoneName")] public string ZoneName { get; set; } = string.Empty;
     [DataMember(Name = "StatusID")] public int StatusID { get; set; } = 1;
 
     [DataMember(Name = "referencie4")] public string? Reference4 { get; set; }

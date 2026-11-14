@@ -44,6 +44,7 @@ public static class Constantes
     public static string UrlUpload                  = UrlBase + "app_mobile_api/setDataUpload";
     public static string UrlSetUploadImageItem      = UrlBase + "app_mobile_api/setDataUploadImageItem";
     public static string UrlGetUploadImageItem      = UrlBase + "app_mobile_api/getDataUploadImageItem";
+    public static string UrlLoadOrder               = UrlBase + "app_mobile_api/getDataLoadOrder";
     public const string UrlGPSShare                 = UrlBase + "app_mobile_api/setPositionGps";
     public const string UrlGpSShareOnly             = "app_mobile_api/setPositionGps";
     public const string UrlPagadito                 = "https://connect.pagadito.com/api/v2/exec-trans";
@@ -58,4 +59,6 @@ public static class Constantes
     public const string CatalogName_MESAS                          = "CATALOGO DE MESAS";
     public const string InvoiceInMobileFieldCommentRequired        = "INVOICE_IN_MOBILE_FIELD_COMMENT_REQUERIED";
     public const string AppMobileSwitchCompany                     = "APP_MOBILE_SWITCH_COMPANY";
+    // true = muestra el boton "Cargar solicitud" en la pantalla 2 de factura (requiere internet)
+    public const string InvoiceMobileShowLoadOrder                 = "INVOICE_MOBILE_SHOW_LOAD_ORDER";
 }

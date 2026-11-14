@@ -29,7 +29,8 @@ public class RestApiAppMobileApi
     private readonly IRepositoryTbParameterSystem _parameterSystem                                  = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbParameterSystem>();
     private readonly IRepositoryTbCatalogItem _repositoryCatalogItem                                = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbCatalogItem>();
     private readonly IRepositoryTbIndicator _repositoryIndicator                                    = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbIndicator>();
-    
+    private readonly IRepositoryTbZone _repositoryZone                                              = VariablesGlobales.UnityContainer.Resolve<IRepositoryTbZone>();
+
     public async Task<DtoMenssage> GetDataDownload(bool onlyQuantityNew)
     {
         HelperLogs.Log($"GetDataDownload: inicio (onlyQuantityNew={onlyQuantityNew})", "Info");
@@ -95,7 +96,15 @@ public class RestApiAppMobileApi
                 await _repositoryTbMenuElement.PosMeDeleteAll();
                 await _repositoryTbMenuElement.PosMeInsertAll(apiResponse.ListMenuElement);
 
-                bool changeInItems                                                  = false;
+                // El catalogo de zonas no es trabajo local: tambien se refresca en descarga suave.
+                // Si el servidor es anterior y no envia ListZone, se conservan las zonas actuales.
+                if (apiResponse.ListZone != null && apiResponse.ListZone.Count > 0)
+                {
+                    await _repositoryZone.PosMeDeleteAll();
+                    await _repositoryZone.PosMeInsertAll(apiResponse.ListZone);
+                }
+
+                bool changeInItems                                                 = false;
                 List<Api_AppMobileApi_GetDataDownloadItemsResponse> objListItemNew  = new List<Api_AppMobileApi_GetDataDownloadItemsResponse>();
                 foreach (var item_ in apiResponse.ListItem)
                 {
@@ -160,7 +169,8 @@ public class RestApiAppMobileApi
                 var menuElementDeleteAll                = _repositoryTbMenuElement.PosMeDeleteAll();
                 var catalogItemAll                      = _repositoryCatalogItem.PosMeDeleteAll();
                 var indicatorDeleteAll                  = _repositoryIndicator.PosMeDeleteAll();
-                
+                var zoneDeleteAll                       = _repositoryZone.PosMeDeleteAll();
+
                 await Task.WhenAll([
                     customerDeleteAll, 
                     itemsDeleteAll, 
@@ -173,7 +183,8 @@ public class RestApiAppMobileApi
                     serverTransactionMasterAll,
                     menuElementDeleteAll,
                     catalogItemAll,
-                    indicatorDeleteAll
+                    indicatorDeleteAll,
+                    zoneDeleteAll
                 ]);
                 HelperLogs.Log("GetDataDownload: datos locales eliminados correctamente", "Info");
 
@@ -208,6 +219,7 @@ public class RestApiAppMobileApi
                             objTransactionMasterTemp.CurrencyId             = (TypeCurrency)objI.tm_currencyID;
                             objTransactionMasterTemp.CustomerCreditLineId   = objI.tm_customerCreditLineID;
                             objTransactionMasterTemp.CustomerIdentification = objI.tm_referenceClientIdentifier!;
+                            objTransactionMasterTemp.ReferenceClientIdentifier = objI.tm_referenceClientIdentifier ?? string.Empty;
                             objTransactionMasterTemp.Plazo                  = objI.tm_plazo;
                             objTransactionMasterTemp.NextVisit              = objI.tm_nextVisit ?? DateTime.MinValue;
                             objTransactionMasterTemp.FixedExpenses          = objI.tm_fixedExpenses;
@@ -257,6 +269,7 @@ public class RestApiAppMobileApi
                 var taskCatalogItem                 = _repositoryCatalogItem!.PosMeInsertAll(apiResponse.ListCatalogItem);                
                 var taskIndicator                   = _repositoryIndicator!.PosMeInsertAll(apiResponse.ListIndicator);
                 var taskTransactionMasterDetail     = _repositoryTbTransactionMasterDetail.PosMeInsertAll(objListTransactionMasterDetailNew);
+                var taskZone                        = _repositoryZone.PosMeInsertAll(apiResponse.ListZone ?? []);
 
                 await Task.WhenAll([
                     taskCustomer, 
@@ -269,7 +282,8 @@ public class RestApiAppMobileApi
                     taskMenuElement,
                     taskCatalogItem,
                     taskIndicator,
-                    taskTransactionMasterDetail
+                    taskTransactionMasterDetail,
+                    taskZone
                 ]);
                 HelperLogs.Log("GetDataDownload: nuevos movimientos insertados correctamente", "Info");
 
@@ -371,6 +385,47 @@ public class RestApiAppMobileApi
             HelperLogs.Log(ex);
             HelperLogs.Log("SendDataAsync: excepción durante el proceso de subida", "Error");
             return $"Error: {ex.Message}";
+        }
+    }
+
+    /// <summary>
+    /// Cargar solicitud (equivalente a app_invoice_billing/loadOrder de la web).
+    /// Unica funcion de la factura que requiere internet; no escribe nada en SQLite.
+    /// Nunca lanza excepcion: ante cualquier fallo devuelve Error = true.
+    /// </summary>
+    public async Task<DtoLoadOrderResponse> GetDataLoadOrder(string? orderNumber)
+    {
+        var numero = HelperLoadOrder.NormalizarNumero(orderNumber);
+        try
+        {
+            HelperLogs.Log($"GetDataLoadOrder: inicio (orderNumber={numero})", "Info");
+            var nvc = new List<KeyValuePair<string, string>>
+            {
+                new("txtNickname", VariablesGlobales.User!.Nickname!),
+                new("txtPassword", VariablesGlobales.User.Password!),
+                new("txtOrderNumber", numero)
+            };
+            var tempUrl = Constantes.UrlLoadOrder.Replace("{UrlBase}", VariablesGlobales.CompanyKey);
+            var req     = new HttpRequestMessage(HttpMethod.Post, tempUrl)
+            {
+                Content = new FormUrlEncodedContent(nvc)
+            };
+            await HelperUserAgent.ApplyUserAgentAsync(req);
+            var response = await _httpClient.SendAsync(req);
+            if (!response.IsSuccessStatusCode)
+            {
+                HelperLogs.Log($"GetDataLoadOrder: respuesta HTTP no exitosa ({(int)response.StatusCode})", "Error");
+                return new DtoLoadOrderResponse { Error = true, Message = Mensajes.MensajeCargarSolicitudError };
+            }
+
+            var responseBody = await response.Content.ReadAsStringAsync();
+            return HelperLoadOrder.ParsearRespuesta(responseBody, Mensajes.MensajeCargarSolicitudError);
+        }
+        catch (Exception ex)
+        {
+            HelperLogs.Log(ex);
+            HelperLogs.Log("GetDataLoadOrder: excepción al cargar la solicitud", "Error");
+            return new DtoLoadOrderResponse { Error = true, Message = Mensajes.MensajeCargarSolicitudError };
         }
     }
 }

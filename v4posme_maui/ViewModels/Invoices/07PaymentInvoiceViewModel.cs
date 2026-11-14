@@ -211,6 +211,12 @@ public class PaymentInvoiceViewModel : BaseViewModel
                 MesaID              = dtoInvoice.Mesa!.Key,
                 ReferenceClientName = dtoInvoice.ReferenceClientName,
                 MesaName            = dtoInvoice.Mesa!.Name,
+                // Datos adicionales (opcionales): el servidor aplica sus valores por defecto si vienen vacios.
+                NumberPhone                 = dtoInvoice.NumberPhone ?? string.Empty,
+                ReferenceClientIdentifier   = dtoInvoice.ReferenceClientIdentifier ?? string.Empty,
+                ReferenceInvoice            = dtoInvoice.Referencia ?? string.Empty,
+                ZoneID                      = dtoInvoice.Zona?.Key ?? 0,
+                ZoneName                    = dtoInvoice.Zona?.Name ?? string.Empty,
                 RegisterLocal       = 1
             };
 

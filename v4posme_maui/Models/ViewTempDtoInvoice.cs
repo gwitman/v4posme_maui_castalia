@@ -49,6 +49,10 @@ public class ViewTempDtoInvoice
     public DateTime NextVisit { get; set; } = DateTime.Now;
     public string ReferenceClientName { get; set; } = string.Empty ;
     public DtoCatalogItem? Mesa { get; set; }
+    // Datos adicionales de facturacion (opcionales)
+    public string ReferenceClientIdentifier { get; set; } = string.Empty;
+    public string NumberPhone { get; set; } = string.Empty;
+    public DtoCatalogItem? Zona { get; set; }
     public DtoCatalogItem PeriodPay { get; set; } 
     public TbTransactionMaster TransactionMaster { get; set; }
 

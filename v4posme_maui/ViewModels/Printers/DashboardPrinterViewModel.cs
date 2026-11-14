@@ -297,6 +297,13 @@ public class DashboardPrinterViewModel : BaseViewModel
             VariablesGlobales.DtoInvoice.TipoDocumento      = new DtoCatalogItem((int)VariablesGlobales.DtoInvoice.TransactionMaster.TransactionCausalId, VariablesGlobales.DtoInvoice.TransactionMaster.TransactionCausalId.ToString(), VariablesGlobales.DtoInvoice.TransactionMaster.TransactionCausalId.ToString());
             VariablesGlobales.DtoInvoice.PeriodPay          = new DtoCatalogItem((int)VariablesGlobales.DtoInvoice.TransactionMaster.PeriodPay, VariablesGlobales.DtoInvoice.TransactionMaster.PeriodPay.ToString(), VariablesGlobales.DtoInvoice.TransactionMaster.PeriodPay.ToString());
             VariablesGlobales.DtoInvoice.Mesa               = new DtoCatalogItem((int)VariablesGlobales.DtoInvoice.TransactionMaster.MesaID, VariablesGlobales.DtoInvoice.TransactionMaster.MesaName, VariablesGlobales.DtoInvoice.TransactionMaster.MesaName);
+            // Datos adicionales de facturacion: se conservan al editar
+            VariablesGlobales.DtoInvoice.Referencia                 = VariablesGlobales.DtoInvoice.TransactionMaster.ReferenceInvoice ?? string.Empty;
+            VariablesGlobales.DtoInvoice.ReferenceClientIdentifier  = VariablesGlobales.DtoInvoice.TransactionMaster.ReferenceClientIdentifier ?? string.Empty;
+            VariablesGlobales.DtoInvoice.NumberPhone                = VariablesGlobales.DtoInvoice.TransactionMaster.NumberPhone ?? string.Empty;
+            VariablesGlobales.DtoInvoice.Zona                       = VariablesGlobales.DtoInvoice.TransactionMaster.ZoneID > 0
+                ? new DtoCatalogItem(VariablesGlobales.DtoInvoice.TransactionMaster.ZoneID, VariablesGlobales.DtoInvoice.TransactionMaster.ZoneName ?? string.Empty, VariablesGlobales.DtoInvoice.TransactionMaster.ZoneName ?? string.Empty)
+                : null;
             VariablesGlobales.DtoInvoice.Balance            = VariablesGlobales.DtoInvoice.TransactionMaster.SubAmount - VariablesGlobales.DtoInvoice.TransactionMaster.Discount;
             VariablesGlobales.DtoInvoice.ClearItems();
 
