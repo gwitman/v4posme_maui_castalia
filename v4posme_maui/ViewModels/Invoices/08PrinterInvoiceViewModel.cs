@@ -149,9 +149,8 @@ public class PrinterInvoiceViewModel : BaseViewModel
                     printerReferencia,
                     VariablesGlobales.User!.Nickname!,
                     _helperCore,
-                    MostrarZona,
-                    NombreZona,
-                    EtiquetaZona
+                    TituloDocumento,
+                    LineasComprobante
                 );
             }
             if (printerFormat.Trim().Equals("loto", StringComparison.OrdinalIgnoreCase))
@@ -170,9 +169,8 @@ public class PrinterInvoiceViewModel : BaseViewModel
                     printerReferencia,
                     VariablesGlobales.User!.Nickname!,
                     _helperCore,
-                    MostrarZona,
-                    NombreZona,
-                    EtiquetaZona
+                    TituloDocumento,
+                    LineasComprobante
                 );
             }
 
@@ -458,41 +456,54 @@ public class PrinterInvoiceViewModel : BaseViewModel
         set => SetProperty(ref _showReferencia, value);
     }
 
-    private bool _mostrarZona;
+    private string _tituloDocumento = Mensajes.TituloDocumentoFactura;
 
-    // Indica si se debe mostrar/imprimir la zona (mesa). Solo true en modo restaurante
-    // (permiso core_billing_invoice_type_restaurant).
-    public bool MostrarZona
+    // Título del comprobante/impresión según el estado de la factura y APP_MOBILE_SETTING
+    // (label_type_document_in_register / label_type_document_in_aplied). Por defecto "FACTURA".
+    public string TituloDocumento
     {
-        get => _mostrarZona;
-        set => SetProperty(ref _mostrarZona, value);
+        get => _tituloDocumento;
+        set => SetProperty(ref _tituloDocumento, value);
     }
 
-    // Nombre de la zona (mesa) a mostrar. Se toma de DtoInvoice.Mesa y, si no, del
-    // TransactionMaster. En restaurante el campo "mesa" se rotula y se imprime como "Zona".
-    public string NombreZona => VariablesGlobales.DtoInvoice.Mesa?.Name
-                                ?? VariablesGlobales.DtoInvoice.TransactionMaster?.MesaName
-                                ?? string.Empty;
+    private List<DtoLineaComprobante> _lineasComprobante = [];
 
-    private string _etiquetaZona = "Zona";
-
-    // Rótulo configurable para la zona (mesa). Se carga del parámetro
-    // APP_MOBILE_LABEL_ZONE_INVOICE y por defecto es "Zona". Se usa tanto en las
-    // pantallas de visualización/voucher como en la impresión.
-    public string EtiquetaZona
+    // Datos de la factura (Tipo, Moneda, Mesa, Zona, Teléfono, Cédula, Cliente) con la
+    // visibilidad y rótulos de APP_MOBILE_SETTING. Se muestran en pantalla y se imprimen.
+    // Mesa y Zona van separadas: la mesa (restaurante) y la zona (tb_zone) son datos distintos.
+    public List<DtoLineaComprobante> LineasComprobante
     {
-        get => _etiquetaZona;
-        set
-        {
-            if (SetProperty(ref _etiquetaZona, value))
-            {
-                OnPropertyChanged(nameof(EtiquetaZonaLabel));
-            }
-        }
+        get => _lineasComprobante;
+        set => SetProperty(ref _lineasComprobante, value);
     }
 
-    // Versión con dos puntos para mostrar en las pantallas (ej. "Zona:").
-    public string EtiquetaZonaLabel => $"{EtiquetaZona}:";
+    // Arma el título y las líneas del comprobante a partir de la factura actual.
+    private async Task CargarDatosComprobanteAsync()
+    {
+        var setting           = await _helperCore.GetAppMobileSettingAsync();
+        var esModoRestaurante = await _helperCore.GetPermission(TypeMenuElementID.core_billing_invoice_type_restaurant, TypePermission.Updated, TypeImpact.All);
+        var etiquetaZona      = await _helperCore.GetValueParameterTrim(Constantes.AppMobileLabelZoneInvoice, Mensajes.EtiquetaZonaFactura);
+        var dto               = VariablesGlobales.DtoInvoice;
+        var mesa              = dto.Mesa is not null
+            ? (dto.Mesa.Key > 0 ? dto.Mesa.Name : string.Empty)
+            : dto.TransactionMaster?.MesaName;
+        var zona              = dto.Zona is not null && dto.Zona.Key > 0
+            ? dto.Zona.Name
+            : dto.TransactionMaster?.ZoneName;
+
+        TituloDocumento   = HelperAppMobileSetting.TituloDocumento(setting, dto.TransactionMaster?.StatusID ?? 0);
+        LineasComprobante = HelperAppMobileSetting.LineasComprobante(
+            setting,
+            dto.TipoDocumento?.Name,
+            dto.Currency?.Simbolo,
+            mesa,
+            esModoRestaurante,
+            zona,
+            etiquetaZona,
+            dto.NumberPhone,
+            dto.ReferenceClientIdentifier,
+            dto.ReferenceClientName);
+    }
 
     private ImageSource? _qrImageSource;
 
@@ -540,12 +551,8 @@ public class PrinterInvoiceViewModel : BaseViewModel
             string printerRef   = await _helperCore.GetValueParameter("PRINTER_REFERENCE_INVOICE_MOBILE", "false");
             ShowReferencia      = printerRef.Trim().Equals("true", StringComparison.OrdinalIgnoreCase);
 
-            // Modo restaurante: solo en ese caso se muestra/imprime la zona (mesa).
-            MostrarZona         = await _helperCore.GetPermission(TypeMenuElementID.core_billing_invoice_type_restaurant, TypePermission.Updated, TypeImpact.All);
-            // Rótulo configurable de la zona (por defecto "Zona").
-            // Mismo parámetro que la pantalla 2 (antes leía "APP_MOBILE_LABEL_ZONA_INVOICE", que no existe).
-            EtiquetaZona        = await _helperCore.GetValueParameterTrim(Constantes.AppMobileLabelZoneInvoice, Mensajes.EtiquetaZonaFactura);
-            OnPropertyChanged(nameof(NombreZona));
+            // Título (FACTURA/Proforma...) y datos configurables con APP_MOBILE_SETTING.
+            await CargarDatosComprobanteAsync();
 
             IsBusy              = false;
         }

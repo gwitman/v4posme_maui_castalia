@@ -125,18 +125,40 @@ public class PaymentInvoiceViewModel : BaseViewModel
             int statusID = !permission ? (int)TypeStatusBilling.Apply : (int)TypeStatusBilling.Register;
             HelperLogs.Trace(Screen, "OnAplicarPagoCommand", $"permission={permission}, statusID={statusID}");
 
-            // En modo restaurante (permission=true) es obligatorio seleccionar una zona/mesa válida.
-            // Fuera de restaurante, Mesa puede quedar null y se aplica un valor neutro.
+            // La mesa es obligatoria según APP_MOBILE_SETTING (control_mesa_facturacion); si el
+            // JSON no define la mesa se conserva la regla anterior (obligatoria en modo restaurante).
+            var setting = await _helper.GetAppMobileSettingAsync();
+            if (HelperAppMobileSetting.MesaObligatoria(setting, permission) &&
+                (dtoInvoice.Mesa is null || dtoInvoice.Mesa.Key <= 0))
+            {
+                HelperLogs.Trace(Screen, "OnAplicarPagoCommand", "mesa obligatoria: no se seleccionó zona/mesa", "Warning");
+                ShowToast(Mensajes.MensajeSeleccionarMesa, ToastDuration.Long, 12);
+                IsBusy = false;
+                return;
+            }
+
+            // Resto de campos obligatorios de APP_MOBILE_SETTING (cubre la facturación rápida,
+            // que no pasa por la pantalla 2/6).
+            var etiquetaZona = await _helper.GetValueParameterTrim(Constantes.AppMobileLabelZoneInvoice, Mensajes.EtiquetaZonaFactura);
+            var faltante     = HelperAppMobileSetting.CampoObligatorioFaltante(
+                setting,
+                dtoInvoice.Currency?.Key ?? 0,
+                dtoInvoice.TipoDocumento?.Key ?? 0,
+                dtoInvoice.Zona?.Key ?? 0,
+                dtoInvoice.NumberPhone,
+                dtoInvoice.ReferenceClientIdentifier,
+                dtoInvoice.ReferenceClientName,
+                etiquetaZona);
+            if (faltante is not null)
+            {
+                HelperLogs.Trace(Screen, "OnAplicarPagoCommand", $"campo obligatorio sin valor: {faltante}", "Warning");
+                ShowToast(string.Format(Mensajes.MensajeCampoObligatorioFactura, faltante), ToastDuration.Long, 12);
+                IsBusy = false;
+                return;
+            }
+
             if (permission)
             {
-                if (dtoInvoice.Mesa is null || dtoInvoice.Mesa.Key <= 0)
-                {
-                    HelperLogs.Trace(Screen, "OnAplicarPagoCommand", "modo restaurante: no se seleccionó zona/mesa", "Warning");
-                    ShowToast(Mensajes.MensajeSeleccionarMesa, ToastDuration.Long, 12);
-                    IsBusy = false;
-                    return;
-                }
-
                 // En modo restaurante solo se permite el tipo de pago Registrar.
                 // Efectivo, Pagadito (crédito/débito), monedero, cheque u otros no se permiten.
                 if (TypePayment != TypePayment.Registrar)
@@ -147,7 +169,8 @@ public class PaymentInvoiceViewModel : BaseViewModel
                     return;
                 }
             }
-            else if (dtoInvoice.Mesa is null)
+
+            if (dtoInvoice.Mesa is null)
             {
                 HelperLogs.Trace(Screen, "OnAplicarPagoCommand", "Mesa era null. Aplicando valor por defecto (0)", "Warning");
                 dtoInvoice.Mesa = new DtoCatalogItem(0, "Seleccione", "Seleccione");

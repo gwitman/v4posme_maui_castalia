@@ -106,7 +106,8 @@
                                     IsErrorIconVisible="{Binding ErrorReferenceClientName}"
                                     StartIcon="identificacion"
                                     Text="{Binding ReferenceClientName}"
-                                    LabelText="Cliente" />
+                                    LabelText="{Binding EtiquetaClienteReferencia}"
+                                    IsVisible="{Binding MostrarClienteReferencia}" />
 
                                 <dxe:TextEdit
                                     Grid.Row="4"
@@ -115,7 +116,8 @@
                                     StartIcon="identificacion"
                                     MaxCharacterCount="50"
                                     Text="{Binding ReferenceClientIdentifier}"
-                                    LabelText="Cédula" />
+                                    LabelText="{Binding EtiquetaCedula}"
+                                    IsVisible="{Binding MostrarCedula}" />
 
                                 <dxe:TextEdit
                                     Grid.Row="5"
@@ -125,7 +127,8 @@
                                     Keyboard="Telephone"
                                     MaxCharacterCount="250"
                                     Text="{Binding NumberPhone}"
-                                    LabelText="Teléfono" />
+                                    LabelText="{Binding EtiquetaTelefono}"
+                                    IsVisible="{Binding MostrarTelefono}" />
 
                                 <dxe:ComboBoxEdit
                                     Grid.Row="6"
@@ -133,7 +136,8 @@
                                     HasError="{Binding ErrorCurrency}"
                                     IsLabelFloating="True"
                                     StartIcon="price"
-                                    LabelText="Moneda"
+                                    LabelText="{Binding EtiquetaMoneda}"
+                                    IsVisible="{Binding MostrarMoneda}"
                                     ItemsSource="{Binding Currencies}" />
 
                                 <dxe:ComboBoxEdit
@@ -142,7 +146,8 @@
                                     HasError="{Binding ErrorTipoDocumento}"
                                     StartIcon="identificacion"
                                     IsLabelFloating="True"
-                                    LabelText="Tipo de documento"
+                                    LabelText="{Binding EtiquetaTipoDocumento}"
+                                    IsVisible="{Binding MostrarTipoDocumento}"
                                     ItemsSource="{Binding TipoDocumentos}" />
 
                                 <dxe:ComboBoxEdit
@@ -151,7 +156,8 @@
                                     HasError="{Binding ErrorMesa}"
                                     IsLabelFloating="True"
                                     StartIcon="price"
-                                    LabelText="Mesa"
+                                    LabelText="{Binding EtiquetaMesa}"
+                                    IsVisible="{Binding MostrarMesa}"
                                     ItemsSource="{Binding Mesas}" />
 
                                 <dxe:ComboBoxEdit
@@ -160,6 +166,7 @@
                                     IsLabelFloating="True"
                                     StartIcon="price"
                                     LabelText="{Binding EtiquetaZona}"
+                                    IsVisible="{Binding MostrarZona}"
                                     ItemsSource="{Binding Zonas}" />
 
                                 <dx:DXButton

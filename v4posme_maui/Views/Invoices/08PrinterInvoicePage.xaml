@@ -66,7 +66,7 @@
                                     </FormattedString>
                                 </Label.FormattedText>
                             </Label>
-                            <Label Text="FACTURA"
+                            <Label Text="{Binding TituloDocumento}"
                                    HorizontalTextAlignment="Center"
                                    TextColor="{StaticResource Primary}"
                                    FontSize="18"
@@ -114,27 +114,34 @@
                                         <RowDefinition Height="Auto" />
                                         <RowDefinition Height="Auto" />
                                         <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
                                     </Grid.RowDefinitions>
                                     <Label Grid.Row="0" Grid.Column="0" Text="Vendedor:" FontAttributes="Bold" />
                                     <Label Grid.Row="0" Grid.Column="1" Text="{Binding CodigoVendedor}" />
                                     <Label Grid.Row="1" Grid.Column="0" Text="Codigo:" FontAttributes="Bold" />
                                     <Label Grid.Row="1" Grid.Column="1" Text="{Binding DtoInvoice.Codigo}" />
-                                    <Label Grid.Row="2" Grid.Column="0" Text="Tipo:" FontAttributes="Bold" />
-                                    <Label Grid.Row="2" Grid.Column="1" Text="{Binding DtoInvoice.TipoDocumento.Name}" />
-                                    <Label Grid.Row="3" Grid.Column="0" Text="Moneda:" FontAttributes="Bold" />
-                                    <Label Grid.Row="3" Grid.Column="1" Text="{Binding SimboloMoneda}" />
-                                    <Label Grid.Row="4" Grid.Column="0" Text="Estado:" FontAttributes="Bold" />
-                                    <Label Grid.Row="4" Grid.Column="1" Text="{Binding EstadoFactura}" />
-                                    <Label Grid.Row="5" Grid.Column="0" Text="{Binding EtiquetaZonaLabel}" FontAttributes="Bold" IsVisible="{Binding MostrarZona}" />
-                                    <Label Grid.Row="5" Grid.Column="1" Text="{Binding NombreZona}" IsVisible="{Binding MostrarZona}" />
-                                    <Label Grid.Row="6" Grid.Column="0" Text="Cliente:" FontAttributes="Bold" />
-                                    <Label Grid.Row="7"
+                                    <Label Grid.Row="2" Grid.Column="0" Text="Estado:" FontAttributes="Bold" />
+                                    <Label Grid.Row="2" Grid.Column="1" Text="{Binding EstadoFactura}" />
+                                    <!-- Tipo, Moneda, Mesa, Zona, Teléfono, Cédula y Cliente según APP_MOBILE_SETTING -->
+                                    <VerticalStackLayout Grid.Row="3"
+                                                         Grid.Column="0"
+                                                         Grid.ColumnSpan="2"
+                                                         Spacing="4"
+                                                         BindableLayout.ItemsSource="{Binding LineasComprobante}">
+                                        <BindableLayout.ItemTemplate>
+                                            <DataTemplate x:DataType="models:DtoLineaComprobante">
+                                                <Grid ColumnDefinitions="*,*">
+                                                    <Label Grid.Column="0" Text="{Binding EtiquetaConDosPuntos}" FontAttributes="Bold" />
+                                                    <Label Grid.Column="1" Text="{Binding Valor}" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </BindableLayout.ItemTemplate>
+                                    </VerticalStackLayout>
+                                    <Label Grid.Row="4" Grid.Column="0" Text="Cliente:" FontAttributes="Bold" />
+                                    <Label Grid.Row="5"
                                            Grid.Column="0"
                                            Grid.ColumnSpan="2"
                                            Text="{Binding NombreCliente}" />
-                                    <Label Grid.Row="8"
+                                    <Label Grid.Row="6"
                                            Grid.ColumnSpan="2"
                                            Grid.Column="0"
                                            Text="{Binding DtoInvoice.Comentarios}" />

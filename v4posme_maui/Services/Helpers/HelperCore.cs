@@ -225,6 +225,20 @@ public class HelperCore(
         return valueDefault;
     }
 
+    // Lee e interpreta APP_MOBILE_SETTING (configuración de campos de la factura móvil).
+    // Si no existe o es inválido devuelve una configuración vacía (comportamiento actual)
+    // y registra el error en tb_logs para que se pueda revisar en Más → Logs.
+    public async Task<DtoAppMobileSetting> GetAppMobileSettingAsync()
+    {
+        var json    = await GetValueParameterTrim(Constantes.AppMobileSetting, string.Empty);
+        var setting = HelperAppMobileSetting.Parse(json);
+        if (!string.IsNullOrEmpty(setting.Error))
+        {
+            HelperLogs.Log(setting.Error);
+        }
+        return setting;
+    }
+
     public async Task<string> GetCodigoFactura()
     {
         var find    = await repositoryParameters.PosMeFindCodigoFactura();

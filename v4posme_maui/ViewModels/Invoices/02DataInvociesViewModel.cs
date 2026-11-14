@@ -22,6 +22,8 @@ public class DataInvoicesViewModel : BaseViewModel, IQueryAttributable
     private IRepositoryTbZone _repositoryTbZone;
     private IRepositoryItems _repositoryItems;
     private bool _commentRequired   = false;
+    private DtoAppMobileSetting _setting = new();
+    private string _etiquetaZonaParametro = Mensajes.EtiquetaZonaFactura;
 
     public DataInvoicesViewModel()
     {
@@ -60,7 +62,34 @@ public class DataInvoicesViewModel : BaseViewModel, IQueryAttributable
 
         // Rótulos iguales a la web (parámetros copiados de tb_company_page_setting por script SQL).
         EtiquetaComentario      = await _helperCore.GetValueParameterTrim(Constantes.AppMobileLabelCommentInvoice, Mensajes.EtiquetaComentarioFactura);
-        EtiquetaZona            = await _helperCore.GetValueParameterTrim(Constantes.AppMobileLabelZoneInvoice, Mensajes.EtiquetaZonaFactura);
+        _etiquetaZonaParametro  = await _helperCore.GetValueParameterTrim(Constantes.AppMobileLabelZoneInvoice, Mensajes.EtiquetaZonaFactura);
+
+        // APP_MOBILE_SETTING: visibilidad, rótulo y obligatoriedad de los campos. Los valores
+        // por defecto ya se aplicaron al crear la factura (HelperInvoiceFlow), por eso aquí no
+        // se tocan los valores (en edición se conservan los guardados).
+        _setting                    = await _helperCore.GetAppMobileSettingAsync();
+        MostrarClienteReferencia    = HelperAppMobileSetting.EsVisible(_setting, Constantes.SettingControlClienteReferencia);
+        MostrarCedula               = HelperAppMobileSetting.EsVisible(_setting, Constantes.SettingControlCedula);
+        MostrarTelefono             = HelperAppMobileSetting.EsVisible(_setting, Constantes.SettingControlTelefono);
+        MostrarMoneda               = HelperAppMobileSetting.EsVisible(_setting, Constantes.SettingControlMoneda);
+        MostrarTipoDocumento        = HelperAppMobileSetting.EsVisible(_setting, Constantes.SettingControlTipoDocumento);
+        MostrarMesa                 = HelperAppMobileSetting.EsVisible(_setting, Constantes.SettingControlMesa);
+        MostrarZona                 = HelperAppMobileSetting.EsVisible(_setting, Constantes.SettingControlZona);
+        EtiquetaClienteReferencia   = EtiquetaCampo(Constantes.SettingControlClienteReferencia, Mensajes.EtiquetaClienteReferenciaFactura);
+        EtiquetaCedula              = EtiquetaCampo(Constantes.SettingControlCedula, Mensajes.EtiquetaCedulaFactura);
+        EtiquetaTelefono            = EtiquetaCampo(Constantes.SettingControlTelefono, Mensajes.EtiquetaTelefonoFactura);
+        EtiquetaMoneda              = EtiquetaCampo(Constantes.SettingControlMoneda, Mensajes.EtiquetaMonedaFactura);
+        EtiquetaTipoDocumento       = EtiquetaCampo(Constantes.SettingControlTipoDocumento, Mensajes.EtiquetaTipoDocumentoFactura);
+        EtiquetaMesa                = EtiquetaCampo(Constantes.SettingControlMesa, Mensajes.EtiquetaMesaFactura);
+        // Zona: rótulo del JSON > APP_MOBILE_LABEL_ZONE_INVOICE > "Zona".
+        EtiquetaZona                = EtiquetaCampo(Constantes.SettingControlZona, _etiquetaZonaParametro);
+    }
+
+    // Rótulo del JSON (o el por defecto) con "*" si el campo es obligatorio.
+    private string EtiquetaCampo(string clave, string porDefecto)
+    {
+        var etiqueta = HelperAppMobileSetting.Etiqueta(_setting, clave, porDefecto);
+        return HelperAppMobileSetting.EsObligatorio(_setting, clave) ? $"{etiqueta} *" : etiqueta;
     }
 
     // Copia lo capturado en pantalla al DTO de la factura (se usa al avanzar y al cargar una solicitud).
@@ -232,6 +261,29 @@ public class DataInvoicesViewModel : BaseViewModel, IQueryAttributable
             return;
         }
 
+        // Campos obligatorios según APP_MOBILE_SETTING (solo los visibles).
+        var faltante = HelperAppMobileSetting.CampoObligatorioFaltante(
+            _setting,
+            SelectedCurrency.Key,
+            SelectedTipoDocumento.Key,
+            SelectedZona?.Key ?? 0,
+            NumberPhone,
+            ReferenceClientIdentifier,
+            ReferenceClientName,
+            _etiquetaZonaParametro);
+        if (faltante is null &&
+            HelperAppMobileSetting.MesaObligatoria(_setting, false) &&
+            (SelectedMesa is null || SelectedMesa.Key <= 0))
+        {
+            faltante = HelperAppMobileSetting.Etiqueta(_setting, Constantes.SettingControlMesa, Mensajes.EtiquetaMesaFactura);
+        }
+        if (faltante is not null)
+        {
+            ShowToast(string.Format(Mensajes.MensajeCampoObligatorioFactura, faltante), ToastDuration.Long, 16);
+            IsBusy = false;
+            return;
+        }
+
         GuardarDatosEnItem();
         Item.Currency               = SelectedCurrency;
         Item.TipoDocumento          = SelectedTipoDocumento;
@@ -372,6 +424,98 @@ public class DataInvoicesViewModel : BaseViewModel, IQueryAttributable
         set => SetProperty(ref _etiquetaZona, value);
     }
 
+    // Visibilidad y rótulos configurables con APP_MOBILE_SETTING (por defecto: visibles y rótulos originales)
+    private bool _mostrarClienteReferencia = true;
+    public bool MostrarClienteReferencia
+    {
+        get => _mostrarClienteReferencia;
+        set => SetProperty(ref _mostrarClienteReferencia, value);
+    }
+
+    private bool _mostrarCedula = true;
+    public bool MostrarCedula
+    {
+        get => _mostrarCedula;
+        set => SetProperty(ref _mostrarCedula, value);
+    }
+
+    private bool _mostrarTelefono = true;
+    public bool MostrarTelefono
+    {
+        get => _mostrarTelefono;
+        set => SetProperty(ref _mostrarTelefono, value);
+    }
+
+    private bool _mostrarMoneda = true;
+    public bool MostrarMoneda
+    {
+        get => _mostrarMoneda;
+        set => SetProperty(ref _mostrarMoneda, value);
+    }
+
+    private bool _mostrarTipoDocumento = true;
+    public bool MostrarTipoDocumento
+    {
+        get => _mostrarTipoDocumento;
+        set => SetProperty(ref _mostrarTipoDocumento, value);
+    }
+
+    private bool _mostrarMesa = true;
+    public bool MostrarMesa
+    {
+        get => _mostrarMesa;
+        set => SetProperty(ref _mostrarMesa, value);
+    }
+
+    private bool _mostrarZona = true;
+    public bool MostrarZona
+    {
+        get => _mostrarZona;
+        set => SetProperty(ref _mostrarZona, value);
+    }
+
+    private string _etiquetaClienteReferencia = Mensajes.EtiquetaClienteReferenciaFactura;
+    public string EtiquetaClienteReferencia
+    {
+        get => _etiquetaClienteReferencia;
+        set => SetProperty(ref _etiquetaClienteReferencia, value);
+    }
+
+    private string _etiquetaCedula = Mensajes.EtiquetaCedulaFactura;
+    public string EtiquetaCedula
+    {
+        get => _etiquetaCedula;
+        set => SetProperty(ref _etiquetaCedula, value);
+    }
+
+    private string _etiquetaTelefono = Mensajes.EtiquetaTelefonoFactura;
+    public string EtiquetaTelefono
+    {
+        get => _etiquetaTelefono;
+        set => SetProperty(ref _etiquetaTelefono, value);
+    }
+
+    private string _etiquetaMoneda = Mensajes.EtiquetaMonedaFactura;
+    public string EtiquetaMoneda
+    {
+        get => _etiquetaMoneda;
+        set => SetProperty(ref _etiquetaMoneda, value);
+    }
+
+    private string _etiquetaTipoDocumento = Mensajes.EtiquetaTipoDocumentoFactura;
+    public string EtiquetaTipoDocumento
+    {
+        get => _etiquetaTipoDocumento;
+        set => SetProperty(ref _etiquetaTipoDocumento, value);
+    }
+
+    private string _etiquetaMesa = Mensajes.EtiquetaMesaFactura;
+    public string EtiquetaMesa
+    {
+        get => _etiquetaMesa;
+        set => SetProperty(ref _etiquetaMesa, value);
+    }
+
     private bool _mostrarCargarSolicitud;
     public bool MostrarCargarSolicitud
     {
@@ -430,16 +574,9 @@ public class DataInvoicesViewModel : BaseViewModel, IQueryAttributable
 
     private void LoadComboBox()
     {
-        Currencies =
-        [
-            new DtoCatalogItem((int)TypeCurrency.Cordoba, "Córdobas", "C$"),
-            new DtoCatalogItem((int)TypeCurrency.Dolar, "Dolares", "$")
-        ];
-        TipoDocumentos =
-        [
-            new DtoCatalogItem((int)TypeTransactionCausal.Contado, "Contado", "D"),
-            new DtoCatalogItem((int)TypeTransactionCausal.Credito, "Crédito", "C")
-        ];
+        // Mismas opciones que usa HelperInvoiceFlow al aplicar los valores por defecto.
+        Currencies      = new ObservableCollection<DtoCatalogItem>(HelperInvoiceFlow.OpcionesMoneda());
+        TipoDocumentos  = new ObservableCollection<DtoCatalogItem>(HelperInvoiceFlow.OpcionesTipoDocumento());
 
         //Llenar el catalogo de mesas
         Mesas                                                                       =  [ new DtoCatalogItem(0, "Seleccione", "Seleccione")];

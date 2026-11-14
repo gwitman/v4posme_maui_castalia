@@ -144,7 +144,8 @@ public class SeleccionarProductoViewModel : BaseViewModel
         // Se valida aqui (y no solo en la pantalla de pago 7/6) para no obligar al usuario
         // a retroceder luego. La mesa se elige en la pantalla 2/6 (Datos de facturacion);
         // Mesa null o con Key <= 0 ("Seleccione") significa que no se ha seleccionado.
-        if (_esModoRestaurante &&
+        // La obligatoriedad viene de APP_MOBILE_SETTING (fallback: modo restaurante).
+        if (_mesaObligatoria &&
             (VariablesGlobales.DtoInvoice.Mesa is null || VariablesGlobales.DtoInvoice.Mesa.Key <= 0))
         {
             ShowToast(Mensajes.MensajeSeleccionarMesa, ToastDuration.Long, 12);
@@ -349,6 +350,7 @@ public class SeleccionarProductoViewModel : BaseViewModel
             TypeMenuElementID.core_billing_invoice_type_restaurant,
             TypePermission.Updated,
             TypeImpact.All);
+        _mesaObligatoria = HelperAppMobileSetting.MesaObligatoria(await _helper.GetAppMobileSettingAsync(), _esModoRestaurante);
 
         // Parametro de servidor INVOICE_SHOW_COST_IN_MOBILE: controla si en el popup de
         // detalle del producto se muestra (solo lectura) el costo del producto. Por
@@ -404,6 +406,10 @@ public class SeleccionarProductoViewModel : BaseViewModel
     // Modo restaurante segun el permiso core_billing_invoice_type_restaurant (igual criterio
     // que la pantalla de pago 7/6). Cuando es true, la zona/mesa es obligatoria antes de avanzar.
     private bool _esModoRestaurante;
+
+    // Mesa obligatoria: la define APP_MOBILE_SETTING (control_mesa_facturacion); si el JSON no
+    // trae la mesa se conserva la regla anterior (obligatoria solo en modo restaurante).
+    private bool _mesaObligatoria;
 
     public bool EsVistaRestaurante
     {

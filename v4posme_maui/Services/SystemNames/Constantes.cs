@@ -64,4 +64,16 @@ public static class Constantes
     // Rotulos de la pantalla 2 de factura; espejo de getBahavioDB labelCommentInvoiceV2Ext / labelZoneInvoiceV2Ext de la web
     public const string AppMobileLabelCommentInvoice               = "APP_MOBILE_LABEL_COMMENT_INVOICE";
     public const string AppMobileLabelZoneInvoice                  = "APP_MOBILE_LABEL_ZONE_INVOICE";
+    // JSON que configura los campos de la factura móvil (visible, required, value_default, label)
+    // y el título del documento. Lo interpreta HelperAppMobileSetting.
+    public const string AppMobileSetting                           = "APP_MOBILE_SETTING";
+    public const string SettingControlZona                         = "control_zone_facturacion";
+    public const string SettingControlMesa                         = "control_mesa_facturacion";
+    public const string SettingControlTipoDocumento                = "control_tipo_documento_facturacion";
+    public const string SettingControlMoneda                       = "control_moneda_facturacion";
+    public const string SettingControlTelefono                     = "control_telefono_facturacion";
+    public const string SettingControlCedula                       = "control_cedula_facturacion";
+    public const string SettingControlClienteReferencia            = "control_cliente_referencia_facturacion";
+    public const string SettingLabelTypeDocumentInRegister         = "label_type_document_in_register";
+    public const string SettingLabelTypeDocumentInAplied           = "label_type_document_in_aplied";
 }

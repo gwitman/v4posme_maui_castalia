@@ -293,8 +293,14 @@ public class DashboardPrinterViewModel : BaseViewModel
             VariablesGlobales.DtoInvoice.TransactionOn          = DateTime.Now;
 
 
-            VariablesGlobales.DtoInvoice.Currency           = new DtoCatalogItem((int)VariablesGlobales.DtoInvoice.TransactionMaster.CurrencyId, VariablesGlobales.DtoInvoice.TransactionMaster.CurrencyId.ToString(), VariablesGlobales.DtoInvoice.TransactionMaster.CurrencyId.ToString());
-            VariablesGlobales.DtoInvoice.TipoDocumento      = new DtoCatalogItem((int)VariablesGlobales.DtoInvoice.TransactionMaster.TransactionCausalId, VariablesGlobales.DtoInvoice.TransactionMaster.TransactionCausalId.ToString(), VariablesGlobales.DtoInvoice.TransactionMaster.TransactionCausalId.ToString());
+            // Moneda y tipo de documento se restauran con su nombre y símbolo reales (mismas opciones
+            // de la pantalla 2); antes se usaba el ID como nombre y el comprobante mostraba "1" o "21".
+            var currencyId                                  = (int)VariablesGlobales.DtoInvoice.TransactionMaster.CurrencyId;
+            var causalId                                    = (int)VariablesGlobales.DtoInvoice.TransactionMaster.TransactionCausalId;
+            VariablesGlobales.DtoInvoice.Currency           = HelperInvoiceFlow.OpcionesMoneda().FirstOrDefault(o => o.Key == currencyId)
+                                                              ?? new DtoCatalogItem(currencyId, currencyId.ToString(), currencyId.ToString());
+            VariablesGlobales.DtoInvoice.TipoDocumento      = HelperInvoiceFlow.OpcionesTipoDocumento().FirstOrDefault(o => o.Key == causalId)
+                                                              ?? new DtoCatalogItem(causalId, causalId.ToString(), causalId.ToString());
             VariablesGlobales.DtoInvoice.PeriodPay          = new DtoCatalogItem((int)VariablesGlobales.DtoInvoice.TransactionMaster.PeriodPay, VariablesGlobales.DtoInvoice.TransactionMaster.PeriodPay.ToString(), VariablesGlobales.DtoInvoice.TransactionMaster.PeriodPay.ToString());
             VariablesGlobales.DtoInvoice.Mesa               = new DtoCatalogItem((int)VariablesGlobales.DtoInvoice.TransactionMaster.MesaID, VariablesGlobales.DtoInvoice.TransactionMaster.MesaName, VariablesGlobales.DtoInvoice.TransactionMaster.MesaName);
             // Datos adicionales de facturacion: se conservan al editar

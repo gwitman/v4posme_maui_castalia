@@ -92,6 +92,17 @@ public static class Mensajes
     // Rótulos por defecto de la pantalla 2 de factura (mismos que la web ext_6_0_2)
     public const string EtiquetaComentarioFactura = "Comentario";
     public const string EtiquetaZonaFactura = "Zona";
+    // Rótulos por defecto de los campos configurables con APP_MOBILE_SETTING
+    public const string EtiquetaMesaFactura = "Mesa";
+    public const string EtiquetaMonedaFactura = "Moneda";
+    public const string EtiquetaTipoDocumentoFactura = "Tipo de documento";
+    public const string EtiquetaTipoComprobante = "Tipo";
+    public const string EtiquetaTelefonoFactura = "Teléfono";
+    public const string EtiquetaCedulaFactura = "Cédula";
+    public const string EtiquetaClienteReferenciaFactura = "Cliente";
+    // Título del comprobante/impresión si APP_MOBILE_SETTING no define label_type_document_in_*
+    public const string TituloDocumentoFactura = "FACTURA";
+    public const string MensajeCampoObligatorioFactura = "El campo \"{0}\" es obligatorio.";
 
     // Cargar solicitud (pantalla 2 de factura)
     public const string TituloCargarSolicitud = "Cargar solicitud";

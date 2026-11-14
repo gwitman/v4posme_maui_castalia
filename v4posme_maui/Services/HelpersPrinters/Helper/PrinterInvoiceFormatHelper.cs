@@ -25,9 +25,8 @@ public static class PrinterInvoiceFormatHelper
         string printerReferencia,
         string userNickname,
         HelperCore helperCore,
-        bool mostrarZona = false,
-        string nombreZona = "",
-        string etiquetaZona = "Zona")
+        string tituloDocumento = Mensajes.TituloDocumentoFactura,
+        IReadOnlyList<DtoLineaComprobante>? lineas = null)
     {
         if (!string.IsNullOrWhiteSpace(logo.Value))
         {
@@ -39,28 +38,26 @@ public static class PrinterInvoiceFormatHelper
         printer.AlignCenter();
         printer.BoldMode(companyName);
         printer.BoldMode($"RUC: {companyRuc}");
-        printer.BoldMode("FACTURA");
+        printer.BoldMode(tituloDocumento);
         printer.BoldMode(dtoInvoice.Codigo);
         printer.BoldMode($"FECHA: {dtoInvoice.TransactionOn:yyyy-MM-dd hh:mm tt}");
         printer.NewLine();
         printer.AlignLeft();
 
+        printer.NewLine();
+        printer.Append($"VENDEDOR     :{userNickname}");
+        printer.Append($"CODIGO       :{dtoInvoice.CustomerResponse.CustomerNumber}");
+        // Tipo, Moneda, Mesa, Zona, Teléfono, Cédula y Cliente según APP_MOBILE_SETTING.
+        foreach (var linea in lineas ?? [])
+        {
+            printer.Append($"{linea.Etiqueta.ToUpper().PadRight(13)}:{linea.Valor}");
+        }
         var detalleHeader = $"""
-                             VENDEDOR     :{userNickname}
-                             CODIGO       :{dtoInvoice.CustomerResponse.CustomerNumber}
-                             MONEDA       :{dtoInvoice.Currency!.Simbolo}
-                             TIPO         :{dtoInvoice.TipoDocumento!.Name}
-                             CLIENTE       
+                             CLIENTE
                              {dtoInvoice.NombreCompleto}
                              {dtoInvoice.Comentarios}
                              """;
-        printer.NewLine();
         printer.Append(detalleHeader);
-        // En modo restaurante se imprime la zona (mesa) con el rótulo configurable.
-        if (mostrarZona && !string.IsNullOrWhiteSpace(nombreZona))
-        {
-            printer.Append($"{etiquetaZona.ToUpper().PadRight(13)}:{nombreZona}");
-        }
         printer.NewLine();
 
         bool showReferencia = printerReferencia.Trim().Equals("true", StringComparison.OrdinalIgnoreCase);
@@ -134,9 +131,8 @@ public static class PrinterInvoiceFormatHelper
         string printerReferencia,
         string userNickname,
         HelperCore helperCore,
-        bool mostrarZona = false,
-        string nombreZona = "",
-        string etiquetaZona = "Zona")
+        string tituloDocumento = Mensajes.TituloDocumentoFactura,
+        IReadOnlyList<DtoLineaComprobante>? lineas = null)
     {
         string ocultarRucRaw = await helperCore.GetValueParameter("MOBILE_IN_PRINTER_INVOICE_OCULTAR_RUC", "false");
         bool ocultarRuc      = ocultarRucRaw.Trim().Equals("true", StringComparison.OrdinalIgnoreCase);
@@ -169,7 +165,7 @@ public static class PrinterInvoiceFormatHelper
         //printer.NewLine();
         printer.AlignLeft();
         var detalleHeader = $"""
-                             FACTURA  :{dtoInvoice.Codigo}
+                             {tituloDocumento.ToUpper().PadRight(9)}:{dtoInvoice.Codigo}
                              FECHA    :{dtoInvoice.TransactionOn:yyyy-MM-dd hh:mm tt}
                              VENDEDOR :{userNickname}
                              CLIENTE  :{dtoInvoice.Comentarios}
@@ -177,10 +173,11 @@ public static class PrinterInvoiceFormatHelper
                              """;
         printer.NewLine();
         printer.Append(detalleHeader);
-        // En modo restaurante se imprime la zona (mesa) con el rótulo configurable.
-        if (mostrarZona && !string.IsNullOrWhiteSpace(nombreZona))
+        // Mesa, Zona, Teléfono, Cédula y Cliente según APP_MOBILE_SETTING (este formato no imprime Tipo/Moneda).
+        foreach (var linea in (lineas ?? []).Where(l => l.Clave != Constantes.SettingControlTipoDocumento
+                                                     && l.Clave != Constantes.SettingControlMoneda))
         {
-            printer.Append($"{etiquetaZona.ToUpper().PadRight(9)}:{nombreZona}");
+            printer.Append($"{linea.Etiqueta.ToUpper().PadRight(9)}:{linea.Valor}");
         }
         //printer.NewLine();
 
