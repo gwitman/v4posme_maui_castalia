@@ -88,17 +88,25 @@ namespace v4posme_maui
             Routing.RegisterRoute(typeof(RevisarProductosOtraEntradaPage).FullName, typeof(RevisarProductosOtraEntradaPage));
             Routing.RegisterRoute(typeof(VisualizarOtraEntradaPage).FullName, typeof(VisualizarOtraEntradaPage));
 
-            var permissionsGranted = await PermissionsService.CheckAndRequestPermissionsAsync();
-            while (!permissionsGranted)
+            // OnStart es async void: una excepción aquí cerraría la app, por eso se registra en tb_logs.
+            try
             {
-                permissionsGranted = await PermissionsService.CheckAndRequestPermissionsAsync();
-                if (!permissionsGranted)
+                var permissionsGranted = await PermissionsService.CheckAndRequestPermissionsAsync();
+                while (!permissionsGranted)
                 {
-                    await Current?.MainPage?.DisplayAlert(
-                        "Advertencia",
-                        Mensajes.MessagePermissionAll,
-                        "OK")!;
+                    permissionsGranted = await PermissionsService.CheckAndRequestPermissionsAsync();
+                    if (!permissionsGranted)
+                    {
+                        await Current?.MainPage?.DisplayAlert(
+                            "Advertencia",
+                            Mensajes.MessagePermissionAll,
+                            "OK")!;
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                HelperLogs.Log(ex);
             }
         }
 
@@ -118,10 +126,21 @@ namespace v4posme_maui
             }
         }
 
-        public static void StartGpsService()
+        public static async void StartGpsService()
         {
-            var intent = new Intent(Android.App.Application.Context, typeof(GPSService));
-            Android.App.Application.Context.StartService(intent);
+            try
+            {
+                // Solo iniciar el GPS si hay permiso de ubicación; sin él el servicio fallaría.
+                var status = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
+                if (status != PermissionStatus.Granted) return;
+
+                var intent = new Intent(Android.App.Application.Context, typeof(GPSService));
+                Android.App.Application.Context.StartService(intent);
+            }
+            catch (Exception ex)
+            {
+                HelperLogs.Log(ex);
+            }
         }
     }
 }

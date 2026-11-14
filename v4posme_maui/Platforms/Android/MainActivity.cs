@@ -62,8 +62,17 @@ namespace v4posme_maui
         private void StartLocationService()
         {
             if (GpsServiceIntent != null) return; // ya iniciado
-            GpsServiceIntent = new Intent(this, typeof(GPSService));
-            StartService(GpsServiceIntent);
+            try
+            {
+                GpsServiceIntent = new Intent(this, typeof(GPSService));
+                StartService(GpsServiceIntent);
+            }
+            catch (Exception ex)
+            {
+                // Si no se pudo iniciar, se permite reintentar en el próximo OnResume.
+                GpsServiceIntent = null;
+                v4posme_maui.Services.Helpers.HelperLogs.Log(ex);
+            }
         }
     }
 }

@@ -34,23 +34,44 @@ namespace v4posme_maui.Services
         {
             Task.Run(async () =>
             {
-                var hasPermission = await PermissionsService.RequestLocationPermissionAsync();
-
-                //  Build the notification for the foreground service
-                var notification = BuildNotification();
-                if (Build.VERSION.SdkInt >= BuildVersionCodes.R)
+                try
                 {
-                    if (hasPermission)
+                    // Un servicio no puede mostrar diálogos de permisos: solo se verifica.
+                    // Si no hay permiso de ubicación se detiene el servicio (evita SecurityException).
+                    var hasPermission = await TienePermisoUbicacionAsync();
+                    if (!hasPermission)
+                    {
+                        Log.Debug(TAG, "Sin permiso de ubicación, se detiene el servicio");
+                        StopSelf();
+                        return;
+                    }
+
+                    //  Build the notification for the foreground service
+                    var notification = BuildNotification();
+                    if (Build.VERSION.SdkInt >= BuildVersionCodes.R)
                     {
                         StartForeground(SERVICE_ID, notification, ForegroundService.TypeLocation);
                     }
-                }
 
-                RequestLocationUpdates();
+                    await RequestLocationUpdates();
+                }
+                catch (Exception ex)
+                {
+                    // Cualquier fallo del GPS (p. ej. notificación rechazada en Xiaomi) no debe cerrar la app.
+                    HelperLogs.Log(ex);
+                    Log.Error(TAG, $"Error iniciando servicio GPS: {ex.Message}");
+                }
             });
 
-            //  Return a sticky result so that the service remains running
-            return StartCommandResult.Sticky;
+            // NotSticky: evita que el sistema (MIUI/HyperOS) reinicie el servicio por su cuenta
+            // en segundo plano, sin la app abierta; se inicia de nuevo al abrir la app / login.
+            return StartCommandResult.NotSticky;
+        }
+
+        private static async Task<bool> TienePermisoUbicacionAsync()
+        {
+            var status = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
+            return status == PermissionStatus.Granted;
         }
 
         public override IBinder? OnBind(Intent? intent) => null;
@@ -63,13 +84,29 @@ namespace v4posme_maui.Services
 
         private Notification BuildNotification()
         {
-            // Building intent
+            // El canal se crea aquí también: el servicio arranca en primer plano desde Android 11
+            // y MainActivity solo creaba el canal en Android 12+.
+            CrearCanalNotificacion();
+
+            // Ícono monocromo propio (ic_stat_gps): notification_action_background no es un ícono
+            // válido y algunas capas (Xiaomi) rechazan la notificación cerrando la app.
             var notificationBuilder = new Notification.Builder(this, Constantes.GpsNameChangelNotification)
                 .SetContentTitle(Constantes.GpsTitleContentNotification)
                 .SetContentText(Constantes.GpsTextContentNotification)
-                .SetSmallIcon(ResourceConstant.Drawable.notification_action_background); // Cambia icon por tu recurso de ícono.
+                .SetSmallIcon(ResourceConstant.Drawable.ic_stat_gps);
 
             return notificationBuilder.Build();
+        }
+
+        private void CrearCanalNotificacion()
+        {
+            if (Build.VERSION.SdkInt < BuildVersionCodes.O) return;
+
+            var manager = GetSystemService(NotificationService) as NotificationManager;
+            if (manager?.GetNotificationChannel(Constantes.GpsNameChangelNotification) != null) return;
+
+            var channel = new NotificationChannel(Constantes.GpsNameChangelNotification, Constantes.GpsDescriptionServices, NotificationImportance.Default);
+            manager?.CreateNotificationChannel(channel);
         }
 
         public void OnLocationChanged(Android.Locations.Location location)
@@ -90,16 +127,46 @@ namespace v4posme_maui.Services
         {
         }
 
-        private async void RequestLocationUpdates()
+        private async Task RequestLocationUpdates()
         {
-            
-            //var time = Convert.ToInt32(Constantes.TimeGpsInMilleseconds);
-            HelperCore _helperTemporal  = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
-            var criteria                = new Criteria { Accuracy = Accuracy.Fine };
-            var timesString             = await _helperTemporal.GetValueParameter("MOBILE_SYNC_GPS", "2629824000"); //1 mes
-            var time                    = Convert.ToInt64(timesString);
+            try
+            {
+                if (_locationManager is null) return;
 
-            _locationManager.RequestLocationUpdates(time, 0, criteria, this, Looper.MainLooper);
+                //var time = Convert.ToInt32(Constantes.TimeGpsInMilleseconds);
+                HelperCore _helperTemporal  = VariablesGlobales.UnityContainer.Resolve<HelperCore>();
+                var timesString             = await _helperTemporal.GetValueParameter("MOBILE_SYNC_GPS", "2629824000"); //1 mes
+                if (!long.TryParse(timesString, out var time) || time <= 0)
+                {
+                    time = 2629824000; //1 mes
+                }
+
+                // Proveedor explícito: con ubicación "Aproximada" (Android 12+) no hay permiso fino
+                // y pedir GPS lanza SecurityException; con GPS apagado no hay proveedor fino.
+                var tienePermisoFino = CheckSelfPermission(Android.Manifest.Permission.AccessFineLocation) == Permission.Granted;
+                string? provider = null;
+                if (tienePermisoFino && _locationManager.IsProviderEnabled(LocationManager.GpsProvider))
+                {
+                    provider = LocationManager.GpsProvider;
+                }
+                else if (_locationManager.IsProviderEnabled(LocationManager.NetworkProvider))
+                {
+                    provider = LocationManager.NetworkProvider;
+                }
+
+                if (provider is null)
+                {
+                    Log.Debug(TAG, "No hay proveedor de ubicación disponible");
+                    return;
+                }
+
+                _locationManager.RequestLocationUpdates(provider, time, 0, this, Looper.MainLooper);
+            }
+            catch (Exception ex)
+            {
+                HelperLogs.Log(ex);
+                Log.Error(TAG, $"Error solicitando ubicación: {ex.Message}");
+            }
         }
 
         private async void SendLocationToApi(double latitude, double longitude)
@@ -211,7 +278,7 @@ namespace v4posme_maui.Services
         public override void OnDestroy()
         {
             base.OnDestroy();
-            _locationManager.RemoveUpdates(this);
+            _locationManager?.RemoveUpdates(this);
             Log.Debug(TAG, "Service destroyed");
         }
     }
