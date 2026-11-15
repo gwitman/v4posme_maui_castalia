@@ -68,10 +68,12 @@ public static class HelperLoadOrder
     }
 
     /// <summary>
-    /// Valor a usar al cargar la solicitud: si el servidor no trae dato se conserva lo que ya escribio el usuario.
+    /// Valor a usar al cargar la solicitud. Igual que la web (fnCargarSolicitudAjax), el dato de la
+    /// orden SIEMPRE reemplaza lo que haya en pantalla, sin importar el cliente elegido en el paso 1
+    /// (generico u otro); si el servidor no trae dato el campo queda vacio.
     /// </summary>
-    public static string ValorOActual(string? valorServidor, string? valorActual)
+    public static string ValorSolicitud(string? valorServidor)
     {
-        return string.IsNullOrWhiteSpace(valorServidor) ? (valorActual ?? string.Empty) : valorServidor.Trim();
+        return valorServidor?.Trim() ?? string.Empty;
     }
 }

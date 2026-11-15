@@ -148,9 +148,11 @@ public class DataInvoicesViewModel : BaseViewModel, IQueryAttributable
             }
 
             var data                    = respuesta.Data;
-            ReferenceClientName         = HelperLoadOrder.ValorOActual(data.ReferenceClientName, ReferenceClientName);
-            ReferenceClientIdentifier   = HelperLoadOrder.ValorOActual(data.ReferenceClientIdentifier, ReferenceClientIdentifier);
-            NumberPhone                 = HelperLoadOrder.ValorOActual(data.NumberPhone, NumberPhone);
+            // Igual que la web: los datos de la orden reemplazan siempre nombre, cedula y telefono,
+            // sin importar el cliente seleccionado en el paso 1 (generico u otro).
+            ReferenceClientName         = HelperLoadOrder.ValorSolicitud(data.ReferenceClientName);
+            ReferenceClientIdentifier   = HelperLoadOrder.ValorSolicitud(data.ReferenceClientIdentifier);
+            NumberPhone                 = HelperLoadOrder.ValorSolicitud(data.NumberPhone);
             GuardarDatosEnItem();
 
             var items = HelperLoadOrder.ConsolidarItems(data.Items);
